@@ -1,0 +1,4 @@
+[submodule "SCRIPTS"]
+	path = SCRIPTS
+	url = https://github.com/sholtee/build.git
+	branch = master
