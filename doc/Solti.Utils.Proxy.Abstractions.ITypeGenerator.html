@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Interface ITypeGenerator
+   | ProxyGen </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Interface ITypeGenerator
+   | ProxyGen ">
+    <meta name="generator" content="docfx 2.46.0.0">
+    
+    <link rel="shortcut icon" href="icon.png">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator">
+  
+  
+  <h1 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator" class="text-break">Interface ITypeGenerator
+  </h1>
+  <div class="markdown level0 summary"><p>Describes a type generator.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Abstractions.html">Solti.Utils.Proxy.Abstractions</a></h6>
+  <h6><strong>Assembly</strong>: ProxyGen.dll</h6>
+  <h5 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface ITypeGenerator</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_GeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.GeneratedType*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_GeneratedType" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.GeneratedType">GeneratedType</h4>
+  <div class="markdown level1 summary"><p>Emits the <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> compiled from the <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html#Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory">SyntaxFactory</a> provided code.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">Type GeneratedType { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_GeneratedType_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The value of this property is generated only once.</p>
+</div>
+  <a id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_References_" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.References*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_References" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.References">References</h4>
+  <div class="markdown level1 summary"><p>References required to compile the code provided by the <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html#Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory">SyntaxFactory</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyList&lt;Assembly&gt; References { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.assembly">Assembly</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory_" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.SyntaxFactory*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.SyntaxFactory">SyntaxFactory</h4>
+  <div class="markdown level1 summary"><p>The factory that provides the class definition.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">ISyntaxFactory SyntaxFactory { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.html">ISyntaxFactory</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>
