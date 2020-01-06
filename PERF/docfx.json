@@ -1,0 +1,24 @@
+{
+	"build": {
+		"content": [
+			{
+				"files": ["*.md"],
+				"src": "../Artifacts/BenchmarkDotNet.Artifacts/results"
+			},
+			{
+				"files": ["index.md"]
+			}
+		],
+		"dest": "../Artifacts/BenchmarkDotNet.Artifacts/perf",
+		"resource": [{
+			"files": ["icon.png"],
+			"src": "../"
+		}],
+		"globalMetadata": {
+			"_appTitle": "Benchmark Results",
+			"_appFaviconPath": "icon.png",
+			"_disableNavbar": true,
+			"_disableContribution": true
+		}
+	}
+}

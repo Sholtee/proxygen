@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>ProxyGen.Perf</AssemblyName>
+    <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
+    <Configurations>Debug;Perf</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="docfx.json" />
+    <None Remove="index.md" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Perf|AnyCPU'">
+    <OutputPath>..\BIN\</OutputPath>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\BIN\</OutputPath>
+    <Optimize>false</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SRC\ProxyGen.csproj" />
+  </ItemGroup>
+
+</Project>
