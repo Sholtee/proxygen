@@ -1,0 +1,37 @@
+{
+	"metadata": [{
+		"src": [{
+			"files": ["ProxyGen.csproj"],
+			"exclude": ["**/bin/**", "**/obj/**"]
+		}],
+		"dest": "../BIN/DOC",
+		"properties": {
+			"TargetFramework": "netstandard1.6"
+		}
+	}],
+	"build": {
+		"content": [
+			{
+				"files": ["*.yml"],
+				"src": "../BIN/DOC"
+			},
+			{
+				"files": ["index.md"]
+			}
+		],
+		"dest": "../Artifacts/DOC",
+		"resource": [{
+			"files": ["icon.png"],
+			"src": "../"
+		}],
+		"globalMetadata": {
+			"_appTitle": "ProxyGen",
+			"_appFaviconPath": "icon.png",
+			"_disableNavbar": true,
+			"_disableContribution": true
+		},
+		"xrefService": [
+			"https://xref.docs.microsoft.com/query?uid={uid}"
+		]
+	}
+}

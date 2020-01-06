@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
+    <Authors>Denes Solti</Authors>
+    <Version>1.0.0-preview1</Version>
+    <AssemblyName>ProxyGen</AssemblyName>
+    <RootNamespace>Solti.Utils.Proxy</RootNamespace>
+    <Configurations>Debug;Release;Perf</Configurations>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="docfx.json" />
+    <None Remove="index.md" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>false</Optimize>
+    <OutputPath>..\BIN\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+    <OutputPath>..\BIN\</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Perf|AnyCPU'">
+    <Optimize>true</Optimize>
+    <OutputPath>..\BIN\</OutputPath>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <DocumentationFile>..\BIN\ProxyGen.xml</DocumentationFile>
+    <Product>ProxyGen</Product>
+    <Description>.NET proxy generator powered by Roslyn</Description>
+    <PackageId>ProxyGen</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIconUrl>https://github.com/Sholtee/ProxyGen/raw/master/icon.png</PackageIconUrl>
+    <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
+    <PackageReleaseNotes>See homepage.</PackageReleaseNotes>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
+    <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>
+  </PropertyGroup>
+
+</Project>
