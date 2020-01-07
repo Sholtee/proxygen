@@ -149,7 +149,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Debug.Assert(declaringType.IsInterface());
 
-            MethodDeclarationSyntax result = MethodDeclaration
+            MethodDeclarationSyntax result = MethodDeclaration // TODO: ref return values
             (
                 returnType: returnType != typeof(void) 
                     ? CreateType(returnType)
@@ -454,10 +454,6 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     node: ArrayRankSpecifier
                     (
-                        //
-                        // TODO: kezelje az int[10]-t
-                        //
-
                         sizes: CreateList(Enumerable.Repeat(0, src.GetArrayRank()), _ => (ExpressionSyntax) OmittedArraySizeExpression())
                     )
                 )
