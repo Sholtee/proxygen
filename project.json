@@ -5,7 +5,7 @@
   "githubrepo": "Sholtee/ProxyGen.git",
   "vendor": "\\Vendor",
   "tests": "\\TEST\\ProxyGen.Tests.csproj",
-  "testtarget": "netcoreapp3.1",
+  "testtarget": "netcoreapp2.2",
   "testresults": "testresults.xml",
   "coveragereport": "coverage.xml",
   "artifacts": "\\Artifacts",
