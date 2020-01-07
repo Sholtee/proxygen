@@ -84,9 +84,18 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<Type> GetOwnGenericArguments(this Type src) => src
-            .GetGenericArguments()
-            .Except(src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), GenericArgumentComparer.Instance);
+        public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
+        {
+            Debug.Assert(src.IsGenericTypeDefinition());
+
+            return src
+                .GetGenericArguments()
+                .Except
+                (
+                    src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), 
+                    GenericArgumentComparer.Instance
+                );
+        }
 
         //
         // Sajat comparer azert kell mert pl List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
