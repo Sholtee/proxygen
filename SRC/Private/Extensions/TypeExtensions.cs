@@ -73,9 +73,9 @@ namespace Solti.Utils.Proxy.Internals
             return references.Distinct();
         }
 
-        public static IReadOnlyList<Type> GetParents(this Type type)
+        public static IEnumerable<Type> GetParents(this Type type)
         {
-            return GetParentsInternal().Reverse().ToArray();
+            return GetParentsInternal().Reverse();
 
             IEnumerable<Type> GetParentsInternal()
             {
@@ -84,10 +84,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IReadOnlyList<Type> GetOwnGenericArguments(this Type src) => src
+        public static IEnumerable<Type> GetOwnGenericArguments(this Type src) => src
             .GetGenericArguments()
-            .Except(src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), GenericArgumentComparer.Instance)
-            .ToArray();
+            .Except(src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), GenericArgumentComparer.Instance);
 
         //
         // Sajat comparer azert kell mert pl List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 

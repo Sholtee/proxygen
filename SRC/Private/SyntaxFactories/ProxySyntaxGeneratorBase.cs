@@ -420,7 +420,7 @@ namespace Solti.Utils.Proxy.Internals
 
                     partNames = parts.Append(src.GetGenericTypeDefinition()).Select(type =>
                     {
-                        int relatedGACount = type.GetOwnGenericArguments().Count;
+                        int relatedGACount = type.GetOwnGenericArguments().Count();
 
                         //
                         // Beagyazott tipusnal a GetQualifiedName() a rovid nevet fogja feldolgozni: 
