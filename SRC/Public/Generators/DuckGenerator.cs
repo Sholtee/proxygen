@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Generators
     using Properties;
 
     /// <summary>
-    /// Type generator for creating proxies for duck typing.
+    /// Type generator for creating proxies that let <typeparamref name="TTarget"/> behaves like a <typeparamref name="TInterface"/>.
     /// </summary>
     /// <typeparam name="TInterface">The interface to which the proxy will be created.</typeparam>
     /// <typeparam name="TTarget">The target who implements all the <typeparamref name="TInterface"/> members.</typeparam>
