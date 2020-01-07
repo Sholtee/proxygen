@@ -163,6 +163,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GeneratedType
   nameWithType: TypeGenerator<TDescendant>.GeneratedType
   nameWithType.vb: TypeGenerator(Of TDescendant).GeneratedType
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance
+  name: Instance
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance
+  commentId: P:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.Instance
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).Instance
+  nameWithType: TypeGenerator<TDescendant>.Instance
+  nameWithType.vb: TypeGenerator(Of TDescendant).Instance
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance*
+  name: Instance
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance_
+  commentId: Overload:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.Instance
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).Instance
+  nameWithType: TypeGenerator<TDescendant>.Instance
+  nameWithType.vb: TypeGenerator(Of TDescendant).Instance
 - uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.References
   name: References
   href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_References

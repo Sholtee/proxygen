@@ -84,7 +84,7 @@
   <h6><strong>Assembly</strong>: ProxyGen.dll</h6>
   <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class TypeGenerator&lt;TDescendant&gt; : ITypeGenerator where TDescendant : TypeGenerator&lt;TDescendant&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class TypeGenerator&lt;TDescendant&gt; : ITypeGenerator where TDescendant : TypeGenerator&lt;TDescendant&gt;, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -101,6 +101,9 @@
       </tr>
     </tbody>
   </table>
+  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>Concrete generators are singletons. To access them use the <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance">Instance</a> property.</p>
+</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType*"></a>
@@ -123,6 +126,30 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance">Instance</h4>
+  <div class="markdown level1 summary"><p>The generator instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TDescendant Instance { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TDescendant</span></td>
         <td></td>
       </tr>
     </tbody>
