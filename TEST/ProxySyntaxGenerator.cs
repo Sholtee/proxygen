@@ -58,13 +58,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void AcquireMethodInfo_ShouldGetAMethodInfoInstance()
         {
-            LocalDeclarationStatementSyntax currentMethod;
-
-            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(Foo, out currentMethod);
+            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(Foo, out _);
             Assert.That(statements.Count, Is.EqualTo(3));
             Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Foo(a, out dummy_b, ref dummy_c));"));
 
-            statements = AcquireMethodInfo(Bar, out currentMethod);
+            statements = AcquireMethodInfo(Bar, out _);
             Assert.That(statements.Count, Is.EqualTo(1));
             Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());"));
         }

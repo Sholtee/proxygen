@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void DeclareMethod_ShouldSupportRefKeywords() 
         {
-            Assert.That(DeclareMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
+            Assert.That(DeclareMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
         }
 
         [Test]
@@ -108,7 +108,21 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         private interface IRefInterface 
         {
-            void RefMethod(in object a, out object b, ref object c);
+            ref object RefMethod(in object a, out object b, ref object c);
+            
+        }
+
+        [Test]
+        public void DeclareMethod_ShouldSupportNullables()
+        {
+            Assert.That(DeclareMethod(typeof(INullable).GetMethod(nameof(INullable.Nullable), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("System.Nullable<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Nullable()"));
+            Assert.That(DeclareMethod(typeof(INullable).GetMethod(nameof(INullable.Object), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("System.Object Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Object()"));
+        }
+
+        private interface INullable 
+        {
+            int? Nullable();
+            object Object(); // nullable
         }
     }
 

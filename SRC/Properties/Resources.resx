@@ -138,6 +138,9 @@
   <data name="NULL_TARGET" xml:space="preserve">
     <value>The target is NULL.</value>
   </data>
+  <data name="REF_RETURNS_NOT_SUPPORTED" xml:space="preserve">
+    <value>Reference return values are not supported.</value>
+  </data>
   <data name="TYPE_NOT_VISIBLE" xml:space="preserve">
     <value>{0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>

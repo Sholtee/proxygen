@@ -149,11 +149,14 @@ namespace Solti.Utils.Proxy.Internals
 
             Debug.Assert(declaringType.IsInterface());
 
-            MethodDeclarationSyntax result = MethodDeclaration // TODO: ref return values
+            TypeSyntax returnTypeSytax = CreateType(returnType);
+
+            if (returnType.IsByRef) 
+                returnTypeSytax = RefType(returnTypeSytax);
+
+            MethodDeclarationSyntax result = MethodDeclaration
             (
-                returnType: returnType != typeof(void) 
-                    ? CreateType(returnType)
-                    : PredefinedType(Token(SyntaxKind.VoidKeyword)),
+                returnType: returnTypeSytax,
                 identifier: Identifier(method.Name)
             )
             .WithExplicitInterfaceSpecifier
@@ -397,6 +400,8 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal static TypeSyntax CreateType(Type src)
         {
+            if (src == typeof(void)) return PredefinedType(Token(SyntaxKind.VoidKeyword));
+
             //
             // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
             //

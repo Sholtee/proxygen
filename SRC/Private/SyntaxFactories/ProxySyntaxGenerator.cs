@@ -16,6 +16,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal class ProxySyntaxGenerator<TInterface, TInterceptor>: ProxySyntaxGeneratorBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         #region Private
@@ -199,6 +201,15 @@ namespace Solti.Utils.Proxy.Internals
         internal static MethodDeclarationSyntax GenerateProxyMethod(MethodInfo ifaceMethod)
         {
             //
+            // "ref" visszateres nem tamogatott.
+            //
+
+            Type returnType = ifaceMethod.ReturnType;
+
+            if (returnType.IsByRef)
+                throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
+
+            //
             // TResult IInterface.Foo<TGeneric>(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
             // {
             //     object[] args = new object[] {para1, para2, default(T3), para4};
@@ -220,13 +231,33 @@ namespace Solti.Utils.Proxy.Internals
             LocalDeclarationStatementSyntax currentMethod, args, result;
 
             var statements = new List<StatementSyntax>()
-                .Concat(AcquireMethodInfo(ifaceMethod, out currentMethod))
-                .Append(args = CreateArgumentsArray(ifaceMethod))
-                .Append(result = CallInvoke(currentMethod, args, currentMethod))
-                .Append(ShouldCallTarget(result, ifTrue: CallTargetAndReturn(ifaceMethod)))
-                .Concat(AssignByRefParameters(ifaceMethod, args));
+                .Concat
+                (
+                    AcquireMethodInfo(ifaceMethod, out currentMethod)
+                )
+                .Append
+                (
+                    args = CreateArgumentsArray(ifaceMethod)
+                )
+                .Append
+                (
+                    result = CallInvoke(currentMethod, args, currentMethod)
+                )
+                .Append
+                (
+                    ShouldCallTarget
+                    (
+                        result, 
+                        ifTrue: CallTargetAndReturn(ifaceMethod)
+                    )
+                )
+                .Concat
+                (
+                    AssignByRefParameters(ifaceMethod, args)
+                );
 
-            if (ifaceMethod.ReturnType != typeof(void)) statements = statements.Append(ReturnResult(ifaceMethod.ReturnType, result));
+            if (returnType != typeof(void)) 
+                statements = statements.Append(ReturnResult(returnType, result));
 
             return DeclareMethod(ifaceMethod).WithBody
             (

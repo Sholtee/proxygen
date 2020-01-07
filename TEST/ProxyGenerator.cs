@@ -164,9 +164,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public MemberInfo Member;
         }
 
-        public class ListProxyWithContext : InterfaceInterceptor<IList<int>>
+        public class ListProxyWithContext : InterfaceInterceptor<IList<object>>
         {
-            public ListProxyWithContext() : base(new List<int>()) { }
+            public ListProxyWithContext() : base(new List<object>()) { }
 
             public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
             {
@@ -185,7 +185,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void GeneratedProxy_ShouldCallInvokeWithTheAppropriateArguments() 
         {
-            IList<int> proxy = CreateProxy<IList<int>, ListProxyWithContext>();
+            IList<object> proxy = CreateProxy<IList<object>, ListProxyWithContext>();
 
             proxy.Add(100);
             _ = proxy.Count;
@@ -198,13 +198,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Method, Is.EqualTo(typeof(ICollection<int>).GetMethod(nameof(ICollection<int>.Add), BindingFlags.Instance | BindingFlags.Public)));
+            Assert.That(context.Method, Is.EqualTo(typeof(ICollection<object>).GetMethod(nameof(ICollection<object>.Add), BindingFlags.Instance | BindingFlags.Public)));
 
             context = interceptor.Contexts[1];
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
-            PropertyInfo prop = typeof(ICollection<int>).GetProperty(nameof(ICollection<int>.Count), BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo prop = typeof(ICollection<object>).GetProperty(nameof(ICollection<object>.Count), BindingFlags.Instance | BindingFlags.Public);
 
             Assert.That(context.Method, Is.EqualTo(prop.GetMethod));
             Assert.That(context.Member, Is.EqualTo(prop));
