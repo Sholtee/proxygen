@@ -1,0 +1,11 @@
+void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Bar()
+{
+    System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());
+    System.Object[] args = new System.Object[0];
+    System.Object result = Invoke(currentMethod, args, currentMethod);
+    if (result == CALL_TARGET)
+    {
+        Target.Bar();
+        return;
+    }
+}

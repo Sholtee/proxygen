@@ -1,0 +1,17 @@
+System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 index]
+{
+    get
+    {
+        System.Object result = Invoke(FItem.GetMethod, new System.Object[]{index}, FItem);
+        if (result == CALL_TARGET)
+            return Target[index];
+        return (System.Int32)result;
+    }
+
+    set
+    {
+        System.Object result = Invoke(FItem.SetMethod, new System.Object[]{index, value}, FItem);
+        if (result == CALL_TARGET)
+            Target[index] = value;
+    }
+}

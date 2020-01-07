@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        protected override ClassDeclarationSyntax GenerateProxyClass()
+        protected internal override ClassDeclarationSyntax GenerateProxyClass()
         {
             Type 
                 interfaceType = typeof(TInterface),

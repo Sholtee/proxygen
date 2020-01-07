@@ -514,7 +514,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string AssemblyName => $"{CreateType<TInterceptor>()}_{CreateType<TInterface>()}_Proxy"; 
 
-        protected override ClassDeclarationSyntax GenerateProxyClass()
+        protected internal override ClassDeclarationSyntax GenerateProxyClass()
         {
             Type
                 interfaceType   = typeof(TInterface),

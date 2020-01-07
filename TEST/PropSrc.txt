@@ -1,0 +1,17 @@
+System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
+{
+    get
+    {
+        System.Object result = Invoke(FProp0.GetMethod, new System.Object[0], FProp0);
+        if (result == CALL_TARGET)
+            return Target.Prop;
+        return (System.Int32)result;
+    }
+
+    set
+    {
+        System.Object result = Invoke(FProp0.SetMethod, new System.Object[]{value}, FProp0);
+        if (result == CALL_TARGET)
+            Target.Prop = value;
+    }
+}

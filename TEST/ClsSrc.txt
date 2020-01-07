@@ -1,0 +1,69 @@
+internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTests.FooInterceptor, Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>
+{
+    public GeneratedProxy(Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32> target): base(target)
+    {
+    }
+
+    System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
+    {
+        System.String dummy_b;
+        TT dummy_c = default(TT);
+        System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Foo(a, out dummy_b, ref dummy_c));
+        System.Object[] args = new System.Object[]{a, default(System.String), c};
+        System.Object result = Invoke(currentMethod, args, currentMethod);
+        if (result == CALL_TARGET)
+            return Target.Foo(a, out b, ref c);
+        b = (System.String)args[1];
+        c = (TT)args[2];
+        return (System.Int32)result;
+    }
+
+    void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Bar()
+    {
+        System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());
+        System.Object[] args = new System.Object[0];
+        System.Object result = Invoke(currentMethod, args, currentMethod);
+        if (result == CALL_TARGET)
+        {
+            Target.Bar();
+            return;
+        }
+    }
+
+    private static readonly System.Reflection.PropertyInfo FProp0 = Properties["Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop"];
+    System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
+    {
+        get
+        {
+            System.Object result = Invoke(FProp0.GetMethod, new System.Object[0], FProp0);
+            if (result == CALL_TARGET)
+                return Target.Prop;
+            return (System.Int32)result;
+        }
+
+        set
+        {
+            System.Object result = Invoke(FProp0.SetMethod, new System.Object[]{value}, FProp0);
+            if (result == CALL_TARGET)
+                Target.Prop = value;
+        }
+    }
+
+    private static readonly System.Reflection.EventInfo FEvent0 = Events["Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event"];
+    event Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event
+    {
+        add
+        {
+            System.Object result = Invoke(FEvent0.AddMethod, new System.Object[]{value}, FEvent0);
+            if (result == CALL_TARGET)
+                Target.Event += value;
+        }
+
+        remove
+        {
+            System.Object result = Invoke(FEvent0.RemoveMethod, new System.Object[]{value}, FEvent0);
+            if (result == CALL_TARGET)
+                Target.Event -= value;
+        }
+    }
+}

@@ -609,7 +609,7 @@ namespace Solti.Utils.Proxy.Internals
             .WithBody(Block());
         }
 
-        protected abstract ClassDeclarationSyntax GenerateProxyClass();
+        protected internal abstract ClassDeclarationSyntax GenerateProxyClass();
         #endregion
 
         #region Public
