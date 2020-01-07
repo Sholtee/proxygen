@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
-            Debug.Assert(src.IsGenericTypeDefinition());
+            Debug.Assert(!src.IsGenericType() || src.IsGenericTypeDefinition());
 
             return src
                 .GetGenericArguments()
