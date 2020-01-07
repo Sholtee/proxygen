@@ -87,7 +87,7 @@ namespace Solti.Utils.Proxy
         /// Called on proxy method invocation.
         /// </summary>
         /// <param name="method">The <typeparamref name="TInterface"/> method that was called</param>
-        /// <param name="args">The arguments passed to the method.</param>
+        /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
         /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
         /// <remarks>The invocation will be forwarded to the <see cref="Target"/> if this method returns <see cref="CALL_TARGET"/>.</remarks>
