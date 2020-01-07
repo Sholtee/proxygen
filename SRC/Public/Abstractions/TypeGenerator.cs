@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -15,7 +16,8 @@ namespace Solti.Utils.Proxy.Abstractions
     /// <summary>
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>
-    public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>
+    /// <remarks>Concrete generators are singletons. To access them use the <see cref="Instance"/> property.</remarks>
+    public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
         //
         // Mivel szerelveny adott nevvel csak egyszer toltheto be ezert globalisan lokkolunk
@@ -44,6 +46,12 @@ namespace Solti.Utils.Proxy.Abstractions
             )
             .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
         }
+
+        /// <summary>
+        /// The generator instance.
+        /// </summary>
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this every concrete generator will have its own Instance")]
+        public static TDescendant Instance { get; } = new TDescendant();
 
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.

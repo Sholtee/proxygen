@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// Emits the <see cref="Type"/> compiled from the <see cref="SyntaxFactory"/> provided code.
         /// </summary>
-        /// <remarks>The value of this property is generated only once.</remarks>
+        /// <remarks>The value of this property is generated on the first request.</remarks>
         Type GeneratedType { get; }
 
         /// <summary>
