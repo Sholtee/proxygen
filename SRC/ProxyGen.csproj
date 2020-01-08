@@ -73,7 +73,7 @@
     <DocumentationFile>..\BIN\ProxyGen.xml</DocumentationFile>
     <Product>ProxyGen</Product>
     <Description>.NET proxy generator powered by Roslyn</Description>
-    <PackageId>ProxyGen</PackageId>
+    <PackageId>ProxyGen.NET</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIconUrl>https://github.com/Sholtee/ProxyGen/raw/master/icon.png</PackageIconUrl>
     <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
