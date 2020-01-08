@@ -88,6 +88,9 @@ namespace Solti.Utils.Proxy.Internals
         #endregion
 
         #region Protected
+        /// <summary>
+        /// System.Object paramName [= ...];
+        /// </summary>
         protected internal static LocalDeclarationStatementSyntax DeclareLocal(Type type, string name, ExpressionSyntax initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
@@ -113,8 +116,14 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// System.Object paramName [= ...];
+        /// </summary>
         protected internal static LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax initializer = null) => DeclareLocal(typeof(T), name, initializer);
 
+        /// <summary>
+        /// new System.Object[] {..., ..., ...}
+        /// </summary>
         protected internal static ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => ArrayCreationExpression
         (
             type: ArrayType
@@ -141,6 +150,9 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
+        /// <summary>
+        /// int IInterface.Foo[T](string a, ref T b)
+        /// </summary>
         protected internal static MethodDeclarationSyntax DeclareMethod(MethodInfo method, bool forceInlining = false)
         {
             Type 
@@ -225,6 +237,13 @@ namespace Solti.Utils.Proxy.Internals
             return result;
         }
 
+        /// <summary>
+        /// int IInterface[T].Prop <br/>
+        /// {                <br/>
+        ///   get{...}       <br/>
+        ///   set{...}       <br/>
+        /// }                <br/>
+        /// </summary>
         protected internal static PropertyDeclarationSyntax DeclareProperty(PropertyInfo property, CSharpSyntaxNode getBody = null, CSharpSyntaxNode setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface());
@@ -256,6 +275,13 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// int IInterface.this[string index, ...] <br/>
+        /// {                                   <br/>
+        ///   get{...}                          <br/>
+        ///   set{...}                          <br/>
+        /// }                                   <br/>
+        /// </summary>
         protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> getBody = null, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface());
@@ -307,6 +333,9 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// [modifier1, modifier2, ....] object Name [= ...];
+        /// </summary>
         protected internal static FieldDeclarationSyntax DeclareField<TField>(string name, ExpressionSyntax initializer = null, params SyntaxKind[] modifiers)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
@@ -339,6 +368,13 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// event TDelegate IInterface.EventName <br/>
+        /// {                                    <br/>
+        ///   add{...}                           <br/>
+        ///   remove{...}                        <br/>
+        /// }                                    <br/>
+        /// </summary>
         protected internal static EventDeclarationSyntax DeclareEvent(EventInfo @event, CSharpSyntaxNode addBody = null, CSharpSyntaxNode removeBody = null, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface());
@@ -370,6 +406,9 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// target.Event [+|-]= value;
+        /// </summary>
         protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, string target, bool add) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
@@ -382,6 +421,13 @@ namespace Solti.Utils.Proxy.Internals
             right: IdentifierName(Value)
         );
 
+        /// <summary>
+        /// target.Property           <br/>
+        ///                           <br/>
+        /// OR                        <br/>
+        ///                           <br/>
+        /// target.Propery[index]
+        /// </summary>
         protected internal static ExpressionSyntax PropertyAccessExpression(PropertyInfo property, string target) => property.IsIndexer()
             ? ElementAccessExpression
             (
@@ -398,6 +444,9 @@ namespace Solti.Utils.Proxy.Internals
                 IdentifierName(property.Name)
             );
 
+        /// <summary>
+        /// Namespace.Type
+        /// </summary>
         protected internal static TypeSyntax CreateType(Type src)
         {
             if (src == typeof(void)) return PredefinedType(Token(SyntaxKind.VoidKeyword));
@@ -475,8 +524,14 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// Namespace.Type
+        /// </summary>
         protected internal static TypeSyntax CreateType<T>() => CreateType(typeof(T));
 
+        /// <summary>
+        /// SyntaxNode1, SyntaxNode2, ....
+        /// </summary>
         protected internal static SeparatedSyntaxList<TNode> CreateList<T, TNode>(IEnumerable<T> src, Func<T, int, TNode> factory) where TNode : SyntaxNode
         {
             int count = (src as IReadOnlyCollection<T>)?.Count ?? (src as ICollection<T>)?.Count ?? (src = src.ToArray()).Count();
@@ -493,8 +548,14 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// SyntaxNode1, SyntaxNode2, ....
+        /// </summary>
         protected internal static SeparatedSyntaxList<TNode> CreateList<T, TNode>(IEnumerable<T> src, Func<T, TNode> factory) where TNode : SyntaxNode => CreateList(src, (p, i) => factory(p));
 
+        /// <summary>
+        /// Namespace.ParentType[T].NestedType[TT]
+        /// </summary>
         protected internal static NameSyntax GetQualifiedName(Type type, Func<string, NameSyntax> typeNameFactory = null)
         {
             Debug.Assert(!type.IsGenericType() || type.IsGenericTypeDefinition());
@@ -524,6 +585,9 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// Name1.Name2.Name3.....
+        /// </summary>
         protected internal static NameSyntax Qualify(params NameSyntax[] parts) => parts.Length <= 1 ? parts.Single() : QualifiedName
         (
             left: Qualify(parts.Take(parts.Length - 1).ToArray()),
@@ -532,6 +596,9 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
+        /// <summary>
+        /// target.Foo(ref a, b, c)
+        /// </summary>
         protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, string target, IReadOnlyList<string> arguments) => InvocationExpression
         (
             expression: MemberAccessExpression
@@ -573,6 +640,9 @@ namespace Solti.Utils.Proxy.Internals
             }))
         );
 
+        /// <summary>
+        /// TypeName(int a, string b, ...){...}
+        /// </summary>
         [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "'GeneratedClassName' won't be localized.")]
         protected internal ConstructorDeclarationSyntax DeclareCtor(ConstructorInfo ctor)
         {

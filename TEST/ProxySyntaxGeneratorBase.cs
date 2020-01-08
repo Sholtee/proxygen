@@ -63,15 +63,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
 
         [Test]
-        public void DeclareProperty_ShouldDeclareTheDesiredProperty() =>
+        public void DeclareProperty_ShouldDoWhatTheNameSuggests() =>
             Assert.That(DeclareProperty(Prop, SyntaxFactory.Block(), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
 
         [Test]
-        public void DeclareField_ShouldDeclareAField() =>
+        public void DeclareField_ShouldDoWhatTheNameSuggests() =>
             Assert.That(DeclareField<EventInfo>("FEvent", SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression), SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword).NormalizeWhitespace().ToFullString(), Is.EqualTo("private static readonly System.Reflection.EventInfo FEvent = null;"));
 
         [Test]
-        public void DeclareEvent_ShouldDeclareTheDesiredEvent() =>
+        public void DeclareEvent_ShouldDoWhatTheNameSuggests() =>
             Assert.That(DeclareEvent(Event, SyntaxFactory.Block(), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
 
         [Test]
