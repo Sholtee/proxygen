@@ -102,18 +102,18 @@
     </tbody>
   </table>
   <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks"><p>Concrete generators are singletons. To access them use the <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance">Instance</a> property.</p>
+  <div class="markdown level0 remarks"><p>Generators can not be instantiated. To access the create type use the <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType">GeneratedType</a> property.</p>
 </div>
   <h3 id="properties">Properties
   </h3>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType*"></a>
   <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType">GeneratedType</h4>
-  <div class="markdown level1 summary"><p>See <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html">ITypeGenerator</a>.</p>
+  <div class="markdown level1 summary"><p>The genrated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Type GeneratedType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">public static Type GeneratedType { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -126,30 +126,6 @@
     <tbody>
       <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_Instance" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.Instance">Instance</h4>
-  <div class="markdown level1 summary"><p>The generator instance.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static TDescendant Instance { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">TDescendant</span></td>
         <td></td>
       </tr>
     </tbody>
