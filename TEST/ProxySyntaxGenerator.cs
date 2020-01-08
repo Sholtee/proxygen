@@ -144,7 +144,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void ReadTargetAndReturn_ShouldReadTheGivenProperty((PropertyInfo Property, string Expected) para) =>
             Assert.That(ReadTargetAndReturn(para.Property).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
-
         [Test]
         public void WriteTarget_ShouldWriteTheGivenProperty()
         {

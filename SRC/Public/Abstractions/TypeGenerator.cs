@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Reflection;
@@ -16,26 +15,15 @@ namespace Solti.Utils.Proxy.Abstractions
     /// <summary>
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>
-    /// <remarks>Concrete generators are singletons. To access them use the <see cref="Instance"/> property.</remarks>
+    /// <remarks>Generators can not be instantiated. To access the create type use the <see cref="GeneratedType"/> property.</remarks>
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
-        //
-        // Mivel szerelveny adott nevvel csak egyszer toltheto be ezert globalisan lokkolunk
-        // generatoronkent.
-        //
-
         private static readonly object FLock = new object();
-
-        //
-        // Generatoronkent kulombozik (ezert kell a TDescendant-os varazslas, bar baszott ronda).
-        //
 
         private static Type FType;
 
-        private Type GenerateType()
+        private Type GenerateType() 
         {
-            Debug.Assert(FType == null);
-
             DoCheck();
 
             return Compile.ToAssembly
@@ -48,22 +36,17 @@ namespace Solti.Utils.Proxy.Abstractions
         }
 
         /// <summary>
-        /// The generator instance.
+        /// The genrated <see cref="Type"/>.
         /// </summary>
-        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this every concrete generator will have its own Instance")]
-        public static TDescendant Instance { get; } = new TDescendant();
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public Type GeneratedType 
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this every concrete generator will have its own generated type")]
+        public static Type GeneratedType 
         {
             get 
             {
                 if (FType == null)
                     lock (FLock)
                         if (FType == null)
-                            FType = GenerateType();
+                            FType = new TDescendant().GenerateType();
                 return FType;
             }
         }

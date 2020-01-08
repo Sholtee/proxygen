@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -18,12 +17,6 @@ namespace Solti.Utils.Proxy.Abstractions
         /// The factory that provides the class definition.
         /// </summary>
         ISyntaxFactory SyntaxFactory { get; }
-
-        /// <summary>
-        /// Emits the <see cref="Type"/> compiled from the <see cref="SyntaxFactory"/> provided code.
-        /// </summary>
-        /// <remarks>The value of this property is generated on the first request.</remarks>
-        Type GeneratedType { get; }
 
         /// <summary>
         /// References required to compile the code provided by the <see cref="SyntaxFactory"/>.
