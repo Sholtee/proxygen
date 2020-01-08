@@ -319,7 +319,9 @@ namespace Solti.Utils.Proxy.Internals
             LocalDeclarationStatementSyntax result = CallInvoke(currentMethod, args, currentMethod);
             statements.Add(result);
 
-            statements.Add(ShouldCallTarget(result, ifTrue: CallTargetAndReturn(ifaceMethod)));
+            statements.Add(ShouldCallTarget(result, 
+                ifTrue: CallTargetAndReturn(ifaceMethod)));
+
             statements.AddRange(AssignByRefParameters(ifaceMethod, args));
 
             if (returnType != typeof(void)) statements.Add
