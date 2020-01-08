@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -37,13 +38,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
             }
         }
 
-        [Test]
-        public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments()
+        public static (MethodInfo Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
-            Assert.That(CreateArgumentsArray(Foo).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object[] args = new System.Object[]{a, default(System.String), c};"));
+            (Foo, "System.Object[] args = new System.Object[]{a, default(System.String), c};"),
+            (Bar, "System.Object[] args = new System.Object[0];")
+        };
 
-            Assert.That(CreateArgumentsArray(Bar).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object[] args = new System.Object[0];"));
-        }
+        [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
+        public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
+            Assert.That(CreateArgumentsArray(para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
@@ -55,16 +58,18 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(assignments[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("c = (TT)args[2];"));
         }
 
-        [Test]
-        public void AcquireMethodInfo_ShouldGetAMethodInfoInstance()
+        public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
-            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(Foo, out _);
-            Assert.That(statements.Count, Is.EqualTo(3));
-            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Foo(a, out dummy_b, ref dummy_c));"));
+            (Foo, 3, "System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Foo(a, out dummy_b, ref dummy_c));"),
+            (Bar, 1, "System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());")
+        };
 
-            statements = AcquireMethodInfo(Bar, out _);
-            Assert.That(statements.Count, Is.EqualTo(1));
-            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());"));
+        [TestCaseSource(nameof(InspectedMethods))]
+        public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) data)
+        {
+            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(data.Method, out _);
+            Assert.That(statements.Count, Is.EqualTo(data.StatementCount));
+            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(data.Expected));
         }
 
         [Test]
@@ -81,20 +86,25 @@ namespace Solti.Utils.Proxy.Internals.Tests
             ).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object result = Invoke(currentMethod, args);"));
         }
 
-
-        [Test]
-        public void ReturnResult_ShouldCreateTheProperExpression()
+        public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
         {
-            Assert.That(ReturnResult(typeof(void), DeclareLocal<object>("@void")).NormalizeWhitespace().ToFullString(), Is.EqualTo("return;"));
-            Assert.That(ReturnResult(typeof(List<int>), DeclareLocal<object>("result")).NormalizeWhitespace().ToFullString(), Is.EqualTo("return (System.Collections.Generic.List<System.Int32>)result;"));
-        }
+            (typeof(void), "@void", "return;"),
+            (typeof(List<int>), "result", "return (System.Collections.Generic.List<System.Int32>)result;")
+        };
 
-        [Test]
-        public void GenerateProxyMethod_Test()
+        [TestCaseSource(nameof(ReturnTypes))]
+        public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para) =>
+            Assert.That(ReturnResult(para.Type, DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+
+        public static (MethodInfo Method, string File)[] Methods = new[]
         {
-            Assert.That(GenerateProxyMethod(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("FooSrc.txt")));
-            Assert.That(GenerateProxyMethod(Bar).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("BarSrc.txt")));
-        }
+            (Foo, "FooSrc.txt"),
+            (Bar, "BarSrc.txt")
+        };
+
+        [TestCaseSource(nameof(Methods))]
+        public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) => 
+            Assert.That(GenerateProxyMethod(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test()
@@ -114,19 +124,26 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(new ProxySyntaxGenerator<IFoo<int>, FooInterceptor>().GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
         }
 
-        [Test]
-        public void CallTargetAndReturn_ShouldInvokeTheTargetMethod()
+        public static (MethodInfo Method, string Expected)[] InvokedMethods = new[]
         {
-            Assert.That(CallTargetAndReturn(Foo).NormalizeWhitespace().ToFullString(), Is.EqualTo("return Target.Foo(a, out b, ref c);"));
-            Assert.That(CallTargetAndReturn(Bar).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("{\n    Target.Bar();\n    return;\n}"));
-        }
+            (Foo, "return Target.Foo(a, out b, ref c);"),
+            (Bar, "{\n    Target.Bar();\n    return;\n}")
+        };
 
-        [Test]
-        public void ReadTargetAndReturn_ShouldReadTheGivenProperty()
+        [TestCaseSource(nameof(InvokedMethods))]
+        public void CallTargetAndReturn_ShouldInvokeTheTargetMethod((MethodInfo Method, string Expected) para) => 
+            Assert.That(CallTargetAndReturn(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(para.Expected));
+
+        public static (PropertyInfo Property, string Expected)[] ReadProperties = new[]
         {
-            Assert.That(ReadTargetAndReturn(Prop).NormalizeWhitespace().ToFullString(), Is.EqualTo("return Target.Prop;"));
-            Assert.That(ReadTargetAndReturn(Indexer).NormalizeWhitespace().ToFullString(), Is.EqualTo("return Target[index];"));
-        }
+            (Prop, "return Target.Prop;"),
+            (Indexer, "return Target[index];")
+        };
+
+        [TestCaseSource(nameof(ReadProperties))]
+        public void ReadTargetAndReturn_ShouldReadTheGivenProperty((PropertyInfo Property, string Expected) para) =>
+            Assert.That(ReadTargetAndReturn(para.Property).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+
 
         [Test]
         public void WriteTarget_ShouldWriteTheGivenProperty()
