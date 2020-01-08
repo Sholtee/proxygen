@@ -38,12 +38,29 @@ namespace Solti.Utils.Proxy.Internals
         #endregion
 
         #region Internal
+        /// <summary>
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
+        /// {                                                                                       <br/>
+        ///   ...                                                                                   <br/>
+        ///   object[] args = new object[]{para1, para2, default(T3), para4};                       <br/>
+        ///   ...                                                                                   <br/>
+        /// }
+        /// </summary>
         internal static LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method) => DeclareLocal<object[]>("args", CreateArray<object>(method
             .GetParameters()
             .Select(param => param.IsOut ? DefaultExpression(CreateType(param.ParameterType)) : (ExpressionSyntax) IdentifierName(param.Name))
             .ToArray()));
 
-        internal static IReadOnlyList<ExpressionStatementSyntax> AssignByRefParameters(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
+        /// <summary>
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
+        /// {                                                                                        <br/>
+        ///   ...                                                                                    <br/>
+        ///   para2 = (T2) args[1];                                                                  <br/>
+        ///   para3 = (T3) args[2];                                                                  <br/>
+        ///   ...                                                                                    <br/>
+        /// }
+        /// </summary>
+        internal static IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
         {
             IdentifierNameSyntax array = ToIdentifierName(argsArray);
 
@@ -72,78 +89,113 @@ namespace Solti.Utils.Proxy.Internals
                             )
                         )
                     )
-                )
-                .ToList();
+                );
         }
 
-        internal static IReadOnlyList<LocalDeclarationStatementSyntax> AcquireMethodInfo(MethodInfo method, out LocalDeclarationStatementSyntax currentMethod)
+        /// <summary>
+        /// T2 dummy_para2 = default(T2);                                                                                <br/>
+        /// T3 dummy_para3;                                                                                              <br/>
+        /// MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
+        /// </summary>
+        internal static IEnumerable<LocalDeclarationStatementSyntax> AcquireMethodInfo(MethodInfo method, out LocalDeclarationStatementSyntax currentMethod)
         {
             IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
 
-            return paramz
-                .Where(param => param.ParameterType.IsByRef)
-                .Select(param => DeclareLocal
+            var statements = new List<LocalDeclarationStatementSyntax>();
+
+            //
+            // T2 dummy_para2 = default(T2);
+            // T3 dummy_para3;
+            //
+
+            statements.AddRange
+            (
+                paramz.Where(param => param.ParameterType.IsByRef).Select(param => DeclareLocal
                 (
-                    type: param.ParameterType, 
-                    name: GetDummyName(param), 
+                    type: param.ParameterType,
+                    name: GetDummyName(param),
                     initializer: param.IsOut ? null : DefaultExpression
                     (
                         type: CreateType(param.ParameterType)
-                    )                   
-                ))
-                .Append
-                (
-                    currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod), InvocationExpression
-                    (
-                        expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.MethodAccess))
                     )
-                    .WithArgumentList
+                ))
+            );
+
+            //
+            // MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
+            //
+
+            currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod), InvocationExpression
+            (
+                expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.MethodAccess))
+            )
+            .WithArgumentList
+            (
+                argumentList: ArgumentList
+                (
+                    arguments: SingletonSeparatedList
                     (
-                        argumentList: ArgumentList
+                        Argument
                         (
-                            arguments: SingletonSeparatedList
+                            expression: ParenthesizedLambdaExpression
                             (
-                                Argument
+                                parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
+                                body: InvokeMethod
                                 (
-                                    expression: ParenthesizedLambdaExpression
-                                    (
-                                        parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
-                                        body: InvokeMethod
-                                        (
-                                            method: method, 
-                                            target: TARGET,
+                                    method: method, 
+                                    target: TARGET,
 
-                                            //
-                                            // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
-                                            //
+                                    //
+                                    // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
+                                    //
 
-                                            arguments: paramz.Select(param => param.ParameterType.IsByRef ? GetDummyName(param) : param.Name).ToArray()
-                                        )
-                                    )
+                                    arguments: paramz.Select(param => param.ParameterType.IsByRef ? GetDummyName(param) : param.Name).ToArray()
                                 )
                             )
                         )
                     )
-                ))
-                .ToArray();
+                )
+            ));
+
+            statements.Add(currentMethod);
+
+            return statements;
 
             string GetDummyName(ParameterInfo param) => $"dummy_{param.Name}";
         }
 
-        internal static LocalDeclarationStatementSyntax CallInvoke(params ExpressionSyntax[] arguments) => DeclareLocal<object>("result", InvocationExpression
-        (
-            expression: IdentifierName(nameof(InterfaceInterceptor<IDisposable>.Invoke))
-        )
-        .WithArgumentList
-        (
-            argumentList: ArgumentList
+        /// <summary>
+        /// object result = Invoke(...);
+        /// </summary>
+        internal static LocalDeclarationStatementSyntax CallInvoke(params ExpressionSyntax[] arguments) =>
+            DeclareLocal<object>("result", InvocationExpression
             (
-                arguments: CreateList(arguments, Argument)
+                expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.Invoke))
             )
-        ));
+            .WithArgumentList
+            (
+                argumentList: ArgumentList
+                (
+                    arguments: CreateList(arguments, Argument)
+                )
+            ));
 
-        internal static LocalDeclarationStatementSyntax CallInvoke(params LocalDeclarationStatementSyntax[] arguments) => CallInvoke(arguments.Select(arg => (ExpressionSyntax) ToIdentifierName(arg)).ToArray());
+        /// <summary>
+        /// object result = Invoke(var1, var2, ..., varN);
+        /// </summary>
+        internal static LocalDeclarationStatementSyntax CallInvoke(params LocalDeclarationStatementSyntax[] arguments) =>
+            CallInvoke(arguments.Select(arg => (ExpressionSyntax) ToIdentifierName(arg)).ToArray());
 
+        /// <summary>
+        /// return Target.Bar(...);  <br/>
+        ///                          <br/>
+        /// OR                       <br/>
+        ///                          <br/>
+        /// {                        <br/>
+        ///   Target.Bar(...);       <br/>
+        ///   return;                <br/>
+        /// }
+        /// </summary>
         internal static StatementSyntax CallTargetAndReturn(MethodInfo method)
         {
             InvocationExpressionSyntax invocation = InvokeMethod(
@@ -154,7 +206,7 @@ namespace Solti.Utils.Proxy.Internals
                     .Select(p => p.Name)
                     .ToArray());
 
-            return method.ReturnType != typeof(void) 
+            return method.ReturnType != typeof(void)
                 ? (StatementSyntax) ReturnStatement(invocation)
                 : Block
                 (
@@ -162,29 +214,51 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        internal static StatementSyntax ReadTargetAndReturn(PropertyInfo property) => ReturnStatement(PropertyAccessExpression(property, TARGET));
+        /// <summary>
+        /// return Target.Prop;
+        /// </summary>
+        internal static StatementSyntax ReadTargetAndReturn(PropertyInfo property) =>
+            ReturnStatement(PropertyAccessExpression(property, TARGET));
 
-        internal static StatementSyntax WriteTarget(PropertyInfo property) => ExpressionStatement
-        (
-            expression: AssignmentExpression
+        /// <summary>
+        /// Target.Prop = value;
+        /// </summary>
+        internal static StatementSyntax WriteTarget(PropertyInfo property) =>
+            ExpressionStatement
             (
-                kind: SyntaxKind.SimpleAssignmentExpression,
-                left: PropertyAccessExpression(property, TARGET),
-                right: IdentifierName(Value)
-            )
-        );
+                expression: AssignmentExpression
+                (
+                    kind: SyntaxKind.SimpleAssignmentExpression,
+                    left: PropertyAccessExpression(property, TARGET),
+                    right: IdentifierName(Value)
+                )
+            );
 
-        internal static IfStatementSyntax ShouldCallTarget(LocalDeclarationStatementSyntax result, StatementSyntax ifTrue) => IfStatement
-        (
-            condition: BinaryExpression
+        /// <summary>
+        /// if (result == CALL_TARGET) <br/>
+        /// {                          <br/>
+        ///   ...                      <br/>
+        /// }
+        /// </summary>
+        internal static IfStatementSyntax ShouldCallTarget(LocalDeclarationStatementSyntax result, StatementSyntax ifTrue) =>
+            IfStatement
             (
-                kind: SyntaxKind.EqualsExpression, 
-                left: ToIdentifierName(result), 
-                right: IdentifierName(CALL_TARGET)
-            ),
-            statement: ifTrue
-        );
+                condition: BinaryExpression
+                (
+                    kind: SyntaxKind.EqualsExpression, 
+                    left: ToIdentifierName(result), 
+                    right: IdentifierName(CALL_TARGET)
+                ),
+                statement: ifTrue
+            );
 
+        /// <summary>
+        /// return;          <br/>
+        ///                  <br/>
+        /// OR               <br/>
+        ///                  <br/>
+        /// return (T) ...;
+        /// </summary>
         internal static ReturnStatementSyntax ReturnResult(Type returnType, ExpressionSyntax result) => ReturnStatement
         (
             expression: returnType == typeof(void)
@@ -196,8 +270,34 @@ namespace Solti.Utils.Proxy.Internals
                 )
         );
 
-        internal static ReturnStatementSyntax ReturnResult(Type returnType, LocalDeclarationStatementSyntax result) => ReturnResult(returnType, ToIdentifierName(result));
+        /// <summary>
+        /// return;             <br/>
+        ///                     <br/>
+        /// OR                  <br/>
+        ///                     <br/>
+        /// return (T) result;
+        /// </summary>
+        internal static ReturnStatementSyntax ReturnResult(Type returnType, LocalDeclarationStatementSyntax result) =>
+            ReturnResult(returnType, ToIdentifierName(result));
 
+        /// <summary>
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)                         <br/>
+        /// {                                                                                                              <br/>
+        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                           <br/>
+        ///                                                                                                                <br/>
+        ///     T2 dummy_para2 = default(T2);                                                                              <br/>
+        ///     T3 dummy_para3;                                                                                            <br/>
+        ///     MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4)); <br/>
+        ///                                                                                                                <br/>
+        ///     object result = Invoke(currentMethod, args, currentMethod);                                                <br/>
+        ///     if (result == CALL_TARGET) return Target.Foo(para1, ref para2, out para3, para4);                          <br/>
+        ///                                                                                                                <br/>
+        ///     para2 = (T2) args[1];                                                                                      <br/>
+        ///     para3 = (T3) args[2];                                                                                      <br/>
+        ///                                                                                                                <br/>
+        ///     return (TResult) result;                                                                                   <br/>
+        /// }
+        /// </summary>
         internal static MethodDeclarationSyntax GenerateProxyMethod(MethodInfo ifaceMethod)
         {
             //
@@ -205,59 +305,27 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             Type returnType = ifaceMethod.ReturnType;
-
             if (returnType.IsByRef)
                 throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
 
-            //
-            // TResult IInterface.Foo<TGeneric>(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
-            // {
-            //     object[] args = new object[] {para1, para2, default(T3), para4};
-            //
-            //     T2 dummy_para2 = default(T2); // ByRef metodus parameterek nem szerepelhetnek kifejezesekben
-            //     T3 dummy_para3;
-            //     MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4)); // MethodBase.GetCurrentMethod() az implementaciot adna vissza, reflexio-val meg kibaszott lassu lenne
-            //
-            //     object result = Invoke(currentMethod, args, currentMethod);
-            //     if (result == CALL_TARGET) return Target.Foo(para1, ref para2, out para3, para4); // void visszateresnel ures return -> argumentumok semmi kepp sem lesznek visszairva
-            //
-            //     para2 = (T2) args[1];
-            //     para3 = (T3) args[2];
-            //
-            //     return (TResult) result; // void visszateresnel nincs
-            // }
-            //
+            var statements = new List<StatementSyntax>();
 
-            LocalDeclarationStatementSyntax currentMethod, args, result;
+            LocalDeclarationStatementSyntax currentMethod;
+            statements.AddRange(AcquireMethodInfo(ifaceMethod, out currentMethod));
 
-            var statements = new List<StatementSyntax>()
-                .Concat
-                (
-                    AcquireMethodInfo(ifaceMethod, out currentMethod)
-                )
-                .Append
-                (
-                    args = CreateArgumentsArray(ifaceMethod)
-                )
-                .Append
-                (
-                    result = CallInvoke(currentMethod, args, currentMethod)
-                )
-                .Append
-                (
-                    ShouldCallTarget
-                    (
-                        result, 
-                        ifTrue: CallTargetAndReturn(ifaceMethod)
-                    )
-                )
-                .Concat
-                (
-                    AssignByRefParameters(ifaceMethod, args)
-                );
+            LocalDeclarationStatementSyntax args = CreateArgumentsArray(ifaceMethod);
+            statements.Add(args);
 
-            if (returnType != typeof(void)) 
-                statements = statements.Append(ReturnResult(returnType, result));
+            LocalDeclarationStatementSyntax result = CallInvoke(currentMethod, args, currentMethod);
+            statements.Add(result);
+
+            statements.Add(ShouldCallTarget(result, ifTrue: CallTargetAndReturn(ifaceMethod)));
+            statements.AddRange(AssignByRefParameters(ifaceMethod, args));
+
+            if (returnType != typeof(void)) statements.Add
+            (
+                ReturnResult(returnType, result)
+            );
 
             return DeclareMethod(ifaceMethod).WithBody
             (
@@ -268,28 +336,27 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// private static readonly PropertyInfo FProp = Properties["IInterface.Prop"];    <br/>
+        ///                                                                                <br/>
+        /// TResult IInterface.Prop                                                        <br/>
+        /// {                                                                              <br/>
+        ///     get                                                                        <br/>
+        ///     {                                                                          <br/>
+        ///         object result = Invoke(FProp.GetMethod, new object[0], FProp);         <br/>
+        ///         if (result == CALL_TARGET) return Target.Prop;                         <br/>
+        ///                                                                                <br/>
+        ///         return (TResult) result;                                               <br/>
+        ///     }                                                                          <br/>
+        ///     set                                                                        <br/>
+        ///     {                                                                          <br/>
+        ///         object result = Invoke(FProp.SetMethod, new object[]{ value }, FProp); <br/>
+        ///         if (result == CALL_TARGET) Target.Prop = value;                        <br/>
+        ///     }                                                                          <br/>
+        /// }
+        /// </summary>
         internal static IEnumerable<MemberDeclarationSyntax> GenerateProxyProperty(PropertyInfo ifaceProperty)
         {
-            //
-            // private static readonly PropertyInfo FProp = Properties["IInterface.Prop"];
-            //
-            // TResult IInterface.Prop
-            // {
-            //     get 
-            //     {
-            //         object result = Invoke(FProp.GetMethod, new object[0], FProp);
-            //         if (result == CALL_TARGET) return Target.Prop;
-            //
-            //         return (TResult) result;
-            //     }
-            //     set
-            //     {
-            //         object result = Invoke(FProp.SetMethod, new object[]{ value }, FProp);
-            //         if (result == CALL_TARGET) Target.Prop = value;
-            //     }
-            // }
-            //
-
             IdentifierNameSyntax fieldName = GenerateFieldName(ifaceProperty, System.Reflection.TypeExtensions.GetProperties);
 
             yield return DeclareField<PropertyInfo>
@@ -323,8 +390,6 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
             }
 
-            LocalDeclarationStatementSyntax result;
-
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
@@ -335,141 +400,155 @@ namespace Solti.Utils.Proxy.Internals
                 property: ifaceProperty,
                 getBody: Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression // FProp.GetMethod
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(PropertyInfo.GetMethod))
-                            ),
-                            CreateArray<object>(), // new object[0]
-                            fieldName // FProp
-                        ),
-                        ShouldCallTarget(result, ifTrue: ReadTargetAndReturn(ifaceProperty)),
-                        ReturnResult(ifaceProperty.PropertyType, result)
-                    }
+                    statements: GetBody()
                 ),
                 setBody: Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression // FProp.SetMethod
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(PropertyInfo.SetMethod))
-                            ),
-                            CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                            fieldName // FProp
-                        ),
-                        ShouldCallTarget(result, ifTrue: WriteTarget(ifaceProperty))
-                    }
+                    statements: SetBody()
                 )
             );
+
+            IEnumerable<StatementSyntax> GetBody() 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression // FProp.GetMethod
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(PropertyInfo.GetMethod))
+                    ),
+                    CreateArray<object>(), // new object[0]
+                    fieldName // FProp
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: ReadTargetAndReturn(ifaceProperty));
+                yield return ReturnResult(ifaceProperty.PropertyType, result);
+            }
+
+            IEnumerable<StatementSyntax> SetBody() 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression // FProp.SetMethod
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(PropertyInfo.SetMethod))
+                    ),
+                    CreateArray<object>(IdentifierName(Value)), // new object[] {value}
+                    fieldName // FProp
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: WriteTarget(ifaceProperty));
+            }
         }
 
+        /// <summary>
+        /// TResult IInterface.this[TParam1 p1, TPAram2 p2]                                                 <br/>
+        /// {                                                                                               <br/>
+        ///     get                                                                                         <br/>
+        ///     {                                                                                           <br/>
+        ///         object result = Invoke(FProp.GetMethod, new object[]{ p1, p2 }, FProp);                 <br/>
+        ///         if (result == CALL_TARGET) return Target[p1, p2];                                       <br/>
+        ///                                                                                                 <br/>
+        ///         return (TResult) result;                                                                <br/>
+        ///     }                                                                                           <br/>
+        ///     set                                                                                         <br/>
+        ///     {                                                                                           <br/>
+        ///         object result = Invoke(FProp.SetMethod, new object[]{ p1, p2, value }, FProp);          <br/>
+        ///         if (result == CALL_TARGET) Target[p1, p2] = value;                                      <br/>
+        ///     }                                                                                           <br/>
+        /// }
+        /// </summary>
         internal static MemberDeclarationSyntax GenerateProxyIndexer(PropertyInfo ifaceProperty, IdentifierNameSyntax fieldName)
         {
-            //
-            // TResult IInterface.this[TParam1 p1, TPAram2 p2]
-            // {
-            //     get 
-            //     {
-            //         object result = Invoke(FProp.GetMethod, new object[]{ p1, p2 }, FProp);
-            //         if (result == CALL_TARGET) return Target[p1, p2];
-            //
-            //         return (TResult) result;
-            //     }
-            //     set
-            //     {
-            //         object result = Invoke(FProp.SetMethod, new object[]{ p1, p2, value }, FProp);
-            //         if (result == CALL_TARGET) Target[p1, p2] = value;
-            //     }
-            // }
-            //
-
-            LocalDeclarationStatementSyntax result;
-
             return DeclareIndexer
             (
                 property: ifaceProperty,
                 getBody: paramz => Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression // FProp.GetMethod
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(PropertyInfo.GetMethod))
-                            ),
-                            CreateArray<object>(paramz // new object[] {p1, p2}
-                                .Select(param => IdentifierName(param.Identifier))
-                                .Cast<ExpressionSyntax>()
-                                .ToArray()),
-                            fieldName // FProp
-                        ),
-                        ShouldCallTarget(result, ifTrue: ReadTargetAndReturn(ifaceProperty)),
-                        ReturnResult(ifaceProperty.PropertyType, result)
-                    }
+                    statements: GetBody(paramz)
                 ),
                 setBody: paramz => Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression // FProp.SetMethod
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(PropertyInfo.SetMethod))
-                            ),
-                            CreateArray<object>(paramz // new object[] {p1, p2, value}
-                                .Select(param => IdentifierName(param.Identifier))
-                                .Append(IdentifierName(Value))
-                                .Cast<ExpressionSyntax>()
-                                .ToArray()),
-                            fieldName // FProp
-                        ),
-                        ShouldCallTarget(result, ifTrue: WriteTarget(ifaceProperty))
-                    }
+                    statements: SetBody(paramz)
                 )
             );
+
+            IEnumerable<StatementSyntax> GetBody(IEnumerable<ParameterSyntax> paramz) 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression // FProp.GetMethod
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(PropertyInfo.GetMethod))
+                    ),
+                    CreateArray<object>(paramz // new object[] {p1, p2}
+                        .Select(param => IdentifierName(param.Identifier))
+                        .Cast<ExpressionSyntax>()
+                        .ToArray()),
+                    fieldName // FProp
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: ReadTargetAndReturn(ifaceProperty));
+                yield return ReturnResult(ifaceProperty.PropertyType, result);
+            }
+
+            IEnumerable<StatementSyntax> SetBody(IEnumerable<ParameterSyntax> paramz) 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression // FProp.SetMethod
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(PropertyInfo.SetMethod))
+                    ),
+                    CreateArray<object>(paramz // new object[] {p1, p2, value}
+                        .Select(param => IdentifierName(param.Identifier))
+                        .Append(IdentifierName(Value))
+                        .Cast<ExpressionSyntax>()
+                        .ToArray()),
+                    fieldName // FProp
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: WriteTarget(ifaceProperty));
+            }
         }
 
+        /// <summary>
+        /// private static readonly EventInfo FEvent = Events["IInterface.Event"];                     <br/>
+        ///                                                                                            <br/>
+        /// event EventType IInterface.Event                                                           <br/>
+        /// {                                                                                          <br/>
+        ///     add                                                                                    <br/>
+        ///     {                                                                                      <br/>
+        ///         object result = Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);           <br/>
+        ///         if (result == CALL_TARGET) Target.Event += value;                                  <br/>
+        ///     }                                                                                      <br/>
+        ///     remove                                                                                 <br/>
+        ///     {                                                                                      <br/>
+        ///         object result = Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);        <br/>
+        ///         if (result == CALL_TARGET) Target.Event -= value;                                  <br/>
+        ///     }                                                                                      <br/>
+        /// }
+        /// </summary>
         internal static IEnumerable<MemberDeclarationSyntax> GenerateProxyEvent(EventInfo ifaceEvent)
         {
-            //
-            // private static readonly EventInfo FEvent = Events["IInterface.Event"];
-            //
-            // event EventType IInterface.Event
-            // {
-            //     add 
-            //     {
-            //         object result = Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);
-            //         if (result == CALL_TARGET) Target.Event += value;
-            //     }
-            //     remove
-            //     {
-            //         object result = Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);
-            //         if (result == CALL_TARGET) Target.Event -= value;
-            //     }
-            // }
-            //
-
             IdentifierNameSyntax fieldName = GenerateFieldName(ifaceEvent, System.Reflection.TypeExtensions.GetEvents);
 
-            LocalDeclarationStatementSyntax result;
-
-            yield return  DeclareField<EventInfo>
+            yield return DeclareField<EventInfo>
             (
                 name: fieldName.Identifier.Text, 
                 initializer: ElementAccessExpression
@@ -499,47 +578,51 @@ namespace Solti.Utils.Proxy.Internals
                 @event: ifaceEvent,
                 addBody: Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression // FEvent.AddMethod
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(EventInfo.AddMethod))
-                            ),
-                            CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                            fieldName //FEvent
-                        ),
-                        ShouldCallTarget(result, ifTrue: ExpressionStatement
-                        (
-                            expression: RegisterEvent(ifaceEvent, TARGET, add: true))
-                        )
-                    }
+                    statements: AddBody()
                 ),
                 removeBody: Block
                 (
-                    statements: new StatementSyntax[]
-                    {
-                        result = CallInvoke
-                        (
-                            MemberAccessExpression
-                            (
-                                kind: SyntaxKind.SimpleMemberAccessExpression,
-                                expression: fieldName,
-                                name: IdentifierName(nameof(EventInfo.RemoveMethod))
-                            ),
-                            CreateArray<object>(IdentifierName(Value)),
-                            fieldName
-                        ),
-                        ShouldCallTarget(result, ifTrue: ExpressionStatement
-                        ( 
-                            expression: RegisterEvent(ifaceEvent, TARGET, add: false))
-                        )
-                    }
+                    statements: RemoveBody()
                 )
             );
+
+            IEnumerable<StatementSyntax> AddBody() 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression // FEvent.AddMethod
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(EventInfo.AddMethod))
+                    ),
+                    CreateArray<object>(IdentifierName(Value)), // new object[] {value}
+                    fieldName //FEvent
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: ExpressionStatement(expression: RegisterEvent(ifaceEvent, TARGET, add: true)));
+            }
+
+            IEnumerable<StatementSyntax> RemoveBody() 
+            {
+                LocalDeclarationStatementSyntax result = CallInvoke
+                (
+                    MemberAccessExpression
+                    (
+                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                        expression: fieldName,
+                        name: IdentifierName(nameof(EventInfo.RemoveMethod))
+                    ),
+                    CreateArray<object>(IdentifierName(Value)),
+                    fieldName
+                );
+
+                yield return result;
+                yield return ShouldCallTarget(result, 
+                    ifTrue: ExpressionStatement(expression: RegisterEvent(ifaceEvent, TARGET, add: false)));
+            }
         }
         #endregion
 

@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            IReadOnlyList<ExpressionStatementSyntax> assignments = AssignByRefParameters(Foo, DeclareLocal<object[]>("args"));
+            IReadOnlyList<ExpressionStatementSyntax> assignments = AssignByRefParameters(Foo, DeclareLocal<object[]>("args")).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
             Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (System.String)args[1];"));
@@ -67,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(InspectedMethods))]
         public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) data)
         {
-            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(data.Method, out _);
+            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(data.Method, out _).ToArray();
             Assert.That(statements.Count, Is.EqualTo(data.StatementCount));
             Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(data.Expected));
         }
