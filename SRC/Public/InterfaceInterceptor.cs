@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy
             if (methodAccess == null)
                 throw new ArgumentNullException(nameof(methodAccess));
 
-            return ((MethodCallExpression) methodAccess.Body).Method;
+            return (MethodInfo) MemberInfoExtensions.ExtractFrom(methodAccess);
         }
 
         //

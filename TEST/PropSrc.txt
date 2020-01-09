@@ -2,16 +2,16 @@ System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFo
 {
     get
     {
-        System.Object result = Invoke(FProp0.GetMethod, new System.Object[0], FProp0);
-        if (result == CALL_TARGET)
-            return Target.Prop;
+        System.Object result = this.Invoke(GeneratedProxy.FProp0.GetMethod, new System.Object[0], GeneratedProxy.FProp0);
+        if (result == this.CALL_TARGET)
+            return this.Target.Prop;
         return (System.Int32)result;
     }
 
     set
     {
-        System.Object result = Invoke(FProp0.SetMethod, new System.Object[]{value}, FProp0);
-        if (result == CALL_TARGET)
-            Target.Prop = value;
+        System.Object result = this.Invoke(GeneratedProxy.FProp0.SetMethod, new System.Object[]{value}, GeneratedProxy.FProp0);
+        if (result == this.CALL_TARGET)
+            this.Target.Prop = value;
     }
 }

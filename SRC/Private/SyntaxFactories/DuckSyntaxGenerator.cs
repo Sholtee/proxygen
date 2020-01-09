@@ -21,7 +21,11 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class DuckSyntaxGenerator<TInterface, TTarget> : ProxySyntaxGeneratorBase
     {
-        private const string TARGET = nameof(DuckBase<TTarget>.Target);
+        private static MemberAccessExpressionSyntax
+            //
+            // this.Target
+            //
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void ThrowIfNotFound<TMember>(TMember targetMember, TMember ifaceMember) where TMember: MemberInfo
@@ -128,7 +132,7 @@ namespace Solti.Utils.Proxy.Internals
             // maskepp vannak elnvezve a parameterei.
             //
 
-            ExpressionSyntax propertyAccess = PropertyAccessExpression(ifaceProperty, TARGET);
+            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"

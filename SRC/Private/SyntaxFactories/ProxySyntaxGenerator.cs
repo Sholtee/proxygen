@@ -21,9 +21,23 @@ namespace Solti.Utils.Proxy.Internals
     internal class ProxySyntaxGenerator<TInterface, TInterceptor>: ProxySyntaxGeneratorBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         #region Private
-        private const string
-            CALL_TARGET = nameof(InterfaceInterceptor<TInterface>.CALL_TARGET),
-            TARGET      = nameof(InterfaceInterceptor<TInterface>.Target);
+        private static readonly MemberAccessExpressionSyntax
+            //
+            // this.Target
+            //
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target)),
+            //
+            // this.CALL_TARGET
+            //
+            CALL_TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.CALL_TARGET));
+
+        private static readonly MethodInfo
+            INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default, default, default)),
+            METHOD_ACCESS = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.MethodAccess(default));
+
+        private static readonly FieldInfo
+            EVENTS = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Events),
+            PROPERTIES = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Properties);
 
         private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current, Func<Type, BindingFlags, TMember[]> factory) where TMember: MemberInfo
         {
@@ -35,6 +49,59 @@ namespace Solti.Utils.Proxy.Internals
 
             return IdentifierName($"F{generator.Value.Name}{generator.Index}");
         }
+
+        private static FieldDeclarationSyntax DeclareField<TFiled>(IdentifierNameSyntax fieldName, MemberInfo getValueFrom, MemberInfo key) =>
+            DeclareField<TFiled>
+            (
+                name: fieldName.Identifier.Text,
+                initializer: ElementAccess
+                (
+                    null, // target
+                    getValueFrom
+                )
+                .WithArgumentList
+                (
+                    argumentList: BracketedArgumentList
+                    (
+                        arguments: SingletonSeparatedList
+                        (
+                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key.GetFullName())))
+                        )
+                    )
+                ),
+                modifiers: new[]
+                {
+                    SyntaxKind.PrivateKeyword,
+                    SyntaxKind.StaticKeyword,
+                    SyntaxKind.ReadOnlyKeyword
+                }
+            );
+
+        /// <summary>
+        /// GeneratedClass.StaticMember
+        /// </summary>
+        private MemberAccessExpressionSyntax StaticMemberName(SimpleNameSyntax name) =>
+            //
+            // A generalt osztaly nincs nevter alatt
+            //
+
+            MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                IdentifierName(GeneratedClassName),
+                name
+            );
+
+        /// <summary>
+        /// GeneratedClass.StaticMember.Member
+        /// </summary>
+        private MemberAccessExpressionSyntax StaticMemberAccess(SimpleNameSyntax name, string member) =>
+            MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                StaticMemberName(name),
+                IdentifierName(member)
+            );
         #endregion
 
         #region Internal
@@ -125,33 +192,25 @@ namespace Solti.Utils.Proxy.Internals
             // MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
             //
 
-            currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod), InvocationExpression
+            currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod), InvokeMethod
             (
-                expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.MethodAccess))
-            )
-            .WithArgumentList
-            (
-                argumentList: ArgumentList
+                METHOD_ACCESS,
+                null,
+                Argument
                 (
-                    arguments: SingletonSeparatedList
+                    expression: ParenthesizedLambdaExpression
                     (
-                        Argument
+                        parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
+                        body: InvokeMethod
                         (
-                            expression: ParenthesizedLambdaExpression
-                            (
-                                parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
-                                body: InvokeMethod
-                                (
-                                    method: method, 
-                                    target: TARGET,
+                            method: method, 
+                            target: TARGET,
 
-                                    //
-                                    // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
-                                    //
+                            //
+                            // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
+                            //
 
-                                    arguments: paramz.Select(param => param.ParameterType.IsByRef ? GetDummyName(param) : param.Name).ToArray()
-                                )
-                            )
+                            arguments: paramz.Select(param => param.ParameterType.IsByRef ? GetDummyName(param) : param.Name).ToArray()
                         )
                     )
                 )
@@ -168,16 +227,11 @@ namespace Solti.Utils.Proxy.Internals
         /// object result = Invoke(...);
         /// </summary>
         internal static LocalDeclarationStatementSyntax CallInvoke(params ExpressionSyntax[] arguments) =>
-            DeclareLocal<object>("result", InvocationExpression
+            DeclareLocal<object>("result", InvokeMethod
             (
-                expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.Invoke))
-            )
-            .WithArgumentList
-            (
-                argumentList: ArgumentList
-                (
-                    arguments: CreateList(arguments, Argument)
-                )
+                INVOKE,
+                null,
+                arguments.Select(Argument).ToArray()
             ));
 
         /// <summary>
@@ -218,7 +272,7 @@ namespace Solti.Utils.Proxy.Internals
         /// return Target.Prop;
         /// </summary>
         internal static StatementSyntax ReadTargetAndReturn(PropertyInfo property) =>
-            ReturnStatement(PropertyAccessExpression(property, TARGET));
+            ReturnStatement(PropertyAccess(property, TARGET));
 
         /// <summary>
         /// Target.Prop = value;
@@ -229,7 +283,7 @@ namespace Solti.Utils.Proxy.Internals
                 expression: AssignmentExpression
                 (
                     kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccessExpression(property, TARGET),
+                    left: PropertyAccess(property, TARGET),
                     right: IdentifierName(Value)
                 )
             );
@@ -247,7 +301,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     kind: SyntaxKind.EqualsExpression, 
                     left: ToIdentifierName(result), 
-                    right: IdentifierName(CALL_TARGET)
+                    right: CALL_TARGET
                 ),
                 statement: ifTrue
             );
@@ -357,34 +411,11 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                          <br/>
         /// }
         /// </summary>
-        internal static IEnumerable<MemberDeclarationSyntax> GenerateProxyProperty(PropertyInfo ifaceProperty)
+        internal IEnumerable<MemberDeclarationSyntax> GenerateProxyProperty(PropertyInfo ifaceProperty)
         {
             IdentifierNameSyntax fieldName = GenerateFieldName(ifaceProperty, System.Reflection.TypeExtensions.GetProperties);
 
-            yield return DeclareField<PropertyInfo>
-            (
-                name: fieldName.Identifier.Text,
-                initializer: ElementAccessExpression
-                (
-                    expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.Properties))
-                )
-                .WithArgumentList
-                (
-                    argumentList: BracketedArgumentList
-                    (
-                        arguments: SingletonSeparatedList
-                        (
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(ifaceProperty.GetFullName())))
-                        )
-                    )
-                ),
-                modifiers: new[]
-                {
-                    SyntaxKind.PrivateKeyword,
-                    SyntaxKind.StaticKeyword,
-                    SyntaxKind.ReadOnlyKeyword
-                }
-            );
+            yield return DeclareField<PropertyInfo>(fieldName, PROPERTIES, ifaceProperty);
 
             if (ifaceProperty.IsIndexer())
             {
@@ -400,28 +431,17 @@ namespace Solti.Utils.Proxy.Internals
             yield return DeclareProperty
             (
                 property: ifaceProperty,
-                getBody: Block
-                (
-                    statements: GetBody()
-                ),
-                setBody: Block
-                (
-                    statements: SetBody()
-                )
+                getBody: Block(GetBody()),
+                setBody: Block(SetBody())
             );
 
             IEnumerable<StatementSyntax> GetBody() 
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression // FProp.GetMethod
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(PropertyInfo.GetMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,
                     CreateArray<object>(), // new object[0]
-                    fieldName // FProp
+                    StaticMemberName(fieldName) // FProp
                 );
 
                 yield return result;
@@ -434,14 +454,9 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression // FProp.SetMethod
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(PropertyInfo.SetMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod
                     CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                    fieldName // FProp
+                    StaticMemberName(fieldName) // FProp
                 );
 
                 yield return result;
@@ -467,36 +482,25 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                                           <br/>
         /// }
         /// </summary>
-        internal static MemberDeclarationSyntax GenerateProxyIndexer(PropertyInfo ifaceProperty, IdentifierNameSyntax fieldName)
+        internal MemberDeclarationSyntax GenerateProxyIndexer(PropertyInfo ifaceProperty, IdentifierNameSyntax fieldName)
         {
             return DeclareIndexer
             (
                 property: ifaceProperty,
-                getBody: paramz => Block
-                (
-                    statements: GetBody(paramz)
-                ),
-                setBody: paramz => Block
-                (
-                    statements: SetBody(paramz)
-                )
+                getBody: paramz => Block(GetBody(paramz)),
+                setBody: paramz => Block(SetBody(paramz))
             );
 
             IEnumerable<StatementSyntax> GetBody(IEnumerable<ParameterSyntax> paramz) 
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression // FProp.GetMethod
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(PropertyInfo.GetMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,,
                     CreateArray<object>(paramz // new object[] {p1, p2}
                         .Select(param => IdentifierName(param.Identifier))
                         .Cast<ExpressionSyntax>()
                         .ToArray()),
-                    fieldName // FProp
+                    StaticMemberName(fieldName) // FProp
                 );
 
                 yield return result;
@@ -509,18 +513,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression // FProp.SetMethod
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(PropertyInfo.SetMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod,
                     CreateArray<object>(paramz // new object[] {p1, p2, value}
                         .Select(param => IdentifierName(param.Identifier))
                         .Append(IdentifierName(Value))
                         .Cast<ExpressionSyntax>()
                         .ToArray()),
-                    fieldName // FProp
+                    StaticMemberName(fieldName) // FProp
                 );
 
                 yield return result;
@@ -546,60 +545,26 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                                      <br/>
         /// }
         /// </summary>
-        internal static IEnumerable<MemberDeclarationSyntax> GenerateProxyEvent(EventInfo ifaceEvent)
+        internal IEnumerable<MemberDeclarationSyntax> GenerateProxyEvent(EventInfo ifaceEvent)
         {
             IdentifierNameSyntax fieldName = GenerateFieldName(ifaceEvent, System.Reflection.TypeExtensions.GetEvents);
 
-            yield return DeclareField<EventInfo>
-            (
-                name: fieldName.Identifier.Text, 
-                initializer: ElementAccessExpression
-                (
-                    expression: IdentifierName(nameof(InterfaceInterceptor<TInterface>.Events))
-                )
-                .WithArgumentList
-                (
-                    argumentList: BracketedArgumentList
-                    (
-                        arguments: SingletonSeparatedList
-                        (
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(ifaceEvent.GetFullName())))
-                        )
-                    )
-                ),
-                modifiers: new []
-                {
-                    SyntaxKind.PrivateKeyword,
-                    SyntaxKind.StaticKeyword,
-                    SyntaxKind.ReadOnlyKeyword
-                }
-            );
+            yield return DeclareField<EventInfo>(fieldName, EVENTS, ifaceEvent);
 
             yield return DeclareEvent
             (
                 @event: ifaceEvent,
-                addBody: Block
-                (
-                    statements: AddBody()
-                ),
-                removeBody: Block
-                (
-                    statements: RemoveBody()
-                )
+                addBody: Block(AddBody()),
+                removeBody: Block(RemoveBody())
             );
 
             IEnumerable<StatementSyntax> AddBody() 
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression // FEvent.AddMethod
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(EventInfo.AddMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(EventInfo.AddMethod)), // FEvent.AddMethod,
                     CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                    fieldName //FEvent
+                    StaticMemberName(fieldName) //FEvent
                 );
 
                 yield return result;
@@ -611,14 +576,9 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
-                    MemberAccessExpression
-                    (
-                        kind: SyntaxKind.SimpleMemberAccessExpression,
-                        expression: fieldName,
-                        name: IdentifierName(nameof(EventInfo.RemoveMethod))
-                    ),
+                    StaticMemberAccess(fieldName, nameof(EventInfo.RemoveMethod)), // FEvent.RemoveMethod
                     CreateArray<object>(IdentifierName(Value)),
-                    fieldName
+                    StaticMemberName(fieldName)
                 );
 
                 yield return result;

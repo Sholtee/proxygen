@@ -44,6 +44,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             (Bar, "System.Object[] args = new System.Object[0];")
         };
 
+        private ProxySyntaxGenerator<IFoo<int>, FooInterceptor> Generator { get; set; }
+
+        [SetUp]
+        public void Setup() => Generator = new ProxySyntaxGenerator<IFoo<int>, FooInterceptor>();
+
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
             Assert.That(CreateArgumentsArray(para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
@@ -60,8 +65,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
-            (Foo, 3, "System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Foo(a, out dummy_b, ref dummy_c));"),
-            (Bar, 1, "System.Reflection.MethodInfo currentMethod = MethodAccess(() => Target.Bar());")
+            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo(a, out dummy_b, ref dummy_c));"),
+            (Bar, 1, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
         };
 
         [TestCaseSource(nameof(InspectedMethods))]
@@ -83,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             (
                 currentMethod,
                 args
-            ).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object result = Invoke(currentMethod, args);"));
+            ).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object result = this.Invoke(currentMethod, args);"));
         }
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
@@ -103,31 +108,25 @@ namespace Solti.Utils.Proxy.Internals.Tests
         };
 
         [TestCaseSource(nameof(Methods))]
-        public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) => 
+        public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
             Assert.That(GenerateProxyMethod(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
-        public void GenerateProxyProperty_Test()
-        {
-            Assert.That(GenerateProxyProperty(Prop).Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
-        }
+        public void GenerateProxyProperty_Test() =>
+            Assert.That(Generator.GenerateProxyProperty(Prop).Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
 
         [Test]
-        public void GenerateProxyIndexer_Test()
-        {
-            Assert.That(GenerateProxyIndexer(Indexer, SyntaxFactory.IdentifierName($"F{Indexer.Name}")).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
-        }
+        public void GenerateProxyIndexer_Test() =>
+            Assert.That(Generator.GenerateProxyIndexer(Indexer, SyntaxFactory.IdentifierName($"F{Indexer.Name}")).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
 
         [Test]
-        public void GenerateProxyClass_Test()
-        {
-            Assert.That(new ProxySyntaxGenerator<IFoo<int>, FooInterceptor>().GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
-        }
+        public void GenerateProxyClass_Test() =>
+            Assert.That(Generator.GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
 
         public static (MethodInfo Method, string Expected)[] InvokedMethods = new[]
         {
-            (Foo, "return Target.Foo(a, out b, ref c);"),
-            (Bar, "{\n    Target.Bar();\n    return;\n}")
+            (Foo, "return this.Target.Foo(a, out b, ref c);"),
+            (Bar, "{\n    this.Target.Bar();\n    return;\n}")
         };
 
         [TestCaseSource(nameof(InvokedMethods))]
@@ -136,8 +135,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static (PropertyInfo Property, string Expected)[] ReadProperties = new[]
         {
-            (Prop, "return Target.Prop;"),
-            (Indexer, "return Target[index];")
+            (Prop, "return this.Target.Prop;"),
+            (Indexer, "return this.Target[index];")
         };
 
         [TestCaseSource(nameof(ReadProperties))]
@@ -145,21 +144,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(ReadTargetAndReturn(para.Property).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
-        public void WriteTarget_ShouldWriteTheGivenProperty()
-        {
-            Assert.That(WriteTarget(Prop).NormalizeWhitespace().ToFullString(), Is.EqualTo("Target.Prop = value;"));
-        }
+        public void WriteTarget_ShouldWriteTheGivenProperty() =>
+            Assert.That(WriteTarget(Prop).NormalizeWhitespace().ToFullString(), Is.EqualTo("this.Target.Prop = value;"));
 
         [Test]
-        public void ShouldCallTarget_ShouldCreateAnIfStatement()
-        {
-            Assert.That(ShouldCallTarget(DeclareLocal<object>("result"), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("if (result == CALL_TARGET)\n{\n}"));
-        }
+        public void ShouldCallTarget_ShouldCreateAnIfStatement() =>
+            Assert.That(ShouldCallTarget(DeclareLocal<object>("result"), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("if (result == this.CALL_TARGET)\n{\n}"));
 
         [Test]
-        public void GenerateProxyEvent_Test()
-        {
-            Assert.That(SyntaxFactory.ClassDeclaration("Test").WithMembers(SyntaxFactory.List(GenerateProxyEvent(Event))).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
-        }
+        public void GenerateProxyEvent_Test() =>
+            Assert.That(SyntaxFactory.ClassDeclaration(Generator.GeneratedClassName).WithMembers(SyntaxFactory.List(Generator.GenerateProxyEvent(Event))).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
     }
 }

@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 node: AttributeArgument
                                 (
-                                    expression: MemberAccessExpression
+                                    MemberAccessExpression
                                     (
                                         SyntaxKind.SimpleMemberAccessExpression,
                                         CreateType<MethodImplOptions>(),
@@ -88,6 +88,26 @@ namespace Solti.Utils.Proxy.Internals
         #endregion
 
         #region Protected
+        /// <summary>
+        /// [target | this | Namespace.Type].Member
+        /// </summary>
+        protected internal static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax target, MemberInfo member) => 
+            MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                target ?? (member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression()),
+                IdentifierName(member.Name)
+            );
+
+        /// <summary>
+        /// [target | this | Namespace.Type].Prop[...]
+        /// </summary>
+        protected internal static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax target, MemberInfo prop) =>
+            ElementAccessExpression
+            (
+                MemberAccess(target, prop)
+            );
+
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
@@ -409,13 +429,13 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Event [+|-]= value;
         /// </summary>
-        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, string target, bool add) => AssignmentExpression
+        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax target, bool add) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName(target),
+                target,
                 IdentifierName(@event.Name)
             ),
             right: IdentifierName(Value)
@@ -428,10 +448,10 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal static ExpressionSyntax PropertyAccessExpression(PropertyInfo property, string target) => property.IsIndexer()
+        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax target) => property.IsIndexer()
             ? ElementAccessExpression
             (
-                expression: IdentifierName(target),
+                expression: target,
                 argumentList: BracketedArgumentList
                 (
                     arguments: CreateList(property.GetIndexParameters(), param => Argument(IdentifierName(param.Name)))
@@ -440,8 +460,8 @@ namespace Solti.Utils.Proxy.Internals
             : (ExpressionSyntax) MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName(target),
-                IdentifierName(property.Name)
+                expression: target,
+                name: IdentifierName(property.Name)
             );
 
         /// <summary>
@@ -597,48 +617,62 @@ namespace Solti.Utils.Proxy.Internals
         protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
         /// <summary>
+        /// target.Foo(..., ..., ...)
+        /// </summary>
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params ArgumentSyntax[] arguments) =>
+            InvocationExpression
+            (
+                expression: MemberAccess
+                (
+                    target: target,
+                    member: method
+                )
+            )
+            .WithArgumentList
+            (
+                argumentList: ArgumentList(CreateList(arguments, arg => arg))
+            );
+
+        /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, string target, IReadOnlyList<string> arguments) => InvocationExpression
-        (
-            expression: MemberAccessExpression
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params string[] arguments) => 
+            InvokeMethod
             (
-                kind: SyntaxKind.SimpleMemberAccessExpression,
-                expression: IdentifierName(target),
-                name: IdentifierName(method.Name)
-            )
-        )
-        .WithArgumentList
-        (
-            argumentList: ArgumentList(CreateList(method.GetParameters(), (param, i) =>
-            {
-                ArgumentSyntax argument = Argument
-                (
-                    expression: IdentifierName(arguments[i])
-                );
+                method,
+                target,
+                arguments: method
+                    .GetParameters()
+                    .Select((param, i) =>
+                    {
+                        ArgumentSyntax argument = Argument
+                        (
+                            expression: IdentifierName(arguments[i])
+                        );
 
-                if (param.IsOut) argument = argument.WithRefKindKeyword
-                (
-                    refKindKeyword: Token(SyntaxKind.OutKeyword)
-                );
+                        if (param.IsOut) argument = argument.WithRefKindKeyword
+                        (
+                            refKindKeyword: Token(SyntaxKind.OutKeyword)
+                        );
 
-                else if (param.IsIn) argument = argument.WithRefKindKeyword
-                (
-                    refKindKeyword: Token(SyntaxKind.InKeyword)
-                );
+                        else if (param.IsIn) argument = argument.WithRefKindKeyword
+                        (
+                            refKindKeyword: Token(SyntaxKind.InKeyword)
+                        );
 
-                //
-                // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel utoljara szerepeljen.
-                //
+                        //
+                        // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel utoljara szerepeljen.
+                        //
 
-                else if (param.ParameterType.IsByRef) argument = argument.WithRefKindKeyword
-                (
-                    refKindKeyword: Token(SyntaxKind.RefKeyword)
-                );
+                        else if (param.ParameterType.IsByRef) argument = argument.WithRefKindKeyword
+                        (
+                            refKindKeyword: Token(SyntaxKind.RefKeyword)
+                        );
 
-                return argument;
-            }))
-        );
+                        return argument;
+                    })
+                    .ToArray()
+            );
 
         /// <summary>
         /// TypeName(int a, string b, ...){...}

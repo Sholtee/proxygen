@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -30,5 +31,27 @@ namespace Solti.Utils.Proxy.Internals
                     return false;
             }
         }
+
+        private static MemberInfo DoExtractFrom(LambdaExpression expr) 
+        {
+            Expression body = expr.Body;
+
+            switch(body)
+            {
+                case MemberExpression member: // Event, Field, Prop
+                    return member.Member;
+                case MethodCallExpression call:
+                    return call.Method;
+                default:
+                    Debug.Fail("Unknown body");
+                    return null;
+            }
+        }
+
+        public static MemberInfo ExtractFrom(Expression<Action> expr) => DoExtractFrom(expr);
+
+        public static MemberInfo ExtractFrom<T>(Expression<Func<T>> expr) => DoExtractFrom(expr);
+
+        public static MemberInfo ExtractFrom<T>(Expression<Func<T, object>> expr) => DoExtractFrom(expr);
     }
 }

@@ -12,6 +12,8 @@ using Microsoft.CodeAnalysis.CSharp;
 
 using NUnit.Framework;
 
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using static ProxySyntaxGeneratorBase;
@@ -89,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         [Test]
         public void InvokeMethod_ShouldSupportRefKeywords() =>
-            Assert.That(InvokeMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public), "target", new[] { "a", "b", "c" }).NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
+            Assert.That(InvokeMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public), IdentifierName("target"),  "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
 
         private interface IRefInterface
         {
