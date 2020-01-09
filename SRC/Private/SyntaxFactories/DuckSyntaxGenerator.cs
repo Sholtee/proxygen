@@ -34,6 +34,9 @@ namespace Solti.Utils.Proxy.Internals
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
         }
 
+        /// <summary>
+        /// ref TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4) => ref Target.Foo[TGeneric](para1, ref para2, out para3, para4);
+        /// </summary>
         internal MethodDeclarationSyntax GenerateDuckMethod(MethodInfo ifaceMethod)
         {
             IReadOnlyList<ParameterInfo> paramz = ifaceMethod.GetParameters();
@@ -49,7 +52,9 @@ namespace Solti.Utils.Proxy.Internals
 
             MethodInfo targetMethod = typeof(TTarget)
                 .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true)
-                .SingleOrDefault(m => m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) && m.GetParameters().SequenceEqual(paramz, ParameterComparer.Instance));
+                .SingleOrDefault(m => 
+                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) && 
+                    m.GetParameters().SequenceEqual(paramz, ParameterComparer.Instance));
 
             ThrowIfNotFound(targetMethod, ifaceMethod);
 
@@ -59,18 +64,24 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetMethod, AssemblyName);
 
-            //
-            // TResult IInterface.Foo<TGeneric>(T1 para1, ref T2 para2, out T3 para3, TGeneric para4) => Target.Foo(para1, ref para2, out para3, para4);
-            //
-
-            return DeclareMethod(ifaceMethod, forceInlining: true).WithExpressionBody
+            ExpressionSyntax invocation = InvokeMethod
             (
-                expressionBody: ArrowExpressionClause
+                targetMethod, 
+                TARGET, 
+                ifaceMethod
+                    .GetParameters()
+                    .Select(para => para.Name)
+                    .ToArray()
+            );
+
+            if (ifaceMethod.ReturnType.IsByRef) invocation = RefExpression(invocation);
+
+            return DeclareMethod(ifaceMethod, forceInlining: true)
+                .WithExpressionBody
                 (
-                    expression: InvokeMethod(targetMethod, TARGET, ifaceMethod.GetParameters().Select(para => para.Name).ToArray())
+                    expressionBody: ArrowExpressionClause(invocation)
                 )
-            )
-            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
         }
 
         private sealed class ParameterComparer : IEqualityComparer<ParameterInfo>
