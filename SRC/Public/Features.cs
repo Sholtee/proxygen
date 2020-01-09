@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Solti.Utils.Proxy
 {
     /// <summary>
-    /// Specifies the global configuration of this library.
+    /// Returns the general features of this library.
     /// </summary>
     public static class Features
     {
