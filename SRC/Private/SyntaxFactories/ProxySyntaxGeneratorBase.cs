@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -677,7 +676,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// TypeName(int a, string b, ...){...}
         /// </summary>
-        [SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "'GeneratedClassName' won't be localized.")]
         protected internal ConstructorDeclarationSyntax DeclareCtor(ConstructorInfo ctor)
         {
             IReadOnlyList<ParameterInfo> paramz = ctor.GetParameters();
