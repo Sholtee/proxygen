@@ -2,11 +2,11 @@ System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFo
 {
     System.String dummy_b;
     TT dummy_c = default(TT);
-    System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo(a, out dummy_b, ref dummy_c));
+    System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
     System.Object[] args = new System.Object[]{a, default(System.String), c};
     System.Object result = this.Invoke(currentMethod, args, currentMethod);
     if (result == this.CALL_TARGET)
-        return this.Target.Foo(a, out b, ref c);
+        return this.Target.Foo<TT>(a, out b, ref c);
     b = (System.String)args[1];
     c = (TT)args[2];
     return (System.Int32)result;

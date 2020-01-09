@@ -93,6 +93,18 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void InvokeMethod_ShouldSupportRefKeywords() =>
             Assert.That(InvokeMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public), IdentifierName("target"),  "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
 
+        private static void GenericMethod<T>(T a) { }
+
+        public static (MethodInfo Method, string Expected)[] GenericMethods = new[] 
+        {
+           (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.GenericMethod<T>(a)"),
+           ((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.GenericMethod<System.Int32>(a)")
+        };
+
+        [TestCaseSource(nameof(GenericMethods))]
+        public void InvokeMethod_ShouldSupportGenerics((MethodInfo Method, string Expected) param) =>
+            Assert.That(InvokeMethod(param.Method, null, "a").NormalizeWhitespace().ToFullString(), Is.EqualTo(param.Expected));
+
         private interface IRefInterface
         {
             ref object RefMethod(in object a, out object b, ref object c);

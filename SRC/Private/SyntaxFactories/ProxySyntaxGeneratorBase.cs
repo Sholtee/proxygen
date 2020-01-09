@@ -84,6 +84,9 @@ namespace Solti.Utils.Proxy.Internals
 
             return declaration;
         }
+
+        private static ExpressionSyntax EnsureHasTarget(ExpressionSyntax target, MemberInfo member) =>
+            target ?? (member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression());
         #endregion
 
         #region Protected
@@ -94,9 +97,32 @@ namespace Solti.Utils.Proxy.Internals
             MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
-                target ?? (member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression()),
+                EnsureHasTarget(target, member),
                 IdentifierName(member.Name)
             );
+
+        /// <summary>
+        /// [target | this | Namespace.Type].Method[...](...)
+        /// </summary>
+        protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax target, MethodInfo method) 
+        {
+            SimpleNameSyntax name = !method.IsGenericMethod
+                ? (SimpleNameSyntax) IdentifierName(method.Name)
+                : (SimpleNameSyntax) GenericName(Identifier(method.Name)).WithTypeArgumentList
+                (
+                    typeArgumentList: TypeArgumentList
+                    (
+                        arguments: CreateList(method.GetGenericArguments(), CreateType)
+                    )                  
+                );
+
+            return MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                EnsureHasTarget(target, method),
+                name
+            );
+        }
 
         /// <summary>
         /// [target | this | Namespace.Type].Prop[...]
@@ -618,30 +644,38 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(..., ..., ...)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params ArgumentSyntax[] arguments) =>
-            InvocationExpression
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params ArgumentSyntax[] arguments)
+        {
+            Debug.Assert(arguments.Length == method.GetParameters().Length);
+
+            return InvocationExpression
             (
-                expression: MemberAccess
+                expression: MethodAccess
                 (
                     target: target,
-                    member: method
+                    method: method
                 )
             )
             .WithArgumentList
             (
                 argumentList: ArgumentList(CreateList(arguments, arg => arg))
             );
+        }
 
         /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params string[] arguments) => 
-            InvokeMethod
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, params string[] arguments)
+        {
+            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+
+            Debug.Assert(arguments.Length == paramz.Count);
+
+            return InvokeMethod
             (
                 method,
                 target,
-                arguments: method
-                    .GetParameters()
+                arguments: paramz
                     .Select((param, i) =>
                     {
                         ArgumentSyntax argument = Argument
@@ -672,6 +706,7 @@ namespace Solti.Utils.Proxy.Internals
                     })
                     .ToArray()
             );
+        }
 
         /// <summary>
         /// TypeName(int a, string b, ...){...}

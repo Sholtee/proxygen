@@ -65,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
-            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo(a, out dummy_b, ref dummy_c));"),
+            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
             (Bar, 1, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
         };
 
@@ -78,18 +78,17 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void CallInvoke_ShouldCallTheInvokeMetehodOnThis()
-        {
-            LocalDeclarationStatementSyntax
-                currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod)),
-                args = DeclareLocal<object[]>(nameof(args));
-
-            Assert.That(CallInvoke
+        public void CallInvoke_ShouldCallTheInvokeMetehodOnThis() =>
+            Assert.That
             (
-                currentMethod,
-                args
-            ).NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Object result = this.Invoke(currentMethod, args);"));
-        }
+                CallInvoke
+                (
+                    DeclareLocal<MethodInfo>("currentMethod"),
+                    DeclareLocal<object[]>("args"),
+                    DeclareLocal<MemberInfo>("extra")
+                ).NormalizeWhitespace().ToFullString(), 
+                Is.EqualTo("System.Object result = this.Invoke(currentMethod, args, extra);")
+            );
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
         {
@@ -125,7 +124,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static (MethodInfo Method, string Expected)[] InvokedMethods = new[]
         {
-            (Foo, "return this.Target.Foo(a, out b, ref c);"),
+            (Foo, "return this.Target.Foo<TT>(a, out b, ref c);"),
             (Bar, "{\n    this.Target.Bar();\n    return;\n}")
         };
 

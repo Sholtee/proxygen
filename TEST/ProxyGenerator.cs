@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         private static TInterface CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            (TInterface) Activator.CreateInstance(ProxyGenerator<TInterface, TInterceptor>.GeneratedType, paramz);
+            (TInterface)Activator.CreateInstance(ProxyGenerator<TInterface, TInterceptor>.GeneratedType, paramz);
 
         [Test]
         public void GeneratedProxy_ShouldHook()
@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             IList<int>
                 src = new List<int>(),
-                proxy =  CreateProxy<IList<int>, ListProxy>(src);
+                proxy = CreateProxy<IList<int>, ListProxy>(src);
 
             proxy.Add(1986);
 
@@ -131,14 +131,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void GeneratedProxy_ShouldWorkWithRefParameters()
         {
-            IFoo proxy = CreateProxy<IFoo, FooProxy>((object) null);
+            IFoo proxy = CreateProxy<IFoo, FooProxy>((object)null);
 
             string x = string.Empty;
 
             Assert.That(proxy.Foo(0, out var a, ref x), Is.EqualTo(1));
         }
 
-        internal interface IInternalInterface 
+        internal interface IInternalInterface
         {
             int Foo();
         }
@@ -151,13 +151,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldWorkWithInternalTypes() 
+        public void GeneratedProxy_ShouldWorkWithInternalTypes()
         {
             IInternalInterface proxy = CreateProxy<IInternalInterface, InternalInterfaceProxy>();
             Assert.That(proxy.Foo(), Is.EqualTo(1));
         }
 
-        public class CallContext 
+        public class CallContext
         {
             public MethodInfo Method;
             public object[] Args;
@@ -170,7 +170,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
             {
-                Contexts.Add(new CallContext 
+                Contexts.Add(new CallContext
                 {
                     Method = method,
                     Args = args,
@@ -183,14 +183,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldCallInvokeWithTheAppropriateArguments() 
+        public void GeneratedProxy_ShouldCallInvokeWithTheAppropriateArguments()
         {
             IList<object> proxy = CreateProxy<IList<object>, ListProxyWithContext>();
 
             proxy.Add(100);
             _ = proxy.Count;
 
-            ListProxyWithContext interceptor = (ListProxyWithContext) proxy;
+            ListProxyWithContext interceptor = (ListProxyWithContext)proxy;
 
             Assert.That(interceptor.Contexts.Count, Is.EqualTo(2));
 
@@ -208,6 +208,26 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(context.Method, Is.EqualTo(prop.GetMethod));
             Assert.That(context.Member, Is.EqualTo(prop));
+        }
+
+        public interface IInterfaceHavingGenericMethod
+        {
+            T GenericMethod<T>(in T a, object b);
+        }
+
+        public class InterfaceHavingGenericMethodProxy : InterfaceInterceptor<IInterfaceHavingGenericMethod>
+        {
+            public InterfaceHavingGenericMethodProxy() : base(null) { }
+
+            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => args[0];
+        }
+
+        [Test]
+        public void GeneratedProxy_ShouldWorkWithGenericMethods() 
+        {
+            IInterfaceHavingGenericMethod proxy = CreateProxy<IInterfaceHavingGenericMethod, InterfaceHavingGenericMethodProxy>();
+
+            Assert.That(proxy.GenericMethod(10, null), Is.EqualTo(10));
         }
     }
 }
