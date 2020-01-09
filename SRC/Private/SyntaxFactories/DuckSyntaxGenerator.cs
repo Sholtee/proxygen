@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class DuckSyntaxGenerator<TInterface, TTarget> : ProxySyntaxGeneratorBase
     {
-        private static MemberAccessExpressionSyntax
+        private static readonly MemberAccessExpressionSyntax
             //
             // this.Target
             //
@@ -129,7 +129,13 @@ namespace Solti.Utils.Proxy.Internals
                     // sorrendjenek es tipusanak.
                     //
 
-                    ifaceProperty.GetIndexParameters().Select(ip => ip.ParameterType).SequenceEqual(p.GetIndexParameters().Select(ip => ip.ParameterType)));
+                    ifaceProperty
+                        .GetIndexParameters()
+                        .Select(ip => ip.ParameterType)
+                        .SequenceEqual
+                        (
+                            p.GetIndexParameters().Select(ip => ip.ParameterType)
+                        ));
 
             ThrowIfNotFound(targetProperty, ifaceProperty);
 
