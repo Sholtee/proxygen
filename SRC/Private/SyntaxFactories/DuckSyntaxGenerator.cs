@@ -54,7 +54,8 @@ namespace Solti.Utils.Proxy.Internals
                 .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true)
                 .SingleOrDefault(m => 
                     m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) && 
-                    m.GetParameters().SequenceEqual(paramz, ParameterComparer.Instance));
+                    m.GetParameters().SequenceEqual(paramz, ParameterComparer.Instance) &&
+                    m.ReturnType == ifaceMethod.ReturnType);
 
             ThrowIfNotFound(targetMethod, ifaceMethod);
 
