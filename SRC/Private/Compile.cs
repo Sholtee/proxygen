@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
         public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, IReadOnlyList<Assembly> references)
         {
             Debug.WriteLine(root.NormalizeWhitespace().ToFullString());
-            Debug.WriteLine(string.Join<Assembly>(Environment.NewLine, references));
+            Debug.WriteLine(string.Join(Environment.NewLine, references));
  
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -52,6 +52,8 @@ namespace Solti.Utils.Proxy.Internals
                     .Select(asm => MetadataReference.CreateFromFile(asm.Location)),
                 options: CompilationOptionsFactory.Create()
             );
+
+            Debug.Assert(compilation.LanguageVersion >= Features.LV_MAX_SUPPORTED, "Language version not supported ");
 
             using (Stream stm = new MemoryStream())
             {
