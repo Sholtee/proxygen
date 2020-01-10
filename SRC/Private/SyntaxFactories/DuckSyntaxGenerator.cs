@@ -35,27 +35,33 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// ref TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4) => ref Target.Foo[TGeneric](para1, ref para2, out para3, para4);
+        /// [MethodImplAttribute(AggressiveInlining)]  <br/>
+        /// ref TResult IFoo[TGeneric1].Bar[TGeneric2](TGeneric1 para1, ref T1 para2, out T2 para3, TGeneric2 para4) => ref Target.Foo[TGeneric2](para1, ref para2, out para3, para4);
         /// </summary>
         internal MethodDeclarationSyntax GenerateDuckMethod(MethodInfo ifaceMethod)
         {
-            IReadOnlyList<ParameterInfo> paramz = ifaceMethod.GetParameters();
-
-            //
-            // Ne a "GetMethod(string, Type[])"-ot hasznaljuk mert az nem fogja megtalalni a nyilt
-            // generikus metodusokat mivel:
-            //
-            // "interface IFoo {void Foo<T>();}" es "class Foo {void Foo<T>(){}}"
-            //
-            // eseten amennyiben Foo nem valositja meg IFoo-t a ket generikus "T" nem ugyanaz a tipus.
-            //
-
             MethodInfo targetMethod = typeof(TTarget)
                 .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true)
                 .SingleOrDefault(m => 
-                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) && 
-                    m.GetParameters().SequenceEqual(paramz, ParameterComparer.Instance) &&
-                    m.ReturnType == ifaceMethod.ReturnType);
+                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal)                &&
+                    m.ReturnType == ifaceMethod.ReturnType                                   &&
+
+                    //
+                    // Nem tartalmazhat nyitott generikusokat -> nem kell sajat Comparer.
+                    //
+
+                    m.GetGenericArguments().SequenceEqual(ifaceMethod.GetGenericArguments()) &&  
+
+                    //
+                    // Azert nem a "GetMethod(string, Type[])"-ot hasznaljuk mert az nem fogja megtalalni 
+                    // a nyilt generikus metodusokat mivel:
+                    //
+                    // "interface IFoo {void Foo<T>(T para);}" es "class Foo {void Foo<T>(T para){}}"
+                    //
+                    // eseten amennyiben Foo nem valositja meg IFoo-t a ket generikus "T" nem ugyanaz a tipus.
+                    //
+
+                    m.GetParameters().SequenceEqual(ifaceMethod.GetParameters(), ParameterComparer.Instance));
 
             ThrowIfNotFound(targetMethod, ifaceMethod);
 
@@ -108,6 +114,15 @@ namespace Solti.Utils.Proxy.Internals
             public static ParameterComparer Instance { get; } = new ParameterComparer();
         }
 
+        /// <summary>
+        /// System.Int32 IFoo[System.Int32].Prop         <br/>
+        /// {                                            <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   get => Target.Prop;                        <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   set => Target.Prop = value;                <br/>
+        /// }
+        /// </summary>
         internal MemberDeclarationSyntax GenerateDuckProperty(PropertyInfo ifaceProperty)
         {
             PropertyInfo targetProperty = typeof(TTarget)
@@ -189,6 +204,15 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
+        /// <summary>
+        /// event TDelegate IFoo[System.Int32].Event     <br/>
+        /// {                                            <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   add => Target.Event += value;              <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   remove => Target.Event -= value;           <br/>
+        /// }
+        /// </summary>
         internal EventDeclarationSyntax GenerateDuckEvent(EventInfo ifaceEvent)
         {
             EventInfo targetEvent = typeof(TTarget)
@@ -225,6 +249,8 @@ namespace Solti.Utils.Proxy.Internals
                 @base = typeof(DuckBase<TTarget>);
 
             Debug.Assert(interfaceType.IsInterface());
+            Debug.Assert(!interfaceType.IsGenericTypeDefinition());
+            Debug.Assert(!@base.IsGenericTypeDefinition());
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (
