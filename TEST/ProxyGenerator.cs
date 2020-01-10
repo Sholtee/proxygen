@@ -10,9 +10,9 @@ using System.Runtime.CompilerServices;
 
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Solti.Utils.Proxy.Internals.Tests.ProxyGeneratorTests.InternalInterfaceProxy_Solti.Utils.Proxy.Internals.Tests.ProxyGeneratorTests.IInternalInterface_Proxy")]
+[assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.InternalInterfaceProxy_Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.IInternalInterface_Proxy")]
 
-namespace Solti.Utils.Proxy.Internals.Tests
+namespace Solti.Utils.Proxy.Generators.Tests
 {
     using Generators;
 

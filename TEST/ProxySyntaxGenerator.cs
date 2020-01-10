@@ -23,12 +23,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
     [TestFixture]
     public sealed class ProxySyntaxGeneratorTests : ProxySyntaxGeneratorTestsBase
     {
-        private static MethodInfo GetMethod(string name) => typeof(IFoo<int>).GetMethod(name);
-
-        private static MethodInfo Foo { get; } = GetMethod(nameof(IFoo<int>.Foo));
-
-        private static MethodInfo Bar { get; } = GetMethod(nameof(IFoo<int>.Bar));
-
         private static PropertyInfo Indexer { get; } = typeof(IList<int>).GetProperty("Item");
 
         internal class FooInterceptor : InterfaceInterceptor<IFoo<int>> // direkt internal
@@ -73,6 +67,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) data)
         {
             IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(data.Method, out _).ToArray();
+
             Assert.That(statements.Count, Is.EqualTo(data.StatementCount));
             Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(data.Expected));
         }

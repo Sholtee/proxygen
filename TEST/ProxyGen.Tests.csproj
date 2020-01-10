@@ -41,6 +41,9 @@
     <None Update="ClsSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="DuckClsSrc.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="EventSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

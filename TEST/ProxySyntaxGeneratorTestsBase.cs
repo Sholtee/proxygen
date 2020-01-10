@@ -9,7 +9,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public class ProxySyntaxGeneratorTestsBase
     {
-        internal delegate void TestDelegate<in T>(object sender, T eventArg);
+        public delegate void TestDelegate<in T>(object sender, T eventArg);
 
         internal interface IFoo<T> // direkt internal
         {
@@ -19,8 +19,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             event TestDelegate<T> Event;
         }
 
-        protected static EventInfo Event { get; } = typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event), BindingFlags.Public | BindingFlags.Instance);
+        protected static EventInfo Event { get; } = typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event));
 
         protected static PropertyInfo Prop { get; } = typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop));
+
+        protected static MethodInfo Foo { get; } = typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo));
+
+        protected static MethodInfo Bar { get; } = typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Bar));
     }
 }

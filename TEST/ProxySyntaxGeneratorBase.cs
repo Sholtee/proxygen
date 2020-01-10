@@ -66,19 +66,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         [Test]
         public void DeclareProperty_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareProperty(Prop, SyntaxFactory.Block(), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
+            Assert.That(DeclareProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
 
         [Test]
         public void DeclareField_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareField<EventInfo>("FEvent", SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression), SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword).NormalizeWhitespace().ToFullString(), Is.EqualTo("private static readonly System.Reflection.EventInfo FEvent = null;"));
+            Assert.That(DeclareField<EventInfo>("FEvent", LiteralExpression(SyntaxKind.NullLiteralExpression), SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword).NormalizeWhitespace().ToFullString(), Is.EqualTo("private static readonly System.Reflection.EventInfo FEvent = null;"));
 
         [Test]
         public void DeclareEvent_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareEvent(Event, SyntaxFactory.Block(), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
+            Assert.That(DeclareEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
 
         [Test]
         public void DeclareMethod_ShouldHandleParamsModifier() =>
-            Assert.That(DeclareMethod(typeof(IParams).GetMethod(nameof(IParams.Foo))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.IParams.Foo(params System.Int32[] paramz)"));
+            Assert.That(DeclareMethod((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.IParams.Foo(params System.Int32[] paramz)"));
 
         private interface IParams
         {
@@ -87,6 +87,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         [Test]
         public void DeclareMethod_ShouldSupportRefKeywords() =>
+            // ref retval miatt a MemberInfoExtensions-s csoda itt nem jo
             Assert.That(DeclareMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
 
         [Test]
@@ -98,7 +99,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public static (MethodInfo Method, string Expected)[] GenericMethods = new[] 
         {
            (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.GenericMethod<T>(a)"),
-           ((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.GenericMethod<System.Int32>(a)")
+           ( (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.GenericMethod<System.Int32>(a)")
         };
 
         [TestCaseSource(nameof(GenericMethods))]
@@ -112,8 +113,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static (MethodInfo Method, string Expected)[] MethodsHavingNullableRetVal = new[]
         {
-            (typeof(INullable).GetMethod(nameof(INullable.Nullable), BindingFlags.Instance | BindingFlags.Public), "System.Nullable<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Nullable()"),
-            (typeof(INullable).GetMethod(nameof(INullable.Object), BindingFlags.Instance | BindingFlags.Public), "System.Object Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Object()")
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Nullable()), "System.Nullable<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Nullable()"),
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Object()), "System.Object Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorBaseTests.INullable.Object()")
         };
 
         [TestCaseSource(nameof(MethodsHavingNullableRetVal))]
