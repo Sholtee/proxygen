@@ -36,8 +36,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             Expression body = expr.Body;
 
+            start:
             switch(body)
             {
+                case UnaryExpression convert:
+                    body = convert.Operand;
+                    goto start;
                 case MemberExpression member: // Event, Field, Prop
                     return member.Member;
                 case MethodCallExpression call:
@@ -49,6 +53,8 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         public static MemberInfo ExtractFrom(Expression<Action> expr) => DoExtractFrom(expr);
+
+        public static MemberInfo ExtractFrom<T>(Expression<Action<T>> expr) => DoExtractFrom(expr);
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T>> expr) => DoExtractFrom(expr);
 
