@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -93,28 +92,8 @@ namespace Solti.Utils.Proxy.Internals
                 .Except
                 (
                     src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), 
-                    GenericArgumentComparer.Instance
+                    ArgumentComparer.Instance
                 );
-        }
-
-        //
-        // Sajat comparer azert kell mert pl List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
-        // testzoleges "T"-re.
-        //
-
-        private sealed class GenericArgumentComparer : IEqualityComparer<Type>
-        {
-            public bool Equals(Type x, Type y) => GetHashCode(x) == GetHashCode(y);
-
-            //
-            // Generikus argumentumnak nincs teljes neve ezert a lenti sor jol kezeli a fenti
-            // problemat.
-            //
-
-            [SuppressMessage("Globalization", "CA1307: Specify StringComparison", Justification = "Type names are not localized.")]
-            public int GetHashCode(Type obj) => (obj.FullName ?? obj.Name).GetHashCode();
-
-            public static GenericArgumentComparer Instance { get; } = new GenericArgumentComparer();
         }
 
         public static ConstructorInfo GetApplicableConstructor(this Type src)

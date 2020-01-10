@@ -43,24 +43,19 @@ namespace Solti.Utils.Proxy.Internals
             MethodInfo targetMethod = typeof(TTarget)
                 .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true)
                 .SingleOrDefault(m => 
-                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal)                &&
-                    m.ReturnType == ifaceMethod.ReturnType                                   &&
-
-                    //
-                    // Nem tartalmazhat nyitott generikusokat -> nem kell sajat Comparer.
-                    //
-
-                    m.GetGenericArguments().SequenceEqual(ifaceMethod.GetGenericArguments()) &&  
+                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) &&
 
                     //
                     // Azert nem a "GetMethod(string, Type[])"-ot hasznaljuk mert az nem fogja megtalalni 
-                    // a nyilt generikus metodusokat mivel:
+                    // a nyilt generikus metodusokat mivel pl.:
                     //
                     // "interface IFoo {void Foo<T>(T para);}" es "class Foo {void Foo<T>(T para){}}"
                     //
                     // eseten amennyiben Foo nem valositja meg IFoo-t a ket generikus "T" nem ugyanaz a tipus.
                     //
 
+                    ArgumentComparer.Instance.Equals(m.ReturnType, ifaceMethod.ReturnType)                              &&
+                    m.GetGenericArguments().SequenceEqual(ifaceMethod.GetGenericArguments(), ArgumentComparer.Instance) &&  
                     m.GetParameters().SequenceEqual(ifaceMethod.GetParameters(), ParameterComparer.Instance));
 
             ThrowIfNotFound(targetMethod, ifaceMethod);
@@ -89,29 +84,6 @@ namespace Solti.Utils.Proxy.Internals
                     expressionBody: ArrowExpressionClause(invocation)
                 )
                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
-        }
-
-        private sealed class ParameterComparer : IEqualityComparer<ParameterInfo>
-        {
-            public bool Equals(ParameterInfo x, ParameterInfo y) => GetHashCode(x) == GetHashCode(y);
-
-            public int GetHashCode(ParameterInfo obj) => new
-            {
-                //
-                // Lasd GenericArgumentComparer
-                //
-
-                Name = obj.ParameterType.FullName ?? obj.ParameterType.Name,
-                obj.Attributes // IN, OUT, stb
-
-                //
-                // Parameter neve nem erdekel bennunket (azonos tipussal es attributumokkal ket parametert
-                // azonosnak veszunk).
-                //
-
-            }.GetHashCode();
-
-            public static ParameterComparer Instance { get; } = new ParameterComparer();
         }
 
         /// <summary>
