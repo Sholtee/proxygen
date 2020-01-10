@@ -1,14 +1,14 @@
-internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTests.FooInterceptor, Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>
+internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTests.FooInterceptor, Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>
 {
-    public GeneratedProxy(Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32> target): base(target)
+    public GeneratedProxy(Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32> target): base(target)
     {
     }
 
-    System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
+    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
     {
         System.String dummy_b;
         TT dummy_c = default(TT);
-        System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
+        System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
         System.Object[] args = new System.Object[]{a, default(System.String), c};
         System.Object result = this.Invoke(currentMethod, args, currentMethod);
         if (result == this.CALL_TARGET)
@@ -18,9 +18,9 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.Tests.ProxySy
         return (System.Int32)result;
     }
 
-    void Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Bar()
+    void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Bar()
     {
-        System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());
+        System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());
         System.Object[] args = new System.Object[0];
         System.Object result = this.Invoke(currentMethod, args, currentMethod);
         if (result == this.CALL_TARGET)
@@ -30,8 +30,8 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.Tests.ProxySy
         }
     }
 
-    private static readonly System.Reflection.PropertyInfo FProp0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.Properties["Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop"];
-    System.Int32 Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
+    private static readonly System.Reflection.PropertyInfo FProp0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.Properties["Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop"];
+    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
     {
         get
         {
@@ -49,8 +49,8 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.Tests.ProxySy
         }
     }
 
-    private static readonly System.Reflection.EventInfo FEvent0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.Events["Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event"];
-    event Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.Internals.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event
+    private static readonly System.Reflection.EventInfo FEvent0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.Events["Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event"];
+    event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event
     {
         add
         {
