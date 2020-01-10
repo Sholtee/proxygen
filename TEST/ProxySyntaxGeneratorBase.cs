@@ -14,9 +14,10 @@ using NUnit.Framework;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Solti.Utils.Proxy.Internals.Tests
+namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
-    using static ProxySyntaxGeneratorBase;
+    using Internals;
+    using static Internals.ProxySyntaxGeneratorBase;
 
     [TestFixture]
     public sealed class ProxySyntaxGeneratorBaseTests : ProxySyntaxGeneratorTestsBase

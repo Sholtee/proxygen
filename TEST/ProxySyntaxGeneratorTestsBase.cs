@@ -5,7 +5,7 @@
 ********************************************************************************/
 using System.Reflection;
 
-namespace Solti.Utils.Proxy.Internals.Tests
+namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     public class ProxySyntaxGeneratorTestsBase
     {

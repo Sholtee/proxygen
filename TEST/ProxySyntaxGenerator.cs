@@ -15,10 +15,10 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using NUnit.Framework;
 
-namespace Solti.Utils.Proxy.Internals.Tests
+namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
-    using static ProxySyntaxGeneratorBase;
-    using static ProxySyntaxGenerator<ProxySyntaxGeneratorTestsBase.IFoo<int>, ProxySyntaxGeneratorTests.FooInterceptor>;
+    using static Internals.ProxySyntaxGeneratorBase;
+    using static Internals.ProxySyntaxGenerator<ProxySyntaxGeneratorTestsBase.IFoo<int>, ProxySyntaxGeneratorTests.FooInterceptor>;
 
     [TestFixture]
     public sealed class ProxySyntaxGeneratorTests : ProxySyntaxGeneratorTestsBase
@@ -38,10 +38,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
             (Bar, "System.Object[] args = new System.Object[0];")
         };
 
-        private ProxySyntaxGenerator<IFoo<int>, FooInterceptor> Generator { get; set; }
+        private Internals.ProxySyntaxGenerator<IFoo<int>, FooInterceptor> Generator { get; set; }
 
         [SetUp]
-        public void Setup() => Generator = new ProxySyntaxGenerator<IFoo<int>, FooInterceptor>();
+        public void Setup() => Generator = new Internals.ProxySyntaxGenerator<IFoo<int>, FooInterceptor>();
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
