@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
             TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ThrowIfNotFound<TMember>(TMember targetMember, TMember ifaceMember) where TMember: MemberInfo
+        private static void ThrowIfNotFound(MemberInfo targetMember, MemberInfo ifaceMember)
         {
             if (targetMember == null) 
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
