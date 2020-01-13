@@ -65,7 +65,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Private\SyntaxFactories\" />
     <Folder Include="Public\Generators\" />
   </ItemGroup>
   

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxGenerator.cs                                                       *
+* ProxySyntaxFactory.cs                                                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal class ProxySyntaxGenerator<TInterface, TInterceptor>: ProxySyntaxGeneratorBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal class ProxySyntaxFactory<TInterface, TInterceptor>: ProxySyntaxFactoryBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         #region Private
         private static readonly MemberAccessExpressionSyntax

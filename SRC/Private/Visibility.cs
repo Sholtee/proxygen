@@ -18,7 +18,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
-    using static ProxySyntaxGeneratorBase; // TODO: torolni
+    using static ProxySyntaxFactoryBase; // TODO: torolni
 
     internal static class Visibility
     {

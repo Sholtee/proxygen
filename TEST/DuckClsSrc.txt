@@ -1,14 +1,14 @@
-internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.DuckBase<Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxGeneratorTests.GoodFoo<System.Int32>>, Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>
+internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.DuckBase<Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<System.Int32>>, Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>
 {
-    public GeneratedProxy(Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxGeneratorTests.GoodFoo<System.Int32> target): base(target)
+    public GeneratedProxy(Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<System.Int32> target): base(target)
     {
     }
 
     [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);
+    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);
     [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Bar() => this.Target.Bar();
-    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
+    void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Bar() => this.Target.Bar();
+    System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop
     {
         [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         get => this.Target.Prop;
@@ -16,7 +16,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.Internals.DuckBase<Solt
         set => this.Target.Prop = value;
     }
 
-    event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Event
+    event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event
     {
         [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         add => this.Target.Event += value;

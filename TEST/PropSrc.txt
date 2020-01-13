@@ -1,4 +1,4 @@
-System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>.Prop
+System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop
 {
     get
     {

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxGeneratorTestsBase.cs                                              *
+* ProxySyntaxFactoryTestsBase.cs                                                *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
-    public class ProxySyntaxGeneratorTestsBase
+    public class ProxySyntaxFactoryTestsBase
     {
         public delegate void TestDelegate<in T>(object sender, T eventArg);
 

@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public override ISyntaxFactory SyntaxFactory { get; } = new DuckSyntaxGenerator<TInterface, TTarget>();
+        public override ISyntaxFactory SyntaxFactory { get; } = new DuckSyntaxFactory<TInterface, TTarget>();
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.

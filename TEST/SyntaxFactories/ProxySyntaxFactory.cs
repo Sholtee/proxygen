@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxGenerator.cs                                                       *
+* ProxySyntaxFactory.cs                                                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -17,11 +17,11 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
-    using static Internals.ProxySyntaxGeneratorBase;
-    using static Internals.ProxySyntaxGenerator<ProxySyntaxGeneratorTestsBase.IFoo<int>, ProxySyntaxGeneratorTests.FooInterceptor>;
+    using static Internals.ProxySyntaxFactoryBase;
+    using static Internals.ProxySyntaxFactory<ProxySyntaxFactoryTestsBase.IFoo<int>, ProxySyntaxFactoryTests.FooInterceptor>;
 
     [TestFixture]
-    public sealed class ProxySyntaxGeneratorTests : ProxySyntaxGeneratorTestsBase
+    public sealed class ProxySyntaxFactoryTests : ProxySyntaxFactoryTestsBase
     {
         private static PropertyInfo Indexer { get; } = typeof(IList<int>).GetProperty("Item");
 
@@ -38,10 +38,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (Bar, "System.Object[] args = new System.Object[0];")
         };
 
-        private Internals.ProxySyntaxGenerator<IFoo<int>, FooInterceptor> Generator { get; set; }
+        private Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor> Generator { get; set; }
 
         [SetUp]
-        public void Setup() => Generator = new Internals.ProxySyntaxGenerator<IFoo<int>, FooInterceptor>();
+        public void Setup() => Generator = new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>();
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
@@ -59,8 +59,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
-            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
-            (Bar, 1, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxGeneratorTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
+            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
+            (Bar, 1, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
         };
 
         [TestCaseSource(nameof(InspectedMethods))]

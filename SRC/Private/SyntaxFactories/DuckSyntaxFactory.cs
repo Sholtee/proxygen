@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* DuckSyntaxGenerator.cs                                                        *
+* DuckSyntaxFactory.cs                                                          *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal class DuckSyntaxGenerator<TInterface, TTarget> : ProxySyntaxGeneratorBase
+    internal class DuckSyntaxFactory<TInterface, TTarget> : ProxySyntaxFactoryBase
     {
         private static readonly MemberAccessExpressionSyntax
             //

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxGeneratorBase.cs                                                   *
+* ProxySyntaxFactoryBase.cs                                                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Abstractions;
 
-    internal abstract class ProxySyntaxGeneratorBase: ISyntaxFactory
+    internal abstract class ProxySyntaxFactoryBase: ISyntaxFactory
     {
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";
