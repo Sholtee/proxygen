@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         private static TInterface CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            (TInterface)Activator.CreateInstance(ProxyGenerator<TInterface, TInterceptor>.GeneratedType, paramz);
+            (TInterface) Activator.CreateInstance(ProxyGenerator<TInterface, TInterceptor>.GeneratedType, paramz);
 
         [Test]
         public void GeneratedProxy_ShouldHook()

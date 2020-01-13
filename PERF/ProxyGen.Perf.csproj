@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>ProxyGen.Perf</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
-    <Configurations>Debug;Perf</Configurations>
+    <Configurations>Debug;Release;Perf</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.11.5" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
   </ItemGroup>
 
   <ItemGroup>

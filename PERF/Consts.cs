@@ -1,23 +1,13 @@
 ﻿/********************************************************************************
-* Program.cs                                                                    *
+* Consts.cs                                                                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-#if DEBUG
-using BenchmarkDotNet.Configs;
-#endif
-using BenchmarkDotNet.Running;
 
 namespace Solti.Utils.Proxy.Perf
 {
-    class Program
+    internal static class Consts
     {
-        static void Main(string[] args) => BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run
-        (
-            args
-#if DEBUG
-            , new DebugInProcessConfig()
-#endif
-        );
+        public const int OperationsPerInvoke = 50;
     }
 }
