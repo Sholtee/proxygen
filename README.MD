@@ -2,4 +2,5 @@
 > .NET proxy generator powered by Roslyn
 
 ## Resources
-You can browse the detailed API docs [here](https://sholtee.github.io/proxygen ) (WIP).
+- [API Docs](https://sholtee.github.io/proxygen ) (WIP).
+- [Benchmark Results](https://sholtee.github.io/proxygen/perf )

@@ -1,3 +1,4 @@
 # ProxyGen Benchmark Results
 
-- [xXx](https://sholtee.github.io/injector/perf/Solti.Utils.Proxy.Perf.xXx-report-github.html )
+- [Proxy Generator](https://sholtee.github.io/proxygen/perf/Solti.Utils.Proxy.Perf.ProxyGenerator-report-github.html )
+- [Generated Proxy](https://sholtee.github.io/proxygen/perf/Solti.Utils.Proxy.Perf.GeneratedProxy-report-github.html )
