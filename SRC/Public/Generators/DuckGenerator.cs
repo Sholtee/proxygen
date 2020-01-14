@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Generators
             CheckVisibility(type);
 
             if (!type.IsInterface()) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters()) throw new NotSupportedException();
+            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
         }
 
         private void CheckTarget()

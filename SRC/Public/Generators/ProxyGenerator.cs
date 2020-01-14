@@ -13,6 +13,7 @@ namespace Solti.Utils.Proxy.Generators
 {
     using Abstractions;
     using Internals;
+    using Properties;
 
     /// <summary>
     /// Type generator for creating proxies that intercept interface method calls.
@@ -55,8 +56,8 @@ namespace Solti.Utils.Proxy.Generators
 
             CheckVisibility(type);
 
-            if (!type.IsInterface()) throw new InvalidOperationException();
-            if (type.ContainsGenericParameters()) throw new NotSupportedException();
+            if (!type.IsInterface()) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
+            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
         }
 
         private void CheckBase()
@@ -65,10 +66,10 @@ namespace Solti.Utils.Proxy.Generators
 
             CheckVisibility(type);
 
-            if (!type.IsClass()) throw new InvalidOperationException();
-            if (type.ContainsGenericParameters()) throw new NotSupportedException();
-            if (type.IsSealed()) throw new NotSupportedException();
-            if (type.IsAbstract()) throw new NotSupportedException();
+            if (!type.IsClass()) throw new InvalidOperationException(Resources.NOT_A_CLASS);
+            if (type.IsSealed()) throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);          
+            if (type.IsAbstract()) throw new NotSupportedException(Resources.ABSTRACT_INTERCEPTOR);
+            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
         }
     }
 }

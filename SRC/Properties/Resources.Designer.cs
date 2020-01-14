@@ -62,6 +62,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The interceptor can not be abstract..
+        /// </summary>
+        internal static string ABSTRACT_INTERCEPTOR {
+            get {
+                return ResourceManager.GetString("ABSTRACT_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ambiguous match for member: {0}.
         /// </summary>
         internal static string AMBIGUOUS_MATCH {
@@ -116,6 +125,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type must be a class..
+        /// </summary>
+        internal static string NOT_A_CLASS {
+            get {
+                return ResourceManager.GetString("NOT_A_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type must be an interface..
         /// </summary>
         internal static string NOT_AN_INTERFACE {
@@ -139,6 +157,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string REF_RETURNS_NOT_SUPPORTED {
             get {
                 return ResourceManager.GetString("REF_RETURNS_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The interceptor can not be sealed..
+        /// </summary>
+        internal static string SEALED_INTERCEPTOR {
+            get {
+                return ResourceManager.GetString("SEALED_INTERCEPTOR", resourceCulture);
             }
         }
         

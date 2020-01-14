@@ -247,5 +247,36 @@ namespace Solti.Utils.Proxy.Generators.Tests
             IBar proxy = CreateProxy<IBar, InterfaceInterceptor<IBar>>(new BarExplicit());
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
+
+        public abstract class AbstractInterceptor : InterfaceInterceptor<IMyInterface> 
+        {
+            public AbstractInterceptor() : base(null) { }
+        }
+
+        public class InterceptorWithPrivateCtor : InterfaceInterceptor<IMyInterface>
+        {
+            private InterceptorWithPrivateCtor() : base(null) { }
+        }
+
+        private  class PrivateInterceptor : InterfaceInterceptor<IMyInterface>
+        {
+            public PrivateInterceptor() : base(null) { }
+        }
+
+        public sealed class SealedInterceptor : InterfaceInterceptor<IMyInterface>
+        {
+            public SealedInterceptor() : base(null) { }
+        }
+
+
+        [Test]
+        public void ProxyGenerator_ShouldValidate() 
+        {
+            Assert.Throws<InvalidOperationException>(() => CreateProxy<object, InterfaceInterceptor<object>>());
+            Assert.Throws<NotSupportedException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
+            Assert.Throws<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
+            Assert.Throws<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
+            Assert.Throws<MemberAccessException>(() => CreateProxy<IMyInterface, PrivateInterceptor>());
+        }
     }
 }

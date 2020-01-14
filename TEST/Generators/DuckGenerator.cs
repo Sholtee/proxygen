@@ -83,5 +83,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy = CreateDuck<IBar, IAnotherBar>(new AnotherBarExplicit());
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
+
+        private class Private : IBar
+        {
+            public int Baz() => 0;
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldValidate() 
+        {
+            Assert.Throws<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
+            Assert.Throws<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
+        }
     }
 }

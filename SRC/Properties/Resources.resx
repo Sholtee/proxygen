@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ABSTRACT_INTERCEPTOR" xml:space="preserve">
+    <value>The interceptor can not be abstract.</value>
+  </data>
   <data name="AMBIGUOUS_MATCH" xml:space="preserve">
     <value>Ambiguous match for member: {0}</value>
   </data>
@@ -138,11 +141,17 @@
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>
   </data>
+  <data name="NOT_A_CLASS" xml:space="preserve">
+    <value>The type must be a class.</value>
+  </data>
   <data name="NULL_TARGET" xml:space="preserve">
     <value>The target is NULL.</value>
   </data>
   <data name="REF_RETURNS_NOT_SUPPORTED" xml:space="preserve">
     <value>Reference return values are not supported.</value>
+  </data>
+  <data name="SEALED_INTERCEPTOR" xml:space="preserve">
+    <value>The interceptor can not be sealed.</value>
   </data>
   <data name="TYPE_NOT_VISIBLE" xml:space="preserve">
     <value>{0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
