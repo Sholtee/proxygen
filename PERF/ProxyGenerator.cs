@@ -10,7 +10,6 @@ using BenchmarkDotNet.Attributes;
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
-    using static Consts;
 
     [MemoryDiagnoser]
     public class ProxyGenerator
@@ -22,13 +21,8 @@ namespace Solti.Utils.Proxy.Perf
             }
         }
 
-        [Benchmark(OperationsPerInvoke = OperationsPerInvoke)]
-        public void AssemblingProxyType()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(Guid.NewGuid().ToString());
-            }
-        }
+        [Benchmark]
+        public void AssemblingProxyType() =>
+            new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(Guid.NewGuid().ToString());
     }
 }
