@@ -7,7 +7,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 using NUnit.Framework;
@@ -41,7 +40,34 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(methods.Length, Is.EqualTo(methods.Distinct().Count()));
 
             // Enumerator, IEnumerator, IEnumerator<int>
-            Assert.That(methods.Where(m => m.Name == "GetEnumerator").Select(m => m.ReturnType).Count(), Is.EqualTo(3));
+            Assert.That(methods.Where(m => m.Name == nameof(IEnumerable.GetEnumerator)).Count(), Is.EqualTo(3));
+
+            PropertyInfo[] properties = typeof(List<int>).ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic: true).ToArray();
+
+            Assert.That(properties.Length, Is.EqualTo(properties.Distinct().Count()));
+
+            // ICollection<T>.IsReadOnly, IList-ReadOnly
+            Assert.That(properties.Where(prop => prop.Name == nameof(IList.IsReadOnly)).Count(), Is.EqualTo(2));
+        }
+
+        public interface IInterface 
+        {
+            void Bar();
+        }
+
+        public class NoughtyClass : IInterface
+        {
+            void IInterface.Bar(){}
+            public void Bar() { }
+        }
+
+        [Test]
+        [Ignore("See FIXME in ListMembers()")]
+        public void ListMembers_ShouldReturnExplicitImplementations2() 
+        {
+            IEnumerable<MethodInfo> methods = typeof(NoughtyClass).ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true);
+
+            Assert.That(methods.Where(m => m.Name == nameof(IInterface.Bar)).Count(), Is.EqualTo(2));
         }
 
         [Test]
