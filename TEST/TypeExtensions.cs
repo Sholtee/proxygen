@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -19,27 +20,39 @@ namespace Solti.Utils.Proxy.Internals.Tests
     public sealed class TypeExtensionsTests
     {
         [Test]
-        public void ListMembers_ShouldReturnOverLoadedMembers() 
+        public void ListMembers_ShouldReturnOverLoadedInterfaceMembers() 
         {
             MethodInfo[] methods = typeof(IEnumerable<string>).ListMembers(System.Reflection.TypeExtensions.GetMethods).ToArray();
             Assert.That(methods.Length, Is.EqualTo(2));
-            Assert.That(methods.Contains(((MethodCallExpression) ((Expression<Action<IEnumerable<string>>>) (i => i.GetEnumerator())).Body).Method));
-            Assert.That(methods.Contains(((MethodCallExpression) ((Expression<Action<System.Collections.IEnumerable>>)(i => i.GetEnumerator())).Body).Method));
+            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable<string>>(i => i.GetEnumerator())));
+            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable>(i => i.GetEnumerator())));
 
             PropertyInfo[] properties = typeof(IEnumerator<string>).ListMembers(System.Reflection.TypeExtensions.GetProperties).ToArray();
             Assert.That(properties.Length, Is.EqualTo(2));
-            Assert.That(properties.Contains((PropertyInfo) ((MemberExpression) ((Expression<Func<IEnumerator<string>, string>>)(i => i.Current)).Body).Member));
-            Assert.That(properties.Contains((PropertyInfo) ((MemberExpression) ((Expression<Func<System.Collections.IEnumerator, object>>)(i => i.Current)).Body).Member));
+            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
+            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
+        }
+
+        [Test]
+        public void ListMembers_ShouldReturnExplicitImplementations() 
+        {
+            MethodInfo[] methods = typeof(List<int>).ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true).ToArray();
+
+            Assert.That(methods.Length, Is.EqualTo(methods.Distinct().Count()));
+
+            // Enumerator, IEnumerator, IEnumerator<int>
+            Assert.That(methods.Where(m => m.Name == "GetEnumerator").Select(m => m.ReturnType).Count(), Is.EqualTo(3));
         }
 
         [Test]
         public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy()
         {
             MethodInfo[] methods = typeof(IGrandChild).ListMembers(System.Reflection.TypeExtensions.GetMethods).ToArray();
+
             Assert.That(methods.Length, Is.EqualTo(3));
-            Assert.That(methods.Contains(((MethodCallExpression) ((Expression<Action<IParent>>)(i => i.Foo())).Body).Method));
-            Assert.That(methods.Contains(((MethodCallExpression) ((Expression<Action<IChild>>)(i => i.Bar())).Body).Method));
-            Assert.That(methods.Contains(((MethodCallExpression) ((Expression<Action<IGrandChild>>)(i => i.Baz())).Body).Method));
+            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IParent>(i => i.Foo())));
+            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IChild>(i => i.Bar())));
+            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IGrandChild>(i => i.Baz())));
         }
 
         [TestCase(true, 3)]

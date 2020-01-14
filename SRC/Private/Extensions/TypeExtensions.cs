@@ -30,25 +30,40 @@ namespace Solti.Utils.Proxy.Internals
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
 
-        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, Func<Type, BindingFlags, TMember[]> factory, bool includeNonPublic = false) where TMember : MemberInfo
+        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, Func<Type, BindingFlags, TMember[]> backend, bool includeNonPublic = false) where TMember : MemberInfo
         {
+            IEnumerable<TMember> ifaceMembers = null;
+
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
-            if (src.IsInterface())
-                return factory(src, flags)
-                    .Concat
-                    (
-                        src.GetInterfaces().SelectMany(iface => factory(iface, flags))
-                    );
+            if (src.IsInterface() | includeNonPublic)
+            {
+                //
+                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre es explicit 
+                // implementaciokra.
+                //
 
-            //
-            // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre.
-            //
+                ifaceMembers = src.GetInterfaces().SelectMany(iface => backend(iface, flags));
 
+                if (src.IsInterface()) 
+                    return backend(src, flags).Concat(ifaceMembers);
+            }
+          
             flags |= BindingFlags.FlattenHierarchy;
-            if (includeNonPublic) flags |= BindingFlags.NonPublic;
+            if (includeNonPublic) flags |= BindingFlags.NonPublic; // explicit implementaciokat nem adja vissza
 
-            return factory(src, flags);
+            IEnumerable<TMember> classMembers = backend(src, flags);
+
+            if (includeNonPublic)
+                //
+                // Explicit interface implementaciok azok akiknek nincs meg a parja a osztaly tagok
+                // kozt.
+                //
+
+                return classMembers.Concat(
+                    ifaceMembers.Where(ifaceMember => !classMembers.Any(classMember => classMember.SignatureEquals(ifaceMember))));
+
+            return classMembers;
         }
 
         //

@@ -14,6 +14,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
+    using Internals;
     using Generators;
 
     [TestFixture]
@@ -198,13 +199,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Method, Is.EqualTo(typeof(ICollection<object>).GetMethod(nameof(ICollection<object>.Add), BindingFlags.Instance | BindingFlags.Public)));
+            Assert.That(context.Method, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
 
             context = interceptor.Contexts[1];
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
-            PropertyInfo prop = typeof(ICollection<object>).GetProperty(nameof(ICollection<object>.Count), BindingFlags.Instance | BindingFlags.Public);
+            PropertyInfo prop = (PropertyInfo) MemberInfoExtensions.ExtractFrom(() => proxy.Count);
 
             Assert.That(context.Method, Is.EqualTo(prop.GetMethod));
             Assert.That(context.Member, Is.EqualTo(prop));
@@ -228,6 +229,23 @@ namespace Solti.Utils.Proxy.Generators.Tests
             IInterfaceHavingGenericMethod proxy = CreateProxy<IInterfaceHavingGenericMethod, InterfaceHavingGenericMethodProxy>();
 
             Assert.That(proxy.GenericMethod(10, null), Is.EqualTo(10));
+        }
+
+        public interface IBar 
+        {
+            int Baz();
+        }
+
+        public class BarExplicit : IBar
+        {
+            int IBar.Baz() => 1986;
+        }
+
+        [Test]
+        public void GeneratedProxy_ShouldWorkWithExplicitImplementations() 
+        {
+            IBar proxy = CreateProxy<IBar, InterfaceInterceptor<IBar>>(new BarExplicit());
+            Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
     }
 }

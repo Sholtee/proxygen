@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,11 +26,22 @@ namespace Solti.Utils.Proxy.Internals
             //
             TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void ThrowIfNotFound(MemberInfo targetMember, MemberInfo ifaceMember)
+        private static TMember GetTargetMember<TMember>(IEnumerable<TMember> members, TMember ifaceMember) where TMember: MemberInfo
         {
-            if (targetMember == null) 
+            TMember[] possibleTargets = members.Where(member => member.SignatureEquals(ifaceMember)).ToArray();
+
+            if (!possibleTargets.Any()) 
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
+
+            //
+            // Lehet tobb implementacio is pl.:
+            // "List<T>: ICollection<T>, IList" ahol IList nem ICollection<T> ose es mindkettonek van ReadOnly tulajdonsaga.
+            //
+
+            if (possibleTargets.Length > 1)
+                throw new AmbiguousMatchException();
+
+            return possibleTargets[0];
         }
 
         /// <summary>
@@ -40,25 +50,12 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal MethodDeclarationSyntax GenerateDuckMethod(MethodInfo ifaceMethod)
         {
-            MethodInfo targetMethod = typeof(TTarget)
-                .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true)
-                .SingleOrDefault(m => 
-                    m.Name.Equals(ifaceMethod.Name, StringComparison.Ordinal) &&
-
-                    //
-                    // Azert nem a "GetMethod(string, Type[])"-ot hasznaljuk mert az nem fogja megtalalni 
-                    // a nyilt generikus metodusokat mivel pl.:
-                    //
-                    // "interface IFoo {void Foo<T>(T para);}" es "class Foo {void Foo<T>(T para){}}"
-                    //
-                    // eseten amennyiben Foo nem valositja meg IFoo-t a ket generikus "T" nem ugyanaz a tipus.
-                    //
-
-                    ArgumentComparer.Instance.Equals(m.ReturnType, ifaceMethod.ReturnType)                              &&
-                    m.GetGenericArguments().SequenceEqual(ifaceMethod.GetGenericArguments(), ArgumentComparer.Instance) &&  
-                    m.GetParameters().SequenceEqual(ifaceMethod.GetParameters(), ParameterComparer.Instance));
-
-            ThrowIfNotFound(targetMethod, ifaceMethod);
+            MethodInfo targetMethod = GetTargetMember
+            (
+                typeof(TTarget)
+                    .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true),
+                ifaceMethod
+            );
 
             //
             // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
@@ -97,34 +94,12 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal MemberDeclarationSyntax GenerateDuckProperty(PropertyInfo ifaceProperty)
         {
-            PropertyInfo targetProperty = typeof(TTarget)
-                .ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic: true)
-                .SingleOrDefault(p => 
-                    p.Name == ifaceProperty.Name && 
-                    p.PropertyType == ifaceProperty.PropertyType &&
-
-                    //
-                    // Ha az interface tulajdonsaga irhato akkor targetnak is irhatonak kell lennie
-                    // (kulomben mind1 h irhato e v sem).
-                    //
-
-                    (!ifaceProperty.CanWrite || p.CanWrite) &&
-                    (!ifaceProperty.CanRead || p.CanRead) &&
-
-                    //
-                    // Indexer property-knel pedig meg kell egyezniuk az index parameterek
-                    // sorrendjenek es tipusanak.
-                    //
-
-                    ifaceProperty
-                        .GetIndexParameters()
-                        .Select(ip => ip.ParameterType)
-                        .SequenceEqual
-                        (
-                            p.GetIndexParameters().Select(ip => ip.ParameterType)
-                        ));
-
-            ThrowIfNotFound(targetProperty, ifaceProperty);
+            PropertyInfo targetProperty = GetTargetMember
+            (
+                typeof(TTarget)
+                    .ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic: true),
+                ifaceProperty
+            );
 
             //
             // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
@@ -187,11 +162,12 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal EventDeclarationSyntax GenerateDuckEvent(EventInfo ifaceEvent)
         {
-            EventInfo targetEvent = typeof(TTarget)
-                .ListMembers(System.Reflection.TypeExtensions.GetEvents, includeNonPublic: true)
-                .SingleOrDefault(ev => ev.Name == ifaceEvent.Name && ev.EventHandlerType == ifaceEvent.EventHandlerType);
-
-            ThrowIfNotFound(targetEvent, ifaceEvent);
+            EventInfo targetEvent = GetTargetMember
+            (
+                typeof(TTarget)
+                    .ListMembers(System.Reflection.TypeExtensions.GetEvents, includeNonPublic: true),
+                ifaceEvent
+            );
 
             //
             // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
@@ -293,7 +269,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
                 catch (Exception e)
                 {
-                    if (e is MissingMemberException || e is MemberAccessException)
+                    if (e is MissingMemberException || e is MemberAccessException || e is AmbiguousMatchException)
                     {
 
                         exceptions.Add(e);

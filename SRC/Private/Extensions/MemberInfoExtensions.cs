@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -59,5 +60,47 @@ namespace Solti.Utils.Proxy.Internals
         public static MemberInfo ExtractFrom<T>(Expression<Func<T>> expr) => DoExtractFrom(expr);
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object>> expr) => DoExtractFrom(expr);
+
+        public static bool SignatureEquals(this MemberInfo self, MemberInfo that) 
+        {
+            if (ReferenceEquals(self, that)) // igaz ha mindketto NULL  
+                return true;
+
+            if (self == null || that == null) 
+                return false;
+
+            if (!self.Name.Equals(that.Name, StringComparison.OrdinalIgnoreCase)) 
+                return false;
+
+            if (self is MethodInfo methodA && that is MethodInfo methodB) 
+                return
+                    methodA.GetGenericArguments().SequenceEqual(methodB.GetGenericArguments(), ArgumentComparer.Instance) &&
+                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance)            &&
+                    ArgumentComparer.Instance.Equals(methodA.ReturnType, methodB.ReturnType); // visszateres lehet generikus => ArgumentComparer
+
+            if (self is PropertyInfo propA && that is PropertyInfo propB)
+                return
+                    propA.PropertyType == propB.PropertyType &&
+                    propA.CanWrite == propB.CanWrite         &&
+                    propA.CanRead == propB.CanRead           &&
+
+                    //
+                    // Indexer property-knel meg kell egyezniuk az index parameterek
+                    // sorrendjenek es tipusanak.
+                    //
+
+                    propA
+                        .GetIndexParameters()
+                        .Select(p => p.ParameterType)
+                        .SequenceEqual
+                        (
+                            propB.GetIndexParameters().Select(p => p.ParameterType)
+                        );
+
+            if (self is EventInfo evtA && that is EventInfo evtB)
+                return evtA.EventHandlerType == evtB.EventHandlerType;
+
+            return false;
+        }
     }
 }

@@ -4,13 +4,16 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
+    using Internals;
     using Properties;
 
     [TestFixture]
@@ -93,5 +96,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckClass_ShouldGenerateTheDesiredClass() =>
             Assert.That(GeneratorFor<GoodFoo<int>>().GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt")));
+
+        [Test]
+        public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
+            Assert.Throws<AmbiguousMatchException>(() => new DuckSyntaxFactory<IList<int>, List<int>>().GenerateDuckProperty((PropertyInfo) MemberInfoExtensions.ExtractFrom<IList<int>>(i => i.IsReadOnly)));
     }
 }
