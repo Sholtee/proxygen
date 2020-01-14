@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxyGenerator.cs                                                             *
+* DuckGenerator.cs                                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -13,13 +13,11 @@ namespace Solti.Utils.Proxy.Perf
     using static Consts;
 
     [MemoryDiagnoser]
-    public class ProxyGenerator
+    public class DuckGenerator
     {
-        public class InterfaceProxy: InterfaceInterceptor<IInterface>
+        public class Implementation 
         {
-            public InterfaceProxy(IInterface target) : base(target)
-            {
-            }
+            public int DoSomething(string param) => param.GetHashCode();
         }
 
         [Benchmark(OperationsPerInvoke = OperationsPerInvoke)]
@@ -27,7 +25,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OperationsPerInvoke; i++)
             {
-                new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(Guid.NewGuid().ToString());
+                new DuckGenerator<IInterface, Implementation>().GenerateType(Guid.NewGuid().ToString());
             }
         }
     }

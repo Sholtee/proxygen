@@ -22,14 +22,18 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type FType;
 
-        private Type GenerateType() 
+        //
+        // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
+        //
+
+        internal Type GenerateType(string assemblyNameOverride = null) 
         {
             DoCheck();
 
             return Compile.ToAssembly
             (
                 root: SyntaxFactory.GenerateProxyUnit(),
-                asmName: SyntaxFactory.AssemblyName,
+                asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
                 references: References
             )
             .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
@@ -38,7 +42,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The genrated <see cref="Type"/>.
         /// </summary>
-        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this every concrete generator will have its own generated type")]
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this, every concrete generator will have its own generated type")]
         public static Type GeneratedType 
         {
             get 

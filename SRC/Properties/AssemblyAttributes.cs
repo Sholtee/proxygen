@@ -8,7 +8,8 @@ using System.Runtime.CompilerServices;
 
 [
     assembly:
-        NeutralResourcesLanguage("en")
+        NeutralResourcesLanguage("en"),
+        InternalsVisibleTo("ProxyGen.Perf")
 #if DEBUG
         , 
         InternalsVisibleTo("ProxyGen.Tests")
