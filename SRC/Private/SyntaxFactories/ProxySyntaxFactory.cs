@@ -195,7 +195,8 @@ namespace Solti.Utils.Proxy.Internals
             currentMethod = DeclareLocal<MethodInfo>(nameof(currentMethod), InvokeMethod
             (
                 METHOD_ACCESS,
-                null,
+                target: null,
+                castTarget: false,
                 Argument
                 (
                     expression: ParenthesizedLambdaExpression
@@ -203,8 +204,9 @@ namespace Solti.Utils.Proxy.Internals
                         parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
                         body: InvokeMethod
                         (
-                            method: method, 
-                            target: TARGET,
+                            method, 
+                            TARGET,
+                            castTarget: false,
 
                             //
                             // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
@@ -230,8 +232,9 @@ namespace Solti.Utils.Proxy.Internals
             DeclareLocal<object>("result", InvokeMethod
             (
                 INVOKE,
-                null,
-                arguments.Select(Argument).ToArray()
+                target: null,
+                castTarget: false,
+                arguments: arguments.Select(Argument).ToArray()
             ));
 
         /// <summary>
@@ -254,8 +257,9 @@ namespace Solti.Utils.Proxy.Internals
         {
             InvocationExpressionSyntax invocation = InvokeMethod(
                 method, 
-                TARGET, 
-                method
+                TARGET,
+                castTarget: false,
+                arguments: method
                     .GetParameters()
                     .Select(p => p.Name)
                     .ToArray());

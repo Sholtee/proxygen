@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AMBIGUOUS_MATCH" xml:space="preserve">
+    <value>Ambiguous match for member: {0}</value>
+  </data>
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>

@@ -62,6 +62,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ambiguous match for member: {0}.
+        /// </summary>
+        internal static string AMBIGUOUS_MATCH {
+            get {
+                return ResourceManager.GetString("AMBIGUOUS_MATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compilation failed. See &quot;Data&quot; for details..
         /// </summary>
         internal static string COMPILATION_FAILED {

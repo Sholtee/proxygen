@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             if (possibleTargets.Length > 1)
-                throw new AmbiguousMatchException();
+                throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.GetFullName()));
 
             return possibleTargets[0];
         }
@@ -67,6 +67,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 targetMethod, 
                 TARGET, 
+                castTarget: true,
                 ifaceMethod
                     .GetParameters()
                     .Select(para => para.Name)
@@ -112,7 +113,7 @@ namespace Solti.Utils.Proxy.Internals
             // maskepp vannak elnvezve a parameterei.
             //
 
-            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET);
+            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTarget: true);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
@@ -180,11 +181,11 @@ namespace Solti.Utils.Proxy.Internals
                 ifaceEvent, 
                 addBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: true)
+                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTarget: true)
                 ),
                 removeBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: false)
+                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTarget: true)
                 ),
                 forceInlining: true
             );

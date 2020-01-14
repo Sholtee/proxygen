@@ -59,6 +59,10 @@ namespace Solti.Utils.Proxy.Internals
                 // Explicit interface implementaciok azok akiknek nincs meg a parja a osztaly tagok
                 // kozt.
                 //
+                // TODO: FIXME: 
+                //   Ez nem fogja megtalalni azokat az explicit tagokat akik mellet van 
+                //   azonos szignaturaval rendelkezo osztaly tag.
+                //
 
                 return classMembers.Concat(
                     ifaceMembers.Where(ifaceMember => !classMembers.Any(classMember => classMember.SignatureEquals(ifaceMember))));
