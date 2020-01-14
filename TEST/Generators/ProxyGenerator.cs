@@ -248,6 +248,32 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
 
+        public interface IEventSource
+        {
+            event EventHandler Event;
+        }
+
+        public class EventSource: IEventSource
+        {
+            public event EventHandler Event;
+            public void Raise() => Event.Invoke(this, null);
+        }
+
+        [Test]
+        public void GeneratedProxy_ShouldHandleEvents()
+        {
+            var src = new EventSource();
+
+            IEventSource proxy = CreateProxy<IEventSource, InterfaceInterceptor<IEventSource>>(src);
+
+            int callCount = 0;
+            proxy.Event += (s, a) => callCount++;
+
+            src.Raise();
+
+            Assert.That(callCount, Is.EqualTo(1));
+        }
+
         public abstract class AbstractInterceptor : InterfaceInterceptor<IMyInterface> 
         {
             public AbstractInterceptor() : base(null) { }
