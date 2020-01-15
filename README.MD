@@ -1,4 +1,4 @@
-# ProxyGen [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![NuGet Badge](https://buildstats.info/nuget/proxygen.net)](https://www.nuget.org/packages/proxygen.net/)
+# ProxyGen [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)
 > .NET proxy generator powered by Roslyn
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
@@ -9,14 +9,14 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ...
   public class MyInterceptor: InterfaceInterceptor<IMyInterface>
   {
-    public ParameterValidator(IMyInterface target) : base(target){}  // Nothing to do here
+    public MyInterceptor(IMyInterface target) : base(target){}  // Nothing to do here
 
     public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) // Invoked on every method call on generated proxy type
     {
 	  if (needToModifyRetval)
 	  {
 	    return something;
-		// ref|out parameters can be assigned by setting the corresponding "args[]" item 
+        // ref|out parameters can be assigned by setting the corresponding "args[]" item 
 	  }
 	  return base.Invoke(method, args, extra); // Let the original method do its work
     }  
