@@ -1,4 +1,4 @@
-# ProxyGen [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)
+# ProxyGen [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)
 > .NET proxy generator powered by Roslyn
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
