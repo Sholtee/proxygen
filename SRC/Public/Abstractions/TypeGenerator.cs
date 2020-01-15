@@ -42,6 +42,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The genrated <see cref="Type"/>.
         /// </summary>
+        /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
         [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this, every concrete generator will have its own generated type")]
         public static Type GeneratedType 
         {
