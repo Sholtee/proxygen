@@ -631,7 +631,7 @@ namespace Solti.Utils.Proxy.Internals
 
             List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(new MemberDeclarationSyntax[]
             {
-                DeclareCtor(interceptorType.GetApplicableConstructor())
+                DeclareCtor(interceptorType.GetApplicableConstructor(AssemblyName))
             });
 
             members.AddRange

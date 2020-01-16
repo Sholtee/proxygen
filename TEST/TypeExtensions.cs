@@ -118,7 +118,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             void Baz();
         }
 
-        [TestCase(typeof(Object), "System.Object")]
+        [TestCase(typeof(object), "System.Object")]
         [TestCase(typeof(List<>), "System.Collections.Generic.List")] // generic
         [TestCase(typeof(IParent), "IParent")] // nested
         public void GetFriendlyName_ShouldBeautifyTheTypeName(Type type, string expected) => Assert.AreEqual(expected, type.GetFriendlyName());
@@ -175,26 +175,31 @@ namespace Solti.Utils.Proxy.Internals.Tests
             }
         }
 
-        [Test]
-        public void GetApplicableConstructor_ShouldNotThrowIfTheTypeHasOnlyOnePublicConstructor() 
-        {
-            Assert.DoesNotThrow(() => typeof(ClassWithPrivateCtor).GetApplicableConstructor());
-            Assert.DoesNotThrow(() => typeof(object).GetApplicableConstructor());
-        }
+        [TestCase(typeof(object))]
+        [TestCase(typeof(ClassWithPrivateCtor))]
+        [TestCase(typeof(ClassWithInternalCtor))]
+        [TestCase(typeof(ClassWithProtectedCtor))]
+        public void GetApplicableConstructor_ShouldNotThrowIfTheTypeHasOnlyOneAccessibleConstructor(Type type) => 
+            Assert.DoesNotThrow(() => type.GetApplicableConstructor(VisibilityTests.AnnotatedAssembly));
 
         private class ClassWithPrivateCtor 
         {
-            public ClassWithPrivateCtor() 
-            { 
-            }
+            public ClassWithPrivateCtor() { }
+            private ClassWithPrivateCtor(int i) { } // nem kene jatszon
+        }
 
-            private ClassWithPrivateCtor(int i) 
-            { 
-            }
+        private class ClassWithInternalCtor 
+        {
+            internal ClassWithInternalCtor() { }
+        }
+
+        private class ClassWithProtectedCtor
+        {
+            internal ClassWithProtectedCtor() { }
         }
 
         [Test]
         public void GetApplicableConstructor_ShouldThrowIfTheTypeHasMoreThanOnePublicConstructor() =>
-            Assert.Throws<InvalidOperationException>(() => typeof(List<int>).GetApplicableConstructor(), Resources.CONSTRUCTOR_AMBIGUITY);
+            Assert.Throws<InvalidOperationException>(() => typeof(List<int>).GetApplicableConstructor(null), Resources.CONSTRUCTOR_AMBIGUITY);
     }
 }

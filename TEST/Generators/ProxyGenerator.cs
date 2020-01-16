@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class ListProxy : InterfaceInterceptor<IList<int>>
         {
-            public ListProxy(IList<int> target) : base(target)
+            protected /*direkt*/ ListProxy(IList<int> target) : base(target)
             {
             }
         }
@@ -146,7 +146,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         internal class InternalInterfaceProxy : InterfaceInterceptor<IInternalInterface>
         {
-            public InternalInterfaceProxy() : base(null) { }
+            internal /*direkt*/ InternalInterfaceProxy() : base(null) { }
 
             public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => 1;
         }

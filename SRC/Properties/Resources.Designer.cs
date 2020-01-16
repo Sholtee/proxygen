@@ -89,7 +89,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type (&quot;{0}&quot;) must have only one public constructor..
+        ///   Looks up a localized string similar to The type (&quot;{0}&quot;) must have only one accessible constructor..
         /// </summary>
         internal static string CONSTRUCTOR_AMBIGUITY {
             get {

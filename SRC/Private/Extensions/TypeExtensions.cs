@@ -115,13 +115,25 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        public static ConstructorInfo GetApplicableConstructor(this Type src)
+        public static ConstructorInfo GetApplicableConstructor(this Type src, string assemblyName)
         {
-            ConstructorInfo[] ctors = src.GetConstructors();
+            ConstructorInfo[] ctors = src
+                .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Instance)
+                .Where(ctor => !ctor.IsPrivate) // protected es internal tagokat meg visszaadja
+                .ToArray();
+
             if (ctors.Length != 1)
                 throw new InvalidOperationException(string.Format(Resources.Culture, Resources.CONSTRUCTOR_AMBIGUITY, src));
 
-            return ctors[0];
+            ConstructorInfo result = ctors[0];
+
+            //
+            // Ez atengedi azt ha a deklaralo tipus maga nem lathato viszont ide akkor mar el sem kene jussunk.
+            //
+
+            Visibility.Check(result, assemblyName, allowProtected: true);
+
+            return result;
         }
     }
 }

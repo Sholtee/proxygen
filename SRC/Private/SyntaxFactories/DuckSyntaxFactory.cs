@@ -227,7 +227,7 @@ namespace Solti.Utils.Proxy.Internals
 
             List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(new MemberDeclarationSyntax[]
             {
-                DeclareCtor(@base.GetApplicableConstructor())
+                DeclareCtor(@base.GetApplicableConstructor(AssemblyName))
             });
 
             var exceptions = new List<Exception>();
