@@ -1,4 +1,4 @@
-# ProxyGen [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net)
+# ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net)
 > .NET proxy generator powered by Roslyn
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
@@ -34,7 +34,7 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ...
   IMyInterface target = ...;
   ...
-  IMyInterface proxy = (IMyInterface) Activator.CreateInstence(proxyType, new object[]{target});
+  IMyInterface proxy = (IMyInterface) Activator.CreateInstance(proxyType, new object[]{target});
   ```
 4. Enjoy
 
@@ -64,10 +64,10 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   ...
   TargetClass target = ...;
   ...
-  IDuck duck = (IDuck) Activator.CreateInstence(duckType, new object[]{target});
+  IDuck duck = (IDuck) Activator.CreateInstance(duckType, new object[]{target});
   ```
   
-If you don't get bored (yet) check out the related [tests](https://github.com/Sholtee/proxygen/blob/master/TEST/Generators/DuckGenerator.cs ).
+Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/Generators/DuckGenerator.cs ).
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen ) (WIP).
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
