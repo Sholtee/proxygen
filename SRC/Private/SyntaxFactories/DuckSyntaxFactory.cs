@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 targetMethod, 
                 TARGET, 
-                castTarget: true,
+                castTargetTo: ifaceMethod.DeclaringType,
                 ifaceMethod
                     .GetParameters()
                     .Select(para => para.Name)
@@ -105,7 +105,7 @@ namespace Solti.Utils.Proxy.Internals
             // maskepp vannak elnvezve a parameterei.
             //
 
-            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTarget: true);
+            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTargetTo: ifaceProperty.DeclaringType);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
@@ -168,11 +168,11 @@ namespace Solti.Utils.Proxy.Internals
                 ifaceEvent, 
                 addBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTarget: true)
+                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTargetTo: ifaceEvent.DeclaringType)
                 ),
                 removeBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTarget: true)
+                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTargetTo: ifaceEvent.DeclaringType)
                 ),
                 forceInlining: true
             );

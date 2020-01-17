@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 METHOD_ACCESS,
                 target: null,
-                castTarget: false,
+                castTargetTo: null,
                 Argument
                 (
                     expression: ParenthesizedLambdaExpression
@@ -206,7 +206,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             method, 
                             TARGET,
-                            castTarget: false,
+                            castTargetTo: null,
 
                             //
                             // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
@@ -233,7 +233,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 INVOKE,
                 target: null,
-                castTarget: false,
+                castTargetTo: null,
                 arguments: arguments.Select(Argument).ToArray()
             ));
 
@@ -258,7 +258,7 @@ namespace Solti.Utils.Proxy.Internals
             InvocationExpressionSyntax invocation = InvokeMethod(
                 method, 
                 TARGET,
-                castTarget: false,
+                castTargetTo: null,
                 arguments: method
                     .GetParameters()
                     .Select(p => p.Name)

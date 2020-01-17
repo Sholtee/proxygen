@@ -85,20 +85,20 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        private static ExpressionSyntax AmendTarget(ExpressionSyntax target, MemberInfo member, bool castTarget)
+        private static ExpressionSyntax AmendTarget(ExpressionSyntax target, MemberInfo member, Type castTargetTo)
         {
             if (target == null) 
             {
                 target = member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
             }
 
-            if (castTarget) 
+            if (castTargetTo != null) 
             {
                 Debug.Assert(!member.IsStatic());
 
                 target = ParenthesizedExpression
                 (
-                    CastExpression(CreateType(member.DeclaringType), target)
+                    CastExpression(CreateType(castTargetTo), target)
                 );
             }
 
@@ -110,18 +110,18 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>
-        protected internal static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax target, MemberInfo member, bool castTarget = false) =>
+        protected internal static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax target, MemberInfo member, Type castTargetTo = null) =>
             MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
-                AmendTarget(target, member, castTarget),
+                AmendTarget(target, member, castTargetTo),
                 IdentifierName(member.StrippedName())
             );
 
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)
         /// </summary>
-        protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax target, MethodInfo method, bool castTarget = false) 
+        protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax target, MethodInfo method, Type castTargetTo = null) 
         {
             string methodName = method.StrippedName();
 
@@ -138,7 +138,7 @@ namespace Solti.Utils.Proxy.Internals
             return MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
-                AmendTarget(target, method, castTarget),
+                AmendTarget(target, method, castTargetTo),
                 name
             );
         }
@@ -473,14 +473,14 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Event [+|-]= value;
         /// </summary>
-        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax target, bool add, bool castTarget = false) => AssignmentExpression
+        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax target, bool add, Type castTargetTo = null) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccess
             (
                 target,
                 @event,
-                castTarget
+                castTargetTo
             ),
             right: IdentifierName(Value)
         );
@@ -492,16 +492,16 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax target, bool castTarget = false) => !property.IsIndexer() 
+        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax target, Type castTargetTo = null) => !property.IsIndexer() 
             ? MemberAccess
             (
                 target,
                 property,
-                castTarget
+                castTargetTo
             )
             : (ExpressionSyntax) ElementAccessExpression
             (
-                AmendTarget(target, property, castTarget),
+                AmendTarget(target, property, castTargetTo),
                 BracketedArgumentList
                 (
                     arguments: CreateList(property.GetIndexParameters(), param => Argument(IdentifierName(param.Name)))
@@ -663,7 +663,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(..., ..., ...)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, bool castTarget = false, params ArgumentSyntax[] arguments)
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, Type castTargetTo = null, params ArgumentSyntax[] arguments)
         {
             Debug.Assert(arguments.Length == method.GetParameters().Length);
 
@@ -673,7 +673,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     target,
                     method,
-                    castTarget
+                    castTargetTo
                 )
             )
             .WithArgumentList
@@ -685,7 +685,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, bool castTarget = false, params string[] arguments)
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, Type castTargetTo = null, params string[] arguments)
         {
             IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
 
@@ -695,7 +695,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 method,
                 target,
-                castTarget,
+                castTargetTo,
                 arguments: paramz
                     .Select((param, i) =>
                     {
