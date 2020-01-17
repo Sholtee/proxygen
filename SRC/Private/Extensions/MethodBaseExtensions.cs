@@ -46,5 +46,25 @@ namespace Solti.Utils.Proxy.Internals
 
             throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER);
         }
+
+        public static Type GetDeclaringType(this MethodBase src) 
+        {
+            Type declaringType = src.DeclaringType;
+#if !NETSTANDARD1_6
+            foreach (Type iface in declaringType.GetInterfaces())
+            {
+                InterfaceMapping mapping = declaringType.GetInterfaceMap(iface);
+
+                //
+                // Ha a metodust resze egy interface implementacionak akkor ezt az interface-t
+                // tekintjuk deklaralo tipusnak.
+                //
+
+                if (mapping.TargetMethods.Contains(src))
+                    return iface;
+            }
+#endif
+            return declaringType;
+        }
     }
 }

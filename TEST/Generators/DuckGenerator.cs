@@ -143,6 +143,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public int Bar() => 0;
             public int Baz() => 0;
+            public string Foo { get; }
         }
 
         [Test]

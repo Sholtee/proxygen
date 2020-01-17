@@ -60,11 +60,13 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetMethod, AssemblyName);
 
+            Type castTargetTo = targetMethod.GetAccessModifiers() == AccessModifiers.Explicit ? targetMethod.GetDeclaringType() : null;
+
             ExpressionSyntax invocation = InvokeMethod
             (
                 targetMethod, 
                 TARGET, 
-                castTargetTo: ifaceMethod.DeclaringType,
+                castTargetTo,
                 ifaceMethod
                     .GetParameters()
                     .Select(para => para.Name)
@@ -98,7 +100,12 @@ namespace Solti.Utils.Proxy.Internals
             // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
             //
 
-            Visibility.Check(targetProperty, AssemblyName, checkGet: ifaceProperty.CanRead, checkSet: ifaceProperty.CanWrite);
+            Visibility.Check(targetProperty, AssemblyName, checkGet: ifaceProperty.CanRead, checkSet: ifaceProperty.CanWrite);       
+
+            MethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod;
+            Debug.Assert(accessor != null);
+
+            Type castTargetTo = accessor.GetAccessModifiers() == AccessModifiers.Explicit ? accessor.GetDeclaringType() : null;
 
             //
             // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
@@ -163,16 +170,21 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetEvent, AssemblyName, checkAdd: ifaceEvent.AddMethod != null, checkRemove: ifaceEvent.RemoveMethod != null);
 
+            MethodInfo accessor = ifaceEvent.AddMethod ?? ifaceEvent.RemoveMethod;
+            Debug.Assert(accessor != null);
+
+            Type castTargetTo = accessor.GetAccessModifiers() == AccessModifiers.Explicit ? accessor.GetDeclaringType() : null;
+
             return DeclareEvent
             (
                 ifaceEvent, 
                 addBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTargetTo: ifaceEvent.DeclaringType)
+                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTargetTo)
                 ),
                 removeBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTargetTo: ifaceEvent.DeclaringType)
+                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTargetTo)
                 ),
                 forceInlining: true
             );
