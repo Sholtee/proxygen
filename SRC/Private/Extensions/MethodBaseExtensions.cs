@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -13,12 +14,35 @@ namespace Solti.Utils.Proxy.Internals
     internal static class MethodBaseExtensions
     {
         public static AccessModifiers GetAccessModifiers(this MethodBase src) 
-        {
-            if (src.IsPrivate) return AccessModifiers.Private;
+        {          
             if (src.IsFamily) return AccessModifiers.Protected;
             if (src.IsAssembly) return AccessModifiers.Internal;
             if (src.IsFamilyOrAssembly) return AccessModifiers.Protected | AccessModifiers.Internal;
             if (src.IsPublic) return AccessModifiers.Public;
+            if (src.IsPrivate)
+            {
+
+#if !NETSTANDARD1_6
+                //
+                // Nem kell MemberInfo-n definialni mert a tulajdonsagok ([Get|Set]Method) es 
+                // esemenyek ([Add|Remove]Method) is visszavezethetok metodusokra.
+                //
+
+                Type declaringType = src.DeclaringType;
+
+                //
+                // Nem kell vizsgalni h a "declaringType" interface e mivel az interface-ek 
+                // metodusai sose privatak.
+                //
+
+                foreach (Type iface in declaringType.GetInterfaces())
+                {
+                    InterfaceMapping mapping = declaringType.GetInterfaceMap(iface);
+                    if (mapping.TargetMethods.Any(impl => impl == src)) return AccessModifiers.Explicit;
+                }
+#endif
+                return AccessModifiers.Private;
+            }
 
             throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER);
         }

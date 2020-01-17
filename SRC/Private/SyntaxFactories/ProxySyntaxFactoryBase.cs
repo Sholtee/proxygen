@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 SyntaxKind.SimpleMemberAccessExpression,
                 AmendTarget(target, member, castTarget),
-                IdentifierName(member.Name)
+                IdentifierName(member.StrippedName())
             );
 
         /// <summary>
@@ -123,9 +123,11 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax target, MethodInfo method, bool castTarget = false) 
         {
+            string methodName = method.StrippedName();
+
             SimpleNameSyntax name = !method.IsGenericMethod
-                ? (SimpleNameSyntax) IdentifierName(method.Name)
-                : (SimpleNameSyntax) GenericName(Identifier(method.Name)).WithTypeArgumentList
+                ? (SimpleNameSyntax) IdentifierName(methodName)
+                : (SimpleNameSyntax) GenericName(Identifier(methodName)).WithTypeArgumentList
                 (
                     typeArgumentList: TypeArgumentList
                     (
@@ -231,7 +233,7 @@ namespace Solti.Utils.Proxy.Internals
             MethodDeclarationSyntax result = MethodDeclaration
             (
                 returnType: returnTypeSytax,
-                identifier: Identifier(method.Name)
+                identifier: Identifier(method.StrippedName())
             )
             .WithExplicitInterfaceSpecifier
             (
@@ -313,7 +315,7 @@ namespace Solti.Utils.Proxy.Internals
             PropertyDeclarationSyntax result = PropertyDeclaration
             (
                 type: CreateType(property.PropertyType),
-                identifier: Identifier(property.Name)
+                identifier: Identifier(property.StrippedName())
             )
             .WithExplicitInterfaceSpecifier
             (
@@ -444,7 +446,7 @@ namespace Solti.Utils.Proxy.Internals
             EventDeclarationSyntax result = EventDeclaration
             (
                 type: CreateType(@event.EventHandlerType),
-                identifier: Identifier(@event.Name)
+                identifier: Identifier(@event.StrippedName())
             )
             .WithExplicitInterfaceSpecifier
             (

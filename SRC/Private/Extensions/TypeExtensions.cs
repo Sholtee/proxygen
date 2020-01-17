@@ -29,45 +29,108 @@ namespace Solti.Utils.Proxy.Internals
             Debug.Assert(!src.IsGenericType() || src.IsGenericTypeDefinition());
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
-
-        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, Func<Type, BindingFlags, TMember[]> backend, bool includeNonPublic = false) where TMember : MemberInfo
+#if !NETSTANDARD1_6
+        public static IReadOnlyDictionary<MethodBase, TMember> GetMembersByAccessor<TMember>(this Type src) where TMember: MemberInfo 
         {
-            IEnumerable<TMember> ifaceMembers = null;
+            Dictionary<MethodBase, TMember> result = new Dictionary<MethodBase, TMember>();
 
+            foreach (TMember member in src
+                .GetMembers(BindingFlags.Instance | BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.NonPublic)
+                .OfType<TMember>())
+            {
+                switch (member) 
+                {
+                    /*
+                    case ConstructorInfo constructor:
+                        result.Add(constructor, member);
+                        break;
+                    */
+                    case MethodInfo method:
+                        result.Add(method, member);
+                        break;
+                    case PropertyInfo property:
+                        if (property.GetMethod != null) result.Add(property.GetMethod, member);
+                        if (property.SetMethod != null) result.Add(property.SetMethod, member);
+                        break;
+                    case EventInfo @event:
+                        if (@event.AddMethod != null) result.Add(@event.AddMethod, member);
+                        if (@event.RemoveMethod != null) result.Add(@event.RemoveMethod, member);
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            return result;
+        }
+
+        public static IReadOnlyDictionary<TMember, TMember> GetInterfaceMappings<TMember>(this Type src) where TMember: MemberInfo
+        {
+            Debug.Assert(src.IsClass());
+
+            var result = new Dictionary<TMember, TMember>();
+
+            IReadOnlyDictionary<MethodBase, TMember> classMembers = src.GetMembersByAccessor<TMember>();
+
+            foreach (Type iface in src.GetInterfaces())
+            {
+                IReadOnlyDictionary<MethodBase, TMember> ifaceMembers = iface.GetMembersByAccessor<TMember>();
+
+                InterfaceMapping mapping = src.GetInterfaceMap(iface);
+
+                for (int i = 0; i < mapping.InterfaceMethods.Length; i++) 
+                {
+                    //
+                    // Biztosan letezik
+                    //
+
+                    TMember ifaceMember = ifaceMembers[mapping.InterfaceMethods[i]];
+
+                    //
+                    // Letezhetnek olyan tagok amik tobb modon is hozzaferhetok (pl.: Property.[Get|Set]Method)
+                    // es amiatt mar fel lehet veve.
+                    //
+
+                    if (result.ContainsKey(ifaceMember)) continue;
+
+                    //
+                    // Explicit implementacioknal pl nem letezik.
+                    //
+
+                    classMembers.TryGetValue(mapping.TargetMethods[i], out var classMember);
+
+                    //
+                    // Mappolas felvetele (ertek lehet NULL).
+                    //
+
+                    result.Add(ifaceMember, classMember);
+                }
+            }
+
+            return result;
+        }
+#endif
+        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false) where TMember : MemberInfo
+        {
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
-            if (src.IsInterface() | includeNonPublic)
-            {
+            if (src.IsInterface())
                 //
-                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre es explicit 
-                // implementaciokra.
+                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre (es explicit 
+                // implementaciokra).
                 //
 
-                ifaceMembers = src.GetInterfaces().SelectMany(iface => backend(iface, flags));
-
-                if (src.IsInterface()) 
-                    return backend(src, flags).Concat(ifaceMembers);
-            }
+                return GetMembers(src).Concat
+                (
+                    src.GetInterfaces().SelectMany(GetMembers)
+                );
           
             flags |= BindingFlags.FlattenHierarchy;
-            if (includeNonPublic) flags |= BindingFlags.NonPublic; // explicit implementaciokat nem adja vissza
+            if (includeNonPublic) flags |= BindingFlags.NonPublic;
 
-            IEnumerable<TMember> classMembers = backend(src, flags);
+            return GetMembers(src);
 
-            if (includeNonPublic)
-                //
-                // Explicit interface implementaciok azok akiknek nincs meg a parja a osztaly tagok
-                // kozt.
-                //
-                // TODO: FIXME: 
-                //   Ez nem fogja megtalalni azokat az explicit tagokat akik mellet van 
-                //   azonos szignaturaval rendelkezo osztaly tag.
-                //
-
-                return classMembers.Concat(
-                    ifaceMembers.Where(ifaceMember => !classMembers.Any(classMember => classMember.SignatureEquals(ifaceMember))));
-
-            return classMembers;
+            IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
         }
 
         //

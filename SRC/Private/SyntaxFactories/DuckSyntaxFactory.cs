@@ -26,9 +26,11 @@ namespace Solti.Utils.Proxy.Internals
             //
             TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target));
 
-        private static TMember GetTargetMember<TMember>(IEnumerable<TMember> members, TMember ifaceMember) where TMember: MemberInfo
+        private static TMember GetTargetMember<TMember>(Type target, TMember ifaceMember) where TMember: MemberInfo
         {
-            TMember[] possibleTargets = members.Where(member => member.SignatureEquals(ifaceMember)).ToArray();
+            TMember[] possibleTargets = target
+                .ListMembers<TMember>(includeNonPublic: true)
+                .Where(member => member.SignatureEquals(ifaceMember)).ToArray();
 
             if (!possibleTargets.Any()) 
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
@@ -50,12 +52,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal MethodDeclarationSyntax GenerateDuckMethod(MethodInfo ifaceMethod)
         {
-            MethodInfo targetMethod = GetTargetMember
-            (
-                typeof(TTarget)
-                    .ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true),
-                ifaceMethod
-            );
+            MethodInfo targetMethod = GetTargetMember(typeof(TTarget), ifaceMethod);
 
             //
             // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
@@ -95,12 +92,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal MemberDeclarationSyntax GenerateDuckProperty(PropertyInfo ifaceProperty)
         {
-            PropertyInfo targetProperty = GetTargetMember
-            (
-                typeof(TTarget)
-                    .ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic: true),
-                ifaceProperty
-            );
+            PropertyInfo targetProperty = GetTargetMember(typeof(TTarget), ifaceProperty);
 
             //
             // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
@@ -163,12 +155,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal EventDeclarationSyntax GenerateDuckEvent(EventInfo ifaceEvent)
         {
-            EventInfo targetEvent = GetTargetMember
-            (
-                typeof(TTarget)
-                    .ListMembers(System.Reflection.TypeExtensions.GetEvents, includeNonPublic: true),
-                ifaceEvent
-            );
+            EventInfo targetEvent = GetTargetMember(typeof(TTarget), ifaceEvent);
 
             //
             // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
@@ -235,7 +222,7 @@ namespace Solti.Utils.Proxy.Internals
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetMethods)
+                    .ListMembers<MethodInfo>()
                     .Where(m => !m.IsSpecialName)
                     .Select(m => AggregateException(m, GenerateDuckMethod))
             );  
@@ -243,14 +230,14 @@ namespace Solti.Utils.Proxy.Internals
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetProperties)
+                    .ListMembers<PropertyInfo>()
                     .Select(p => AggregateException(p, GenerateDuckProperty))
             );
 
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetEvents)
+                    .ListMembers<EventInfo>()
                     .Select(e => AggregateException(e, GenerateDuckEvent))
             );
 
