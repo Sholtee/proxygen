@@ -107,8 +107,6 @@ namespace Solti.Utils.Proxy.Internals
                 return evtA.EventHandlerType == evtB.EventHandlerType;
 
             return false;
-
-
         }
 
         private static MethodInfo EnsureNotSpecialized(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;

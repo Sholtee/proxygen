@@ -21,7 +21,6 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsPublic) return AccessModifiers.Public;
             if (src.IsPrivate)
             {
-
 #if !NETSTANDARD1_6
                 //
                 // Nem kell MemberInfo-n definialni mert a tulajdonsagok ([Get|Set]Method) es 
