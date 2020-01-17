@@ -112,7 +112,7 @@ namespace Solti.Utils.Proxy.Internals
             // maskepp vannak elnvezve a parameterei.
             //
 
-            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTargetTo: ifaceProperty.DeclaringType);
+            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTargetTo: castTargetTo);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"

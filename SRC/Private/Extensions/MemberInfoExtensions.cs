@@ -73,11 +73,16 @@ namespace Solti.Utils.Proxy.Internals
             if (self.StrippedName() != that.StrippedName()) 
                 return false;
 
-            if (self is MethodInfo methodA && that is MethodInfo methodB) 
+            if (self is MethodInfo methodA && that is MethodInfo methodB)
+            {
+                methodA = EnsureNotSpecialized(methodA);
+                methodB = EnsureNotSpecialized(methodB);
+
                 return
                     methodA.GetGenericArguments().SequenceEqual(methodB.GetGenericArguments(), ArgumentComparer.Instance) &&
-                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance)            &&
+                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance) &&
                     ArgumentComparer.Instance.Equals(methodA.ReturnType, methodB.ReturnType); // visszateres lehet generikus => ArgumentComparer
+            }
 
             if (self is PropertyInfo propA && that is PropertyInfo propB)
                 return
@@ -102,7 +107,11 @@ namespace Solti.Utils.Proxy.Internals
                 return evtA.EventHandlerType == evtB.EventHandlerType;
 
             return false;
+
+
         }
+
+        private static MethodInfo EnsureNotSpecialized(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van
