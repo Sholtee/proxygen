@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
@@ -44,7 +45,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         }
 
-        private static Internals.DuckSyntaxFactory<IFoo<int>, T> GeneratorFor<T>() => new Internals.DuckSyntaxFactory<IFoo<int>, T>();
+        private static DuckSyntaxFactory<IFoo<int>, T> GeneratorFor<T>() => new DuckSyntaxFactory<IFoo<int>, T>();
 
         [Test]
         public void GenerateDuckMethod_ShouldThrowIfTheMethodNotSupported() =>
@@ -56,7 +57,30 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateDuckMethod_ShouldGenerateTheDesiredMethodIfSupported() =>
-            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckMethod(Foo).NormalizeWhitespace().ToFullString(), Is.EqualTo("[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\r\nSystem.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c) => ((Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<System.Int32>)this.Target).Foo<TT>(a, out b, ref c);"));
+            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckMethod(Foo).NormalizeWhitespace().ToFullString(), Is.EqualTo("[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\r\nSystem.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);"));
+
+        public class ExplicitFoo : IFoo<int>
+        {
+            int IFoo<int>.Prop { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+            event TestDelegate<int> IFoo<int>.Event
+            {
+                add => throw new NotImplementedException();
+                remove => throw new NotImplementedException();
+            }
+            void IFoo<int>.Bar() => throw new NotImplementedException();
+            int IFoo<int>.Foo<TT>(int a, out string b, ref TT c) => throw new NotImplementedException();
+        }
+
+        [Test]
+        public void GenerateDuckMethod_ShouldHandleExplicitImplementations() 
+        {
+            string dummyS;
+            int dummyI = 0;
+
+            MethodInfo foo = (MethodInfo) MemberInfoExtensions.ExtractFrom<IFoo<int>>(i => i.Foo(0, out dummyS, ref dummyI));
+
+            Assert.That(GeneratorFor<ExplicitFoo>().GenerateDuckMethod(foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nSystem.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<System.Int32>(System.Int32 a, out System.String b, ref System.Int32 c) => ((Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>)this.Target).Foo<TT>(a, out b, ref c);"));
+        }
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowIfThePropertyNotSupported() =>
@@ -68,7 +92,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateDuckProperty_ShouldGenerateTheDesiredPropertyIfSupported() =>
-            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckProperty(Prop).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    get => ((Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>)this.Target).Prop;\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    set => ((Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>)this.Target).Prop = value;\n}"));
+            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckProperty(Prop).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    get => this.Target.Prop;\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    set => this.Target.Prop = value;\n}"));
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowIfTheEventNotSupported() =>
@@ -80,7 +104,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateDuckEvent_ShouldGenerateTheDesiredEventIfSupported() =>
-            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckEvent(Event).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    add => ((Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<System.Int32>)this.Target).Event += value;\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    remove => ((Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<System.Int32>)this.Target).Event -= value;\n}"));
+            Assert.That(GeneratorFor<GoodFoo<int>>().GenerateDuckEvent(Event).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    add => this.Target.Event += value;\n    [System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\n    remove => this.Target.Event -= value;\n}"));
 
         private class Dummy
         {

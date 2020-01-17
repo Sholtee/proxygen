@@ -39,10 +39,10 @@ namespace Solti.Utils.Proxy.Internals
             EVENTS = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Events),
             PROPERTIES = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Properties);
 
-        private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current, Func<Type, BindingFlags, TMember[]> factory) where TMember: MemberInfo
+        private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current) where TMember: MemberInfo
         {
             var generator = typeof(TInterface)
-                .ListMembers(factory)
+                .ListMembers<TMember>()
                 .Where(member => member.Name == current.Name)
                 .Select((member, i) => new { Index = i, Value = member })
                 .First(member => member.Value == current);
@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 METHOD_ACCESS,
                 target: null,
-                castTarget: false,
+                castTargetTo: null,
                 Argument
                 (
                     expression: ParenthesizedLambdaExpression
@@ -206,7 +206,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             method, 
                             TARGET,
-                            castTarget: false,
+                            castTargetTo: null,
 
                             //
                             // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
@@ -233,7 +233,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 INVOKE,
                 target: null,
-                castTarget: false,
+                castTargetTo: null,
                 arguments: arguments.Select(Argument).ToArray()
             ));
 
@@ -258,7 +258,7 @@ namespace Solti.Utils.Proxy.Internals
             InvocationExpressionSyntax invocation = InvokeMethod(
                 method, 
                 TARGET,
-                castTarget: false,
+                castTargetTo: null,
                 arguments: method
                     .GetParameters()
                     .Select(p => p.Name)
@@ -417,7 +417,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal IEnumerable<MemberDeclarationSyntax> GenerateProxyProperty(PropertyInfo ifaceProperty)
         {
-            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceProperty, System.Reflection.TypeExtensions.GetProperties);
+            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceProperty);
 
             yield return DeclareField<PropertyInfo>(fieldName, PROPERTIES, ifaceProperty);
 
@@ -551,7 +551,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal IEnumerable<MemberDeclarationSyntax> GenerateProxyEvent(EventInfo ifaceEvent)
         {
-            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceEvent, System.Reflection.TypeExtensions.GetEvents);
+            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceEvent);
 
             yield return DeclareField<EventInfo>(fieldName, EVENTS, ifaceEvent);
 
@@ -637,7 +637,7 @@ namespace Solti.Utils.Proxy.Internals
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetMethods)
+                    .ListMembers<MethodInfo>()
                     .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && !m.IsSpecialName)
                     .Select(GenerateProxyMethod)
             );
@@ -645,7 +645,7 @@ namespace Solti.Utils.Proxy.Internals
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetProperties)
+                    .ListMembers<PropertyInfo>()
                     .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
                     .SelectMany(GenerateProxyProperty)
             );
@@ -653,7 +653,7 @@ namespace Solti.Utils.Proxy.Internals
             members.AddRange
             (
                 interfaceType
-                    .ListMembers(System.Reflection.TypeExtensions.GetEvents)
+                    .ListMembers<EventInfo>()
                     .Where(e => !implementedInterfaces.Contains(e.DeclaringType))
                     .SelectMany(GenerateProxyEvent)
             );

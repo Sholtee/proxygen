@@ -49,8 +49,10 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
-            // "Private" mellett mas nem szerepelhet -> nem kell HasFlag()
+            // "Private", "Explicit" mellett mas nem szerepelhet -> nem kell HasFlag()
             //
+
+            if (am == AccessModifiers.Explicit) return; // meg ha cast-olni is kell hozza de lathato
 
             if (am == AccessModifiers.Private)
                 throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.GetFullName()));

@@ -30,44 +30,27 @@ namespace Solti.Utils.Proxy.Internals
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
 
-        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, Func<Type, BindingFlags, TMember[]> backend, bool includeNonPublic = false) where TMember : MemberInfo
+        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false) where TMember : MemberInfo
         {
-            IEnumerable<TMember> ifaceMembers = null;
-
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
-            if (src.IsInterface() | includeNonPublic)
-            {
+            if (src.IsInterface())
                 //
-                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre es explicit 
-                // implementaciokra.
+                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre (es explicit 
+                // implementaciokra).
                 //
 
-                ifaceMembers = src.GetInterfaces().SelectMany(iface => backend(iface, flags));
-
-                if (src.IsInterface()) 
-                    return backend(src, flags).Concat(ifaceMembers);
-            }
+                return GetMembers(src).Concat
+                (
+                    src.GetInterfaces().SelectMany(GetMembers)
+                );
           
             flags |= BindingFlags.FlattenHierarchy;
-            if (includeNonPublic) flags |= BindingFlags.NonPublic; // explicit implementaciokat nem adja vissza
+            if (includeNonPublic) flags |= BindingFlags.NonPublic;
 
-            IEnumerable<TMember> classMembers = backend(src, flags);
+            return GetMembers(src);
 
-            if (includeNonPublic)
-                //
-                // Explicit interface implementaciok azok akiknek nincs meg a parja a osztaly tagok
-                // kozt.
-                //
-                // TODO: FIXME: 
-                //   Ez nem fogja megtalalni azokat az explicit tagokat akik mellet van 
-                //   azonos szignaturaval rendelkezo osztaly tag.
-                //
-
-                return classMembers.Concat(
-                    ifaceMembers.Where(ifaceMember => !classMembers.Any(classMember => classMember.SignatureEquals(ifaceMember))));
-
-            return classMembers;
+            IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
         }
 
         //

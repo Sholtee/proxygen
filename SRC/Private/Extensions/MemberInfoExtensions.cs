@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -69,14 +70,19 @@ namespace Solti.Utils.Proxy.Internals
             if (self == null || that == null) 
                 return false;
 
-            if (!self.Name.Equals(that.Name, StringComparison.OrdinalIgnoreCase)) 
+            if (self.StrippedName() != that.StrippedName()) 
                 return false;
 
-            if (self is MethodInfo methodA && that is MethodInfo methodB) 
+            if (self is MethodInfo methodA && that is MethodInfo methodB)
+            {
+                methodA = EnsureNotSpecialized(methodA);
+                methodB = EnsureNotSpecialized(methodB);
+
                 return
                     methodA.GetGenericArguments().SequenceEqual(methodB.GetGenericArguments(), ArgumentComparer.Instance) &&
-                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance)            &&
+                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance) &&
                     ArgumentComparer.Instance.Equals(methodA.ReturnType, methodB.ReturnType); // visszateres lehet generikus => ArgumentComparer
+            }
 
             if (self is PropertyInfo propA && that is PropertyInfo propB)
                 return
@@ -102,5 +108,15 @@ namespace Solti.Utils.Proxy.Internals
 
             return false;
         }
+
+        private static MethodInfo EnsureNotSpecialized(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
+
+        //
+        // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van
+        //
+
+        private static readonly Regex FStripper = new Regex("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
+
+        public static string StrippedName(this MemberInfo self) => FStripper.Match(self.Name).Value;
     }
 }

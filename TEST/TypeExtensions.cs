@@ -21,12 +21,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void ListMembers_ShouldReturnOverLoadedInterfaceMembers() 
         {
-            MethodInfo[] methods = typeof(IEnumerable<string>).ListMembers(System.Reflection.TypeExtensions.GetMethods).ToArray();
+            MethodInfo[] methods = typeof(IEnumerable<string>).ListMembers<MethodInfo>().ToArray();
             Assert.That(methods.Length, Is.EqualTo(2));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable<string>>(i => i.GetEnumerator())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable>(i => i.GetEnumerator())));
 
-            PropertyInfo[] properties = typeof(IEnumerator<string>).ListMembers(System.Reflection.TypeExtensions.GetProperties).ToArray();
+            PropertyInfo[] properties = typeof(IEnumerator<string>).ListMembers<PropertyInfo>().ToArray();
             Assert.That(properties.Length, Is.EqualTo(2));
             Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
             Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
@@ -35,19 +35,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void ListMembers_ShouldReturnExplicitImplementations() 
         {
-            MethodInfo[] methods = typeof(List<int>).ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true).ToArray();
+            MethodInfo[] methods = typeof(List<int>).ListMembers<MethodInfo>(includeNonPublic: true).ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(methods.Distinct().Count()));
 
             // Enumerator, IEnumerator, IEnumerator<int>
-            Assert.That(methods.Where(m => m.Name == nameof(IEnumerable.GetEnumerator)).Count(), Is.EqualTo(3));
+            Assert.That(methods.Where(m => m.Name.Contains(nameof(IEnumerable.GetEnumerator))).Count(), Is.EqualTo(3));
 
-            PropertyInfo[] properties = typeof(List<int>).ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic: true).ToArray();
+            PropertyInfo[] properties = typeof(List<int>).ListMembers<PropertyInfo>(includeNonPublic: true).ToArray();
 
             Assert.That(properties.Length, Is.EqualTo(properties.Distinct().Count()));
 
             // ICollection<T>.IsReadOnly, IList-ReadOnly
-            Assert.That(properties.Where(prop => prop.Name == nameof(IList.IsReadOnly)).Count(), Is.EqualTo(2));
+            Assert.That(properties.Where(prop => prop.Name.Contains(nameof(IList.IsReadOnly))).Count(), Is.EqualTo(2));
         }
 
         public interface IInterface 
@@ -62,18 +62,20 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        [Ignore("See FIXME in ListMembers()")]
         public void ListMembers_ShouldReturnExplicitImplementations2() 
         {
-            IEnumerable<MethodInfo> methods = typeof(NoughtyClass).ListMembers(System.Reflection.TypeExtensions.GetMethods, includeNonPublic: true);
+            MethodInfo[] methods = typeof(NoughtyClass)
+                .ListMembers<MethodInfo>(includeNonPublic: true)
+                .Where(m => m.Name.Contains(nameof(IInterface.Bar)))
+                .ToArray();
 
-            Assert.That(methods.Where(m => m.Name == nameof(IInterface.Bar)).Count(), Is.EqualTo(2));
+            Assert.That(methods.Count, Is.EqualTo(2));
         }
 
         [Test]
         public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy()
         {
-            MethodInfo[] methods = typeof(IGrandChild).ListMembers(System.Reflection.TypeExtensions.GetMethods).ToArray();
+            MethodInfo[] methods = typeof(IGrandChild).ListMembers<MethodInfo>().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(3));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IParent>(i => i.Foo())));
@@ -85,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase(false, 1)]
         public void ListMembers_ShouldReturnNonPublicMembersIfNecessary(bool includeNonPublic, int expectedLength) 
         {
-            PropertyInfo[] properties = typeof(Class).ListMembers(System.Reflection.TypeExtensions.GetProperties, includeNonPublic).ToArray();
+            PropertyInfo[] properties = typeof(Class).ListMembers<PropertyInfo>(includeNonPublic).ToArray();
 
             Assert.That(properties.Length, Is.EqualTo(expectedLength));
         }

@@ -100,16 +100,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public interface IBar
         {
+            string Foo { get; }
             int Baz();
         }
 
         public interface IAnotherBar 
         {
+            string Foo { get; }
             int Baz();
         }
 
         public class AnotherBarExplicit : IAnotherBar
         {
+            string IAnotherBar.Foo => "cica";
             int IAnotherBar.Baz() => 1986;
         }
 
@@ -126,6 +129,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         private class Private : IBar
         {
             public int Baz() => 0;
+            public string Foo { get; }
         }
 
         [Test]
@@ -134,5 +138,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.Throws<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
             Assert.Throws<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
         }
+
+        public class MyBar 
+        {
+            public int Bar() => 0;
+            public int Baz() => 0;
+            public string Foo { get; }
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldDistinguishByName() =>
+            Assert.DoesNotThrow(() => _ = DuckGenerator<IBar, MyBar>.GeneratedType);       
     }
 }
