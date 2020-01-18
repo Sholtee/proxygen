@@ -23,22 +23,10 @@ namespace Solti.Utils.Proxy.Internals
             {
 #if !NETSTANDARD1_6
                 //
-                // Nem kell MemberInfo-n definialni mert a tulajdonsagok ([Get|Set]Method) es 
-                // esemenyek ([Add|Remove]Method) is visszavezethetok metodusokra.
+                // Ha a metodus privat akkor biztos nem interface metodus.
                 //
 
-                Type declaringType = src.DeclaringType;
-
-                //
-                // Nem kell vizsgalni h a "declaringType" interface e mivel az interface-ek 
-                // metodusai sose privatak.
-                //
-
-                foreach (Type iface in declaringType.GetInterfaces())
-                {
-                    InterfaceMapping mapping = declaringType.GetInterfaceMap(iface);
-                    if (mapping.TargetMethods.Any(impl => impl == src)) return AccessModifiers.Explicit;
-                }
+                if (src.GetDeclaringType().IsInterface()) return AccessModifiers.Explicit;
 #endif
                 return AccessModifiers.Private;
             }
@@ -55,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
                 InterfaceMapping mapping = declaringType.GetInterfaceMap(iface);
 
                 //
-                // Ha a metodust resze egy interface implementacionak akkor ezt az interface-t
+                // Ha a metodus resze egy interface implementacionak akkor ezt az interface-t
                 // tekintjuk deklaralo tipusnak.
                 //
 
