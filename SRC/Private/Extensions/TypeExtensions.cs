@@ -101,7 +101,7 @@ namespace Solti.Utils.Proxy.Internals
         public static ConstructorInfo GetApplicableConstructor(this Type src, string assemblyName)
         {
             ConstructorInfo[] ctors = src
-                .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy | BindingFlags.Instance)
+                .GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Instance)
                 .Where(ctor => !ctor.IsPrivate) // protected es internal tagokat meg visszaadja
                 .ToArray();
 
