@@ -11,7 +11,7 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   {
     public MyInterceptor(IMyInterface target) : base(target){}  // Nothing to do here
 
-    public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) // Invoked on every method call on generated proxy type
+    public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) // Invoked on every method call on generated proxy instance
     {
 	  if (needToModifyRetval)
 	  {
@@ -26,7 +26,10 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ```csharp
   using Solti.Utils.Proxy.Generators;
   ...  
-  Type proxyType = ProxyGenerator<IMyInterface, MyInterceptor>.GeneratedType; // The returned proxy type is assembled only once
+  // The returned type 
+  // 1) is assembled only once
+  // 2) "inherits" all the public constructors from "MyInterceptor"
+  Type proxyType = ProxyGenerator<IMyInterface, MyInterceptor>.GeneratedType;
   ```
 3. Activate the proxy:
   ```csharp
@@ -40,7 +43,7 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
 
 For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/master/TEST/Generators/ProxyGenerator.cs ) or [that](https://github.com/Sholtee/injector#decorating-services ).
 ### To create ducks:
-1. Take an interface that covers the desired members of the target class:
+1. Declare an interface that covers the desired members of the target class:
   ```csharp
   public class TargetClass // Not implements IDuck
   {
@@ -56,7 +59,10 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   ```csharp
   using Solti.Utils.Proxy.Generators;
   ...
-  Type duckType = DuckGenerator<IDuck, TargetClass>.GeneratedType; // The returned duck type is assembled only once
+  // The returned type:
+  // 1) is assembled only once
+  // 2) has only one public constructor with the following layout: "GeneratedProxy(TargetClass target)"
+  Type duckType = DuckGenerator<IDuck, TargetClass>.GeneratedType;
   ```
 3. Quack:
   ```csharp
