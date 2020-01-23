@@ -77,6 +77,7 @@ Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen ) (WIP).
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
+- [Version History](https://github.com/Sholtee/proxygen/blob/master/history.md )
 
 ## Supported frameworks
 This project currently targets *.NET Standard* 1.6, 2.0 and 2.1.
