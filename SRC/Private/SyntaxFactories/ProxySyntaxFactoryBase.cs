@@ -730,7 +730,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// TypeName(int a, string b, ...){...}
+        /// TypeName(int a, string b, ...): base(a, b, ...){ }
         /// </summary>
         protected internal ConstructorDeclarationSyntax DeclareCtor(ConstructorInfo ctor)
         {
