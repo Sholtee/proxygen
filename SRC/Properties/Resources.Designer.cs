@@ -89,15 +89,6 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type (&quot;{0}&quot;) must have only one accessible constructor..
-        /// </summary>
-        internal static string CONSTRUCTOR_AMBIGUITY {
-            get {
-                return ResourceManager.GetString("CONSTRUCTOR_AMBIGUITY", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The method (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
         /// </summary>
         internal static string IVT_REQUIRED {
@@ -121,6 +112,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string MISSING_IMPLEMENTATION {
             get {
                 return ResourceManager.GetString("MISSING_IMPLEMENTATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least one public constructor should be declared on {0}..
+        /// </summary>
+        internal static string NO_PUBLIC_CTOR {
+            get {
+                return ResourceManager.GetString("NO_PUBLIC_CTOR", resourceCulture);
             }
         }
         

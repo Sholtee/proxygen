@@ -176,32 +176,5 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
             }
         }
-
-        [TestCase(typeof(object))]
-        [TestCase(typeof(ClassWithPrivateCtor))]
-        [TestCase(typeof(ClassWithInternalCtor))]
-        [TestCase(typeof(ClassWithProtectedCtor))]
-        public void GetApplicableConstructor_ShouldNotThrowIfTheTypeHasOnlyOneAccessibleConstructor(Type type) => 
-            Assert.DoesNotThrow(() => type.GetApplicableConstructor(VisibilityTests.AnnotatedAssembly));
-
-        private class ClassWithPrivateCtor 
-        {
-            public ClassWithPrivateCtor() { }
-            private ClassWithPrivateCtor(int i) { } // nem kene jatszon
-        }
-
-        private class ClassWithInternalCtor 
-        {
-            internal ClassWithInternalCtor() { }
-        }
-
-        private class ClassWithProtectedCtor
-        {
-            internal ClassWithProtectedCtor() { }
-        }
-
-        [Test]
-        public void GetApplicableConstructor_ShouldThrowIfTheTypeHasMoreThanOnePublicConstructor() =>
-            Assert.Throws<InvalidOperationException>(() => typeof(List<int>).GetApplicableConstructor(null), Resources.CONSTRUCTOR_AMBIGUITY);
     }
 }

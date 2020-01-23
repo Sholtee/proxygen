@@ -126,9 +126,6 @@
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>
-  <data name="CONSTRUCTOR_AMBIGUITY" xml:space="preserve">
-    <value>The type ("{0}") must have only one accessible constructor.</value>
-  </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>
@@ -143,6 +140,9 @@
   </data>
   <data name="NOT_A_CLASS" xml:space="preserve">
     <value>The type must be a class.</value>
+  </data>
+  <data name="NO_PUBLIC_CTOR" xml:space="preserve">
+    <value>At least one public constructor should be declared on {0}.</value>
   </data>
   <data name="NULL_TARGET" xml:space="preserve">
     <value>The target is NULL.</value>

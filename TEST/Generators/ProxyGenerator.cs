@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class ListProxy : InterfaceInterceptor<IList<int>>
         {
-            protected /*direkt*/ ListProxy(IList<int> target) : base(target)
+            public ListProxy(IList<int> target) : base(target)
             {
             }
         }
@@ -146,7 +146,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         internal class InternalInterfaceProxy : InterfaceInterceptor<IInternalInterface>
         {
-            internal /*direkt*/ InternalInterfaceProxy() : base(null) { }
+            public InternalInterfaceProxy() : base(null) { }
 
             public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => 1;
         }
@@ -284,7 +284,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             private InterceptorWithPrivateCtor() : base(null) { }
         }
 
-        private  class PrivateInterceptor : InterfaceInterceptor<IMyInterface>
+        private class PrivateInterceptor : InterfaceInterceptor<IMyInterface>
         {
             public PrivateInterceptor() : base(null) { }
         }
@@ -303,6 +303,24 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.Throws<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
             Assert.Throws<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
             Assert.Throws<MemberAccessException>(() => CreateProxy<IMyInterface, PrivateInterceptor>());
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldHandleInterceptorsWithMultipleCtors() 
+        {
+            Assert.DoesNotThrow(() => CreateProxy<IList<int>, InterceptorWithMultipleCtors>(new List<int>()));
+            Assert.DoesNotThrow(() => CreateProxy<IList<int>, InterceptorWithMultipleCtors>(new List<int>(), "cica"));
+        }
+
+        public class InterceptorWithMultipleCtors : InterfaceInterceptor<IList<int>>
+        {
+            public InterceptorWithMultipleCtors(IList<int> target) : base(target)
+            {
+            }
+
+            public InterceptorWithMultipleCtors(IList<int> target, string cica) : this(target)
+            {
+            }
         }
     }
 }

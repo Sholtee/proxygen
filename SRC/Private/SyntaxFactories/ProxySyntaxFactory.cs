@@ -629,10 +629,7 @@ namespace Solti.Utils.Proxy.Internals
 
             HashSet<Type> implementedInterfaces = new HashSet<Type>(interceptorType.GetInterfaces());
 
-            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(new MemberDeclarationSyntax[]
-            {
-                DeclareCtor(interceptorType.GetApplicableConstructor(AssemblyName))
-            });
+            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(interceptorType.GetPublicConstructors().Select(DeclareCtor));
 
             members.AddRange
             (
