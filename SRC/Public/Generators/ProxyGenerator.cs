@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Generators
     /// Type generator for creating proxies that intercept interface method calls.
     /// </summary>
     /// <typeparam name="TInterface">The interface to which the proxy will be created.</typeparam>
-    /// <typeparam name="TInterceptor">The <see cref="InterfaceInterceptor{TInterface}"/> descendant.</typeparam>
+    /// <typeparam name="TInterceptor">An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.</typeparam>
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         /// <summary>
