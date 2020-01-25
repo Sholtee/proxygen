@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
@@ -20,6 +22,12 @@ namespace Solti.Utils.Proxy.Internals
         /// Creates a new <see cref="DuckBase{T}"/> instance.
         /// </summary>
         /// <param name="target">The target of the entity being created.</param>
-        public DuckBase(T target) => Target = target; // ne Protected legyen
+        public DuckBase(T target)  // ne "protected" legyen
+        {
+            if (target == null)
+                throw new ArgumentNullException(nameof(target));
+
+            Target = target;
+        }
     }
 }
