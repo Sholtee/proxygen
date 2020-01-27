@@ -31,8 +31,8 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Extracts the <see cref="MethodInfo"/> from the given expression.
         /// </summary>
-        /// <param name="methodAccess">The expression to be process.</param>
-        /// <returns>The extracted <see cref="MethodInfo"/> object.</returns>
+        /// <param name="methodAccess">The expression to be processed.</param>
+        /// <returns>The extracted <see cref="MethodInfo"/> instance.</returns>
         /// <remarks>This is an internal method, don't use it.</remarks>
         protected internal static MethodInfo MethodAccess(Expression<Action> methodAccess)
         {
@@ -80,7 +80,6 @@ namespace Solti.Utils.Proxy
         /// Creates a new <see cref="InterfaceInterceptor{TInterface}"/> instance against the given <paramref name="target"/>.
         /// </summary>
         /// <param name="target">The target of this interceptor.</param>
-        /// <remarks>The interceptor must have only one public constructor.</remarks>
         public InterfaceInterceptor(TInterface target) => Target = target;
 
         /// <summary>
@@ -90,7 +89,7 @@ namespace Solti.Utils.Proxy
         /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
         /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
-        /// <remarks>The invocation will be forwarded to the <see cref="Target"/> if this method returns <see cref="CALL_TARGET"/>.</remarks>
+        /// <remarks>The invocation will be forwarded to the <see cref="Target"/> if this method returns the value of <see cref="CALL_TARGET"/>.</remarks>
         public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra) => Target != null ? CALL_TARGET : throw new InvalidOperationException(Resources.NULL_TARGET);
     }
 }
