@@ -36,11 +36,12 @@ namespace Solti.Utils.Proxy.Internals
 
         public static Type GetDeclaringType(this MethodBase src) 
         {
-            Type declaringType = src.DeclaringType;
 #if !NETSTANDARD1_6
-            foreach (Type iface in declaringType.GetInterfaces())
+            Type reflectedType = src.ReflectedType;
+
+            foreach (Type iface in reflectedType.GetInterfaces())
             {
-                InterfaceMapping mapping = declaringType.GetInterfaceMap(iface);
+                InterfaceMapping mapping = reflectedType.GetInterfaceMap(iface);
 
                 //
                 // Ha a metodus resze egy interface implementacionak akkor ezt az interface-t
@@ -51,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
                     return iface;
             }
 #endif
-            return declaringType;
+            return src.DeclaringType;
         }
     }
 }
