@@ -109,7 +109,11 @@ namespace Solti.Utils.Proxy.Internals
         #region Protected
         protected internal static string GetSafeTypeName<T>() => CreateType<T>()
             .ToFullString()
-            .Replace(",", "_");
+            //
+            // Csak karaktert es ne karakterlancot csereljunk h az eredmenyt ne befolyasolja a
+            // felhasznalo teruleti beallitasa.
+            //
+            .Replace(',', '_');
 
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
