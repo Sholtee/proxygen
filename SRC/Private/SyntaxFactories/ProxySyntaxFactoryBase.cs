@@ -107,6 +107,10 @@ namespace Solti.Utils.Proxy.Internals
         #endregion
 
         #region Protected
+        protected internal static string GetSafeTypeName<T>() => CreateType<T>()
+            .ToFullString()
+            .Replace(",", "_");
+
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>

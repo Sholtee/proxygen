@@ -592,7 +592,7 @@ namespace Solti.Utils.Proxy.Internals
         }
         #endregion
 
-        public override string AssemblyName => $"{CreateType<TInterceptor>()}_{CreateType<TInterface>()}_Proxy"; 
+        public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy"; 
 
         protected internal override ClassDeclarationSyntax GenerateProxyClass()
         {

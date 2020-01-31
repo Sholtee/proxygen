@@ -30,7 +30,8 @@ namespace Solti.Utils.Proxy.Internals
         {
             TMember[] possibleTargets = target
                 .ListMembers<TMember>(includeNonPublic: true)
-                .Where(member => member.SignatureEquals(ifaceMember)).ToArray();
+                .Where(member => member.SignatureEquals(ifaceMember))
+                .ToArray();
 
             if (!possibleTargets.Any()) 
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
@@ -60,14 +61,14 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetMethod, AssemblyName);
 
-            Type castTargetTo = targetMethod.GetAccessModifiers() == AccessModifiers.Explicit ? targetMethod.GetDeclaringType() : null;
-
             ExpressionSyntax invocation = InvokeMethod
             (
                 targetMethod, 
                 TARGET, 
-                castTargetTo,
-                ifaceMethod
+                castTargetTo: targetMethod.GetAccessModifiers() == AccessModifiers.Explicit 
+                    ? targetMethod.GetDeclaringType() 
+                    : null,
+                arguments: ifaceMethod
                     .GetParameters()
                     .Select(para => para.Name)
                     .ToArray()
@@ -105,14 +106,19 @@ namespace Solti.Utils.Proxy.Internals
             MethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod;
             Debug.Assert(accessor != null);
 
-            Type castTargetTo = accessor.GetAccessModifiers() == AccessModifiers.Explicit ? accessor.GetDeclaringType() : null;
-
             //
             // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
             // maskepp vannak elnvezve a parameterei.
             //
 
-            ExpressionSyntax propertyAccess = PropertyAccess(ifaceProperty, TARGET, castTargetTo: castTargetTo);
+            ExpressionSyntax propertyAccess = PropertyAccess
+            (
+                ifaceProperty, 
+                TARGET, 
+                castTargetTo: accessor.GetAccessModifiers() == AccessModifiers.Explicit 
+                    ? accessor.GetDeclaringType() 
+                    : null
+            );
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
@@ -277,6 +283,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public override string AssemblyName => $"{CreateType<TTarget>()}_{CreateType<TInterface>()}_Duck";
+        public override string AssemblyName => $"{GetSafeTypeName<TTarget>()}_{GetSafeTypeName<TInterface>()}_Duck";
     }
 }

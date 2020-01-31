@@ -20,6 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         // "&":  referencia szerinti parameter
         // "`d": generikus tipus ahol "d" egesz szam
         // "[T, TT]": generikus parameterek
+        // "[<PropName_1>xXx, <PropName_2>xXx]": anonim oljektum property-k
         //
 
         private static readonly Regex TypeNameReplacer = new Regex(@"\&|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
