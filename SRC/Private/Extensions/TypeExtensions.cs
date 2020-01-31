@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
         // "[T, TT]": generikus parameterek
         //
 
-        private static readonly Regex TypeNameReplacer = new Regex(@"\&|`\d+(\[[\w,]+\])?", RegexOptions.Compiled);
+        private static readonly Regex TypeNameReplacer = new Regex(@"\&|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
 
         public static string GetFriendlyName(this Type src)
         {
