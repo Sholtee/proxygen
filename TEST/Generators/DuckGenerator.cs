@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using NUnit.Framework;
@@ -17,7 +18,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static TInterface CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface) Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
+            (TInterface)Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
 
         [Test]
         public void GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -58,19 +59,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(para, Is.EqualTo("cica"));
         }
 
-        public interface IEventSource 
+        public interface IEventSource
         {
             event EventHandler Event;
         }
 
-        public class EventSource 
+        public class EventSource
         {
             public event EventHandler Event;
             public void Raise() => Event.Invoke(this, null);
         }
 
         [Test]
-        public void GeneratedProxy_ShouldHandleEvents() 
+        public void GeneratedProxy_ShouldHandleEvents()
         {
             var src = new EventSource();
 
@@ -89,7 +90,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             void Foo();
         }
 
-        internal class Internal 
+        internal class Internal
         {
             internal void Foo() { }
         }
@@ -104,7 +105,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int Baz();
         }
 
-        public interface IAnotherBar 
+        public interface IAnotherBar
         {
             string Foo { get; }
             int Baz();
@@ -133,13 +134,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void DuckGenerator_ShouldValidate() 
+        public void DuckGenerator_ShouldValidate()
         {
             Assert.Throws<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
             Assert.Throws<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
         }
 
-        public class MyBar 
+        public class MyBar
         {
             public int Bar() => 0;
             public int Baz() => 0;
@@ -148,6 +149,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldDistinguishByName() =>
-            Assert.DoesNotThrow(() => _ = DuckGenerator<IBar, MyBar>.GeneratedType);       
+            Assert.DoesNotThrow(() => _ = DuckGenerator<IBar, MyBar>.GeneratedType);
+
+        [Test]
+        public void DuckGenerator_ShouldThrowOnAmbiguousImplementation() =>
+            Assert.Throws<AmbiguousMatchException>(() => _ = DuckGenerator<IBar, MultipleBaz>.GeneratedType);
+
+        public class MultipleBaz : IBar
+        {
+            string IBar.Foo => throw new NotImplementedException();
+
+            int IBar.Baz() => throw new NotImplementedException();
+
+            public int Baz() => throw new NotImplementedException();
+        } 
     }
 }
