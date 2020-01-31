@@ -45,7 +45,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
 ### To create ducks:
 1. Declare an interface that covers the desired members of the target class:
   ```csharp
-  public class TargetClass // Not implements IDuck
+  public class TargetClass // does not implement IDuck
   {
     public void Foo(){...}
   }
