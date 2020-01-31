@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.6;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Denes Solti</Authors>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <AssemblyName>ProxyGen</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release;Perf</Configurations>
