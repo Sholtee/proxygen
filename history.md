@@ -2,3 +2,7 @@
 - 1.0.0: First non preview release
 - 1.1.0:
   - *added:* `ProxyGenerator` accepts intercetors having more than one public constructor
+- 1.1.1:
+  - *added:* Anonymous type support
+  - *fixed:* Malformed assmebly names (in certain circumstances)
+  - *fixed:* Badly identified declaring types (in certain circumstances)
