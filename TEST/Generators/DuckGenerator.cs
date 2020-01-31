@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using NUnit.Framework;
 
 [assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.Internal_Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.IInternal_Duck")]
+[assembly: InternalsVisibleTo("<>f__AnonymousType0<System.Int32_System.String>_Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.IProps_Duck")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -162,6 +163,28 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int IBar.Baz() => throw new NotImplementedException();
 
             public int Baz() => throw new NotImplementedException();
-        } 
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldWorkWithAnonimObjects() 
+        {
+            var anon = new 
+            {
+                Cica = 1,
+                Kutya = "Dénes"
+            };
+
+            // anonim objektumok mindig internal-ok
+            Assert.DoesNotThrow(() => typeof(DuckGenerator<,>)
+                .MakeGenericType(typeof(IProps), anon.GetType())
+                .GetProperty("GeneratedType", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+                .GetValue(null));
+        }
+
+        public interface IProps 
+        {
+            int Cica { get; }
+            string Kutya { get; }
+        }
     }
 }
