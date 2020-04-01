@@ -39,6 +39,15 @@ namespace Solti.Utils.Proxy.Internals
             EVENTS = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Events),
             PROPERTIES = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Properties);
 
+        private static string EnsureUnused(string name, MethodInfo method) 
+        {
+            for (IReadOnlyList<ParameterInfo> paramz = method.GetParameters(); paramz.Any(param => param.Name == name);)
+            {
+                name = $"_{name}";
+            }
+            return name;
+        }
+
         private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current) where TMember: MemberInfo
         {
             var generator = typeof(TInterface)
@@ -113,7 +122,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   ...                                                                                   <br/>
         /// }
         /// </summary>
-        internal static LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method) => DeclareLocal<object[]>("args", CreateArray<object>(method
+        internal static LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method) => DeclareLocal<object[]>(EnsureUnused("args", method), CreateArray<object>(method
             .GetParameters()
             .Select(param => param.IsOut ? DefaultExpression(CreateType(param.ParameterType)) : (ExpressionSyntax) IdentifierName(param.Name))
             .ToArray()));
@@ -222,14 +231,14 @@ namespace Solti.Utils.Proxy.Internals
 
             return statements;
 
-            string GetDummyName(ParameterInfo param) => $"dummy_{param.Name}";
+            string GetDummyName(ParameterInfo param) => EnsureUnused($"dummy_{param.Name}", method);
         }
 
         /// <summary>
         /// object result = Invoke(...);
         /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(params ExpressionSyntax[] arguments) =>
-            DeclareLocal<object>("result", InvokeMethod
+        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params ExpressionSyntax[] arguments) =>
+            DeclareLocal<object>(variableName, InvokeMethod
             (
                 INVOKE,
                 target: null,
@@ -240,8 +249,8 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// object result = Invoke(var1, var2, ..., varN);
         /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(params LocalDeclarationStatementSyntax[] arguments) =>
-            CallInvoke(arguments.Select(arg => (ExpressionSyntax) ToIdentifierName(arg)).ToArray());
+        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params LocalDeclarationStatementSyntax[] arguments) =>
+            CallInvoke(variableName, arguments.Select(arg => (ExpressionSyntax) ToIdentifierName(arg)).ToArray());
 
         /// <summary>
         /// return Target.Bar(...);  <br/>
@@ -374,7 +383,12 @@ namespace Solti.Utils.Proxy.Internals
             LocalDeclarationStatementSyntax args = CreateArgumentsArray(ifaceMethod);
             statements.Add(args);
 
-            LocalDeclarationStatementSyntax result = CallInvoke(currentMethod, args, currentMethod);
+            LocalDeclarationStatementSyntax result = CallInvoke(
+                EnsureUnused(nameof(result), ifaceMethod), 
+                currentMethod, 
+                args, 
+                currentMethod);
+
             statements.Add(result);
 
             statements.Add(ShouldCallTarget(result, 
@@ -443,6 +457,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,
                     CreateArray<object>(), // new object[0]
                     StaticMemberName(fieldName) // FProp
@@ -458,6 +473,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod
                     CreateArray<object>(IdentifierName(Value)), // new object[] {value}
                     StaticMemberName(fieldName) // FProp
@@ -499,6 +515,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,,
                     CreateArray<object>(paramz // new object[] {p1, p2}
                         .Select(param => IdentifierName(param.Identifier))
@@ -517,6 +534,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod,
                     CreateArray<object>(paramz // new object[] {p1, p2, value}
                         .Select(param => IdentifierName(param.Identifier))
@@ -566,6 +584,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(EventInfo.AddMethod)), // FEvent.AddMethod,
                     CreateArray<object>(IdentifierName(Value)), // new object[] {value}
                     StaticMemberName(fieldName) //FEvent
@@ -580,6 +599,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 LocalDeclarationStatementSyntax result = CallInvoke
                 (
+                    nameof(result),
                     StaticMemberAccess(fieldName, nameof(EventInfo.RemoveMethod)), // FEvent.RemoveMethod
                     CreateArray<object>(IdentifierName(Value)),
                     StaticMemberName(fieldName)

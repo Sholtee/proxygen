@@ -78,6 +78,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 CallInvoke
                 (
+                    "result",
                     DeclareLocal<MethodInfo>("currentMethod"),
                     DeclareLocal<object[]>("args"),
                     DeclareLocal<MemberInfo>("extra")

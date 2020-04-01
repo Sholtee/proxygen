@@ -322,5 +322,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
             {
             }
         }
+
+        [Test]
+        public void ProxyGenerator_ShouldHandleIdentifierNameCollision() =>
+            Assert.DoesNotThrow(() => CreateProxy<IInterfaceHavingNaughtyParameterNames, InterfaceInterceptor<IInterfaceHavingNaughtyParameterNames>>((object) null));
+
+        public interface IInterfaceHavingNaughtyParameterNames 
+        {
+            //
+            // Mindket nev hasznalva van belsoleg
+            //
+            void Foo(int result, object[] args);
+        }
     }
 }
