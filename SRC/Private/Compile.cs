@@ -53,8 +53,6 @@ namespace Solti.Utils.Proxy.Internals
                 options: CompilationOptionsFactory.Create()
             );
 
-            Debug.Assert(compilation.LanguageVersion >= Features.LV_MAX_SUPPORTED, "Language version not supported ");
-
             using (Stream stm = new MemoryStream())
             {
                 EmitResult result = compilation.Emit(stm);
