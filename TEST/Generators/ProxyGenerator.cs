@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -332,7 +333,43 @@ namespace Solti.Utils.Proxy.Generators.Tests
             //
             // Mindket nev hasznalva van belsoleg
             //
+
             void Foo(int result, object[] args);
         }
+        
+        public interface IByRef<T>
+        {
+            void In(in T p);
+            void Out(out T p);
+            void Ref(ref T p);
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldWorkWithByRefStructs() =>
+            Assert.DoesNotThrow(() => CreateProxy<IByRef<Guid>, InterfaceInterceptor<IByRef<Guid>>>((object) null));
+        
+        [Test]
+        public void ProxyGenerator_ShouldWorkWithByRefObjects() =>
+            Assert.DoesNotThrow(() => CreateProxy<IByRef<object>, InterfaceInterceptor<IByRef<object>>>((object) null));
+
+        [Test]
+        public void ProxyGenerator_ShouldWorkWithByRefArrays() =>
+            Assert.DoesNotThrow(() => CreateProxy<IByRef<object[]>, InterfaceInterceptor<IByRef<object[]>>>((object) null));
+
+        public static IEnumerable<Type> RandomInterfaces => typeof(object)
+            .Assembly
+            .GetExportedTypes()
+            .Where(t => t.IsInterface && !t.ContainsGenericParameters && !t.Namespace.Contains("InteropServices"));
+
+        [TestCaseSource(nameof(RandomInterfaces))]
+        public void ProxyGenerator_ShouldWorkWith(Type iface) =>
+            typeof(ProxyGenerator<,>)
+                .MakeGenericType
+                (
+                    iface,
+                    typeof(InterfaceInterceptor<>).MakeGenericType(iface)
+                )
+                .GetProperty("GeneratedType", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .GetValue(null);  
     }
 }
