@@ -56,35 +56,11 @@
     <h5>Implements</h5>
     <div><a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html">ITypeGenerator</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#System_Object_Equals_System_Object_">Object.Equals(Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#System_Object_Equals_System_Object_System_Object_">Object.Equals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#System_Object_GetHashCode">Object.GetHashCode()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#System_Object_GetType">Object.GetType()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.memberwiseclone#System_Object_MemberwiseClone">Object.MemberwiseClone()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#System_Object_ReferenceEquals_System_Object_System_Object_">Object.ReferenceEquals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#System_Object_ToString">Object.ToString()</a>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Abstractions.html">Solti.Utils.Proxy.Abstractions</a></h6>
   <h6><strong>Assembly</strong>: ProxyGen.dll</h6>
   <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class TypeGenerator&lt;TDescendant&gt; : ITypeGenerator where TDescendant : TypeGenerator&lt;TDescendant&gt;, new()</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class TypeGenerator&lt;TDescendant&gt; : object, ITypeGenerator where TDescendant : TypeGenerator&lt;TDescendant&gt;, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -108,7 +84,7 @@
   </h3>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType*"></a>
   <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType">GeneratedType</h4>
-  <div class="markdown level1 summary"><p>The genrated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
+  <div class="markdown level1 summary"><p>The genrated <see cref="!:Type"></see>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -125,13 +101,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="xref">Type</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is assembled only once so you can read this property multiple times.</p>
+  <div class="markdown level1 remarks"><p>The returned <see cref="!:Type"></see> is assembled only once so you can read this property multiple times.</p>
 </div>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_References_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.References*"></a>
   <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_References" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.References">References</h4>
@@ -152,7 +128,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1">IReadOnlyList</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.assembly">Assembly</a>&gt;</td>
+        <td><span class="xref">IReadOnlyList</span>&lt;<span class="xref">Assembly</span>&gt;</td>
         <td></td>
       </tr>
     </tbody>
@@ -184,7 +160,7 @@
   <h3 id="methods">Methods
   </h3>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_System_Type_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(System.Type)">CheckVisibility(Type)</h4>
+  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_Type_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(Type)">CheckVisibility(Type)</h4>
   <div class="markdown level1 summary"><p>Throws if the <code data-dev-comment-type="paramref" class="paramref">type</code> is not visible for the assembly being created.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -203,7 +179,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="xref">Type</span></td>
         <td><span class="parametername">type</span></td>
         <td></td>
       </tr>
