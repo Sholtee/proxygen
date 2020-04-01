@@ -202,9 +202,9 @@ namespace Solti.Utils.Proxy.Internals
                 interfaceType = typeof(TInterface),
                 @base = typeof(DuckBase<TTarget>);
 
-            Debug.Assert(interfaceType.IsInterface());
-            Debug.Assert(!interfaceType.IsGenericTypeDefinition());
-            Debug.Assert(!@base.IsGenericTypeDefinition());
+            Debug.Assert(interfaceType.IsInterface);
+            Debug.Assert(!interfaceType.IsGenericTypeDefinition);
+            Debug.Assert(!@base.IsGenericTypeDefinition);
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (

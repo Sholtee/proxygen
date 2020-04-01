@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 bool grantedByAttr = method
                     .DeclaringType
-                    .Assembly()
+                    .Assembly
                     .GetCustomAttributes<InternalsVisibleToAttribute>()
                     .FirstOrDefault(ivt => ivt.AssemblyName == assemblyName) != null;
 

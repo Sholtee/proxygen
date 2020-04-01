@@ -231,7 +231,7 @@ namespace Solti.Utils.Proxy.Internals
                 declaringType = method.DeclaringType,
                 returnType    = method.ReturnType;
 
-            Debug.Assert(declaringType.IsInterface());
+            Debug.Assert(declaringType.IsInterface);
 
             TypeSyntax returnTypeSytax = CreateType(returnType);
 
@@ -314,7 +314,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static PropertyDeclarationSyntax DeclareProperty(PropertyInfo property, CSharpSyntaxNode getBody = null, CSharpSyntaxNode setBody = null, bool forceInlining = false)
         {
-            Debug.Assert(property.DeclaringType.IsInterface());
+            Debug.Assert(property.DeclaringType.IsInterface);
 
             PropertyDeclarationSyntax result = PropertyDeclaration
             (
@@ -352,7 +352,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> getBody = null, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> setBody = null, bool forceInlining = false)
         {
-            Debug.Assert(property.DeclaringType.IsInterface());
+            Debug.Assert(property.DeclaringType.IsInterface);
             Debug.Assert(property.IsIndexer());
 
             ParameterInfo[] indices = property.GetIndexParameters();
@@ -445,7 +445,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static EventDeclarationSyntax DeclareEvent(EventInfo @event, CSharpSyntaxNode addBody = null, CSharpSyntaxNode removeBody = null, bool forceInlining = false)
         {
-            Debug.Assert(@event.DeclaringType.IsInterface());
+            Debug.Assert(@event.DeclaringType.IsInterface);
 
             EventDeclarationSyntax result = EventDeclaration
             (
@@ -531,7 +531,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 IEnumerable<Type> parts = src.GetParents();
 
-                if (!src.IsGenericType()) partNames = parts.Append(src).Select(type => GetQualifiedName(type));
+                if (!src.IsGenericType) partNames = parts.Append(src).Select(type => GetQualifiedName(type));
                 else
                 { 
                     //
@@ -566,7 +566,7 @@ namespace Solti.Utils.Proxy.Internals
                 return Qualify(partNames.ToArray());
             }
 
-            if (src.IsGenericType()) return GetQualifiedName(src.GetGenericTypeDefinition(), name => CreateGenericName(name, src.GetGenericArguments()));
+            if (src.IsGenericType) return GetQualifiedName(src.GetGenericTypeDefinition(), name => CreateGenericName(name, src.GetGenericArguments()));
 
             if (src.IsArray) return ArrayType
             (
@@ -628,7 +628,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static NameSyntax GetQualifiedName(Type type, Func<string, NameSyntax> typeNameFactory = null)
         {
-            Debug.Assert(!type.IsGenericType() || type.IsGenericTypeDefinition());
+            Debug.Assert(!type.IsGenericType || type.IsGenericTypeDefinition);
 
             return Parts2QualifiedName
             (

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static IEnumerable<Assembly> GetRuntimeAssemblies()
         {
-            yield return typeof(Object).Assembly();
+            yield return typeof(object).Assembly;
 #if NETSTANDARD
             string[] mandatoryAssemblies = 
             {

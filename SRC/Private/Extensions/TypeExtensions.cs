@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this Type src)
         {
-            Debug.Assert(!src.IsGenericType() || src.IsGenericTypeDefinition());
+            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition);
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
 
@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
-            if (src.IsInterface())
+            if (src.IsInterface)
                 //
                 // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre (es explicit 
                 // implementaciokra).
@@ -60,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Assembly> GetReferences(this Type src)
         {
-            Assembly declaringAsm = src.Assembly();
+            Assembly declaringAsm = src.Assembly;
 
             var references = new[] { declaringAsm }.Concat(declaringAsm.GetReferences());
 
@@ -68,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
             // Generikus parameterek szerepelhetnek masik szerelvenyben.
             //
 
-            if (src.IsGenericType())
+            if (src.IsGenericType)
                 foreach (Type type in src.GetGenericArguments().Where(t => !t.IsGenericParameter))
                     references = references.Concat(type.GetReferences());
 
@@ -88,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
-            Debug.Assert(!src.IsGenericType() || src.IsGenericTypeDefinition());
+            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition);
 
             return src
                 .GetGenericArguments()

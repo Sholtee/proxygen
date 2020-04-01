@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
                 // Ha a metodus privat akkor biztos nem interface metodus.
                 //
 
-                if (src.GetDeclaringType().IsInterface()) return AccessModifiers.Explicit;
+                if (src.GetDeclaringType().IsInterface) return AccessModifiers.Explicit;
 
                 return AccessModifiers.Private;
             }

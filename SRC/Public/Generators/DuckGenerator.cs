@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public override IReadOnlyList<Assembly> References { get; } = new[]
             {
-                typeof(DuckBase<>).Assembly()
+                typeof(DuckBase<>).Assembly
             }
             .Concat(typeof(TInterface).GetReferences())
             .Concat(typeof(TTarget).GetReferences())
@@ -53,8 +53,8 @@ namespace Solti.Utils.Proxy.Generators
 
             CheckVisibility(type);
 
-            if (!type.IsInterface()) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
+            if (!type.IsInterface) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
+            if (type.ContainsGenericParameters) throw new InvalidOperationException();
         }
 
         private void CheckTarget()

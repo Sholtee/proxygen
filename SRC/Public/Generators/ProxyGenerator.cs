@@ -27,8 +27,8 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public override IReadOnlyList<Assembly> References { get; } = new[]
             {
-                typeof(Expression<>).Assembly(),
-                typeof(MethodInfo).Assembly(),
+                typeof(Expression<>).Assembly,
+                typeof(MethodInfo).Assembly,
             }
             .Concat(typeof(TInterface).GetReferences())
             .Concat(typeof(TInterceptor).GetReferences()) // az interceptor konstruktora miatt lehetnek uj referenciak
@@ -56,8 +56,8 @@ namespace Solti.Utils.Proxy.Generators
 
             CheckVisibility(type);
 
-            if (!type.IsInterface()) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
+            if (!type.IsInterface) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
+            if (type.ContainsGenericParameters) throw new InvalidOperationException();
         }
 
         private void CheckBase()
@@ -66,10 +66,10 @@ namespace Solti.Utils.Proxy.Generators
 
             CheckVisibility(type);
 
-            if (!type.IsClass()) throw new InvalidOperationException(Resources.NOT_A_CLASS);
-            if (type.IsSealed()) throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);          
-            if (type.IsAbstract()) throw new NotSupportedException(Resources.ABSTRACT_INTERCEPTOR);
-            if (type.ContainsGenericParameters()) throw new InvalidOperationException();
+            if (!type.IsClass) throw new InvalidOperationException(Resources.NOT_A_CLASS);
+            if (type.IsSealed) throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);          
+            if (type.IsAbstract) throw new NotSupportedException(Resources.ABSTRACT_INTERCEPTOR);
+            if (type.ContainsGenericParameters) throw new InvalidOperationException();
         }
     }
 }
