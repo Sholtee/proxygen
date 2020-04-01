@@ -7,7 +7,8 @@
   - *fixed:* Malformed assmebly names (in certain circumstances)
   - *fixed:* Badly identified declaring types (in certain circumstances)
 - 2.0.0:
-  - *breaking:* dropped `netstandard1.6` support  
+  - *breaking:* Dropped `netstandard1.6` support
+  - *breaking:* Compilation errors are stored in a single string (instead of string array)
   - *fixed:* Misinterpreted "ref" modifier (in certain circumstances)
   - *fixed:* Proxy generation failed on interface methods having parameter names that were used internally
   - *fixed:* Proxy generation failed on interface methods having by ref array parameter

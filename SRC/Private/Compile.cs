@@ -63,11 +63,9 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (!result.Success)
                 {
-                    string[] failures = result
+                    string failures = string.Join($",{Environment.NewLine}", result
                         .Diagnostics
-                        .Where(d => d.Severity == DiagnosticSeverity.Error)
-                        .Select(d => d.ToString())
-                        .ToArray();
+                        .Where(d => d.Severity == DiagnosticSeverity.Error));
 
                     var ex = new Exception(Resources.COMPILATION_FAILED);
 
