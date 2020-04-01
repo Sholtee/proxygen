@@ -184,25 +184,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).SyntaxFactory
   nameWithType: TypeGenerator<TDescendant>.SyntaxFactory
   nameWithType.vb: TypeGenerator(Of TDescendant).SyntaxFactory
-- uid: Solti.Utils.Proxy.Features
-  name: Features
-  href: Solti.Utils.Proxy.Features.html
-  commentId: T:Solti.Utils.Proxy.Features
-  fullName: Solti.Utils.Proxy.Features
-  nameWithType: Features
-- uid: Solti.Utils.Proxy.Features.LanguageVersion
-  name: LanguageVersion
-  href: Solti.Utils.Proxy.Features.html#Solti_Utils_Proxy_Features_LanguageVersion
-  commentId: P:Solti.Utils.Proxy.Features.LanguageVersion
-  fullName: Solti.Utils.Proxy.Features.LanguageVersion
-  nameWithType: Features.LanguageVersion
-- uid: Solti.Utils.Proxy.Features.LanguageVersion*
-  name: LanguageVersion
-  href: Solti.Utils.Proxy.Features.html#Solti_Utils_Proxy_Features_LanguageVersion_
-  commentId: Overload:Solti.Utils.Proxy.Features.LanguageVersion
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Features.LanguageVersion
-  nameWithType: Features.LanguageVersion
 - uid: Solti.Utils.Proxy.Generators
   name: Solti.Utils.Proxy.Generators
   href: Solti.Utils.Proxy.Generators.html
