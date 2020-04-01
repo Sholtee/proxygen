@@ -9,3 +9,4 @@
 - 1.1.2:
   - *fixed:* Misinterpreted "ref" modifier (in certain circumstances)
   - *fixed:* Proxy generation failed on interface methods having parameter names that were used internally
+  - *fixed:* Proxy generation failed on interface methods having by ref array parameter

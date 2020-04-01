@@ -517,6 +517,8 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static TypeSyntax CreateType(Type src)
         {
+            if (src.IsByRef) src = src.GetElementType();
+
             if (src == typeof(void)) return PredefinedType(Token(SyntaxKind.VoidKeyword));
 
             //
