@@ -6,3 +6,5 @@
   - *added:* Anonymous type support
   - *fixed:* Malformed assmebly names (in certain circumstances)
   - *fixed:* Badly identified declaring types (in certain circumstances)
+- 1.1.2:
+  - *fixed:* Misinterpreted "ref" modifier (in certain circumstances)

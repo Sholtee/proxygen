@@ -262,10 +262,14 @@ namespace Solti.Utils.Proxy.Internals
 
                         if (param.IsOut) 
                             modifiers.Add(SyntaxKind.OutKeyword);
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+                        //
+                        // "ref ValueType" parameter is IN ezert az attributum vizsgalat.
+                        //
 
-                        else if (param.IsIn) 
+                        else if (param.IsIn && param.GetCustomAttribute<IsReadOnlyAttribute>() != null) 
                             modifiers.Add(SyntaxKind.InKeyword);
-
+#endif
                         //
                         // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel In|Out vizsgalat utan szerepeljen.
                         //
@@ -716,12 +720,16 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             refKindKeyword: Token(SyntaxKind.OutKeyword)
                         );
+#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+                        //
+                        // "ref ValueType" parameter is IN ezert az attributum vizsgalat.
+                        //
 
-                        else if (param.IsIn) argument = argument.WithRefKindKeyword
+                        else if (param.IsIn && param.GetCustomAttribute<IsReadOnlyAttribute>() != null) argument = argument.WithRefKindKeyword
                         (
                             refKindKeyword: Token(SyntaxKind.InKeyword)
                         );
-
+#endif
                         //
                         // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel utoljara szerepeljen.
                         //
