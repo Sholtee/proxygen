@@ -359,7 +359,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> RandomInterfaces => typeof(object)
             .Assembly
             .GetExportedTypes()
-            .Where(t => t.IsInterface && !t.ContainsGenericParameters && !t.Namespace.Contains("InteropServices"));
+            .Where(t => t.IsInterface && !t.ContainsGenericParameters);
 
         [TestCaseSource(nameof(RandomInterfaces))]
         public void ProxyGenerator_ShouldWorkWith(Type iface) =>
