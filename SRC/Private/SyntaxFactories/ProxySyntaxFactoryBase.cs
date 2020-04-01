@@ -260,29 +260,21 @@ namespace Solti.Utils.Proxy.Internals
 
                         List<SyntaxKind> modifiers = new List<SyntaxKind>();
 
-                        if (param.IsOut) 
-                            modifiers.Add(SyntaxKind.OutKeyword);
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-                        //
-                        // "ref ValueType" parameter is IN ezert az attributum vizsgalat.
-                        //
-
-                        else if (param.IsIn && param.GetCustomAttribute<IsReadOnlyAttribute>() != null) 
-                            modifiers.Add(SyntaxKind.InKeyword);
-#endif
-                        //
-                        // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel In|Out vizsgalat utan szerepeljen.
-                        //
-
-                        else if (param.ParameterType.IsByRef)
-                            modifiers.Add(SyntaxKind.RefKeyword);
-
-                        //
-                        // "params" es referencia szerinti parameter atadas egymast kizaroak
-                        //
-
-                        else if (param.GetCustomAttribute<ParamArrayAttribute>() != null) 
-                            modifiers.Add(SyntaxKind.ParamsKeyword);
+                        switch (param.GetParameterKind())
+                        {
+                            case ParameterKind.In:
+                                modifiers.Add(SyntaxKind.InKeyword);
+                                break;
+                            case ParameterKind.Out:
+                                modifiers.Add(SyntaxKind.OutKeyword);
+                                break;
+                            case ParameterKind.InOut:
+                                modifiers.Add(SyntaxKind.RefKeyword);
+                                break;
+                            case ParameterKind.Params:
+                                modifiers.Add(SyntaxKind.ParamsKeyword);
+                                break;
+                        }
 
                         if (modifiers.Any()) 
                             parameter = parameter.WithModifiers(TokenList(modifiers.Select(Token)));
@@ -716,28 +708,27 @@ namespace Solti.Utils.Proxy.Internals
                             expression: IdentifierName(arguments[i])
                         );
 
-                        if (param.IsOut) argument = argument.WithRefKindKeyword
-                        (
-                            refKindKeyword: Token(SyntaxKind.OutKeyword)
-                        );
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
-                        //
-                        // "ref ValueType" parameter is IN ezert az attributum vizsgalat.
-                        //
-
-                        else if (param.IsIn && param.GetCustomAttribute<IsReadOnlyAttribute>() != null) argument = argument.WithRefKindKeyword
-                        (
-                            refKindKeyword: Token(SyntaxKind.InKeyword)
-                        );
-#endif
-                        //
-                        // "ParameterType.IsByRef" param.Is[In|Out] eseten is igazat ad vissza -> a lenti feltetel utoljara szerepeljen.
-                        //
-
-                        else if (param.ParameterType.IsByRef) argument = argument.WithRefKindKeyword
-                        (
-                            refKindKeyword: Token(SyntaxKind.RefKeyword)
-                        );
+                        switch (param.GetParameterKind())
+                        {
+                            case ParameterKind.In:
+                                argument = argument.WithRefKindKeyword
+                                (
+                                    refKindKeyword: Token(SyntaxKind.InKeyword)
+                                );
+                                break;
+                            case ParameterKind.Out:
+                                argument = argument.WithRefKindKeyword
+                                (
+                                    refKindKeyword: Token(SyntaxKind.OutKeyword)
+                                );
+                                break;
+                            case ParameterKind.InOut:
+                                argument = argument.WithRefKindKeyword
+                                (
+                                    refKindKeyword: Token(SyntaxKind.RefKeyword)
+                                );
+                                break;
+                        }
 
                         return argument;
                     })
