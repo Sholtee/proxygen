@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (IsNativeByRef()) return ParameterKind.None;
 
-#if !NETSTANDARD1_6 && !NETSTANDARD2_0
+#if !NETSTANDARD2_0
                 //
                 // Ha nincs "IsReadOnlyAttribute" akkor "ref ValueType" a parameter tipusa.
                 //

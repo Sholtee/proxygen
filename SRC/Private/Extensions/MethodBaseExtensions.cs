@@ -21,13 +21,12 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsPublic) return AccessModifiers.Public;
             if (src.IsPrivate)
             {
-#if !NETSTANDARD1_6
                 //
                 // Ha a metodus privat akkor biztos nem interface metodus.
                 //
 
                 if (src.GetDeclaringType().IsInterface()) return AccessModifiers.Explicit;
-#endif
+
                 return AccessModifiers.Private;
             }
 
@@ -36,7 +35,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public static Type GetDeclaringType(this MethodBase src) 
         {
-#if !NETSTANDARD1_6
             Type reflectedType = src.ReflectedType;
 
             foreach (Type iface in reflectedType.GetInterfaces())
@@ -51,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                 if (mapping.TargetMethods.Contains(src))
                     return iface;
             }
-#endif
+
             return src.DeclaringType;
         }
     }
