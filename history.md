@@ -13,3 +13,4 @@
   - *fixed:* Misinterpreted "ref" modifier (in certain circumstances)
   - *fixed:* Proxy generation failed on interface methods having parameter names that were used internally
   - *fixed:* Proxy generation failed on interface methods having by ref array parameter
+  - *done:* `ProxyGenerator` tested aganist all the public interfaces found in *mscorlib.dll*
