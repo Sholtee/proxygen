@@ -80,4 +80,4 @@ Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master
 - [Version History](https://github.com/Sholtee/proxygen/blob/master/history.md )
 
 ## Supported frameworks
-This project currently targets *.NET Standard* 1.6, 2.0 and 2.1.
+This project currently targets *.NET Standard* 2.0 and 2.1.
