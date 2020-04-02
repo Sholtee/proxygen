@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
                     return call.Method;
                 default:
                     Debug.Fail("Unknown body");
-                    return null;
+                    return null!;
             }
         }
 

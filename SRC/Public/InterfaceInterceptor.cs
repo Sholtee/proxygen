@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy
     /// Provides the mechanism for intercepting interface method calls.
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
-    public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface> where TInterface: class
+    public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?> where TInterface: class
     {
         /// <summary>
         /// Signals that the original method should be called.
@@ -74,13 +74,13 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The target of this interceptor.
         /// </summary>
-        public TInterface Target { get; }
+        public TInterface? Target { get; }
 
         /// <summary>
         /// Creates a new <see cref="InterfaceInterceptor{TInterface}"/> instance against the given <paramref name="target"/>.
         /// </summary>
         /// <param name="target">The target of this interceptor.</param>
-        public InterfaceInterceptor(TInterface target) => Target = target;
+        public InterfaceInterceptor(TInterface? target) => Target = target;
 
         /// <summary>
         /// Called on proxy method invocation.

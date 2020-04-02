@@ -25,15 +25,15 @@ namespace Solti.Utils.Proxy.Internals
             //
             // this.Target
             //
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target)),
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!)),
             //
             // this.CALL_TARGET
             //
             CALL_TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.CALL_TARGET));
 
         private static readonly MethodInfo
-            INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default, default, default)),
-            METHOD_ACCESS = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.MethodAccess(default));
+            INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
+            METHOD_ACCESS = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.MethodAccess(default!));
 
         private static readonly FieldInfo
             EVENTS = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Events),

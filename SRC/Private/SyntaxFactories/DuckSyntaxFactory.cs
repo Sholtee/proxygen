@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             //
             // this.Target
             //
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target));
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!));
 
         private static TMember GetTargetMember<TMember>(Type target, TMember ifaceMember) where TMember: MemberInfo
         {
@@ -103,7 +103,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetProperty, AssemblyName, checkGet: ifaceProperty.CanRead, checkSet: ifaceProperty.CanWrite);       
 
-            MethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod;
+            MethodInfo accessor = (targetProperty.GetMethod ?? targetProperty.SetMethod)!;
             Debug.Assert(accessor != null);
 
             //
@@ -115,8 +115,8 @@ namespace Solti.Utils.Proxy.Internals
             (
                 ifaceProperty, 
                 TARGET, 
-                castTargetTo: accessor.GetAccessModifiers() == AccessModifiers.Explicit 
-                    ? accessor.GetDeclaringType() 
+                castTargetTo: accessor!.GetAccessModifiers() == AccessModifiers.Explicit 
+                    ? accessor!.GetDeclaringType() 
                     : null
             );
 
@@ -176,10 +176,10 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(targetEvent, AssemblyName, checkAdd: ifaceEvent.AddMethod != null, checkRemove: ifaceEvent.RemoveMethod != null);
 
-            MethodInfo accessor = ifaceEvent.AddMethod ?? ifaceEvent.RemoveMethod;
+            MethodInfo accessor = (ifaceEvent.AddMethod ?? ifaceEvent.RemoveMethod)!;
             Debug.Assert(accessor != null);
 
-            Type castTargetTo = accessor.GetAccessModifiers() == AccessModifiers.Explicit ? accessor.GetDeclaringType() : null;
+            Type? castTargetTo = accessor!.GetAccessModifiers() == AccessModifiers.Explicit ? accessor!.GetDeclaringType() : null;
 
             return DeclareEvent
             (
@@ -276,7 +276,7 @@ namespace Solti.Utils.Proxy.Internals
                     {
 
                         exceptions.Add(e);
-                        return default(TResult);
+                        return default(TResult)!;
                     }
                     throw;
                 }

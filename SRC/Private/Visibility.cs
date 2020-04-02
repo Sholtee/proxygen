@@ -67,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals
                 MethodInfo get = property.GetMethod;
                 Debug.Assert(get != null, "property.GetMethod == NULL");
 
-                Check(get, assemblyName, allowProtected);
+                Check(get!, assemblyName, allowProtected);
             }
 
             if (checkSet)
@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
                 MethodInfo set = property.SetMethod;
                 Debug.Assert(set != null, "property.SetMethod == NULL");
 
-                Check(set, assemblyName, allowProtected);
+                Check(set!, assemblyName, allowProtected);
             }
         }
 
@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
                 MethodInfo add = @event.AddMethod;
                 Debug.Assert(add != null, "event.AddMethod == NULL");
 
-                Check(add, assemblyName, allowProtected);
+                Check(add!, assemblyName, allowProtected);
             }
 
             if (checkRemove)
@@ -94,7 +94,7 @@ namespace Solti.Utils.Proxy.Internals
                 MethodInfo remove = @event.RemoveMethod;
                 Debug.Assert(remove != null, "event.RemoveMethod == NULL");
 
-                Check(remove, assemblyName, allowProtected);
+                Check(remove!, assemblyName, allowProtected);
             }
         }
 

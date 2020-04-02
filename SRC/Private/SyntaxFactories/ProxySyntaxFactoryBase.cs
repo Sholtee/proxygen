@@ -74,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals
                     break;
                 default:
                     Debug.Fail("Unknown node type");
-                    return null;
+                    return null!;
             }
 
             if (forceInlining) declaration = declaration.WithAttributeLists
@@ -85,12 +85,9 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        private static ExpressionSyntax AmendTarget(ExpressionSyntax target, MemberInfo member, Type castTargetTo)
+        private static ExpressionSyntax AmendTarget(ExpressionSyntax? target, MemberInfo member, Type? castTargetTo)
         {
-            if (target == null) 
-            {
-                target = member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
-            }
+            target ??= member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
 
             if (castTargetTo != null) 
             {
@@ -118,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>
-        protected internal static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax target, MemberInfo member, Type castTargetTo = null) =>
+        protected internal static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax? target, MemberInfo member, Type? castTargetTo = null) =>
             MemberAccessExpression
             (
                 SyntaxKind.SimpleMemberAccessExpression,
@@ -129,7 +126,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)
         /// </summary>
-        protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax target, MethodInfo method, Type castTargetTo = null) 
+        protected internal static MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax? target, MethodInfo method, Type? castTargetTo = null) 
         {
             string methodName = method.StrippedName();
 
@@ -154,7 +151,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [target | this | Namespace.Type].Prop[...]
         /// </summary>
-        protected internal static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax target, MemberInfo prop) =>
+        protected internal static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax? target, MemberInfo prop) =>
             ElementAccessExpression
             (
                 MemberAccess(target, prop)
@@ -163,7 +160,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal static LocalDeclarationStatementSyntax DeclareLocal(Type type, string name, ExpressionSyntax initializer = null)
+        protected internal static LocalDeclarationStatementSyntax DeclareLocal(Type type, string name, ExpressionSyntax? initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -191,7 +188,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal static LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax initializer = null) => DeclareLocal(typeof(T), name, initializer);
+        protected internal static LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(typeof(T), name, initializer);
 
         /// <summary>
         /// new System.Object[] {..., ..., ...}
@@ -312,7 +309,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}       <br/>
         /// }                <br/>
         /// </summary>
-        protected internal static PropertyDeclarationSyntax DeclareProperty(PropertyInfo property, CSharpSyntaxNode getBody = null, CSharpSyntaxNode setBody = null, bool forceInlining = false)
+        protected internal static PropertyDeclarationSyntax DeclareProperty(PropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
 
@@ -350,7 +347,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                          <br/>
         /// }                                   <br/>
         /// </summary>
-        protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> getBody = null, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode> setBody = null, bool forceInlining = false)
+        protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode>? getBody = null, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode>? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
             Debug.Assert(property.IsIndexer());
@@ -404,7 +401,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [modifier1, modifier2, ....] object Name [= ...];
         /// </summary>
-        protected internal static FieldDeclarationSyntax DeclareField<TField>(string name, ExpressionSyntax initializer = null, params SyntaxKind[] modifiers)
+        protected internal static FieldDeclarationSyntax DeclareField<TField>(string name, ExpressionSyntax? initializer = null, params SyntaxKind[] modifiers)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -443,7 +440,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove{...}                        <br/>
         /// }                                    <br/>
         /// </summary>
-        protected internal static EventDeclarationSyntax DeclareEvent(EventInfo @event, CSharpSyntaxNode addBody = null, CSharpSyntaxNode removeBody = null, bool forceInlining = false)
+        protected internal static EventDeclarationSyntax DeclareEvent(EventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface);
 
@@ -477,7 +474,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Event [+|-]= value;
         /// </summary>
-        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax target, bool add, Type castTargetTo = null) => AssignmentExpression
+        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax? target, bool add, Type? castTargetTo = null) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccess
@@ -496,7 +493,7 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax target, Type castTargetTo = null) => !property.IsIndexer() 
+        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null) => !property.IsIndexer() 
             ? MemberAccess
             (
                 target,
@@ -626,7 +623,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Namespace.ParentType[T].NestedType[TT]
         /// </summary>
-        protected internal static NameSyntax GetQualifiedName(Type type, Func<string, NameSyntax> typeNameFactory = null)
+        protected internal static NameSyntax GetQualifiedName(Type type, Func<string, NameSyntax>? typeNameFactory = null)
         {
             Debug.Assert(!type.IsGenericType || type.IsGenericTypeDefinition);
 
@@ -669,7 +666,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(..., ..., ...)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, Type castTargetTo = null, params ArgumentSyntax[] arguments)
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax? target, Type? castTargetTo = null, params ArgumentSyntax[] arguments)
         {
             Debug.Assert(arguments.Length == method.GetParameters().Length);
 
@@ -691,7 +688,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax target, Type castTargetTo = null, params string[] arguments)
+        protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax? target, Type? castTargetTo = null, params string[] arguments)
         {
             IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
 

@@ -9,7 +9,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class ComparerBase<TConcreteComparer, T> : IEqualityComparer<T> where TConcreteComparer : ComparerBase<TConcreteComparer, T>, new()
     {
-        public bool Equals(T x, T y) => ReferenceEquals(x, y) /*igazat ad vissza ha mind2 NULL*/ || (x != null && y != null && GetHashCode(x) == GetHashCode(y));
+        public bool Equals(T x, T y) => ReferenceEquals(x, y) || GetHashCode(x) == GetHashCode(y);
         public abstract int GetHashCode(T obj);
         public static TConcreteComparer Instance { get; } = new TConcreteComparer();
     }

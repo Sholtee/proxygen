@@ -20,13 +20,13 @@ namespace Solti.Utils.Proxy.Abstractions
     {
         private static readonly object FLock = new object();
 
-        private static Type FType;
+        private static Type? FType;
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Type GenerateType(string assemblyNameOverride = null) 
+        internal Type GenerateType(string? assemblyNameOverride = null) 
         {
             DoCheck();
 
