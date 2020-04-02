@@ -25,10 +25,11 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <PackageReference Condition="'$(LibVersion)' != ''" Include="ProxyGen.NET" Version="$(LibVersion)"></PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SRC\ProxyGen.csproj" />
+    <ProjectReference Condition="'$(LibVersion)' == ''" Include="..\SRC\ProxyGen.csproj" />
   </ItemGroup>
 
 </Project>
