@@ -72,7 +72,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIconUrl>https://github.com/Sholtee/ProxyGen/raw/master/icon.png</PackageIconUrl>
     <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
-    <PackageReleaseNotes>See homepage.</PackageReleaseNotes>
+    <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
     <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>
