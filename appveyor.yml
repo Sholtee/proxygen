@@ -44,6 +44,7 @@ before_test:
   - ps: |
       Set-Location -path ".\scripts"
       .(".\includes.ps1")
+      Update-AppveyorBuild -Version "$($PROJECT.version).$($Env:APPVEYOR_BUILD_NUMBER)-$($Env:APPVEYOR_REPO_BRANCH)"
       Get-SysInfo
 
 test_script:
