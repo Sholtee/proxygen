@@ -99,12 +99,12 @@ references:
   fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant)
   nameWithType: TypeGenerator<TDescendant>
   nameWithType.vb: TypeGenerator(Of TDescendant)
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(Type)
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(System.Type)
   name: CheckVisibility(Type)
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_Type_
-  commentId: M:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(Type)
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.CheckVisibility(Type)
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).CheckVisibility(Type)
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_System_Type_
+  commentId: M:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(System.Type)
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.CheckVisibility(System.Type)
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).CheckVisibility(System.Type)
   nameWithType: TypeGenerator<TDescendant>.CheckVisibility(Type)
   nameWithType.vb: TypeGenerator(Of TDescendant).CheckVisibility(Type)
 - uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility*
@@ -352,13 +352,13 @@ references:
   fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Events
   nameWithType: InterfaceInterceptor<TInterface>.Events
   nameWithType.vb: InterfaceInterceptor(Of TInterface).Events
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke(MethodInfo,System.Object[],MemberInfo)
+- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke(System.Reflection.MethodInfo,System.Object[],System.Reflection.MemberInfo)
   name: Invoke(MethodInfo, Object[], MemberInfo)
-  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Invoke_MethodInfo_System_Object___MemberInfo_
-  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke(MethodInfo,System.Object[],MemberInfo)
+  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Invoke_System_Reflection_MethodInfo_System_Object___System_Reflection_MemberInfo_
+  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke(System.Reflection.MethodInfo,System.Object[],System.Reflection.MemberInfo)
   name.vb: Invoke(MethodInfo, Object(), MemberInfo)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Invoke(MethodInfo, System.Object[], MemberInfo)
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Invoke(MethodInfo, System.Object(), MemberInfo)
+  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Invoke(System.Reflection.MethodInfo, System.Object[], System.Reflection.MemberInfo)
+  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Invoke(System.Reflection.MethodInfo, System.Object(), System.Reflection.MemberInfo)
   nameWithType: InterfaceInterceptor<TInterface>.Invoke(MethodInfo, Object[], MemberInfo)
   nameWithType.vb: InterfaceInterceptor(Of TInterface).Invoke(MethodInfo, Object(), MemberInfo)
 - uid: Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke*
@@ -370,13 +370,13 @@ references:
   fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Invoke
   nameWithType: InterfaceInterceptor<TInterface>.Invoke
   nameWithType.vb: InterfaceInterceptor(Of TInterface).Invoke
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess(Expression{Action})
+- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess(System.Linq.Expressions.Expression{System.Action})
   name: MethodAccess(Expression<Action>)
-  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_MethodAccess_Expression_Action__
-  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess(Expression{Action})
+  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_MethodAccess_System_Linq_Expressions_Expression_System_Action__
+  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess(System.Linq.Expressions.Expression{System.Action})
   name.vb: MethodAccess(Expression(Of Action))
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.MethodAccess(Expression<Action>)
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).MethodAccess(Expression(Of Action))
+  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.MethodAccess(System.Linq.Expressions.Expression<System.Action>)
+  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).MethodAccess(System.Linq.Expressions.Expression(Of System.Action))
   nameWithType: InterfaceInterceptor<TInterface>.MethodAccess(Expression<Action>)
   nameWithType.vb: InterfaceInterceptor(Of TInterface).MethodAccess(Expression(Of Action))
 - uid: Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess*
