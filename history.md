@@ -14,3 +14,5 @@
   - *fixed:* Proxy generation failed on interface methods having parameter names that were used internally
   - *fixed:* Proxy generation failed on interface methods having by ref array parameter
   - *done:* `ProxyGenerator` tested aganist all the public interfaces found in *mscorlib.dll*
+- 2.0.1:
+  - *done:* Remove internal classes that can be referenced from "Solti.Utils.Primitives"
