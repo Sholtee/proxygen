@@ -8,6 +8,8 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Primitives;
+
     [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "The class is passed as a type parameter that has a new constraint.")]
     internal sealed class ParameterComparer : ComparerBase<ParameterComparer, ParameterInfo>
     {

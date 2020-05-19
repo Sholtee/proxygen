@@ -8,6 +8,8 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Primitives;
+
     //
     // Sajat comparer azert kell mert pl List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
     // testzoleges "T"-re.
