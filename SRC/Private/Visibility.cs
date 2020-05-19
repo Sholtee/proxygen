@@ -148,21 +148,23 @@ namespace Solti.Utils.Proxy.Internals
                 .Where(diag => diag.Severity == DiagnosticSeverity.Error)
                 .ToArray();
 
-            if (diagnostics.Length > 0)
+            if (diagnostics.Length == 0) return;
+
+            //
+            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0122
+            //
+
+            if (diagnostics.Length > 1 || !diagnostics.Single().Id.Equals("CS0122", StringComparison.OrdinalIgnoreCase))
             {
-                //
-                // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0122
-                //
-
-                Debug.Assert(diagnostics.Single().Id.Equals("CS0122", StringComparison.OrdinalIgnoreCase));
-
-                //
-                // A fordito nem fogja megmondani h mi a tipus lathatosaga csak azt h lathato e v sem,
-                // ezert vmi altalanosabb hibauzenet kell.
-                //
-
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type, assemblyName));
+                throw new Exception(string.Join(Environment.NewLine, diagnostics.Select(diagnostic => diagnostic.GetMessage())));
             }
+
+            //
+            // A fordito nem fogja megmondani h mi a tipus lathatosaga csak azt h lathato e v sem,
+            // ezert vmi altalanosabb hibauzenet kell.
+            //
+
+            throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type, assemblyName));
         }
     }
 }
