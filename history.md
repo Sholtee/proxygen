@@ -16,3 +16,5 @@
   - *done:* `ProxyGenerator` tested aganist all the public interfaces found in *mscorlib.dll*
 - 2.0.1:
   - *done:* Remove internal classes that can be referenced from "Solti.Utils.Primitives"
+- 2.0.2:
+  - *done:* Handle unexpected errors on visibility checks
