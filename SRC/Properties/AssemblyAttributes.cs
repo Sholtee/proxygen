@@ -12,6 +12,6 @@ using System.Runtime.CompilerServices;
         InternalsVisibleTo("ProxyGen.Perf")
 #if DEBUG
         , 
-        InternalsVisibleTo("ProxyGen.Tests")
+        InternalsVisibleTo("Solti.Utils.Proxy.Tests")
 #endif
 ]

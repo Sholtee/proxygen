@@ -4,7 +4,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Denes Solti</Authors>
     <Version>2.0.2</Version>
-    <AssemblyName>ProxyGen</AssemblyName>
+    <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release;Perf</Configurations>
     <LangVersion>8</LangVersion>
@@ -66,7 +66,7 @@
   </ItemGroup>
   
   <PropertyGroup>
-    <DocumentationFile>..\BIN\ProxyGen.xml</DocumentationFile>
+    <DocumentationFile>..\BIN\Solti.Utils.Proxy.xml</DocumentationFile>
     <Product>ProxyGen</Product>
     <Description>.NET proxy generator powered by Roslyn</Description>
     <PackageId>ProxyGen.NET</PackageId>

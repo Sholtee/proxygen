@@ -9,7 +9,7 @@
   "testresults": "testresults.xml",
   "coveragereport": "coverage.xml",
   "artifacts": "\\Artifacts",
-  "coveragefilter": "+[ProxyGen*]* -[ProxyGen.Tests]*",
+  "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests]*",
   "perftests": "\\PERF\\ProxyGen.Perf.csproj",
   "perftarget": "netcoreapp3.1",
   "docsbranch": "gh-pages",
