@@ -18,3 +18,5 @@
   - *done:* Remove internal classes that can be referenced from "Solti.Utils.Primitives"
 - 2.0.2:
   - *done:* Handle unexpected errors on visibility checks
+- 2.0.3:
+  - *done:* Renamed assembly
