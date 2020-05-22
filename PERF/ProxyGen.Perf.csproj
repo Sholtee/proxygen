@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <!--BenchmarkDotNet requires that the exe and csproj name to be equal-->
+    <!--BenchmarkDotNet requires the exe and csproj name to be equal-->
     <AssemblyName>ProxyGen.Perf</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
     <Configurations>Debug;Release;Perf</Configurations>
