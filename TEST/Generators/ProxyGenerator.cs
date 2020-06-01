@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 
 using NUnit.Framework;
 
@@ -380,23 +379,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = null;
+            string cacheFile = $"{MD5Hash.Create(new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().SyntaxFactory.AssemblyName)}.dll";
+            cacheFile = Path.Combine(tmpDir, cacheFile);
 
-            using (var watcher = new FileSystemWatcher(tmpDir, "*.dll"))
-            {
-                watcher.Changed += OnChange;
-                watcher.Created += OnChange;
-                watcher.EnableRaisingEvents = true;
+            if (File.Exists(cacheFile))
+                File.Delete(cacheFile);
 
-                ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = tmpDir;
-                _ = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedType;
+            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = tmpDir;
+            _ = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedType;
 
-                Thread.Sleep(10);
-
-                void OnChange(object sender, FileSystemEventArgs e) => cacheFile = e.FullPath;
-            }
-
-            Assert.That(cacheFile, Is.Not.Null);               
+            Assert.That(File.Exists(cacheFile));               
         }
     }
 }
