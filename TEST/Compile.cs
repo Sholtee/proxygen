@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 )
             );
 
-            Exception ex = Assert.Throws<Exception>(() => Compile.ToAssembly(unit, "cica", new Assembly[0]));
+            Exception ex = Assert.Throws<Exception>(() => Compile.ToAssembly(unit, "cica", null, new Assembly[0]));
 
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);

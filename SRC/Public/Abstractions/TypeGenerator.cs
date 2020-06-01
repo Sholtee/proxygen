@@ -4,8 +4,9 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Abstractions
@@ -34,9 +35,27 @@ namespace Solti.Utils.Proxy.Abstractions
             (
                 root: SyntaxFactory.GenerateProxyUnit(),
                 asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
+                outputDirectory: CacheDirectory,
                 references: References
             )
             .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
+        }
+
+        internal bool TryLoadType(out Type? type) 
+        {
+            if (CacheDirectory != null)
+            {
+                string cacheFile = Path.Combine(CacheDirectory, $"{MD5Hash.Create(SyntaxFactory.AssemblyName)}.dll");
+                if (File.Exists(cacheFile))
+                {
+                    type = Assembly
+                        .LoadFile(cacheFile)
+                        .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
+                    return true;
+                }
+            }
+            type = null;
+            return false;
         }
 
         /// <summary>
@@ -51,8 +70,11 @@ namespace Solti.Utils.Proxy.Abstractions
                 if (FType == null)
                     lock (FLock)
                         if (FType == null)
-                            FType = new TDescendant().GenerateType();
-                return FType;
+                        {
+                            var self = new TDescendant();
+                            if (!self.TryLoadType(out FType)) FType = self.GenerateType();
+                        }
+                return FType!;
             }
         }
 
@@ -65,6 +87,13 @@ namespace Solti.Utils.Proxy.Abstractions
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
         public abstract ISyntaxFactory SyntaxFactory { get; }
+
+        /// <summary>
+        /// The (optional) cache directory to be used to store the generated assembly.
+        /// </summary>
+        /// <remarks>Every product version should have its own cache directory to prevent unexpected <see cref="TypeLoadException"/>s.</remarks>
+        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this, every concrete generator will have its own cache directory")]
+        public static string? CacheDirectory { get; set; }
 
         /// <summary>
         /// Override to invoke your own checks.
