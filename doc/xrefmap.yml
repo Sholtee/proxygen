@@ -99,6 +99,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant)
   nameWithType: TypeGenerator<TDescendant>
   nameWithType.vb: TypeGenerator(Of TDescendant)
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory
+  name: CacheDirectory
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CacheDirectory
+  commentId: P:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.CacheDirectory
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).CacheDirectory
+  nameWithType: TypeGenerator<TDescendant>.CacheDirectory
+  nameWithType.vb: TypeGenerator(Of TDescendant).CacheDirectory
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory*
+  name: CacheDirectory
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CacheDirectory_
+  commentId: Overload:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.CacheDirectory
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).CacheDirectory
+  nameWithType: TypeGenerator<TDescendant>.CacheDirectory
+  nameWithType.vb: TypeGenerator(Of TDescendant).CacheDirectory
 - uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CheckVisibility(System.Type)
   name: CheckVisibility(Type)
   href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CheckVisibility_System_Type_
