@@ -74,7 +74,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   ```
   
 Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/Generators/DuckGenerator.cs ).
-## Caching generated types
+## Caching generated assembly
 Starting from version 2.1, by setting the `[Proxy|Duck]Generator.CacheDirectory` property you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation. It's strongly recommended to have each app version its own cache directory e.g. `"tmp_folder\your_app\current_version\"`.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen ) (WIP).
