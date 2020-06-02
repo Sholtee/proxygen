@@ -23,6 +23,12 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type? FType;
 
+        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
+
+        internal string? CacheFile => CacheDirectory != null 
+            ? Path.Combine(CacheDirectory, $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName)}.dll")
+            : null;
+
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
@@ -31,29 +37,28 @@ namespace Solti.Utils.Proxy.Abstractions
         {
             DoCheck();
 
-            return Compile.ToAssembly
+            return ExtractType
             (
-                root: SyntaxFactory.GenerateProxyUnit(),
-                asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
-                outputDirectory: CacheDirectory,
-                references: References
-            )
-            .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
+                Compile.ToAssembly
+                (
+                    root: SyntaxFactory.GenerateProxyUnit(),
+                    asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
+                    outputFile: CacheFile,
+                    references: References
+                )
+            );
         }
 
         internal bool TryLoadType(out Type? type) 
         {
-            if (CacheDirectory != null)
+            string? cacheFile = CacheFile;
+
+            if (cacheFile != null && File.Exists(cacheFile))
             {
-                string cacheFile = Path.Combine(CacheDirectory, $"{MD5Hash.Create(SyntaxFactory.AssemblyName)}.dll");
-                if (File.Exists(cacheFile))
-                {
-                    type = Assembly
-                        .LoadFile(cacheFile)
-                        .GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
-                    return true;
-                }
+                type = ExtractType(Assembly.LoadFile(cacheFile));
+                return true;
             }
+
             type = null;
             return false;
         }

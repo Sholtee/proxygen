@@ -12,11 +12,11 @@ namespace Solti.Utils.Proxy.Internals
     internal static class MD5Hash
     {
         [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms", Justification = "MD5 is only used to generate short file names")]
-        public static string Create(string source) 
+        public static string CreateFromString(string str) 
         {
             using (var core = MD5.Create()) 
             {
-                byte[] data = core.ComputeHash(Encoding.UTF8.GetBytes(source));
+                byte[] data = core.ComputeHash(Encoding.UTF8.GetBytes(str));
 
                 StringBuilder sb = new StringBuilder();
 

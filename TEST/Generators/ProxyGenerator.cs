@@ -379,13 +379,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = $"{MD5Hash.Create(new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().SyntaxFactory.AssemblyName)}.dll";
+            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = tmpDir;
+
+            string cacheFile = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFile;
             cacheFile = Path.Combine(tmpDir, cacheFile);
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
-
-            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = tmpDir;
+           
             _ = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedType;
 
             Assert.That(File.Exists(cacheFile));               

@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputDirectory, IReadOnlyList<Assembly> references)
+        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyList<Assembly> references)
         {
             Debug.WriteLine(root.NormalizeWhitespace().ToFullString());
             Debug.WriteLine(string.Join(Environment.NewLine, references));
@@ -53,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
                 options: CompilationOptionsFactory.Create()
             );
 
-            using (Stream stm = outputDirectory != null ? File.Create(Path.Combine(outputDirectory, $"{MD5Hash.Create(asmName)}.dll")) : (Stream) new MemoryStream())
+            using (Stream stm = outputFile != null ? File.Create(outputFile) : (Stream) new MemoryStream())
             {
                 EmitResult result = compilation.Emit(stm);
 
