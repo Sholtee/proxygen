@@ -18,7 +18,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
 {
     using Internals;
     using Generators;
-    
+    using System.Diagnostics;
+
     [TestFixture]
     public class ProxyGeneratorTests
     {
@@ -379,17 +380,28 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = tmpDir;
+            ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.CacheDirectory = tmpDir;
 
-            string cacheFile = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFile;
-            cacheFile = Path.Combine(tmpDir, cacheFile);
+            string cacheFile = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>().CacheFile;
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
            
-            _ = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedType;
+            _ = ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GeneratedType;
 
             Assert.That(File.Exists(cacheFile));               
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet() 
+        {
+            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string cacheFile = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFile;
+
+            Type gt = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedType;
+
+            Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
     }
 }

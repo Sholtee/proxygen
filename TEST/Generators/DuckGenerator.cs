@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -19,7 +20,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static TInterface CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface)Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
+            (TInterface) Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
 
         [Test]
         public void GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -185,6 +186,47 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             int Cica { get; }
             string Kutya { get; }
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldWorkWithGenericTypes() =>
+            Assert.DoesNotThrow(() => _ = DuckGenerator<IGeneric<int>, Generic<int>>.GeneratedType);
+
+        public interface IGeneric<T> { T Foo(); }
+
+        public class Generic<T> 
+        {
+            public T Foo() => default;
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
+        {
+            string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
+            Directory.CreateDirectory(tmpDir);
+
+            DuckGenerator<IGeneric<Guid>, Generic<Guid>>.CacheDirectory = tmpDir;
+
+            string cacheFile = new DuckGenerator<IGeneric<Guid>, Generic<Guid>>().CacheFile;
+
+            if (File.Exists(cacheFile))
+                File.Delete(cacheFile);
+
+            _ = DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GeneratedType;
+
+            Assert.That(File.Exists(cacheFile));
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        {
+            DuckGenerator<IGeneric<object>, Generic<object>>.CacheDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            string cacheFile = new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFile;
+
+            Type gt = DuckGenerator<IGeneric<object>, Generic<object>>.GeneratedType;
+
+            Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
     }
 }
