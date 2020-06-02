@@ -33,21 +33,16 @@ namespace Solti.Utils.Proxy.Abstractions
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Type GenerateType(string? assemblyNameOverride = null) 
-        {
-            DoCheck();
-
-            return ExtractType
+        internal Type GenerateType(string? assemblyNameOverride = null) => ExtractType
+        (
+            Compile.ToAssembly
             (
-                Compile.ToAssembly
-                (
-                    root: SyntaxFactory.GenerateProxyUnit(),
-                    asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
-                    outputFile: CacheFile,
-                    references: References
-                )
-            );
-        }
+                root: SyntaxFactory.GenerateProxyUnit(),
+                asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
+                outputFile: CacheFile,
+                references: References
+            )
+        );
 
         internal bool TryLoadType(out Type? type) 
         {
@@ -77,6 +72,7 @@ namespace Solti.Utils.Proxy.Abstractions
                         if (FType == null)
                         {
                             var self = new TDescendant();
+                            self.DoCheck();
                             if (!self.TryLoadType(out FType)) FType = self.GenerateType();
                         }
                 return FType!;
