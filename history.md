@@ -20,3 +20,5 @@
   - *done:* Handle unexpected errors on visibility checks
 - 2.0.3:
   - *done:* Renamed assembly
+- 2.1.0:
+  - *added:* `xXxGenerator.CacheDirectory` property
