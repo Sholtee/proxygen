@@ -172,7 +172,7 @@ namespace Solti.Utils.Proxy.Internals
         /// System.String cb_a;    <br/>
         /// TT cb_b = (TT)args[1];
         /// </summary>
-        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocalsForByRefParameters(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
+        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
         {
             IdentifierNameSyntax array = ToIdentifierName(argsArray);
 
@@ -239,6 +239,45 @@ namespace Solti.Utils.Proxy.Internals
         
             if (method.ReturnType == typeof(void))
                 yield return ExpressionStatement(invocation);
+        }
+
+        /// <summary>
+        /// args[0] = (System.Object)cb_a // ref
+        /// args[2] = (TT)cb_c // out
+        /// </summary>
+        internal static IEnumerable<StatementSyntax> ReassignArgsArray(MethodInfo method, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> args)
+        {
+            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+
+            Debug.Assert(args.Count == paramz.Count);
+
+            return method
+                .GetParameters()
+                .Select((param, i) => new { Parameter = param, Index = i })
+                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
+                .Select
+                (
+                    p => ExpressionStatement
+                    (
+                        expression: AssignmentExpression
+                        (
+                            kind: SyntaxKind.SimpleAssignmentExpression,
+                            left: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
+                            (
+                                argumentList: BracketedArgumentList
+                                (
+                                    SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
+                                )
+                            ),
+                            right: CastExpression
+                            (
+                                type: CreateType(typeof(object)),
+                                ToIdentifierName(args[p.Index])
+                            )
+                        )
+                    )
+                );
+
         }
 
         /// <summary>

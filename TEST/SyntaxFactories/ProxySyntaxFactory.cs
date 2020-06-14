@@ -58,9 +58,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void DeclareCallbackLocalsForByRefParameters_ShouldDoWhatItsNameSuggests() 
+        public void DeclareCallbackLocals_ShouldDeclareALocalForEachArgument() 
         {
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocalsForByRefParameters(Foo, DeclareLocal<object[]>("args")).ToArray();
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(Foo, DeclareLocal<object[]>("args")).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
             Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Int32 cb_a = (System.Int32)args[0];"));
@@ -71,7 +71,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void CallTarget_ShouldStoreTheResult() 
         {
-            IReadOnlyList<StatementSyntax> result = CallTarget(Foo, DeclareLocal<object[]>("result"), DeclareCallbackLocalsForByRefParameters(Foo, DeclareLocal<object[]>("args"))).ToArray();
+            IReadOnlyList<StatementSyntax> result = CallTarget(Foo, DeclareLocal<object[]>("result"), DeclareCallbackLocals(Foo, DeclareLocal<object[]>("args"))).ToArray();
 
             Assert.That(result.Count, Is.EqualTo(1));
             Assert.That(result.Single().NormalizeWhitespace().ToFullString(), Is.EqualTo("result = this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);"));
@@ -80,11 +80,23 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void CallTarget_ShouldHandleVoidMethods()
         {
-            IReadOnlyList<StatementSyntax> result = CallTarget(Bar, DeclareLocal<object[]>("result"), DeclareCallbackLocalsForByRefParameters(Bar, DeclareLocal<object[]>("args"))).ToArray();
+            IReadOnlyList<StatementSyntax> result = CallTarget(Bar, DeclareLocal<object[]>("result"), DeclareCallbackLocals(Bar, DeclareLocal<object[]>("args"))).ToArray();
 
             Assert.That(result.Count, Is.EqualTo(2));
             Assert.That(result[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("result = null;"));
             Assert.That(result[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("this.Target.Bar();"));
+        }
+
+        [Test]
+        public void ReassignArgsArray_ShouldCopyByRefArgumentsBack() 
+        {
+            LocalDeclarationStatementSyntax args = DeclareLocal<object[]>("args");
+
+            IReadOnlyList<StatementSyntax> assigns = ReassignArgsArray(Foo, args, DeclareCallbackLocals(Foo, args).ToArray()).ToArray();
+
+            Assert.That(assigns.Count, Is.EqualTo(2));
+            Assert.That(assigns[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (System.Object)cb_b;"));
+            Assert.That(assigns[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (System.Object)cb_c;"));
         }
 
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
