@@ -57,6 +57,36 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.That(assignments[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("c = (TT)args[2];"));
         }
 
+        [Test]
+        public void DeclareCallbackLocalsForByRefParameters_ShouldDoWhatItsNameSuggests() 
+        {
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocalsForByRefParameters(Foo, DeclareLocal<object[]>("args")).ToArray();
+
+            Assert.That(locals.Count, Is.EqualTo(3));
+            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Int32 cb_a = (System.Int32)args[0];"));
+            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.String cb_b;"));
+            Assert.That(locals[2].NormalizeWhitespace().ToFullString(), Is.EqualTo("TT cb_c = (TT)args[2];"));
+        }
+
+        [Test]
+        public void CallTarget_ShouldStoreTheResult() 
+        {
+            IReadOnlyList<StatementSyntax> result = CallTarget(Foo, DeclareLocal<object[]>("result"), DeclareCallbackLocalsForByRefParameters(Foo, DeclareLocal<object[]>("args"))).ToArray();
+
+            Assert.That(result.Count, Is.EqualTo(1));
+            Assert.That(result.Single().NormalizeWhitespace().ToFullString(), Is.EqualTo("result = this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);"));
+        }
+
+        [Test]
+        public void CallTarget_ShouldHandleVoidMethods()
+        {
+            IReadOnlyList<StatementSyntax> result = CallTarget(Bar, DeclareLocal<object[]>("result"), DeclareCallbackLocalsForByRefParameters(Bar, DeclareLocal<object[]>("args"))).ToArray();
+
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("result = null;"));
+            Assert.That(result[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("this.Target.Bar();"));
+        }
+
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
             (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),

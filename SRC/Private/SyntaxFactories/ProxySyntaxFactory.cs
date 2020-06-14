@@ -169,6 +169,79 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// System.String cb_a;    <br/>
+        /// TT cb_b = (TT)args[1];
+        /// </summary>
+        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocalsForByRefParameters(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
+        {
+            IdentifierNameSyntax array = ToIdentifierName(argsArray);
+
+            return method
+                .GetParameters()
+                .Select((param, i) => new { Parameter = param, Index = i })
+
+                //
+                // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
+                // erteket.
+                //
+
+                .Select
+                (
+                    p => DeclareLocal
+                    (
+                        p.Parameter.ParameterType, 
+                        EnsureUnused($"cb_{p.Parameter.Name}", method),
+                        p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
+                        (
+                            type: CreateType(p.Parameter.ParameterType),
+                            expression: ElementAccessExpression(array).WithArgumentList
+                            (
+                                argumentList: BracketedArgumentList
+                                (
+                                    SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
+                                )
+                            )
+                        )
+                    )
+                );
+        }
+
+        /// <summary>
+        /// System.Object result = this.Target(...);
+        /// 
+        /// OR
+        /// 
+        /// System.Object result = null;
+        /// this.Target(...);
+        /// </summary>
+        internal static IEnumerable<StatementSyntax> CallTarget(MethodInfo method, LocalDeclarationStatementSyntax result, IEnumerable<LocalDeclarationStatementSyntax> args)
+        {
+            InvocationExpressionSyntax invocation = InvokeMethod(
+                method,
+                TARGET,
+                castTargetTo: null,
+                arguments: args.Select
+                (
+                    arg => Argument(ToIdentifierName(arg))
+                ).ToArray());
+
+            yield return ExpressionStatement
+            (
+                AssignmentExpression
+                (
+                    SyntaxKind.SimpleAssignmentExpression,
+                    ToIdentifierName(result),
+                    method.ReturnType != typeof(void)
+                        ? (ExpressionSyntax) invocation
+                        : LiteralExpression(SyntaxKind.NullLiteralExpression)
+                )
+            );
+        
+            if (method.ReturnType == typeof(void))
+                yield return ExpressionStatement(invocation);
+        }
+
+        /// <summary>
         /// T2 dummy_para2 = default(T2);                                                                                <br/>
         /// T3 dummy_para3;                                                                                              <br/>
         /// MethodInfo currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
