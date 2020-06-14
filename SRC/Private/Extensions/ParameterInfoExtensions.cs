@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
                 // "src.IsIn" nem eleg
                 //
 
-                if (src.IsIn && src.GetCustomAttribute<IsReadOnlyAttribute>() != null)
+                if (src.IsIn && src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() != null)
 #endif
                     return ParameterKind.In;
 
