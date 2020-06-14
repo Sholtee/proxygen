@@ -64,12 +64,17 @@ namespace Solti.Utils.Proxy
         /// All the <typeparamref name="TInterface"/> properties.
         /// </summary>
         protected internal static readonly IReadOnlyDictionary<string, PropertyInfo> Properties = typeof(TInterface).ListMembers<PropertyInfo>()
+            //
+            // Tekintsuk a kovetkezot: IA: IB, IC ahol IB: IC -> Distinct()
+            //
+            .Distinct()
             .ToDictionary(prop => prop.GetFullName());
 
         /// <summary>
         /// All the <typeparamref name="TInterface"/> events.
         /// </summary>
         protected internal static readonly IReadOnlyDictionary<string, EventInfo> Events = typeof(TInterface).ListMembers<EventInfo>()
+            .Distinct()
             .ToDictionary(ev => ev.GetFullName());
 
         /// <summary>
@@ -96,7 +101,19 @@ namespace Solti.Utils.Proxy
         /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
         /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
-        /// <remarks>The invocation will be forwarded to the <see cref="Target"/> if this method returns the value of <see cref="CALL_TARGET"/>.</remarks>
-        public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra) => Target != null ? CALL_TARGET : throw new InvalidOperationException(Resources.NULL_TARGET);
+        public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+        {
+            if (Target == null) throw new InvalidOperationException(Resources.NULL_TARGET);
+            if (InvokeTarget == null) throw new InvalidOperationException(); // TODO
+
+            try
+            {
+                return InvokeTarget();
+            }
+            finally 
+            {
+                InvokeTarget = null;
+            }
+        }
     }
 }

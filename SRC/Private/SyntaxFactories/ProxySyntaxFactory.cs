@@ -302,7 +302,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                        <br/>
         /// }
         /// </summary>
-        public sealed class InterceptorMethodDeclarationFactory 
+        public sealed class MethodInterceptorFactory 
         {
             public MethodInfo Method { get; }
 
@@ -310,7 +310,7 @@ namespace Solti.Utils.Proxy.Internals
 
             public LocalDeclarationStatementSyntax CurrentMethod { get; }
 
-            public InterceptorMethodDeclarationFactory(MethodInfo method) 
+            public MethodInterceptorFactory(MethodInfo method) 
             {
                 //
                 // "ref" visszateres nem tamogatott.
@@ -608,77 +608,151 @@ namespace Solti.Utils.Proxy.Internals
             ReturnResult(returnType, ToIdentifierName(result));
 
         /// <summary>
-        /// private static readonly PropertyInfo FProp = Properties["IInterface.Prop"];    <br/>
-        ///                                                                                <br/>
-        /// TResult IInterface.Prop                                                        <br/>
-        /// {                                                                              <br/>
-        ///     get                                                                        <br/>
-        ///     {                                                                          <br/>
-        ///         object result = Invoke(FProp.GetMethod, new object[0], FProp);         <br/>
-        ///         if (result == CALL_TARGET) return Target.Prop;                         <br/>
-        ///                                                                                <br/>
-        ///         return (TResult) result;                                               <br/>
-        ///     }                                                                          <br/>
-        ///     set                                                                        <br/>
-        ///     {                                                                          <br/>
-        ///         object result = Invoke(FProp.SetMethod, new object[]{ value }, FProp); <br/>
-        ///         if (result == CALL_TARGET) Target.Prop = value;                        <br/>
-        ///     }                                                                          <br/>
+        /// private static readonly PropertyInfo FProp = Properties["IInterface.Prop"]; <br/>
+        ///                                                                             <br/>
+        /// TResult IInterface.Prop                                                     <br/>
+        /// {                                                                           <br/>
+        ///     get                                                                     <br/>
+        ///     {                                                                       <br/>
+        ///         InvokeTarget = () => Target.Prop;                                   <br/>
+        ///         return (TResult) Invoke(FProp.GetMethod, new object[0], FProp);     <br/>
+        ///     }                                                                       <br/>
+        ///     set                                                                     <br/>
+        ///     {                                                                       <br/>
+        ///         InvokeTarget = () =>                                                <br/>
+        ///         {                                                                   <br/>
+        ///           Target.Prop = value;                                              <br/>
+        ///           return null;                                                      <br/>
+        ///         };                                                                  <br/>
+        ///         Invoke(FProp.SetMethod, new object[]{ value }, FProp);              <br/>
+        ///     }                                                                       <br/>
         /// }
         /// </summary>
-        internal IEnumerable<MemberDeclarationSyntax> GenerateProxyProperty(PropertyInfo ifaceProperty)
+        public sealed class PropertyInterceptorFactory 
         {
-            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceProperty);
+            public PropertyInfo Property { get; }
 
-            yield return DeclareField<PropertyInfo>(fieldName, PROPERTIES, ifaceProperty);
+            public IdentifierNameSyntax RelatedField { get; }
 
-            if (ifaceProperty.IsIndexer())
+            public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
+
+            public PropertyInterceptorFactory(PropertyInfo property, ProxySyntaxFactory<TInterface, TInterceptor> owner) 
             {
-                yield return GenerateProxyIndexer(ifaceProperty, fieldName);
-                yield break;
+                Property = property;
+                RelatedField = GenerateFieldName(property);
+                Owner = owner;
             }
 
-            //
-            // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-            // figyelmen kivul lesz hagyva.
-            //
-
-            yield return DeclareProperty
+            /// <summary>
+            /// () => Target.Prop;
+            /// </summary>
+            internal LambdaExpressionSyntax BuildPropertyGetter() => ParenthesizedLambdaExpression
             (
-                property: ifaceProperty,
-                getBody: Block(GetBody()),
-                setBody: Block(SetBody())
+                PropertyAccess(Property, TARGET)
             );
 
-            IEnumerable<StatementSyntax> GetBody() 
-            {
-                LocalDeclarationStatementSyntax result = CallInvoke
+            /// <summary>
+            /// () =>                     <br/>
+            /// {                         <br/>
+            ///     Target.Prop = value;  <br/>
+            ///     return null;          <br/>
+            /// };  
+            /// </summary>
+            internal LambdaExpressionSyntax BuildPropertySetter() => ParenthesizedLambdaExpression
+            (
+                Block
                 (
-                    nameof(result),
-                    StaticMemberAccess(fieldName, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,
-                    CreateArray<object>(), // new object[0]
-                    StaticMemberName(fieldName) // FProp
-                );
+                    ExpressionStatement
+                    (
+                        expression: AssignmentExpression
+                        (
+                            kind: SyntaxKind.SimpleAssignmentExpression,
+                            left: PropertyAccess(Property, TARGET),
+                            right: IdentifierName(Value)
+                        )
+                    ),
+                    ReturnStatement
+                    (
+                        LiteralExpression(SyntaxKind.NullLiteralExpression)
+                    )
+                )
+            );
 
-                yield return result;
-                yield return ShouldCallTarget(result, 
-                    ifTrue: ReadTargetAndReturn(ifaceProperty));
-                yield return ReturnResult(ifaceProperty.PropertyType, result);
-            }
-
-            IEnumerable<StatementSyntax> SetBody() 
-            {
-                LocalDeclarationStatementSyntax result = CallInvoke
+            /// <summary>
+            /// return (TResult) this.Invoke(FProp.GetMethod, new object[0], FProp);
+            /// </summary>
+            internal StatementSyntax CallInvokeAndReturn() => ReturnResult
+            (
+                Property.PropertyType,
+                InvokeMethod
                 (
-                    nameof(result),
-                    StaticMemberAccess(fieldName, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod
-                    CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                    StaticMemberName(fieldName) // FProp
-                );
+                    INVOKE,
+                    target: null,
+                    castTargetTo: null,
+                    arguments: new ExpressionSyntax[]
+                    {
+                        Owner.StaticMemberAccess(RelatedField, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,
+                        CreateArray<object>(), // new object[0]
+                        Owner.StaticMemberName(RelatedField) // FProp
+                    }.Select(Argument).ToArray()
+                )
+            );
 
-                yield return result;
-                yield return ShouldCallTarget(result, 
-                    ifTrue: WriteTarget(ifaceProperty));
+            /// <summary>
+            /// this.Invoke(FProp.SetMethod, new object[]{ value }, FProp);
+            /// </summary>
+            internal StatementSyntax CallInvoke() => ExpressionStatement
+            (
+                InvokeMethod
+                (
+                    INVOKE,
+                    target: null,
+                    castTargetTo: null,
+                    arguments: new ExpressionSyntax[]
+                    {
+                        Owner.StaticMemberAccess(RelatedField, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod
+                        CreateArray<object>(IdentifierName(Value)), // new object[] {value}
+                        Owner.StaticMemberName(RelatedField) // FProp
+                    }.Select(Argument).ToArray()
+                )
+            );
+
+            /// <summary>
+            /// InvokeTarget = () => { ... };
+            /// </summary>
+            private static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
+            (
+                expression: AssignmentExpression
+                (
+                    kind: SyntaxKind.SimpleAssignmentExpression,
+                    left: PropertyAccess(INVOKE_TARGET, null),
+                    right: lambda
+                )
+            );
+
+            public IEnumerable<MemberDeclarationSyntax> Build() 
+            {
+                yield return DeclareField<PropertyInfo>(RelatedField, PROPERTIES, Property);
+
+                //
+                // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
+                // figyelmen kivul lesz hagyva.
+                //
+
+                yield return DeclareProperty
+                (
+                    property: Property,
+                    getBody: Block
+                    (
+                        AssignCallback(BuildPropertyGetter()),
+                        CallInvokeAndReturn()
+                    ),
+                    setBody: Block
+                    (
+                        AssignCallback(BuildPropertySetter()),
+                        CallInvoke()
+                    )
+                );
             }
         }
 
@@ -853,17 +927,17 @@ namespace Solti.Utils.Proxy.Internals
                 interfaceType
                     .ListMembers<MethodInfo>()
                     .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && !m.IsSpecialName)
-                    .Select(m => new InterceptorMethodDeclarationFactory(m).Build())
+                    .Select(m => new MethodInterceptorFactory(m).Build())
             );
 
-            members.AddRange
+           /* members.AddRange
             (
                 interfaceType
                     .ListMembers<PropertyInfo>()
                     .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
                     .SelectMany(GenerateProxyProperty)
             );
-
+            */
             members.AddRange
             (
                 interfaceType
