@@ -417,7 +417,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 statements.AddRange
                 (
-                    paramz.Where(param => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(param.GetParameterKind())).Select(param => DeclareLocal
+                    paramz.Where(param => param.ParameterType.IsByRef).Select(param => DeclareLocal
                     (
                         type: param.ParameterType,
                         name: GetDummyName(param),
