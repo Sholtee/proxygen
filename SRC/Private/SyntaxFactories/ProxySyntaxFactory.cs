@@ -143,7 +143,7 @@ namespace Solti.Utils.Proxy.Internals
             return method
                 .GetParameters()
                 .Select((param, i) => new {Parameter = param, Index = i})
-                .Where(p => p.Parameter.ParameterType.IsByRef && !p.Parameter.IsIn)
+                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
                 .Select
                 (
                     p => ExpressionStatement
