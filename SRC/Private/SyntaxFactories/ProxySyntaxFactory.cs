@@ -765,7 +765,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-
         /// <summary>
         /// private static readonly PropertyInfo FItem = Properties["IInterface.Item"];             <br/>
         ///                                                                                         <br/>
@@ -811,63 +810,95 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly EventInfo FEvent = Events["IInterface.Event"];                     <br/>
-        ///                                                                                            <br/>
-        /// event EventType IInterface.Event                                                           <br/>
-        /// {                                                                                          <br/>
-        ///     add                                                                                    <br/>
-        ///     {                                                                                      <br/>
-        ///         object result = Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);           <br/>
-        ///         if (result == CALL_TARGET) Target.Event += value;                                  <br/>
-        ///     }                                                                                      <br/>
-        ///     remove                                                                                 <br/>
-        ///     {                                                                                      <br/>
-        ///         object result = Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);        <br/>
-        ///         if (result == CALL_TARGET) Target.Event -= value;                                  <br/>
-        ///     }                                                                                      <br/>
+        /// private static readonly EventInfo FEvent = Events["IInterface.Event"];  <br/>
+        ///                                                                         <br/>
+        /// event EventType IInterface.Event                                        <br/>
+        /// {                                                                       <br/>
+        ///     add                                                                 <br/>
+        ///     {                                                                   <br/>
+        ///         InvokeTarget = () => Target.Event += value;                     <br/>
+        ///         Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);        <br/>
+        ///     }                                                                   <br/>
+        ///     remove                                                              <br/>
+        ///     {                                                                   <br/>
+        ///         InvokeTarget = () => Target.Event -= value;                     <br/>
+        ///         Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);     <br/>
+        ///     }                                                                   <br/>
         /// }
         /// </summary>
-        internal IEnumerable<MemberDeclarationSyntax> GenerateProxyEvent(EventInfo ifaceEvent)
+        public sealed class EventInterceptorFactory 
         {
-            IdentifierNameSyntax fieldName = GenerateFieldName(ifaceEvent);
+            public EventInfo Event { get; }
 
-            yield return DeclareField<EventInfo>(fieldName, EVENTS, ifaceEvent);
+            public IdentifierNameSyntax RelatedField { get; }
 
-            yield return DeclareEvent
-            (
-                @event: ifaceEvent,
-                addBody: Block(AddBody()),
-                removeBody: Block(RemoveBody())
-            );
+            public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
 
-            IEnumerable<StatementSyntax> AddBody() 
+            public EventInterceptorFactory(EventInfo @event, ProxySyntaxFactory<TInterface, TInterceptor> owner)
             {
-                LocalDeclarationStatementSyntax result = CallInvoke
-                (
-                    nameof(result),
-                    StaticMemberAccess(fieldName, nameof(EventInfo.AddMethod)), // FEvent.AddMethod,
-                    CreateArray<object>(IdentifierName(Value)), // new object[] {value}
-                    StaticMemberName(fieldName) //FEvent
-                );
-
-                yield return result;
-                yield return ShouldCallTarget(result, 
-                    ifTrue: ExpressionStatement(expression: RegisterEvent(ifaceEvent, TARGET, add: true)));
+                Event = @event;
+                RelatedField = GenerateFieldName(@event);
+                Owner = owner;
             }
 
-            IEnumerable<StatementSyntax> RemoveBody() 
-            {
-                LocalDeclarationStatementSyntax result = CallInvoke
-                (
-                    nameof(result),
-                    StaticMemberAccess(fieldName, nameof(EventInfo.RemoveMethod)), // FEvent.RemoveMethod
-                    CreateArray<object>(IdentifierName(Value)),
-                    StaticMemberName(fieldName)
-                );
+            /// <summary>
+            /// () => Target.Event [+|-]= value;
+            /// </summary>
+            internal LambdaExpressionSyntax BuildRegister(bool add) => ParenthesizedLambdaExpression
+            (
+                RegisterEvent(Event, TARGET, add)
+            );
 
-                yield return result;
-                yield return ShouldCallTarget(result, 
-                    ifTrue: ExpressionStatement(expression: RegisterEvent(ifaceEvent, TARGET, add: false)));
+            /// <summary>
+            /// this.Invoke(FEvent.AddMethod, new System.Object[]{ value }, FEvent);
+            /// </summary>
+            internal StatementSyntax CallInvoke(bool add) => ExpressionStatement
+            (
+                InvokeMethod
+                (
+                    INVOKE,
+                    target: null,
+                    castTargetTo: null,
+                    arguments: new ExpressionSyntax[]
+                    {
+                        Owner.StaticMemberAccess(RelatedField, add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)), // FEvent.[Add|Remove]Method
+                        CreateArray<object>(IdentifierName(Value)),
+                        Owner.StaticMemberName(RelatedField) // FEvent
+                    }.Select(Argument).ToArray()
+                )
+            );
+
+            /// <summary>
+            /// InvokeTarget = () => ...;
+            /// </summary>
+            private static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
+            (
+                expression: AssignmentExpression
+                (
+                    kind: SyntaxKind.SimpleAssignmentExpression,
+                    left: PropertyAccess(INVOKE_TARGET, null),
+                    right: lambda
+                )
+            );
+
+            public IEnumerable<MemberDeclarationSyntax> Build()
+            {
+                yield return DeclareField<EventInfo>(RelatedField, EVENTS, Event);
+
+                yield return DeclareEvent
+                (
+                    @event: Event,
+                    addBody: Block
+                    (
+                        AssignCallback(BuildRegister(add: true)),
+                        CallInvoke(add: true)
+                    ),
+                    removeBody: Block
+                    (
+                        AssignCallback(BuildRegister(add: false)),
+                        CallInvoke(add: false)
+                    )
+                );
             }
         }
         #endregion
@@ -919,21 +950,22 @@ namespace Solti.Utils.Proxy.Internals
                     .Select(m => new MethodInterceptorFactory(m).Build())
             );
 
-           /* members.AddRange
-            (
-                interfaceType
-                    .ListMembers<PropertyInfo>()
-                    .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
-                    .SelectMany(GenerateProxyProperty)
-            );
-            */
-            members.AddRange
-            (
-                interfaceType
-                    .ListMembers<EventInfo>()
-                    .Where(e => !implementedInterfaces.Contains(e.DeclaringType))
-                    .SelectMany(GenerateProxyEvent)
-            );
+            /* members.AddRange
+             (
+                 interfaceType
+                     .ListMembers<PropertyInfo>()
+                     .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
+                     .SelectMany(GenerateProxyProperty)
+             );
+
+             members.AddRange
+             (
+                 interfaceType
+                     .ListMembers<EventInfo>()
+                     .Where(e => !implementedInterfaces.Contains(e.DeclaringType))
+                     .SelectMany(GenerateProxyEvent)
+             );
+             */
 
             return cls.WithMembers(List(members));
         }
