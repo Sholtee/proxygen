@@ -1,11 +1,16 @@
 void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Bar()
 {
-    System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());
     System.Object[] args = new System.Object[0];
-    System.Object result = this.Invoke(currentMethod, args, currentMethod);
-    if (result == this.CALL_TARGET)
+    System.Reflection.MethodInfo currentMethod;
+    currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());
+    this.InvokeTarget = () =>
     {
+        System.Object result;
+        result = null;
         this.Target.Bar();
-        return;
+        return result;
     }
+
+    ;
+    System.Object result = this.Invoke(currentMethod, args, currentMethod);
 }

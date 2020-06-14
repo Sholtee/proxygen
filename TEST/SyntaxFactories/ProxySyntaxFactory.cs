@@ -45,12 +45,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
-            Assert.That(CreateArgumentsArray(para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(new InterceptorMethodDeclarationFactory(para.Method).CreateArgumentsArray().NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            IReadOnlyList<ExpressionStatementSyntax> assignments = AssignByRefParameters(Foo, DeclareLocal<object[]>("args")).ToArray();
+            IReadOnlyList<ExpressionStatementSyntax> assignments = new InterceptorMethodDeclarationFactory(Foo).AssignByRefParameters().ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
             Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (System.String)args[1];"));
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void DeclareCallbackLocals_ShouldDeclareALocalForEachArgument() 
+        public void DeclareCallbackLocals_ShouldDeclareALocalForEachArgument()
         {
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = new CallbackLambdaExpressionFactory(Foo, DeclareLocal<object[]>("args")).LocalArgs;
 
@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void CallTarget_ShouldStoreTheResult() 
+        public void CallTarget_ShouldStoreTheResult()
         {
             IReadOnlyList<StatementSyntax> result = new CallbackLambdaExpressionFactory(Foo, DeclareLocal<object[]>("args")).CallTarget().ToArray();
 
@@ -88,7 +88,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void ReassignArgsArray_ShouldCopyByRefArgumentsBack() 
+        public void ReassignArgsArray_ShouldCopyByRefArgumentsBack()
         {
             IReadOnlyList<StatementSyntax> assigns = new CallbackLambdaExpressionFactory(Foo, DeclareLocal<object[]>("args")).ReassignArgsArray().ToArray();
 
@@ -108,12 +108,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         };
 
         [TestCaseSource(nameof(InspectedMethods))]
-        public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) data)
+        public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) para)
         {
-            IReadOnlyList<StatementSyntax> statements = AcquireMethodInfo(data.Method, out _).ToArray();
+            IReadOnlyList<StatementSyntax> statements = new InterceptorMethodDeclarationFactory(para.Method).AcquireMethodInfo().ToArray();
 
-            Assert.That(statements.Count, Is.EqualTo(data.StatementCount));
-            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(data.Expected));
+            Assert.That(statements.Count, Is.EqualTo(para.StatementCount));
+            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     DeclareLocal<MethodInfo>("currentMethod"),
                     DeclareLocal<object[]>("args"),
                     DeclareLocal<MemberInfo>("extra")
-                ).NormalizeWhitespace().ToFullString(), 
+                ).NormalizeWhitespace().ToFullString(),
                 Is.EqualTo("System.Object result = this.Invoke(currentMethod, args, extra);")
             );
 
@@ -148,7 +148,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(Methods))]
         public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
-            Assert.That(GenerateProxyMethod(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
+            Assert.That(new InterceptorMethodDeclarationFactory(para.Method).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test() =>
