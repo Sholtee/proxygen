@@ -2,13 +2,25 @@ event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDe
 {
     add
     {
-        this.InvokeTarget = () => this.Target.Event += value;
+        this.InvokeTarget = () =>
+        {
+            this.Target.Event += value;
+            return null;
+        }
+
+        ;
         this.Invoke(GeneratedProxy.FEvent0.AddMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
     }
 
     remove
     {
-        this.InvokeTarget = () => this.Target.Event -= value;
+        this.InvokeTarget = () =>
+        {
+            this.Target.Event -= value;
+            return null;
+        }
+
+        ;
         this.Invoke(GeneratedProxy.FEvent0.RemoveMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
     }
 }

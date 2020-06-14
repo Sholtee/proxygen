@@ -785,11 +785,25 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             /// <summary>
-            /// () => Target.Event [+|-]= value;
+            /// () => 
+            /// {
+            ///   Target.Event [+|-]= value;
+            ///   return null;
+            /// }
             /// </summary>
             internal LambdaExpressionSyntax BuildRegister(bool add) => ParenthesizedLambdaExpression
             (
-                RegisterEvent(Event, TARGET, add)
+                Block
+                (
+                    ExpressionStatement
+                    (
+                        RegisterEvent(Event, TARGET, add)
+                    ),
+                    ReturnStatement
+                    (
+                        LiteralExpression(SyntaxKind.NullLiteralExpression)
+                    )
+                )
             );
 
             /// <summary>
