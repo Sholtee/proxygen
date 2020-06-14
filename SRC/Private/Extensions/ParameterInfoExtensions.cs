@@ -6,7 +6,6 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace Solti.Utils.Proxy.Internals
 {
