@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -22,13 +21,6 @@ namespace Solti.Utils.Proxy
     /// <remarks>This class is not thread safe even if the <see cref="InterfaceInterceptor{TInterface}.Target"/> is it.</remarks>
     public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?> where TInterface: class
     {
-        /// <summary>
-        /// Signals that the original method should be called.
-        /// </summary>
-        /// <remarks>Internal, don't use it!</remarks>
-        [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Descendants need direct access to the field")]
-        protected internal readonly object CALL_TARGET = new object();
-
         /// <summary>
         /// Extracts the <see cref="MethodInfo"/> from the given expression.
         /// </summary>

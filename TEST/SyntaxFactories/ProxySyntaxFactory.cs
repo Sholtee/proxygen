@@ -103,8 +103,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
         {
-            (Foo, 3, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
-            (Bar, 1, "System.Reflection.MethodInfo currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
+            (Foo, 3, "currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
+            (Bar, 1, "currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());")
         };
 
         [TestCaseSource(nameof(InspectedMethods))]
@@ -161,34 +161,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyClass_Test() =>
             Assert.That(Generator.GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
-
-        public static (MethodInfo Method, string Expected)[] InvokedMethods = new[]
-        {
-            (Foo, "return this.Target.Foo<TT>(a, out b, ref c);"),
-            (Bar, "{\n    this.Target.Bar();\n    return;\n}")
-        };
-
-        [TestCaseSource(nameof(InvokedMethods))]
-        public void CallTargetAndReturn_ShouldInvokeTheTargetMethod((MethodInfo Method, string Expected) para) => 
-            Assert.That(CallTargetAndReturn(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(para.Expected));
-
-        public static (PropertyInfo Property, string Expected)[] ReadProperties = new[]
-        {
-            (Prop, "return this.Target.Prop;"),
-            (Indexer, "return this.Target[index];")
-        };
-
-        [TestCaseSource(nameof(ReadProperties))]
-        public void ReadTargetAndReturn_ShouldReadTheGivenProperty((PropertyInfo Property, string Expected) para) =>
-            Assert.That(ReadTargetAndReturn(para.Property).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
-
-        [Test]
-        public void WriteTarget_ShouldWriteTheGivenProperty() =>
-            Assert.That(WriteTarget(Prop).NormalizeWhitespace().ToFullString(), Is.EqualTo("this.Target.Prop = value;"));
-
-        [Test]
-        public void ShouldCallTarget_ShouldCreateAnIfStatement() =>
-            Assert.That(ShouldCallTarget(DeclareLocal<object>("result"), SyntaxFactory.Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("if (result == this.CALL_TARGET)\n{\n}"));
 
         [Test]
         public void GenerateProxyEvent_Test() =>

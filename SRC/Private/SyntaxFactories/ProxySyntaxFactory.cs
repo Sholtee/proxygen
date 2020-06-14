@@ -25,11 +25,7 @@ namespace Solti.Utils.Proxy.Internals
             //
             // this.Target
             //
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!)),
-            //
-            // this.CALL_TARGET
-            //
-            CALL_TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.CALL_TARGET));
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!));
 
         private static readonly MethodInfo
             INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
@@ -117,7 +113,69 @@ namespace Solti.Utils.Proxy.Internals
         #endregion
 
         #region Internal
-        public sealed class CallbackLambdaExpressionFactory
+        /// <summary>
+        /// object result = Invoke(...);
+        /// </summary>
+        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params ExpressionSyntax[] arguments) =>
+            DeclareLocal<object>(variableName, InvokeMethod
+            (
+                INVOKE,
+                target: null,
+                castTargetTo: null,
+                arguments: arguments.Select(Argument).ToArray()
+            ));
+
+        /// <summary>
+        /// object result = Invoke(var1, var2, ..., varN);
+        /// </summary>
+        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params LocalDeclarationStatementSyntax[] arguments) =>
+            CallInvoke(variableName, arguments.Select(arg => (ExpressionSyntax)ToIdentifierName(arg)).ToArray());
+
+        /// <summary>
+        /// return;          <br/>
+        ///                  <br/>
+        /// OR               <br/>
+        ///                  <br/>
+        /// return (T) ...;
+        /// </summary>
+        internal static ReturnStatementSyntax ReturnResult(Type? returnType, ExpressionSyntax result) => ReturnStatement
+        (
+            expression: returnType == typeof(void)
+                ? null
+                : returnType != null
+                    ? CastExpression
+                    (
+                        type: CreateType(returnType),
+                        expression: result
+                    )
+                    : result
+        );
+
+        /// <summary>
+        /// return;             <br/>
+        ///                     <br/>
+        /// OR                  <br/>
+        ///                     <br/>
+        /// return (T) result;
+        /// </summary>
+        internal static ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
+            ReturnResult(returnType, ToIdentifierName(result));
+
+        /// <summary>
+        /// () =>                                                        <br/>
+        /// {                                                            <br/>
+        ///     System.Int32 cb_a = (System.Int32)args[0];               <br/>
+        ///     System.String cb_b;                                      <br/>
+        ///     TT cb_c = (TT)args[2];                                   <br/>
+        ///     System.Object result;                                    <br/>
+        ///     result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);  <br/>
+        ///                                                              <br/>
+        ///     args[1] = (System.Object)cb_b;                           <br/>
+        ///     args[2] = (System.Object)cb_c;                           <br/>
+        ///     return result;                                           <br/>
+        /// };   
+        /// </summary>
+        internal sealed class CallbackLambdaExpressionFactory
         {
             public MethodInfo Method { get; }
 
@@ -302,7 +360,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                        <br/>
         /// }
         /// </summary>
-        public sealed class MethodInterceptorFactory 
+        internal sealed class MethodInterceptorFactory 
         {
             public MethodInfo Method { get; }
 
@@ -493,121 +551,6 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// object result = Invoke(...);
-        /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params ExpressionSyntax[] arguments) =>
-            DeclareLocal<object>(variableName, InvokeMethod
-            (
-                INVOKE,
-                target: null,
-                castTargetTo: null,
-                arguments: arguments.Select(Argument).ToArray()
-            ));
-
-        /// <summary>
-        /// object result = Invoke(var1, var2, ..., varN);
-        /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params LocalDeclarationStatementSyntax[] arguments) =>
-            CallInvoke(variableName, arguments.Select(arg => (ExpressionSyntax) ToIdentifierName(arg)).ToArray());
-
-        /// <summary>
-        /// return Target.Bar(...);  <br/>
-        ///                          <br/>
-        /// OR                       <br/>
-        ///                          <br/>
-        /// {                        <br/>
-        ///   Target.Bar(...);       <br/>
-        ///   return;                <br/>
-        /// }
-        /// </summary>
-        internal static StatementSyntax CallTargetAndReturn(MethodInfo method)
-        {
-            InvocationExpressionSyntax invocation = InvokeMethod(
-                method, 
-                TARGET,
-                castTargetTo: null,
-                arguments: method
-                    .GetParameters()
-                    .Select(p => p.Name)
-                    .ToArray());
-
-            return method.ReturnType != typeof(void)
-                ? (StatementSyntax) ReturnStatement(invocation)
-                : Block
-                (
-                    statements: List(new StatementSyntax[]{ExpressionStatement(invocation), ReturnStatement()})
-                );
-        }
-
-        /// <summary>
-        /// return Target.Prop;
-        /// </summary>
-        internal static StatementSyntax ReadTargetAndReturn(PropertyInfo property) =>
-            ReturnStatement(PropertyAccess(property, TARGET));
-
-        /// <summary>
-        /// Target.Prop = value;
-        /// </summary>
-        internal static StatementSyntax WriteTarget(PropertyInfo property) =>
-            ExpressionStatement
-            (
-                expression: AssignmentExpression
-                (
-                    kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccess(property, TARGET),
-                    right: IdentifierName(Value)
-                )
-            );
-
-        /// <summary>
-        /// if (result == CALL_TARGET) <br/>
-        /// {                          <br/>
-        ///   ...                      <br/>
-        /// }
-        /// </summary>
-        internal static IfStatementSyntax ShouldCallTarget(LocalDeclarationStatementSyntax result, StatementSyntax ifTrue) =>
-            IfStatement
-            (
-                condition: BinaryExpression
-                (
-                    kind: SyntaxKind.EqualsExpression, 
-                    left: ToIdentifierName(result), 
-                    right: CALL_TARGET
-                ),
-                statement: ifTrue
-            );
-
-        /// <summary>
-        /// return;          <br/>
-        ///                  <br/>
-        /// OR               <br/>
-        ///                  <br/>
-        /// return (T) ...;
-        /// </summary>
-        internal static ReturnStatementSyntax ReturnResult(Type? returnType, ExpressionSyntax result) => ReturnStatement
-        (
-            expression: returnType == typeof(void)
-                ? null
-                : returnType != null 
-                    ? CastExpression
-                    (
-                        type: CreateType(returnType),
-                        expression: result
-                    )
-                    : result
-        );
-
-        /// <summary>
-        /// return;             <br/>
-        ///                     <br/>
-        /// OR                  <br/>
-        ///                     <br/>
-        /// return (T) result;
-        /// </summary>
-        internal static ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
-            ReturnResult(returnType, ToIdentifierName(result));
-
-        /// <summary>
         /// private static readonly PropertyInfo FProp = Properties["IInterface.Prop"]; <br/>
         ///                                                                             <br/>
         /// TResult IInterface.Prop                                                     <br/>
@@ -628,7 +571,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                       <br/>
         /// }
         /// </summary>
-        public class PropertyInterceptorFactory 
+        internal class PropertyInterceptorFactory 
         {
             public PropertyInfo Property { get; }
 
@@ -786,7 +729,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                                   <br/>
         /// }
         /// </summary>
-        public sealed class IndexedPropertyInterceptorFactory : PropertyInterceptorFactory
+        internal sealed class IndexedPropertyInterceptorFactory : PropertyInterceptorFactory
         {
             public IndexedPropertyInterceptorFactory(PropertyInfo property, ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(property, owner)
             {
@@ -826,7 +769,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                   <br/>
         /// }
         /// </summary>
-        public sealed class EventInterceptorFactory 
+        internal sealed class EventInterceptorFactory 
         {
             public EventInfo Event { get; }
 
@@ -950,12 +893,14 @@ namespace Solti.Utils.Proxy.Internals
                     .Select(m => new MethodInterceptorFactory(m).Build())
             );
 
-            /* members.AddRange
+             members.AddRange
              (
                  interfaceType
                      .ListMembers<PropertyInfo>()
                      .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
-                     .SelectMany(GenerateProxyProperty)
+                     .SelectMany(p => p.IsIndexer() 
+                        ? new IndexedPropertyInterceptorFactory(p, this).Build() 
+                        : new PropertyInterceptorFactory(p, this).Build())
              );
 
              members.AddRange
@@ -963,9 +908,8 @@ namespace Solti.Utils.Proxy.Internals
                  interfaceType
                      .ListMembers<EventInfo>()
                      .Where(e => !implementedInterfaces.Contains(e.DeclaringType))
-                     .SelectMany(GenerateProxyEvent)
+                     .SelectMany(e => new EventInterceptorFactory(e, this).Build())
              );
-             */
 
             return cls.WithMembers(List(members));
         }
