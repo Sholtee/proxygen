@@ -168,116 +168,152 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        /// <summary>
-        /// System.String cb_a;    <br/>
-        /// TT cb_b = (TT)args[1];
-        /// </summary>
-        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
+        public sealed class CallbackLambdaExpressionFactory
         {
-            IdentifierNameSyntax array = ToIdentifierName(argsArray);
+            public MethodInfo Method { get; }
 
-            return method
-                .GetParameters()
-                .Select((param, i) => new { Parameter = param, Index = i })
+            public LocalDeclarationStatementSyntax ArgsArray { get; }
 
-                //
-                // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
-                // erteket.
-                //
+            public LocalDeclarationStatementSyntax Result { get; }
 
-                .Select
-                (
-                    p => DeclareLocal
+            public IReadOnlyList<LocalDeclarationStatementSyntax> LocalArgs { get; }
+
+            public CallbackLambdaExpressionFactory(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
+            {
+                Method    = method;
+                ArgsArray = argsArray;
+                Result    = DeclareLocal(typeof(object), EnsureUnused("result", method));
+                LocalArgs = DeclareCallbackLocals().ToArray();
+            }
+
+            /// <summary>
+            /// System.String cb_a;    <br/>
+            /// TT cb_b = (TT)args[1];
+            /// </summary>
+            internal IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals()
+            {
+                IdentifierNameSyntax array = ToIdentifierName(ArgsArray);
+
+                return Method
+                    .GetParameters()
+                    .Select((param, i) => new { Parameter = param, Index = i })
+
+                    //
+                    // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
+                    // erteket.
+                    //
+
+                    .Select
                     (
-                        p.Parameter.ParameterType, 
-                        EnsureUnused($"cb_{p.Parameter.Name}", method),
-                        p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
+                        p => DeclareLocal
                         (
-                            type: CreateType(p.Parameter.ParameterType),
-                            expression: ElementAccessExpression(array).WithArgumentList
+                            p.Parameter.ParameterType, 
+                            EnsureUnused($"cb_{p.Parameter.Name}", Method),
+                            p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
                             (
-                                argumentList: BracketedArgumentList
+                                type: CreateType(p.Parameter.ParameterType),
+                                expression: ElementAccessExpression(array).WithArgumentList
                                 (
-                                    SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
+                                    argumentList: BracketedArgumentList
+                                    (
+                                        SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
+                                    )
                                 )
                             )
                         )
+                    );
+            }
+
+            /// <summary>
+            /// System.Object result = this.Target(...);
+            /// 
+            /// OR
+            /// 
+            /// System.Object result = null;
+            /// this.Target(...);
+            /// </summary>
+            internal IEnumerable<StatementSyntax> CallTarget()
+            {
+                InvocationExpressionSyntax invocation = InvokeMethod(
+                    Method,
+                    TARGET,
+                    castTargetTo: null,
+                    arguments: LocalArgs.Select
+                    (
+                        arg => Argument(ToIdentifierName(arg))
+                    ).ToArray());
+
+                yield return ExpressionStatement
+                (
+                    AssignmentExpression
+                    (
+                        SyntaxKind.SimpleAssignmentExpression,
+                        ToIdentifierName(Result),
+                        Method.ReturnType != typeof(void)
+                            ? (ExpressionSyntax) invocation
+                            : LiteralExpression(SyntaxKind.NullLiteralExpression)
                     )
                 );
-        }
+        
+                if (Method.ReturnType == typeof(void))
+                    yield return ExpressionStatement(invocation);
+            }
 
-        /// <summary>
-        /// System.Object result = this.Target(...);
-        /// 
-        /// OR
-        /// 
-        /// System.Object result = null;
-        /// this.Target(...);
-        /// </summary>
-        internal static IEnumerable<StatementSyntax> CallTarget(MethodInfo method, LocalDeclarationStatementSyntax result, IEnumerable<LocalDeclarationStatementSyntax> args)
-        {
-            InvocationExpressionSyntax invocation = InvokeMethod(
-                method,
-                TARGET,
-                castTargetTo: null,
-                arguments: args.Select
-                (
-                    arg => Argument(ToIdentifierName(arg))
-                ).ToArray());
+            /// <summary>
+            /// args[0] = (System.Object)cb_a // ref
+            /// args[2] = (TT)cb_c // out
+            /// </summary>
+            internal IEnumerable<StatementSyntax> ReassignArgsArray()
+            {
+                IReadOnlyList<ParameterInfo> paramz = Method.GetParameters();
 
-            yield return ExpressionStatement
+                Debug.Assert(LocalArgs.Count == paramz.Count);
+
+                return Method
+                    .GetParameters()
+                    .Select((param, i) => new { Parameter = param, Index = i })
+                    .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
+                    .Select
+                    (
+                        p => ExpressionStatement
+                        (
+                            expression: AssignmentExpression
+                            (
+                                kind: SyntaxKind.SimpleAssignmentExpression,
+                                left: ElementAccessExpression(ToIdentifierName(ArgsArray)).WithArgumentList
+                                (
+                                    argumentList: BracketedArgumentList
+                                    (
+                                        SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
+                                    )
+                                ),
+                                right: CastExpression
+                                (
+                                    type: CreateType(typeof(object)),
+                                    ToIdentifierName(LocalArgs[p.Index])
+                                )
+                            )
+                        )
+                    );
+
+            }
+
+            public LambdaExpressionSyntax Build() => ParenthesizedLambdaExpression
             (
-                AssignmentExpression
+                Block
                 (
-                    SyntaxKind.SimpleAssignmentExpression,
-                    ToIdentifierName(result),
-                    method.ReturnType != typeof(void)
-                        ? (ExpressionSyntax) invocation
-                        : LiteralExpression(SyntaxKind.NullLiteralExpression)
+                    LocalArgs.Cast<StatementSyntax>()
+                        .Append(Result)
+                        .Concat
+                        (
+                            CallTarget()
+                        )
+                        .Concat
+                        (
+                            ReassignArgsArray()
+                        )
                 )
             );
-        
-            if (method.ReturnType == typeof(void))
-                yield return ExpressionStatement(invocation);
-        }
-
-        /// <summary>
-        /// args[0] = (System.Object)cb_a // ref
-        /// args[2] = (TT)cb_c // out
-        /// </summary>
-        internal static IEnumerable<StatementSyntax> ReassignArgsArray(MethodInfo method, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> args)
-        {
-            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
-
-            Debug.Assert(args.Count == paramz.Count);
-
-            return method
-                .GetParameters()
-                .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
-                .Select
-                (
-                    p => ExpressionStatement
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
-                            (
-                                argumentList: BracketedArgumentList
-                                (
-                                    SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
-                                )
-                            ),
-                            right: CastExpression
-                            (
-                                type: CreateType(typeof(object)),
-                                ToIdentifierName(args[p.Index])
-                            )
-                        )
-                    )
-                );
-
         }
 
         /// <summary>

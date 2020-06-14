@@ -41,6 +41,9 @@
     <None Update="BarSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="CallbackSrc.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="ClsSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
