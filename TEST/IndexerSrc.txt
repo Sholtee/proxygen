@@ -2,16 +2,19 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
 {
     get
     {
-        System.Object result = this.Invoke(GeneratedProxy.FItem.GetMethod, new System.Object[]{index}, GeneratedProxy.FItem);
-        if (result == this.CALL_TARGET)
-            return this.Target[index];
-        return (System.Int32)result;
+        this.InvokeTarget = () => this.Target[index];
+        return (System.Int32)this.Invoke(GeneratedProxy.FItem0.GetMethod, new System.Object[]{index}, GeneratedProxy.FItem0);
     }
 
     set
     {
-        System.Object result = this.Invoke(GeneratedProxy.FItem.SetMethod, new System.Object[]{index, value}, GeneratedProxy.FItem);
-        if (result == this.CALL_TARGET)
+        this.InvokeTarget = () =>
+        {
             this.Target[index] = value;
+            return null;
+        }
+
+        ;
+        this.Invoke(GeneratedProxy.FItem0.SetMethod, new System.Object[]{index, value}, GeneratedProxy.FItem0);
     }
 }

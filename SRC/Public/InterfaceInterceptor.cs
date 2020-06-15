@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -19,15 +18,9 @@ namespace Solti.Utils.Proxy
     /// Provides the mechanism for intercepting interface method calls.
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
+    /// <remarks>This class is not thread safe even if the <see cref="InterfaceInterceptor{TInterface}.Target"/> is it.</remarks>
     public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?> where TInterface: class
     {
-        /// <summary>
-        /// Signals that the original method should be called.
-        /// </summary>
-        /// <remarks>Internal, don't use it!</remarks>
-        [SuppressMessage("Design", "CA1051:Do not declare visible instance fields", Justification = "Descendants need direct access to the field")]
-        protected internal readonly object CALL_TARGET = new object();
-
         /// <summary>
         /// Extracts the <see cref="MethodInfo"/> from the given expression.
         /// </summary>
@@ -63,18 +56,29 @@ namespace Solti.Utils.Proxy
         /// All the <typeparamref name="TInterface"/> properties.
         /// </summary>
         protected internal static readonly IReadOnlyDictionary<string, PropertyInfo> Properties = typeof(TInterface).ListMembers<PropertyInfo>()
+            //
+            // Tekintsuk a kovetkezot: IA: IB, IC ahol IB: IC -> Distinct()
+            //
+            .Distinct()
             .ToDictionary(prop => prop.GetFullName());
 
         /// <summary>
         /// All the <typeparamref name="TInterface"/> events.
         /// </summary>
         protected internal static readonly IReadOnlyDictionary<string, EventInfo> Events = typeof(TInterface).ListMembers<EventInfo>()
+            .Distinct()
             .ToDictionary(ev => ev.GetFullName());
 
         /// <summary>
         /// The target of this interceptor.
         /// </summary>
         public TInterface? Target { get; }
+
+        /// <summary>
+        /// Invokes the original <see cref="Target"/> method.
+        /// </summary>
+        /// <remarks>Each intercepted method will have its own invocation.</remarks>
+        protected internal Func<object>? InvokeTarget { get; set; }
 
         /// <summary>
         /// Creates a new <see cref="InterfaceInterceptor{TInterface}"/> instance against the given <paramref name="target"/>.
@@ -89,7 +93,19 @@ namespace Solti.Utils.Proxy
         /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
         /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
-        /// <remarks>The invocation will be forwarded to the <see cref="Target"/> if this method returns the value of <see cref="CALL_TARGET"/>.</remarks>
-        public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra) => Target != null ? CALL_TARGET : throw new InvalidOperationException(Resources.NULL_TARGET);
+        public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+        {
+            if (Target == null) throw new InvalidOperationException(Resources.NULL_TARGET);
+            if (InvokeTarget == null) throw new InvalidOperationException(); // TODO
+
+            try
+            {
+                return InvokeTarget();
+            }
+            finally 
+            {
+                InvokeTarget = null;
+            }
+        }
     }
 }

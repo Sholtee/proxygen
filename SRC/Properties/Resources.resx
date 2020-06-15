@@ -126,6 +126,9 @@
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>
+  <data name="DYNAMIC_ASM" xml:space="preserve">
+    <value>Dynamic assemblies are not supported.</value>
+  </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>

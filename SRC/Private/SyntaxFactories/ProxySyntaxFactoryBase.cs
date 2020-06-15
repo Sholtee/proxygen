@@ -664,11 +664,13 @@ namespace Solti.Utils.Proxy.Internals
         protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
         /// <summary>
-        /// target.Foo(..., ..., ...)
+        /// target.Foo(..., ref ..., ...)
         /// </summary>
         protected internal static InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax? target, Type? castTargetTo = null, params ArgumentSyntax[] arguments)
         {
-            Debug.Assert(arguments.Length == method.GetParameters().Length);
+            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+
+            Debug.Assert(arguments.Length == paramz.Count);
 
             return InvocationExpression
             (
@@ -681,7 +683,29 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithArgumentList
             (
-                argumentList: ArgumentList(CreateList(arguments, arg => arg))
+                argumentList: ArgumentList
+                (
+                    CreateList
+                    (
+                        arguments, 
+                        (arg, i) => (paramz[i].GetParameterKind()) switch
+                        {
+                            ParameterKind.In => arg.WithRefKindKeyword
+                            (
+                                refKindKeyword: Token(SyntaxKind.InKeyword)
+                            ),       
+                            ParameterKind.Out => arg.WithRefKindKeyword
+                            (
+                                refKindKeyword: Token(SyntaxKind.OutKeyword)
+                            ),
+                            ParameterKind.InOut => arg.WithRefKindKeyword
+                            (
+                                refKindKeyword: Token(SyntaxKind.RefKeyword)
+                            ),
+                            _ => arg
+                        }
+                    )
+                )
             );
         }
 
@@ -700,37 +724,10 @@ namespace Solti.Utils.Proxy.Internals
                 target,
                 castTargetTo,
                 arguments: paramz
-                    .Select((param, i) =>
-                    {
-                        ArgumentSyntax argument = Argument
-                        (
-                            expression: IdentifierName(arguments[i])
-                        );
-
-                        switch (param.GetParameterKind())
-                        {
-                            case ParameterKind.In:
-                                argument = argument.WithRefKindKeyword
-                                (
-                                    refKindKeyword: Token(SyntaxKind.InKeyword)
-                                );
-                                break;
-                            case ParameterKind.Out:
-                                argument = argument.WithRefKindKeyword
-                                (
-                                    refKindKeyword: Token(SyntaxKind.OutKeyword)
-                                );
-                                break;
-                            case ParameterKind.InOut:
-                                argument = argument.WithRefKindKeyword
-                                (
-                                    refKindKeyword: Token(SyntaxKind.RefKeyword)
-                                );
-                                break;
-                        }
-
-                        return argument;
-                    })
+                    .Select((param, i) => Argument
+                    (
+                        expression: IdentifierName(arguments[i])
+                    ))
                     .ToArray()
             );
         }

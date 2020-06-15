@@ -1,5 +1,7 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net)
 > .NET proxy generator powered by Roslyn
+
+**This documentation refers the version 3.X of the library**
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
 ### To hook into interface method calls:
@@ -18,6 +20,9 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
 	    return something;
         // ref|out parameters can be assigned by setting the corresponding "args[]" item 
 	  }
+	  
+	  args[0] = someNewVal; // "someNewVal" will be forwarded to the original method
+	  
 	  return base.Invoke(method, args, extra); // Let the original method do its work
     }  
   }
@@ -75,7 +80,10 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   
 Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/Generators/DuckGenerator.cs ).
 ## Caching generated assembly
-Starting from version 2.1, by setting the `[Proxy|Duck]Generator.CacheDirectory` property you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation. It's strongly recommended to have each app version its own cache directory e.g. `"tmp_folder\your_app\current_version\"`.
+By setting the `[Proxy|Duck]Generator.CacheDirectory` property you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation. It's strongly recommended to have each app version its own cache directory e.g. `"tmp_folder\your_app\current_version\"`.
+## Migrating from version 2.X
+- Delete all the cached assemblies (if the `[Proxy|Duck]Generator.CacheDirectory` is set somewhere)
+- `InterfaceInterceptor.Invoke()` returns the result of the original method (instead of `CALL_TARGET`) so in the override you may never need to invoke the `method` parameter directly.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen ) (WIP).
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )

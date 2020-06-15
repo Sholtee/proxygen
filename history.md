@@ -24,3 +24,6 @@
   - *added:* `xXxGenerator.CacheDirectory` property
 - 2.1.1:
   - *done:* Small optimization under the hood
+- 3.0.0:
+  - *breaking:* `InterfaceInterceptor.CALL_TARGET` has been removed
+  - *breaking:* `InterfaceInterceptor.Invoke()` returns the result of the original method (instead of `CALL_TARGET`)

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using Moq;
 using NUnit.Framework;
 
 [assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.InternalInterfaceProxy_Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.IInternalInterface_Proxy")]
@@ -18,7 +19,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 {
     using Internals;
     using Generators;
-    using System.Diagnostics;
+    using Primitives;
 
     [TestFixture]
     public class ProxyGeneratorTests
@@ -55,8 +56,22 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
-        private static TInterface CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            (TInterface) Activator.CreateInstance(ProxyGenerator<TInterface, TInterceptor>.GeneratedType, paramz);
+        private static TInterface CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class
+        {
+            Type generated = ProxyGenerator<TInterface, TInterceptor>.GeneratedType;
+
+            ConstructorInfo ctor;
+
+            ConstructorInfo[] ctors = generated.GetConstructors();
+
+            ctor = ctors.Length == 1 
+                ? ctors[0] 
+                : generated.GetConstructor(paramz.Select(p => p.GetType()).ToArray());
+
+            return (TInterface) ctor
+                .ToStaticDelegate()
+                .Invoke(paramz);
+        }
 
         [Test]
         public void GeneratedProxy_ShouldHook()
@@ -297,6 +312,37 @@ namespace Solti.Utils.Proxy.Generators.Tests
             public SealedInterceptor() : base(null) { }
         }
 
+        [Test]
+        public void GeneratedProxy_ShouldBeAbleToModifyTheInputArguments() 
+        {
+            var mockCalculator = new Mock<ICalculator>(MockBehavior.Strict);
+            mockCalculator
+                .Setup(calc => calc.Add(2, 1))
+                .Returns<int, int>((a, b) => a + b);
+
+            ICalculator calculator = CreateProxy<ICalculator, CalculatorInterceptor>(mockCalculator.Object);
+            calculator.Add(0, 1); // elso parameter direkt 0
+
+            mockCalculator.Verify(calc => calc.Add(2, 1), Times.Once);
+        }
+
+        public interface ICalculator 
+        {
+            int Add(int a, int b);
+        }
+
+        public class CalculatorInterceptor : InterfaceInterceptor<ICalculator>
+        {
+            public CalculatorInterceptor(ICalculator target) : base(target)
+            {
+            }
+
+            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            {
+                args[0] = 2;
+                return base.Invoke(method, args, extra);
+            }
+        }
 
         [Test]
         public void ProxyGenerator_ShouldValidate() 
@@ -364,7 +410,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             .Where(t => t.IsInterface && !t.ContainsGenericParameters);
 
         [TestCaseSource(nameof(RandomInterfaces))]
-        public void ProxyGenerator_ShouldWorkWith(Type iface) =>
+        public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
             typeof(ProxyGenerator<,>)
                 .MakeGenericType
                 (
@@ -372,7 +418,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     typeof(InterfaceInterceptor<>).MakeGenericType(iface)
                 )
                 .GetProperty("GeneratedType", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
-                .GetValue(null);
+                .GetValue(null));
 
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 

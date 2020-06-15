@@ -1,20 +1,26 @@
-class GeneratedProxy
+event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event
 {
-    private static readonly System.Reflection.EventInfo FEvent0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.Events["Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event"];
-    event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event
+    add
     {
-        add
+        this.InvokeTarget = () =>
         {
-            System.Object result = this.Invoke(GeneratedProxy.FEvent0.AddMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
-            if (result == this.CALL_TARGET)
-                this.Target.Event += value;
+            this.Target.Event += value;
+            return null;
         }
 
-        remove
+        ;
+        this.Invoke(GeneratedProxy.FEvent0.AddMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
+    }
+
+    remove
+    {
+        this.InvokeTarget = () =>
         {
-            System.Object result = this.Invoke(GeneratedProxy.FEvent0.RemoveMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
-            if (result == this.CALL_TARGET)
-                this.Target.Event -= value;
+            this.Target.Event -= value;
+            return null;
         }
+
+        ;
+        this.Invoke(GeneratedProxy.FEvent0.RemoveMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
     }
 }
