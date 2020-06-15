@@ -161,6 +161,11 @@ namespace Solti.Utils.Proxy.Internals
         internal static ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
             ReturnResult(returnType, ToIdentifierName(result));
 
+        internal interface IInterceptorFactory
+        {
+            IEnumerable<MemberDeclarationSyntax> Build();
+        }
+
         /// <summary>
         /// () =>                                                        <br/>
         /// {                                                            <br/>
@@ -360,7 +365,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                        <br/>
         /// }
         /// </summary>
-        internal sealed class MethodInterceptorFactory 
+        internal sealed class MethodInterceptorFactory : IInterceptorFactory
         {
             public MethodInfo Method { get; }
 
@@ -523,7 +528,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            public MethodDeclarationSyntax Build() 
+            public IEnumerable<MemberDeclarationSyntax> Build() 
             {
                 LocalDeclarationStatementSyntax result = CallInvoke(GetLocalName("result"), CurrentMethod, ArgsArray, CurrentMethod);
 
@@ -540,7 +545,7 @@ namespace Solti.Utils.Proxy.Internals
                     ReturnResult(Method.ReturnType, result)
                 );
 
-                return DeclareMethod(Method).WithBody
+                yield return DeclareMethod(Method).WithBody
                 (
                     body: Block
                     (
@@ -571,7 +576,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                       <br/>
         /// }
         /// </summary>
-        internal class PropertyInterceptorFactory 
+        internal class PropertyInterceptorFactory : IInterceptorFactory
         {
             public PropertyInfo Property { get; }
 
@@ -769,7 +774,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                   <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory 
+        internal sealed class EventInterceptorFactory : IInterceptorFactory
         {
             public EventInfo Event { get; }
 
@@ -891,41 +896,40 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            //
-            // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
-            //
-
             HashSet<Type> implementedInterfaces = new HashSet<Type>(interceptorType.GetInterfaces());
 
-            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>(interceptorType.GetPublicConstructors().Select(DeclareCtor));
-
-            members.AddRange
+            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
             (
-                interfaceType
-                    .ListMembers<MethodInfo>()
-                    .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && !m.IsSpecialName)
-                    .Select(m => new MethodInterceptorFactory(m).Build())
+                interceptorType.GetPublicConstructors().Select(DeclareCtor)
             );
 
-             members.AddRange
-             (
-                 interfaceType
-                     .ListMembers<PropertyInfo>()
-                     .Where(p => !implementedInterfaces.Contains(p.DeclaringType))
-                     .SelectMany(p => p.IsIndexer() 
-                        ? new IndexedPropertyInterceptorFactory(p, this).Build() 
-                        : new PropertyInterceptorFactory(p, this).Build())
-             );
-
-             members.AddRange
-             (
-                 interfaceType
-                     .ListMembers<EventInfo>()
-                     .Where(e => !implementedInterfaces.Contains(e.DeclaringType))
-                     .SelectMany(e => new EventInterceptorFactory(e, this).Build())
-             );
+            DeclareMembers<MethodInfo>(
+                m => !m.IsSpecialName, 
+                m => new MethodInterceptorFactory(m));
+            DeclareMembers<PropertyInfo>(
+                p => true,
+                p => p.IsIndexer() ? new IndexedPropertyInterceptorFactory(p, this) : new PropertyInterceptorFactory(p, this));
+            DeclareMembers<EventInfo>(
+                e => true,
+                e => new EventInterceptorFactory(e, this));
 
             return cls.WithMembers(List(members));
+
+            void DeclareMembers<TMember>(Func<TMember, bool> filter, Func<TMember, IInterceptorFactory> interceptorFactory) where TMember : MemberInfo => members.AddRange
+            (
+                interfaceType
+                    .ListMembers<TMember>()
+
+                    //
+                    // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
+                    //
+
+                    .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && filter(m))
+                    .SelectMany
+                    (
+                        member => interceptorFactory(member).Build()
+                    )
+            );
         }
     }
 }

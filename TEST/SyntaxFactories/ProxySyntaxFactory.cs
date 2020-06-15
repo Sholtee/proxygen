@@ -148,7 +148,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(Methods))]
         public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
-            Assert.That(new MethodInterceptorFactory(para.Method).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
+            Assert.That(new MethodInterceptorFactory(para.Method).Build().Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test() =>
