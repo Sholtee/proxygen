@@ -96,6 +96,9 @@
       </tr>
     </tbody>
   </table>
+  <h5 id="Solti_Utils_Proxy_InterfaceInterceptor_1_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>This class is not thread safe even if the <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Target">Target</a> is it.</p>
+</div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Solti_Utils_Proxy_InterfaceInterceptor_1__ctor_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.#ctor*"></a>
@@ -127,32 +130,6 @@
   </table>
   <h3 id="fields">Fields
   </h3>
-  <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_CALL_TARGET" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.CALL_TARGET">CALL_TARGET</h4>
-  <div class="markdown level1 summary"><p>Signals that the original method should be called.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected readonly object CALL_TARGET</code></pre>
-  </div>
-  <h5 class="fieldValue">Field Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Solti_Utils_Proxy_InterfaceInterceptor_1_CALL_TARGET_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Internal, don&apos;t use it!</p>
-</div>
   <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Events" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Events">Events</h4>
   <div class="markdown level1 summary"><p>All the <code data-dev-comment-type="typeparamref" class="typeparamref">TInterface</code> events.</p>
 </div>
@@ -201,6 +178,33 @@
   </table>
   <h3 id="properties">Properties
   </h3>
+  <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_InvokeTarget_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.InvokeTarget*"></a>
+  <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_InvokeTarget" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.InvokeTarget">InvokeTarget</h4>
+  <div class="markdown level1 summary"><p>Invokes the original <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Target">Target</a> method.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Func&lt;object&gt; InvokeTarget { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Solti_Utils_Proxy_InterfaceInterceptor_1_InvokeTarget_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Each intercepted method will have its own invocation.</p>
+</div>
   <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_Target_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Target*"></a>
   <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Target" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Target">Target</h4>
   <div class="markdown level1 summary"><p>The target of this interceptor.</p>
@@ -282,9 +286,6 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Invoke_System_Reflection_MethodInfo_System_Object___System_Reflection_MemberInfo__remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The invocation will be forwarded to the <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Target">Target</a> if this method returns the value of <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_CALL_TARGET">CALL_TARGET</a>.</p>
-</div>
   <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_MethodAccess_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess*"></a>
   <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_MethodAccess_System_Linq_Expressions_Expression_System_Action__" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.MethodAccess(System.Linq.Expressions.Expression{System.Action})">MethodAccess(Expression&lt;Action&gt;)</h4>
   <div class="markdown level1 summary"><p>Extracts the <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a> from the given expression.</p>
