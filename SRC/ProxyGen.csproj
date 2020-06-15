@@ -66,7 +66,7 @@
   </ItemGroup>
   
   <PropertyGroup>
-    <DocumentationFile>..\BIN\Solti.Utils.Proxy.xml</DocumentationFile>
+    <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <Product>ProxyGen</Product>
     <Description>.NET proxy generator powered by Roslyn</Description>
     <PackageId>ProxyGen.NET</PackageId>
