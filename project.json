@@ -2,7 +2,6 @@
   "bin": "\\BIN",
   "solution": "\\ProxyGen.sln",
   "app": "\\SRC\\ProxyGen.csproj",
-  "githubrepo": "Sholtee/ProxyGen.git",
   "vendor": "\\Vendor",
   "tests": "\\TEST\\ProxyGen.Tests.csproj",
   "testtarget": "netcoreapp2.2",
