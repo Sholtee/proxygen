@@ -139,7 +139,7 @@ namespace Solti.Utils.Proxy.Internals
                     .Assemblies
                     .Concat(type.GetReferences())  // NE "Append(type.Assembly())" legyen mert specializalt tipusnal a generikus argumentumok szerelvenyei is kellenek
                     .Distinct()
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location)),
+                    .Select(asm => MetadataReference.CreateFromFile(asm.Location ?? throw new NotSupportedException(Resources.DYNAMIC_ASM))),
                 options: CompilationOptionsFactory.Create()
             );
 

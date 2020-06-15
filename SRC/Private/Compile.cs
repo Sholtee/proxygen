@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                     .Append(typeof(IgnoresAccessChecksToAttribute).Assembly())
 #endif
                     .Distinct()
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location)),
+                    .Select(asm => MetadataReference.CreateFromFile(asm.Location ?? throw new NotSupportedException(Resources.DYNAMIC_ASM)))),
                 options: CompilationOptionsFactory.Create()
             );
 

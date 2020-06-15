@@ -10,7 +10,6 @@
 
 namespace Solti.Utils.Proxy.Properties {
     using System;
-    using System.Reflection;
     
     
     /// <summary>
@@ -40,7 +39,7 @@ namespace Solti.Utils.Proxy.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Solti.Utils.Proxy.Properties.Resources", typeof(Resources).GetTypeInfo().Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Solti.Utils.Proxy.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -85,6 +84,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string COMPILATION_FAILED {
             get {
                 return ResourceManager.GetString("COMPILATION_FAILED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dynamic assemblies are not supported..
+        /// </summary>
+        internal static string DYNAMIC_ASM {
+            get {
+                return ResourceManager.GetString("DYNAMIC_ASM", resourceCulture);
             }
         }
         
