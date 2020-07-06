@@ -27,3 +27,5 @@
 - 3.0.0:
   - *breaking:* `InterfaceInterceptor.CALL_TARGET` has been removed
   - *breaking:* `InterfaceInterceptor.Invoke()` returns the result of the original method (instead of `CALL_TARGET`)
+- 3.0.1:
+  - *done:* The return value of `InterfaceInterceptor.Invoke()` should be `object?` (it may return `null`)
