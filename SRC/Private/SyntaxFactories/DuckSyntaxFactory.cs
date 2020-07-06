@@ -275,7 +275,7 @@ namespace Solti.Utils.Proxy.Internals
                     if (e is MissingMemberException || e is MemberAccessException || e is AmbiguousMatchException)
                     {
 
-                        exceptions.Add(e);
+                        exceptions!.Add(e);
                         return default(TResult)!;
                     }
                     throw;
