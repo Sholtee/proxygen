@@ -60,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T>> expr) => DoExtractFrom(expr);
 
-        public static MemberInfo ExtractFrom<T>(Expression<Func<T, object>> expr) => DoExtractFrom(expr);
+        public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
 
         public static bool SignatureEquals(this MemberInfo self, MemberInfo that) 
         {
