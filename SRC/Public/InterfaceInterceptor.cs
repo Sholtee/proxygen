@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy
         /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
         /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
-        public virtual object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+        public virtual object? Invoke(MethodInfo method, object[] args, MemberInfo extra)
         {
             if (Target == null) throw new InvalidOperationException(Resources.NULL_TARGET);
             if (InvokeTarget == null) throw new InvalidOperationException(); // TODO
