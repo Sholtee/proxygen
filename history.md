@@ -29,3 +29,5 @@
   - *breaking:* `InterfaceInterceptor.Invoke()` returns the result of the original method (instead of `CALL_TARGET`)
 - 3.0.1:
   - *done:* The return value of `InterfaceInterceptor.Invoke()` should be `object?` (it may return `null`)
+- 3.0.2:
+  - *done:* Add title and description to the generated assembly
