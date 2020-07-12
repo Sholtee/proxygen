@@ -4,13 +4,9 @@
   "app": "\\SRC\\ProxyGen.csproj",
   "vendor": "\\Vendor",
   "tests": "\\TEST\\ProxyGen.Tests.csproj",
-  "testtarget": "netcoreapp2.2",
-  "testresults": "testresults.xml",
-  "coveragereport": "coverage.xml",
   "artifacts": "\\Artifacts",
   "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests]*",
   "perftests": "\\PERF\\ProxyGen.Perf.csproj",
-  "perftarget": "netcoreapp3.1",
   "docsbranch": "gh-pages",
   "CI": "AppVeyor"
 }
