@@ -5,7 +5,7 @@
   "vendor": "\\Vendor",
   "tests": "\\TEST\\ProxyGen.Tests.csproj",
   "artifacts": "\\Artifacts",
-  "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests]*",
+  "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests]* -[*]*.Properties.*",
   "perftests": "\\PERF\\ProxyGen.Perf.csproj",
   "docsbranch": "gh-pages",
   "CI": "AppVeyor"
