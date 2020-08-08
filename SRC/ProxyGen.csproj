@@ -65,15 +65,19 @@
     <Folder Include="Public\Generators\" />
   </ItemGroup>
   
+  <ItemGroup>
+    <None Include="..\icon.png" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  
   <PropertyGroup>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <Product>ProxyGen</Product>
     <Description>.NET proxy generator powered by Roslyn</Description>
     <PackageId>ProxyGen.NET</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIconUrl>https://github.com/Sholtee/ProxyGen/raw/master/icon.png</PackageIconUrl>
     <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
     <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>
