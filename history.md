@@ -28,6 +28,8 @@
   - *breaking:* `InterfaceInterceptor.CALL_TARGET` has been removed
   - *breaking:* `InterfaceInterceptor.Invoke()` returns the result of the original method (instead of `CALL_TARGET`)
 - 3.0.1:
-  - *done:* The return value of `InterfaceInterceptor.Invoke()` should be `object?` (it may return `null`)
+  - *fixed:* Missing nullable annotation on `InterfaceInterceptor.Invoke()`
 - 3.0.2:
   - *done:* Add title and description to the generated assembly
+- 3.0.3:
+  - *fixed:* Missing nullable annotation on `InterfaceInterceptor.Invoke()` (again)
