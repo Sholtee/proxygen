@@ -33,3 +33,6 @@
   - *done:* Add title and description to the generated assembly
 - 3.0.3:
   - *fixed:* Missing nullable annotation on `InterfaceInterceptor.Invoke()` (again)
+- 3.1.0:
+  - *added:* `xXxGenerator.GeneratedTypeAsync` property
+  - *obsolete:* `xXxGenerator.GeneratedType` property
