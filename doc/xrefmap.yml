@@ -167,23 +167,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GeneratedType
   nameWithType: TypeGenerator<TDescendant>.GeneratedType
   nameWithType.vb: TypeGenerator(Of TDescendant).GeneratedType
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  name: GetGeneratedTypeAsync(CancellationToken)
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedTypeAsync(CancellationToken)
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedTypeAsync(CancellationToken)
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync*
-  name: GetGeneratedTypeAsync
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_
-  commentId: Overload:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync
+  name: GeneratedTypeAsync
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedTypeAsync
+  commentId: P:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.GeneratedTypeAsync
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GeneratedTypeAsync
+  nameWithType: TypeGenerator<TDescendant>.GeneratedTypeAsync
+  nameWithType.vb: TypeGenerator(Of TDescendant).GeneratedTypeAsync
+- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync*
+  name: GeneratedTypeAsync
+  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedTypeAsync_
+  commentId: Overload:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.GetGeneratedTypeAsync
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedTypeAsync
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
+  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.GeneratedTypeAsync
+  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).GeneratedTypeAsync
+  nameWithType: TypeGenerator<TDescendant>.GeneratedTypeAsync
+  nameWithType.vb: TypeGenerator(Of TDescendant).GeneratedTypeAsync
 - uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.References
   name: References
   href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_References
