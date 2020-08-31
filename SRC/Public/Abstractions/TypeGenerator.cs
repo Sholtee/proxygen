@@ -83,7 +83,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// The genrated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
-        [Obsolete("Use GetGeneratedTypeAsync() instead")]
+        [Obsolete("Use GeneratedTypeAsync instead")]
         public static Type GeneratedType => GeneratedTypeAsync.GetAwaiter().GetResult();
 
         /// <summary>
