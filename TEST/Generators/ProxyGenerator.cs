@@ -9,7 +9,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Moq;
@@ -60,7 +59,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class
         {
-            Type generated = await ProxyGenerator<TInterface, TInterceptor>.GetGeneratedTypeAsync();
+            Type generated = await ProxyGenerator<TInterface, TInterceptor>.GeneratedTypeAsync;
 
             ConstructorInfo ctor;
 
@@ -419,7 +418,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     iface,
                     typeof(InterfaceInterceptor<>).MakeGenericType(iface)
                 )
-                .InvokeMember("GetGeneratedTypeAsync", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { default(CancellationToken) }));
+                .InvokeMember("GeneratedTypeAsync", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.GetProperty, null, null, new object[0]));
 
         [Test]
         public async Task ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 
@@ -434,7 +433,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
            
-            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GetGeneratedTypeAsync();
+            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GeneratedTypeAsync;
 
             Assert.That(File.Exists(cacheFile));               
         }
@@ -446,7 +445,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             string cacheFile = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFile;
 
-            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync();
+            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedTypeAsync;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

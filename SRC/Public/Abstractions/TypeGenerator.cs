@@ -36,17 +36,34 @@ namespace Solti.Utils.Proxy.Abstractions
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Task<Type> GenerateType(string? assemblyNameOverride = default, CancellationToken cancellation = default) => Task.Factory.StartNew(() => ExtractType
+        internal Task<Type> GenerateType(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => ExtractType
         (
             Compile.ToAssembly
             (
                 root: SyntaxFactory.GenerateProxyUnit(),
                 asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
                 outputFile: CacheFile,
-                references: References,
-                cancellation: cancellation
+                references: References
             )
-        ), cancellation, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        ), default, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+
+        internal static async Task<Type> GetGeneratedTypeAsync()
+        {
+            if (FType != null) return FType;
+
+            await FLock.WaitAsync().ConfigureAwait(false);
+
+            if (FType == null)
+            {
+                var self = new TDescendant();
+                self.DoCheck();
+
+                if (!self.TryLoadType(out FType))
+                    FType = await self.GenerateType().ConfigureAwait(false);
+            }
+
+            return FType!;
+        }
 
         internal bool TryLoadType(out Type? type) 
         {
@@ -67,28 +84,13 @@ namespace Solti.Utils.Proxy.Abstractions
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
         [Obsolete("Use GetGeneratedTypeAsync() instead")]
-        public static Type GeneratedType => GetGeneratedTypeAsync().GetAwaiter().GetResult();
+        public static Type GeneratedType => GeneratedTypeAsync.GetAwaiter().GetResult();
 
         /// <summary>
-        /// Gets the generated proxy <see cref="Type"/> asynchronously.
+        /// The genrated <see cref="Type"/>.
         /// </summary>
-        public static async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) 
-        {
-            if (FType != null) return FType;
-
-            await FLock.WaitAsync(cancellation).ConfigureAwait(false);
-
-            if (FType == null)
-            {
-                var self = new TDescendant();
-                self.DoCheck();
-
-                if (!self.TryLoadType(out FType)) 
-                    FType = await self.GenerateType(cancellation: cancellation).ConfigureAwait(false);
-            }
-
-            return FType!;
-        }
+        /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
+        public static Task<Type> GeneratedTypeAsync => GetGeneratedTypeAsync();
 
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.

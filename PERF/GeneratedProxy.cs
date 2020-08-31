@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Perf
         private IInterface FInstance;
 
         private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            (TInterface) Activator.CreateInstance(await ProxyGenerator<TInterface, TInterceptor>.GetGeneratedTypeAsync(), paramz);
+            (TInterface) Activator.CreateInstance(await ProxyGenerator<TInterface, TInterceptor>.GeneratedTypeAsync, paramz);
 
         #region Helper classes
         public class Implementation : IInterface

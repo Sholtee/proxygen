@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
@@ -22,7 +21,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GetGeneratedTypeAsync(), target);
+            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GeneratedTypeAsync, target);
 
         [Test]
         public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -153,11 +152,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldDistinguishByName() =>
-            Assert.DoesNotThrowAsync(() => DuckGenerator<IBar, MyBar>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IBar, MyBar>.GeneratedTypeAsync);
 
         [Test]
         public void DuckGenerator_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.ThrowsAsync<AmbiguousMatchException>(() => DuckGenerator<IBar, MultipleBaz>.GetGeneratedTypeAsync());
+            Assert.ThrowsAsync<AmbiguousMatchException>(() => DuckGenerator<IBar, MultipleBaz>.GeneratedTypeAsync);
 
         public class MultipleBaz : IBar
         {
@@ -180,7 +179,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             // anonim objektumok mindig internal-ok
             Assert.DoesNotThrowAsync(() => (Task) typeof(DuckGenerator<,>)
                 .MakeGenericType(typeof(IProps), anon.GetType())
-                .InvokeMember("GetGeneratedTypeAsync", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { default(CancellationToken) }));
+                .InvokeMember("GeneratedTypeAsync", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.GetProperty, null, null, new object[0]));
         }
 
         public interface IProps 
@@ -191,7 +190,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldWorkWithGenericTypes() =>
-            Assert.DoesNotThrowAsync(() => DuckGenerator<IGeneric<int>, Generic<int>>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IGeneric<int>, Generic<int>>.GeneratedTypeAsync);
 
         public interface IGeneric<T> { T Foo(); }
 
@@ -213,7 +212,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GetGeneratedTypeAsync();
+            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GeneratedTypeAsync;
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -225,7 +224,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             string cacheFile = new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFile;
 
-            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GetGeneratedTypeAsync();
+            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GeneratedTypeAsync;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
