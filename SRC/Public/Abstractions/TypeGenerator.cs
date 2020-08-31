@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Solti.Utils.Proxy.Abstractions
 {
@@ -17,9 +19,10 @@ namespace Solti.Utils.Proxy.Abstractions
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>
     /// <remarks>Generators can not be instantiated. To access the create type use the <see cref="GeneratedType"/> property.</remarks>
+    [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
-        private static readonly object FLock = new object();
+        private static readonly SemaphoreSlim FLock = new SemaphoreSlim(1, 1);
 
         private static Type? FType;
 
@@ -33,16 +36,17 @@ namespace Solti.Utils.Proxy.Abstractions
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Type GenerateType(string? assemblyNameOverride = null) => ExtractType
+        internal Task<Type> GenerateType(string? assemblyNameOverride = default, CancellationToken cancellation = default) => Task.Factory.StartNew(() => ExtractType
         (
             Compile.ToAssembly
             (
                 root: SyntaxFactory.GenerateProxyUnit(),
                 asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
                 outputFile: CacheFile,
-                references: References
+                references: References,
+                cancellation: cancellation
             )
-        );
+        ), cancellation, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         internal bool TryLoadType(out Type? type) 
         {
@@ -62,21 +66,28 @@ namespace Solti.Utils.Proxy.Abstractions
         /// The genrated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
-        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this, every concrete generator will have its own generated type")]
-        public static Type GeneratedType 
+        [Obsolete("Use GetGeneratedTypeAsync() instead")]
+        public static Type GeneratedType => GetGeneratedTypeAsync().GetAwaiter().GetResult();
+
+        /// <summary>
+        /// Gets the generated proxy <see cref="Type"/> asynchronously.
+        /// </summary>
+        public static async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) 
         {
-            get 
+            if (FType != null) return FType;
+
+            await FLock.WaitAsync(cancellation).ConfigureAwait(false);
+
+            if (FType == null)
             {
-                if (FType == null)
-                    lock (FLock)
-                        if (FType == null)
-                        {
-                            var self = new TDescendant();
-                            self.DoCheck();
-                            if (!self.TryLoadType(out FType)) FType = self.GenerateType();
-                        }
-                return FType!;
+                var self = new TDescendant();
+                self.DoCheck();
+
+                if (!self.TryLoadType(out FType)) 
+                    FType = await self.GenerateType(cancellation: cancellation).ConfigureAwait(false);
             }
+
+            return FType!;
         }
 
         /// <summary>
@@ -93,7 +104,6 @@ namespace Solti.Utils.Proxy.Abstractions
         /// The (optional) cache directory to be used to store the generated assembly.
         /// </summary>
         /// <remarks>Every product version should have its own cache directory to prevent unexpected <see cref="TypeLoadException"/>s.</remarks>
-        [SuppressMessage("Design", "CA1000:Do not declare static members on generic types", Justification = "By this, every concrete generator will have its own cache directory")]
         public static string? CacheDirectory { get; set; }
 
         /// <summary>

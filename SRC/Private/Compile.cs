@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Threading;
 
 #if IGNORE_VISIBILITY
 using System.Runtime.CompilerServices;
@@ -27,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyList<Assembly> references)
+        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyList<Assembly> references, CancellationToken cancellation = default)
         {
             Debug.WriteLine(root.NormalizeWhitespace().ToFullString());
             Debug.WriteLine(string.Join(Environment.NewLine, references));
@@ -53,35 +54,34 @@ namespace Solti.Utils.Proxy.Internals
                 options: CompilationOptionsFactory.Create()
             );
 
-            using (Stream stm = outputFile != null ? File.Create(outputFile) : (Stream) new MemoryStream())
+            using Stream stm = outputFile != null ? File.Create(outputFile) : (Stream) new MemoryStream();
+
+            EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
+
+            Debug.WriteLine(string.Join(Environment.NewLine, result.Diagnostics));
+
+            if (!result.Success)
             {
-                EmitResult result = compilation.Emit(stm);
+                string failures = string.Join($",{Environment.NewLine}", result
+                    .Diagnostics
+                    .Where(d => d.Severity == DiagnosticSeverity.Error));
 
-                Debug.WriteLine(string.Join(Environment.NewLine, result.Diagnostics));
+                var ex = new Exception(Resources.COMPILATION_FAILED);
 
-                if (!result.Success)
-                {
-                    string failures = string.Join($",{Environment.NewLine}", result
-                        .Diagnostics
-                        .Where(d => d.Severity == DiagnosticSeverity.Error));
+                IDictionary extra = ex.Data;
 
-                    var ex = new Exception(Resources.COMPILATION_FAILED);
+                extra.Add(nameof(failures), failures);
+                extra.Add("src", root.NormalizeWhitespace().ToFullString());
+                extra.Add(nameof(references), references);
 
-                    IDictionary extra = ex.Data;
+                throw ex;
+            }
 
-                    extra.Add(nameof(failures), failures);
-                    extra.Add("src", root.NormalizeWhitespace().ToFullString());
-                    extra.Add(nameof(references), references);
+            stm.Seek(0, SeekOrigin.Begin);
 
-                    throw ex;
-                }
-
-                stm.Seek(0, SeekOrigin.Begin);
-
-                return AssemblyLoadContext
-                    .Default
-                    .LoadFromStream(stm);
-            } 
+            return AssemblyLoadContext
+                .Default
+                .LoadFromStream(stm);
         }
     }
 }

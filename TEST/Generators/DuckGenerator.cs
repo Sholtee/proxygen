@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 using NUnit.Framework;
 
@@ -19,13 +21,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
     [TestFixture]
     public sealed class DuckGeneratorTests
     {
-        private static TInterface CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface) Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
+        private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
+            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GetGeneratedTypeAsync(), target);
 
         [Test]
-        public void GeneratedDuck_ShouldWorkWithComplexInterfaces()
+        public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()
         {
-            IList<int> proxy = CreateDuck<IList<int>, IList<int>>(new List<int>());
+            IList<int> proxy = await CreateDuck<IList<int>, IList<int>>(new List<int>());
 
             Assert.DoesNotThrow(() => proxy.Add(1986));
 
@@ -51,9 +53,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldHandleRefs()
+        public async Task GeneratedProxy_ShouldHandleRefs()
         {
-            IRef proxy = CreateDuck<IRef, Ref>(new Ref());
+            IRef proxy = await CreateDuck<IRef, Ref>(new Ref());
 
             string para = null;
 
@@ -73,11 +75,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldHandleEvents()
+        public async Task GeneratedProxy_ShouldHandleEvents()
         {
             var src = new EventSource();
 
-            IEventSource proxy = CreateDuck<IEventSource, EventSource>(src);
+            IEventSource proxy = await CreateDuck<IEventSource, EventSource>(src);
 
             int callCount = 0;
             proxy.Event += (s, a) => callCount++;
@@ -99,7 +101,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void GeneratedProxy_ShouldWorkWithInternalTypes() =>
-            Assert.DoesNotThrow(() => CreateDuck<IInternal, Internal>(new Internal()));
+            Assert.DoesNotThrowAsync(() => CreateDuck<IInternal, Internal>(new Internal()));
 
         public interface IBar
         {
@@ -120,12 +122,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldWorkWithExplicitImplementations()
+        public async Task GeneratedProxy_ShouldWorkWithExplicitImplementations()
         {
-            IBar proxy = CreateDuck<IBar, AnotherBarExplicit>(new AnotherBarExplicit());
+            IBar proxy = await CreateDuck<IBar, AnotherBarExplicit>(new AnotherBarExplicit());
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
 
-            proxy = CreateDuck<IBar, IAnotherBar>(new AnotherBarExplicit());
+            proxy = await CreateDuck<IBar, IAnotherBar>(new AnotherBarExplicit());
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
 
@@ -138,8 +140,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldValidate()
         {
-            Assert.Throws<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
-            Assert.Throws<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
+            Assert.ThrowsAsync<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
+            Assert.ThrowsAsync<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
         }
 
         public class MyBar
@@ -151,11 +153,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldDistinguishByName() =>
-            Assert.DoesNotThrow(() => _ = DuckGenerator<IBar, MyBar>.GeneratedType);
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IBar, MyBar>.GetGeneratedTypeAsync());
 
         [Test]
         public void DuckGenerator_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.Throws<AmbiguousMatchException>(() => _ = DuckGenerator<IBar, MultipleBaz>.GeneratedType);
+            Assert.ThrowsAsync<AmbiguousMatchException>(() => DuckGenerator<IBar, MultipleBaz>.GetGeneratedTypeAsync());
 
         public class MultipleBaz : IBar
         {
@@ -176,10 +178,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
             };
 
             // anonim objektumok mindig internal-ok
-            Assert.DoesNotThrow(() => typeof(DuckGenerator<,>)
+            Assert.DoesNotThrowAsync(() => (Task) typeof(DuckGenerator<,>)
                 .MakeGenericType(typeof(IProps), anon.GetType())
-                .GetProperty("GeneratedType", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy)
-                .GetValue(null));
+                .InvokeMember("GetGeneratedTypeAsync", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { default(CancellationToken) }));
         }
 
         public interface IProps 
@@ -190,7 +191,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldWorkWithGenericTypes() =>
-            Assert.DoesNotThrow(() => _ = DuckGenerator<IGeneric<int>, Generic<int>>.GeneratedType);
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IGeneric<int>, Generic<int>>.GetGeneratedTypeAsync());
 
         public interface IGeneric<T> { T Foo(); }
 
@@ -200,7 +201,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
+        public async Task DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
@@ -212,19 +213,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            _ = DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GeneratedType;
+            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GetGeneratedTypeAsync();
 
             Assert.That(File.Exists(cacheFile));
         }
 
         [Test]
-        public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        public async Task DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             DuckGenerator<IGeneric<object>, Generic<object>>.CacheDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             string cacheFile = new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFile;
 
-            Type gt = DuckGenerator<IGeneric<object>, Generic<object>>.GeneratedType;
+            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GetGeneratedTypeAsync();
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

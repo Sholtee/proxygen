@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
 
@@ -21,8 +22,8 @@ namespace Solti.Utils.Proxy.Perf
         private Implementation FOriginal;
         private IInterface FDuck;
 
-        private static TInterface CreateDuck<TInterface, TTarget>(TTarget target) where TInterface: class =>
-            (TInterface) Activator.CreateInstance(DuckGenerator<TInterface, TTarget>.GeneratedType, target);
+        private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface: class =>
+            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GetGeneratedTypeAsync(), target);
 
         public class Implementation
         {
@@ -34,7 +35,7 @@ namespace Solti.Utils.Proxy.Perf
         public void SetupNoProxy() => FOriginal = new Implementation();
 
         [GlobalSetup(Target = nameof(Duck))]
-        public void SetupThroughProxy() => FDuck = CreateDuck<IInterface, Implementation>(new Implementation());
+        public async Task SetupThroughProxy() => FDuck = await CreateDuck<IInterface, Implementation>(new Implementation());
 
         [Benchmark(Baseline = true, OperationsPerInvoke = OperationsPerInvoke)]
         public void NoDuck()

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
 
@@ -20,7 +21,7 @@ namespace Solti.Utils.Proxy.Perf
         }
 
         [Benchmark]
-        public void AssemblingDuckType() =>
-            new DuckGenerator<IInterface, Implementation>().GenerateType(Guid.NewGuid().ToString());
+        public async Task AssemblingDuckType() =>
+            await new DuckGenerator<IInterface, Implementation>().GenerateType(Guid.NewGuid().ToString());
     }
 }
