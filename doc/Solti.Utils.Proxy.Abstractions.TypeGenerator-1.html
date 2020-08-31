@@ -140,7 +140,8 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Type GeneratedType { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use GetGeneratedTypeAsync() instead&quot;)]
+public static Type GeneratedType { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -245,6 +246,47 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">protected virtual void DoCheck()</code></pre>
   </div>
+  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)">GetGeneratedTypeAsync(CancellationToken)</h4>
+  <div class="markdown level1 summary"><p>Gets the generated proxy <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> asynchronously.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;Type&gt; GetGeneratedTypeAsync(CancellationToken cancellation = default(CancellationToken))</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
+        <td><span class="parametername">cancellation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html">ITypeGenerator</a>
