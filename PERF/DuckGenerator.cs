@@ -22,6 +22,6 @@ namespace Solti.Utils.Proxy.Perf
 
         [Benchmark]
         public async Task AssemblingDuckType() =>
-            await new DuckGenerator<IInterface, Implementation>().GenerateType(Guid.NewGuid().ToString());
+            await new DuckGenerator<IInterface, Implementation>().GenerateTypeAsync(Guid.NewGuid().ToString());
     }
 }

@@ -24,6 +24,6 @@ namespace Solti.Utils.Proxy.Perf
 
         [Benchmark]
         public async Task AssemblingProxyType() =>
-            await new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(Guid.NewGuid().ToString());
+            await new ProxyGenerator<IInterface, InterfaceProxy>().GenerateTypeAsync(Guid.NewGuid().ToString());
     }
 }

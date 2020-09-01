@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Abstractions
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Task<Type> GenerateType(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => ExtractType
+        internal Task<Type> GenerateTypeAsync(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => ExtractType
         (
             Compile.ToAssembly
             (
@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Abstractions
                 self.DoCheck();
 
                 if (!self.TryLoadType(out FType))
-                    FType = await self.GenerateType().ConfigureAwait(false);
+                    FType = await self.GenerateTypeAsync().ConfigureAwait(false);
             }
 
             return FType!;
