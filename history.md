@@ -36,3 +36,5 @@
 - 3.1.0:
   - *added:* `xXxGenerator.GeneratedTypeAsync` property
   - *obsolete:* `xXxGenerator.GeneratedType` property
+- 3.1.1:
+  - *fixed:* Infinite lock in `TypeGenerator.GetGeneratedTypeAsync()`
