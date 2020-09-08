@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldBeAccessibleParalelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
+        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
             .Repeat(0, 100)
             .Select(_ => CreateDuck<IRef, Ref>(new Ref()))));
 
