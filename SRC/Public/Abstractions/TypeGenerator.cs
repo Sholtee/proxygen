@@ -22,6 +22,10 @@ namespace Solti.Utils.Proxy.Abstractions
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
+        //
+        // Szal biztos: https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim?view=netcore-3.1#thread-safety
+        //
+
         private static readonly SemaphoreSlim FLock = new SemaphoreSlim(1, 1);
 
         private static Type? FType;
@@ -53,16 +57,20 @@ namespace Solti.Utils.Proxy.Abstractions
 
             await FLock.WaitAsync().ConfigureAwait(false);
 
-            if (FType == null)
+            try
             {
-                var self = new TDescendant();
-                self.DoCheck();
+                if (FType == null)
+                {
+                    var self = new TDescendant();
+                    self.DoCheck();
 
-                if (!self.TryLoadType(out FType))
-                    FType = await self.GenerateTypeAsync().ConfigureAwait(false);
+                    if (!self.TryLoadType(out FType))
+                        FType = await self.GenerateTypeAsync().ConfigureAwait(false);
+                }
+
+                return FType!;
             }
-
-            return FType!;
+            finally { FLock.Release(); }
         }
 
         internal bool TryLoadType(out Type? type) 

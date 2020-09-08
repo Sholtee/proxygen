@@ -84,6 +84,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
+        public void GeneratedProxy_ShouldBeAccessibleParalelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
+            .Repeat(0, 100)
+            .Select(_ => CreateProxy<IMyInterface, MyInterfaceProxy>(new MyClass()))));
+
+        [Test]
         public async Task GeneratedProxy_ShouldWorkWithComplexInterfaces()
         {
             IList<string> proxy = await CreateProxy<IList<string>, InterfaceInterceptor<IList<string>>>(new List<string>());

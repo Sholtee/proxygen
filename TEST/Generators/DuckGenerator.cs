@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -72,6 +73,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
             public event EventHandler Event;
             public void Raise() => Event.Invoke(this, null);
         }
+
+        [Test]
+        public void GeneratedProxy_ShouldBeAccessibleParalelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
+            .Repeat(0, 100)
+            .Select(_ => CreateDuck<IRef, Ref>(new Ref()))));
 
         [Test]
         public async Task GeneratedProxy_ShouldHandleEvents()
