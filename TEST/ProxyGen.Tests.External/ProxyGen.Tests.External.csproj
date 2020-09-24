@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
     <OutputPath>..\..\BIN\</OutputPath>
     <AssemblyName>Solti.Utils.Proxy.Tests.External</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests.External</RootNamespace>
