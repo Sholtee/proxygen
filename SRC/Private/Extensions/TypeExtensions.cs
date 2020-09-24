@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             Assembly declaringAsm = src.Assembly;
 
-            var references = new[] { declaringAsm }.Concat(declaringAsm.GetReferences());
+            IEnumerable<Assembly> references = new[] { declaringAsm }.Concat(declaringAsm.GetReferences());
 
             //
             // Generikus parameterek szerepelhetnek masik szerelvenyben.
@@ -71,6 +71,14 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericType)
                 foreach (Type type in src.GetGenericArguments().Where(t => !t.IsGenericParameter))
                     references = references.Concat(type.GetReferences());
+
+            //
+            // NET Standard fix
+            //
+
+            Assembly? netstandard = references.SingleOrDefault(asm => asm.FullName.StartsWith("netstandard,", StringComparison.OrdinalIgnoreCase));
+            if (netstandard != null)
+                references = references.Concat(netstandard.GetReferences());
 
             return references.Distinct();
         }

@@ -18,6 +18,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
+    using Proxy.Tests.External;
     using Internals;
     using Generators;
     using Primitives;
@@ -409,6 +410,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldWorkWithByRefArrays() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IByRef<object[]>, InterfaceInterceptor<IByRef<object[]>>>((object) null));
+
+        [Test]
+        public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
+            Assert.DoesNotThrowAsync(() => CreateProxy<IMyInterface, InterceptorHavingDependency<IMyInterface>>((object) null, (object) null));
 
         public static IEnumerable<Type> RandomInterfaces => typeof(object)
             .Assembly
