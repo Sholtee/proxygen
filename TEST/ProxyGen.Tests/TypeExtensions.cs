@@ -164,10 +164,18 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
                 yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly });
                 yield return (typeof(IList), new[] { typeof(IList).Assembly });
-                yield return (typeof(IDisposableEx), new[] { typeof(IDisposableEx).Assembly, typeof(IDisposable).Assembly });
+                yield return (typeof(IDisposableEx), new[] { typeof(IDisposableEx).Assembly, typeof(IDisposable).Assembly
+#if NETCOREAPP2_2
+                    , typeof(IAsyncDisposable).Assembly
+#endif
+                });
                 yield return (typeof(IList<>), new[] { typeof(IList<>).Assembly });
                 yield return (typeof(IList<int>), new[] { typeof(IList<>).Assembly });
-                yield return (typeof(IList<IDisposableEx>), new[] { typeof(IList<>).Assembly, typeof(IDisposableEx).Assembly });
+                yield return (typeof(IList<IDisposableEx>), new[] { typeof(IList<>).Assembly, typeof(IDisposableEx).Assembly 
+#if NETCOREAPP2_2
+                    , typeof(IAsyncDisposable).Assembly
+#endif           
+                });
             }
         }
 
