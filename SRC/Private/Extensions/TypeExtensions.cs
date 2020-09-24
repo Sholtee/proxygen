@@ -72,14 +72,6 @@ namespace Solti.Utils.Proxy.Internals
                 foreach (Type type in src.GetGenericArguments().Where(t => !t.IsGenericParameter))
                     references = references.Concat(type.GetReferences());
 
-            //
-            // NET Standard fix
-            //
-
-            Assembly? netstandard = references.SingleOrDefault(asm => asm.FullName.StartsWith("netstandard,", StringComparison.OrdinalIgnoreCase));
-            if (netstandard != null)
-                references = references.Concat(netstandard.GetReferences());
-
             return references.Distinct();
         }
 

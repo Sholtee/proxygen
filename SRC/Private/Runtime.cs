@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,16 +20,26 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return typeof(object).Assembly;
 #if NETSTANDARD
-            string[] mandatoryAssemblies = 
-            {
-                "System.Runtime",
-                "netstandard"
-            };
+            yield return GetPlatformAssembly("System.Runtime");
 
-            foreach (string assemblyPath in ((string) AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator))
+            Assembly netstandard = GetPlatformAssembly("netstandard");
+            yield return netstandard;
+
+            //
+            // Az implementacio szerelvenyei (kell ha nem "netcoreapp"-ot celzunk) 
+            //
+
+            foreach (Assembly netstandardAsm in netstandard.GetReferences())
+                yield return netstandardAsm;
+
+            static Assembly GetPlatformAssembly(string name) 
             {
-                if (mandatoryAssemblies.Contains(Path.GetFileNameWithoutExtension(assemblyPath)))
-                    yield return AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyPath);
+                string asms = (string) AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
+
+                return AssemblyLoadContext.Default.LoadFromAssemblyPath
+                (
+                    asms.Split(Path.PathSeparator).Single(asm => Path.GetFileNameWithoutExtension(asm) == name)
+                );
             }
 #endif
         }
