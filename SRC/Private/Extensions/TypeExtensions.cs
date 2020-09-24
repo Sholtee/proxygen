@@ -54,15 +54,58 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
         }
 
-        //
-        // TODO: szukiteni a szerelvenyek halmazat (csak azokat adjuk vissza amitol "src" tenylegesen fugg is)
-        //
-
         public static IEnumerable<Assembly> GetReferences(this Type src)
         {
-            Assembly declaringAsm = src.Assembly;
+            var result = new HashSet<Assembly>(src.GetBasicReferences());
 
-            IEnumerable<Assembly> references = new[] { declaringAsm }.Concat(declaringAsm.GetReferences());
+            foreach (MemberInfo member in src.ListMembers<MemberInfo>()) 
+            {
+                switch (member) 
+                {
+                    case MethodBase methodBase: // ctor, method
+                    {
+                        //
+                        // Generikus parameterek lenyegtelenek
+                        //
+
+                        foreach (Type param in methodBase.GetParameters().Select(param => param.ParameterType))
+                            AddAsmsFrom(param);
+
+                        if (methodBase is MethodInfo method && method.ReturnType != typeof(void))
+                            AddAsmsFrom(method.ReturnType);
+
+                        continue;
+                    }
+                    case FieldInfo field: 
+                    {
+                        AddAsmsFrom(field.FieldType);
+                        continue;
+                    }
+                    case PropertyInfo property:
+                    {
+                        AddAsmsFrom(property.PropertyType);
+                        continue;
+                    }
+                    case EventInfo evt:
+                    {
+                        AddAsmsFrom(evt.EventHandlerType);
+                        continue;
+                    }
+                }
+            }
+
+            return result;
+
+            void AddAsmsFrom(Type t) 
+            {
+                foreach (Assembly asm in t.GetBasicReferences())
+                    result.Add(asm);
+            }
+        }
+
+        public static IEnumerable<Assembly> GetBasicReferences(this Type src) 
+        {
+            var result = new HashSet<Assembly>(new[] { src.Assembly });
 
             //
             // Generikus parameterek szerepelhetnek masik szerelvenyben.
@@ -70,9 +113,19 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.IsGenericType)
                 foreach (Type type in src.GetGenericArguments().Where(t => !t.IsGenericParameter))
-                    references = references.Concat(type.GetReferences());
+                    foreach (Assembly asm in type.GetBasicReferences())
+                        result.Add(asm);
 
-            return references.Distinct();
+            //
+            // Az os (osztaly) szerepelhet masik szerelvenyben. "BaseType" csak az os osztalyokat adja vissza
+            // megvalositott interfaceket nem.
+            //
+
+            for(Type? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
+                foreach (Assembly asm in baseType.GetBasicReferences())
+                    result.Add(asm);
+
+            return result;
         }
 
         public static IEnumerable<Type> GetParents(this Type type)

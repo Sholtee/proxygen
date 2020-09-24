@@ -13,8 +13,6 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    using Properties;
-
     [TestFixture]
     public sealed class TypeExtensionsTests
     {
@@ -132,14 +130,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.AreEqual("System.Int32", refType.GetFriendlyName());
         }
-
-        [TestCase(typeof(Class))]
-        [TestCase(typeof(List<>))] // open generic type
-        public void GetReferences_ShouldReturnAllReferencesOfTheContainingAssembly(Type type) =>
-            Assert.That(type.GetReferences().SequenceEqual
-            (
-                new[] { type.Assembly }.Concat(type.Assembly.GetReferences())
-            ));
 
         [Test]
         public void GetReferences_ShouldTakeGenericParametersIntoAccount() => Assert.That(typeof(List<Class>)
