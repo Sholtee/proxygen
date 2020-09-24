@@ -3,7 +3,7 @@
   "solution": "\\ProxyGen.sln",
   "app": "\\SRC\\ProxyGen.csproj",
   "vendor": "\\Vendor",
-  "tests": "\\TEST\\ProxyGen.Tests.csproj",
+  "tests": "\\TEST\\ProxyGen.Tests\\ProxyGen.Tests.csproj",
   "artifacts": "\\Artifacts",
   "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests]* -[*]*.Properties.*",
   "perftests": "\\PERF\\ProxyGen.Perf.csproj",
