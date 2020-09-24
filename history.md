@@ -38,3 +38,5 @@
   - *obsolete:* `xXxGenerator.GeneratedType` property
 - 3.1.1:
   - *fixed:* Infinite lock in `TypeGenerator.GetGeneratedTypeAsync()`
+- 3.1.2:
+  - *fixed:* Missing reference error
