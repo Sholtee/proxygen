@@ -107,11 +107,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
             // IEnumerator.Current, IEnumerator<string>.Current
             //
 
-            using (IEnumerator<string> proxy = await CreateProxy<IEnumerator<string>, InterfaceInterceptor<IEnumerator<string>>>(new List<string> { "cica" }.GetEnumerator()))
-            {
-                Assert.That(proxy.MoveNext);
-                Assert.That(proxy.Current, Is.EqualTo("cica"));
-            }
+            using IEnumerator<string> proxy = await CreateProxy<IEnumerator<string>, InterfaceInterceptor<IEnumerator<string>>>(new List<string> { "cica" }.GetEnumerator());
+
+            Assert.That(proxy.MoveNext);
+            Assert.That(proxy.Current, Is.EqualTo("cica"));
         }
 
         public class ListProxy : InterfaceInterceptor<IList<int>>
@@ -161,7 +160,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             string x = string.Empty;
 
-            Assert.That(proxy.Foo(0, out var a, ref x), Is.EqualTo(1));
+            Assert.That(proxy.Foo(0, out var _, ref x), Is.EqualTo(1));
         }
 
         internal interface IInternalInterface

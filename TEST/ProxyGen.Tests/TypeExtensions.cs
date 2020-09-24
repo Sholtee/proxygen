@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             internal int InternalProperty { get; }
             private int PrivateProperty { get; }
 
-            private int[] ar = new[] { 1 }; 
+            private readonly int[] ar = new[] { 1 }; 
 
             public ref int RefMethod() => ref ar[0];
         }
