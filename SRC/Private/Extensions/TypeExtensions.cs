@@ -113,19 +113,33 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.IsGenericType)
                 foreach (Type type in src.GetGenericArguments().Where(t => !t.IsGenericParameter))
-                    foreach (Assembly asm in type.GetBasicReferences())
-                        result.Add(asm);
+                    AddAsmsFrom(type);
 
-            //
-            // Az os (osztaly) szerepelhet masik szerelvenyben. "BaseType" csak az os osztalyokat adja vissza
-            // megvalositott interfaceket nem.
-            //
+            if (src.IsClass)
+                //
+                // Az os (osztaly) szerepelhet masik szerelvenyben. "BaseType" csak az os osztalyokat adja vissza
+                // megvalositott interfaceket nem.
+                //
 
-            for(Type? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
-                foreach (Assembly asm in baseType.GetBasicReferences())
-                    result.Add(asm);
+                for (Type? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
+                    AddAsmsFrom(baseType);
+
+            else if (src.IsInterface)
+                //
+                // "os" interface-ek szarmazhatnak masik szerelvenybol. A GetInterfaces() az osszes "os"-t
+                // visszaadja.
+                //
+
+                foreach (Type iface in src.GetInterfaces())
+                    AddAsmsFrom(iface);
 
             return result;
+
+            void AddAsmsFrom(Type t)
+            {
+                foreach (Assembly asm in t.GetBasicReferences())
+                    result.Add(asm);
+            }
         }
 
         public static IEnumerable<Type> GetParents(this Type type)

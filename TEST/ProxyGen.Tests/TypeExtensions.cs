@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reflection;
 
@@ -13,6 +14,8 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
+    using Primitives.Patterns;
+    
     [TestFixture]
     public sealed class TypeExtensionsTests
     {
@@ -146,6 +149,37 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .Distinct()
                     .OrderBy(r => r.FullName))
             );
+
+        private class MyInterceptor : InterfaceInterceptor<IDbConnection> 
+        {
+            public MyInterceptor() : base(null) { }
+        }
+
+        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences 
+        {
+            get 
+            {
+                yield return (typeof(InterfaceInterceptor<>), new[] { typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
+                yield return (typeof(InterfaceInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
+                yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
+                yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly });
+                yield return (typeof(IList), new[] { typeof(IList).Assembly });
+                yield return (typeof(IDisposableEx), new[] { typeof(IDisposableEx).Assembly, typeof(IDisposable).Assembly });
+                yield return (typeof(IList<>), new[] { typeof(IList<>).Assembly });
+                yield return (typeof(IList<int>), new[] { typeof(IList<>).Assembly });
+                yield return (typeof(IList<IDisposableEx>), new[] { typeof(IList<>).Assembly, typeof(IDisposableEx).Assembly });
+            }
+        }
+
+        [TestCaseSource(nameof(TypeReferences))]
+        public void GetBasicReferences_ShouldReturnTheDeclaringAssemblyOfTheSourceTypeAndItsAncestors((Type Type, IEnumerable<Assembly> References) data) 
+        {
+            IEnumerable<Assembly>
+                refs = data.References.OrderBy(x => x.FullName),
+                returned = data.Type.GetBasicReferences().OrderBy(x => x.FullName);
+
+            Assert.That(returned.SequenceEqual(refs));
+        }
 
         [Test]
         public void GetParents_ShouldReturnTheParents() =>
