@@ -16,6 +16,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Primitives.Patterns;
+    using Proxy.Tests.External;
 
     [TestFixture]
     public sealed class TypeExtensionsTests
@@ -146,6 +147,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
                 yield return (typeof(InterfaceInterceptor<>), new[] { typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
                 yield return (typeof(InterfaceInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
+                yield return (typeof(InterceptorHavingDependency<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterceptorHavingDependency<>).Assembly, typeof(object).Assembly, typeof(InterfaceInterceptor<>).Assembly });
                 yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
                 yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly });
                 yield return (typeof(IList), new[] { typeof(IList).Assembly });
@@ -187,6 +189,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
                 yield return (typeof(DummyClass_1), new[] { typeof(DummyClass_1).Assembly, typeof(IDisposable).Assembly, typeof(IDbConnection).Assembly, typeof(IComponent).Assembly });
                 yield return (typeof(IList<IDbConnection>), new[] { typeof(IList<>).Assembly, typeof(IDbConnection).Assembly });
+                yield return (typeof(InterceptorHavingDependency<>), new[] { typeof(InterceptorHavingDependency<>).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
             }
         }
 
