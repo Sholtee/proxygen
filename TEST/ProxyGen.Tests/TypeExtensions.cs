@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -15,7 +16,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Primitives.Patterns;
-    
+
     [TestFixture]
     public sealed class TypeExtensionsTests
     {
@@ -134,22 +135,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.AreEqual("System.Int32", refType.GetFriendlyName());
         }
 
-        [Test]
-        public void GetReferences_ShouldTakeGenericParametersIntoAccount() => Assert.That(typeof(List<Class>)
-            .GetReferences()
-            .OrderBy(r => r.FullName)
-            .SequenceEqual
-            (
-                typeof(List<>)
-                    .GetReferences()
-                    .Concat
-                    (
-                        typeof(Class).GetReferences()
-                    )
-                    .Distinct()
-                    .OrderBy(r => r.FullName))
-            );
-
         private class MyInterceptor : InterfaceInterceptor<IDbConnection> 
         {
             public MyInterceptor() : base(null) { }
@@ -185,6 +170,32 @@ namespace Solti.Utils.Proxy.Internals.Tests
             IEnumerable<Assembly>
                 refs = data.References.OrderBy(x => x.FullName),
                 returned = data.Type.GetBasicReferences().OrderBy(x => x.FullName);
+
+            Assert.That(returned.SequenceEqual(refs));
+        }
+
+        private class DummyClass_1 
+        {
+            public DummyClass_1(IDisposable p) { }
+            public List<int> Method(IDbConnection conn) => null;
+            public IComponent Prop { get; }
+        }
+
+        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences2
+        {
+            get
+            {
+                yield return (typeof(DummyClass_1), new[] { typeof(DummyClass_1).Assembly, typeof(IDisposable).Assembly, typeof(IDbConnection).Assembly, typeof(IComponent).Assembly });
+                yield return (typeof(IList<IDbConnection>), new[] { typeof(IList<>).Assembly, typeof(IDbConnection).Assembly });
+            }
+        }
+
+        [TestCaseSource(nameof(TypeReferences2))]
+        public void GetReferences_TheDeclaringAssemblyOfAllTheMemberParameters((Type Type, IEnumerable<Assembly> References) data) 
+        {
+            IEnumerable<Assembly>
+                refs = data.References.OrderBy(x => x.FullName),
+                returned = data.Type.GetReferences().OrderBy(x => x.FullName);
 
             Assert.That(returned.SequenceEqual(refs));
         }
