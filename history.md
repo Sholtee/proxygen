@@ -40,3 +40,5 @@
   - *fixed:* Infinite lock in `TypeGenerator.GetGeneratedTypeAsync()`
 - 3.1.2:
   - *fixed:* Missing reference error
+- 3.1.3:
+  - *done:* Reduced reference count in the generated assembly
