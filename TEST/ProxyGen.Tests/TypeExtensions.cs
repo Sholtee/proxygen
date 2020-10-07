@@ -240,7 +240,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get
             {
                 yield return (typeof(SelfReferencingClass), new[] { typeof(SelfReferencingClass).Assembly, typeof(Object).Assembly });
-                yield return (typeof(ISelfReferencingIface), new[] { typeof(IComposite<>).Assembly, typeof(ISelfReferencingIface).Assembly, typeof(Object).Assembly });
+                yield return (typeof(ISelfReferencingIface), new[] 
+                { 
+                    typeof(IComposite<>).Assembly, 
+                    typeof(ISelfReferencingIface).Assembly, 
+                    typeof(Object).Assembly 
+#if NETCOREAPP2_2
+                    , typeof(IAsyncDisposable).Assembly
+#endif    
+                });
             }
         }
 
