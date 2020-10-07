@@ -81,16 +81,18 @@ namespace Solti.Utils.Proxy.Internals
                         AddAsmsFrom(field.FieldType);
                         continue;
                     }
-                    case PropertyInfo property:
+                    /* 
+                    case PropertyInfo property: // Nem kell mert getter-t es setter-t ugy is feldolgozzuk (metoduskent)
                     {
                         AddAsmsFrom(property.PropertyType);
                         continue;
                     }
-                    case EventInfo evt:
+                    case EventInfo evt: // Nem kell mert "add" es "remove" metodust ugy is feldolgozzuk 
                     {
                         AddAsmsFrom(evt.EventHandlerType);
                         continue;
                     }
+                    */
                 }
             }
 
