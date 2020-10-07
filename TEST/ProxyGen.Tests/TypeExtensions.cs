@@ -183,18 +183,43 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public IComponent Prop { get; }
         }
 
+        public interface IInterface_1
+        {
+        }
+
+        public interface IInterface_2
+        {
+            IInterface_1 Interface1 { get; }
+        }
+
+        public interface IInterface_3<T>
+        {
+            IInterface_1 Interface1 { get; }
+        }
+
+        public class DummyClass_2 : InterfaceInterceptor<IInterface_2>
+        {
+            public DummyClass_2(IInterface_3<int> dependency, IInterface_2 target) : base(target)
+            {
+                Dependency = dependency;
+            }
+
+            public IInterface_3<int> Dependency { get; }
+        }
+
         public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences2
         {
             get
             {
                 yield return (typeof(DummyClass_1), new[] { typeof(DummyClass_1).Assembly, typeof(IDisposable).Assembly, typeof(IDbConnection).Assembly, typeof(IComponent).Assembly });
+                yield return (typeof(DummyClass_2), new[] { typeof(DummyClass_2).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(Object).Assembly});
                 yield return (typeof(IList<IDbConnection>), new[] { typeof(IList<>).Assembly, typeof(IDbConnection).Assembly });
                 yield return (typeof(InterceptorHavingDependency<>), new[] { typeof(InterceptorHavingDependency<>).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
             }
         }
 
         [TestCaseSource(nameof(TypeReferences2))]
-        public void GetReferences_TheDeclaringAssemblyOfAllTheMemberParameters((Type Type, IEnumerable<Assembly> References) data) 
+        public void GetReferences_ShouldReturnTheDeclaringAssemblyOfAllTheMemberParameters((Type Type, IEnumerable<Assembly> References) data) 
         {
             IEnumerable<Assembly>
                 refs = data.References.OrderBy(x => x.FullName),
@@ -202,6 +227,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(returned.SequenceEqual(refs));
         }
+
+        private class SelfReferencingClass 
+        {
+            public SelfReferencingClass SelfReference { get; }
+        }
+
+        [Test]
+        public void GetReferences_ShouldHandleSelfReferences() => Assert.That(typeof(SelfReferencingClass).GetReferences().OrderBy(x => x.FullName).SequenceEqual(new[] { typeof(object).Assembly, typeof(SelfReferencingClass).Assembly }.OrderBy(x => x.FullName)));
 
         [Test]
         public void GetParents_ShouldReturnTheParents() =>
