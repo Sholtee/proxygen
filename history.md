@@ -42,3 +42,5 @@
   - *fixed:* Missing reference error
 - 3.1.3:
   - *done:* Reduced reference count in the generated assembly
+- 3.1.4
+  - *fixed:* Possible stack overflow
