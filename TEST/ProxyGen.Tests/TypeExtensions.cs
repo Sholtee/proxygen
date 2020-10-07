@@ -149,7 +149,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return (typeof(InterfaceInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
                 yield return (typeof(ExternalInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(ExternalInterceptor<>).Assembly, typeof(object).Assembly, typeof(InterfaceInterceptor<>).Assembly });
                 yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
-                yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly });
+                yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly 
+ #if NETCOREAPP2_2
+                    , typeof(IAsyncDisposable).Assembly
+#endif               
+                });
                 yield return (typeof(IList), new[] { typeof(IList).Assembly });
                 yield return (typeof(IDisposableEx), new[] { typeof(IDisposableEx).Assembly, typeof(IDisposable).Assembly
 #if NETCOREAPP2_2
@@ -240,11 +244,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get
             {
                 yield return (typeof(SelfReferencingClass), new[] { typeof(SelfReferencingClass).Assembly, typeof(Object).Assembly });
-                yield return (typeof(ISelfReferencingIface), new[] 
-                { 
-                    typeof(IComposite<>).Assembly, 
-                    typeof(ISelfReferencingIface).Assembly, 
-                    typeof(Object).Assembly 
+                yield return (typeof(ISelfReferencingIface), new[] { typeof(IComposite<>).Assembly, typeof(ISelfReferencingIface).Assembly, typeof(Object).Assembly 
 #if NETCOREAPP2_2
                     , typeof(IAsyncDisposable).Assembly
 #endif    
