@@ -526,7 +526,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 IEnumerable<NameSyntax> partNames;
 
-                IEnumerable<Type> parts = src.GetParents();
+                IEnumerable<Type> parts = src.GetEnclosingTypes();
 
                 if (!src.IsGenericType) partNames = parts.Append(src).Select(type => GetQualifiedName(type));
                 else

@@ -413,7 +413,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
-            Assert.DoesNotThrowAsync(() => CreateProxy<IMyInterface, InterceptorHavingDependency<IMyInterface>>((object) null, (object) null));
+            Assert.DoesNotThrowAsync(() => CreateProxy<IMyInterface, ExternalInterceptor<IMyInterface>>((object) null, (object) null));
 
         public static IEnumerable<Type> RandomInterfaces => typeof(object)
             .Assembly

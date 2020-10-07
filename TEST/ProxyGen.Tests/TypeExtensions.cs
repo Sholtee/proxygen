@@ -147,7 +147,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
                 yield return (typeof(InterfaceInterceptor<>), new[] { typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
                 yield return (typeof(InterfaceInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
-                yield return (typeof(InterceptorHavingDependency<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterceptorHavingDependency<>).Assembly, typeof(object).Assembly, typeof(InterfaceInterceptor<>).Assembly });
+                yield return (typeof(ExternalInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(ExternalInterceptor<>).Assembly, typeof(object).Assembly, typeof(InterfaceInterceptor<>).Assembly });
                 yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
                 yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly });
                 yield return (typeof(IList), new[] { typeof(IList).Assembly });
@@ -212,9 +212,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get
             {
                 yield return (typeof(DummyClass_1), new[] { typeof(DummyClass_1).Assembly, typeof(IDisposable).Assembly, typeof(IDbConnection).Assembly, typeof(IComponent).Assembly });
-                yield return (typeof(DummyClass_2), new[] { typeof(DummyClass_2).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(Object).Assembly});
+                yield return (typeof(DummyClass_2), new[] { typeof(DummyClass_2).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(int).Assembly});
                 yield return (typeof(IList<IDbConnection>), new[] { typeof(IList<>).Assembly, typeof(IDbConnection).Assembly });
-                yield return (typeof(InterceptorHavingDependency<>), new[] { typeof(InterceptorHavingDependency<>).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
+                yield return (typeof(ExternalInterceptor<>), new[] { typeof(ExternalInterceptor<>).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
             }
         }
 
@@ -233,12 +233,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public SelfReferencingClass SelfReference { get; }
         }
 
-        [Test]
-        public void GetReferences_ShouldHandleSelfReferences() => Assert.That(typeof(SelfReferencingClass).GetReferences().OrderBy(x => x.FullName).SequenceEqual(new[] { typeof(object).Assembly, typeof(SelfReferencingClass).Assembly }.OrderBy(x => x.FullName)));
+        private interface ISelfReferencingIface : IComposite<ISelfReferencingIface> { }
+
+        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences3
+        {
+            get
+            {
+                yield return (typeof(SelfReferencingClass), new[] { typeof(SelfReferencingClass).Assembly, typeof(Object).Assembly });
+                yield return (typeof(ISelfReferencingIface), new[] { typeof(IComposite<>).Assembly, typeof(ISelfReferencingIface).Assembly, typeof(Object).Assembly });
+            }
+        }
+
+        [TestCaseSource(nameof(TypeReferences3))]
+        public void GetReferences_ShouldHandleSelfReferences((Type Type, IEnumerable<Assembly> References) data) => Assert.That(data.Type.GetReferences().OrderBy(x => x.FullName).SequenceEqual(data.References.OrderBy(x => x.FullName)));
 
         [Test]
-        public void GetParents_ShouldReturnTheParents() =>
-            Assert.That(typeof(Class.Nested).GetParents().SequenceEqual(new[] { typeof(TypeExtensionsTests), typeof(Class) }));
+        public void GetEnclosingTypes_ShouldReturnTheParentTypes() =>
+            Assert.That(typeof(Class.Nested).GetEnclosingTypes().SequenceEqual(new[] { typeof(TypeExtensionsTests), typeof(Class) }));
 
         [Test]
         public void GetOwnGenericArguments_ShouldDoWhatTheNameSuggests() 
