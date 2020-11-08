@@ -226,7 +226,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    CreateList(new[] { @base, interfaceType }, t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
+                    new[] { @base, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
                 )
             );
 

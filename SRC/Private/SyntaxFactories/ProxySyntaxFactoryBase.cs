@@ -136,7 +136,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     typeArgumentList: TypeArgumentList
                     (
-                        arguments: CreateList(method.GetGenericArguments(), CreateType)
+                        arguments: method.GetGenericArguments().ToSyntaxList(CreateType)
                     )                  
                 );
 
@@ -215,7 +215,7 @@ namespace Solti.Utils.Proxy.Internals
             ),
             initializer: !elements.Any() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
             (
-                expressions: CreateList(elements)
+                expressions: elements.ToSyntaxList()
             )
         );
 
@@ -248,7 +248,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 ParameterList
                 (
-                    parameters: CreateList(method.GetParameters(), param =>
+                    parameters: method.GetParameters().ToSyntaxList(param =>
                     {
                         ParameterSyntax parameter = Parameter(Identifier(param.Name)).WithType
                         (
@@ -285,7 +285,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 typeParameterList: TypeParameterList
                 (
-                    parameters: CreateList(method.GetGenericArguments(), type => TypeParameter(CreateType(type).ToFullString()))
+                    parameters: method.GetGenericArguments().ToSyntaxList(type => TypeParameter(CreateType(type).ToFullString()))
                 )
             );
 
@@ -366,9 +366,8 @@ namespace Solti.Utils.Proxy.Internals
             (
                 parameterList: BracketedParameterList
                 (
-                    parameters: CreateList
+                    parameters: indices.ToSyntaxList
                     (
-                        indices, 
                         index => Parameter
                         (
                             identifier: Identifier(index.Name)                          
@@ -505,7 +504,7 @@ namespace Solti.Utils.Proxy.Internals
                 AmendTarget(target, property, castTargetTo),
                 BracketedArgumentList
                 (
-                    arguments: CreateList(property.GetIndexParameters(), param => Argument(IdentifierName(param.Name)))
+                    arguments: property.GetIndexParameters().ToSyntaxList(param => Argument(IdentifierName(param.Name)))
                 )
             );
 
@@ -575,7 +574,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     node: ArrayRankSpecifier
                     (
-                        sizes: CreateList(Enumerable.Repeat(0, src.GetArrayRank()), _ => (ExpressionSyntax) OmittedArraySizeExpression())
+                        sizes: Enumerable.Repeat(0, src.GetArrayRank()).ToSyntaxList(_ => (ExpressionSyntax) OmittedArraySizeExpression())
                     )
                 )
             );
@@ -586,7 +585,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 typeArgumentList: TypeArgumentList
                 (
-                    arguments: CreateList(genericArguments, CreateType)
+                    arguments: genericArguments.ToSyntaxList(CreateType)
                 )
             );
         }
@@ -596,34 +595,6 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal static TypeSyntax CreateType<T>() => CreateType(typeof(T));
 
-        /// <summary>
-        /// SyntaxNode1, SyntaxNode2, ....
-        /// </summary>
-        protected internal static SeparatedSyntaxList<TNode> CreateList<T, TNode>(IEnumerable<T> src, Func<T, int, TNode> factory) where TNode : SyntaxNode
-        {
-            int count = (src as IReadOnlyCollection<T>)?.Count ?? (src as ICollection<T>)?.Count ?? (src = src.ToArray()).Count();
-
-            return SeparatedList<TNode>
-            (
-                nodesAndTokens: src.SelectMany((p, i) =>
-                {
-                    var l = new List<SyntaxNodeOrToken> {factory(p, i)};
-                    if (i < count - 1) l.Add(Token(SyntaxKind.CommaToken));
-
-                    return l;
-                })
-            );
-        }
-
-        /// <summary>
-        /// SyntaxNode1, SyntaxNode2, ....
-        /// </summary>
-        protected internal static SeparatedSyntaxList<TNode> CreateList<T, TNode>(IEnumerable<T> src, Func<T, TNode> factory) where TNode : SyntaxNode => CreateList(src, (p, i) => factory(p));
-
-        /// <summary>
-        /// SyntaxNode1, SyntaxNode2, ....
-        /// </summary>
-        protected internal static SeparatedSyntaxList<TNode> CreateList<TNode>(IEnumerable<TNode> src) where TNode : SyntaxNode => CreateList(src, x => x);
 
         /// <summary>
         /// Namespace.ParentType[T].NestedType[TT]
@@ -690,9 +661,8 @@ namespace Solti.Utils.Proxy.Internals
             (
                 argumentList: ArgumentList
                 (
-                    CreateList
-                    (
-                        arguments, 
+                    arguments.ToSyntaxList
+                    ( 
                         (arg, i) => (paramz[i].GetParameterKind()) switch
                         {
                             ParameterKind.In => arg.WithRefKindKeyword
@@ -757,7 +727,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithParameterList
             (
-                parameterList: ParameterList(CreateList(paramz, param => Parameter
+                parameterList: ParameterList(paramz.ToSyntaxList(param => Parameter
                     (
                         identifier: Identifier(param.Name)
                     )
@@ -771,7 +741,7 @@ namespace Solti.Utils.Proxy.Internals
                 initializer: ConstructorInitializer
                 (
                     SyntaxKind.BaseConstructorInitializer,
-                    ArgumentList(CreateList(paramz, param => Argument
+                    ArgumentList(paramz.ToSyntaxList(param => Argument
                     (
                         expression: IdentifierName(param.Name)
                     )))
@@ -808,21 +778,20 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     AttributeList
                     (
-                        CreateList
-                        (
-                            new[] 
-                            {
-                                CreateAttribute<AssemblyTitleAttribute>(AssemblyName),
-                                CreateAttribute<AssemblyDescriptionAttribute>("Generated by ProxyGen.NET")
-                            }
-#if IGNORE_VISIBILITY
-                            .Concat
-                            (
-                                ignoreAccessChecksTo.Select(asmName => (SyntaxNodeOrToken) CreateAttribute<IgnoresAccessChecksToAttribute>(asmName))
 
-                            )
-#endif
+                        new[] 
+                        {
+                            CreateAttribute<AssemblyTitleAttribute>(AssemblyName),
+                            CreateAttribute<AssemblyDescriptionAttribute>("Generated by ProxyGen.NET")
+                        }
+#if IGNORE_VISIBILITY
+                        .Concat
+                        (
+                            ignoreAccessChecksTo.Select(asmName => (SyntaxNodeOrToken) CreateAttribute<IgnoresAccessChecksToAttribute>(asmName))
+
                         )
+#endif
+                        .ToSyntaxList()
                     )
                     .WithTarget
                     (

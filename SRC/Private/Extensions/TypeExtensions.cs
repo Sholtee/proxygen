@@ -166,13 +166,21 @@ namespace Solti.Utils.Proxy.Internals
         {
             Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition);
 
-            return src
-                .GetGenericArguments()
-                .Except
-                (
-                    src.DeclaringType?.GetGenericArguments() ?? Array.Empty<Type>(), 
-                    ArgumentComparer.Instance
-                );
+            foreach (Type ga in src.GetGenericArguments()) 
+            {
+                bool own = true;
+                for (Type? parent = src; (parent = parent.DeclaringType) != null;)
+                    //
+                    // Ha "parent" nem generikus akkor a GetGenericArguments() ures tombot ad vissza
+                    //
+
+                    if (parent.GetGenericArguments().Contains(ga, ArgumentComparer.Instance))
+                    {
+                        own = false;
+                        break;
+                    }
+                if (own) yield return ga;
+            } 
         }
 
         public static IEnumerable<ConstructorInfo> GetPublicConstructors(this Type src) 

@@ -892,7 +892,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    CreateList(new[] { interceptorType, interfaceType}, t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
+                    new[] { interceptorType, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
                 )
             );
 
