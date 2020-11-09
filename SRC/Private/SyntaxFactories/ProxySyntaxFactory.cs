@@ -29,11 +29,8 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly MethodInfo
             INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
-            METHOD_ACCESS = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.MethodAccess(default!));
-
-        private static readonly FieldInfo
-            EVENTS = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Events),
-            PROPERTIES = (FieldInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.Properties);
+            RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)),
+            RESOLVE_MEMBER = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMember(default));
 
         private static readonly PropertyInfo
             INVOKE_TARGET = (PropertyInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.InvokeTarget!);
@@ -47,33 +44,27 @@ namespace Solti.Utils.Proxy.Internals
             return name;
         }
 
-        private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current) where TMember: MemberInfo
-        {
-            var generator = typeof(TInterface)
-                .ListMembers<TMember>()
-                .Where(member => member.Name == current.Name)
-                .Select((member, i) => new { Index = i, Value = member })
-                .First(member => member.Value == current);
+        private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current) where TMember: MemberInfo => IdentifierName($"Field{current.MetadataToken}");
 
-            return IdentifierName($"F{generator.Value.Name}{generator.Index}");
-        }
-
-        private static FieldDeclarationSyntax DeclareField<TFiled>(IdentifierNameSyntax fieldName, MemberInfo getValueFrom, MemberInfo key) =>
+        private static FieldDeclarationSyntax DeclareField<TFiled>(IdentifierNameSyntax fieldName, int metadataToken) =>
             DeclareField<TFiled>
             (
                 name: fieldName.Identifier.Text,
-                initializer: ElementAccess
+                initializer: CastExpression
                 (
-                    null, // target
-                    getValueFrom
-                )
-                .WithArgumentList
-                (
-                    argumentList: BracketedArgumentList
+                    CreateType(typeof(TFiled)),
+                    InvokeMethod
                     (
-                        arguments: SingletonSeparatedList
+                        RESOLVE_MEMBER, 
+                        null, 
+                        null,
+                        Argument
                         (
-                            Argument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(key.GetFullName())))
+                            LiteralExpression
+                            (
+                                SyntaxKind.NumericLiteralExpression,
+                                Literal(metadataToken)
+                            )
                         )
                     )
                 ),
@@ -335,34 +326,34 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)              <br/>
-        /// {                                                                                                   <br/>
-        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                <br/>
-        ///                                                                                                     <br/>
-        ///     T2 dummy_para2 = default(T2);                                                                   <br/>
-        ///     T3 dummy_para3;                                                                                 <br/>
-        ///     MethodInfo currentMethod;                                                                       <br/>
-        ///     currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4)); <br/>
-        ///                                                                                                     <br/>
-        ///     InvokeTarget = () =>                                                                            <br/>
-        ///     {                                                                                               <br/>
-        ///         System.Int32 cb_a = (System.Int32)args[0];                                                  <br/>
-        ///         System.String cb_b;                                                                         <br/>
-        ///         TT cb_c = (TT)args[2];                                                                      <br/>
-        ///         System.Object result;                                                                       <br/>
-        ///         result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);                                     <br/>
-        ///                                                                                                     <br/>
-        ///         args[1] = (System.Object)cb_b;                                                              <br/>
-        ///         args[2] = (System.Object)cb_c;                                                              <br/>
-        ///         return result;                                                                              <br/>
-        ///     };                                                                                              <br/>         
-        ///                                                                                                     <br/>
-        ///     System.Object result = Invoke(currentMethod, args, currentMethod);                              <br/>
-        ///                                                                                                     <br/>
-        ///     para2 = (T2) args[1];                                                                           <br/>
-        ///     para3 = (T3) args[2];                                                                           <br/>
-        ///                                                                                                     <br/>
-        ///     return (TResult) result;                                                                        <br/>
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)               <br/>
+        /// {                                                                                                    <br/>
+        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
+        ///                                                                                                      <br/>
+        ///     T2 dummy_para2 = default(T2);                                                                    <br/>
+        ///     T3 dummy_para3;                                                                                  <br/>
+        ///     MethodInfo currentMethod;                                                                        <br/>
+        ///     currentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4)); <br/>
+        ///                                                                                                      <br/>
+        ///     InvokeTarget = () =>                                                                             <br/>
+        ///     {                                                                                                <br/>
+        ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
+        ///         System.String cb_b;                                                                          <br/>
+        ///         TT cb_c = (TT)args[2];                                                                       <br/>
+        ///         System.Object result;                                                                        <br/>
+        ///         result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);                                      <br/>
+        ///                                                                                                      <br/>
+        ///         args[1] = (System.Object)cb_b;                                                               <br/>
+        ///         args[2] = (System.Object)cb_c;                                                               <br/>
+        ///         return result;                                                                               <br/>
+        ///     };                                                                                               <br/>         
+        ///                                                                                                      <br/>
+        ///     System.Object result = Invoke(currentMethod, args, currentMethod);                               <br/>
+        ///                                                                                                      <br/>
+        ///     para2 = (T2) args[1];                                                                            <br/>
+        ///     para3 = (T3) args[2];                                                                            <br/>
+        ///                                                                                                      <br/>
+        ///     return (TResult) result;                                                                         <br/>
         /// }
         /// </summary>
         internal sealed class MethodInterceptorFactory : IInterceptorFactory
@@ -407,7 +398,7 @@ namespace Solti.Utils.Proxy.Internals
             /// <summary>
             /// T2 dummy_para2 = default(T2);                                                                    <br/>
             /// T3 dummy_para3;                                                                                  <br/>
-            /// currentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
+            /// currentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
             /// </summary>
             internal IEnumerable<StatementSyntax> AcquireMethodInfo()
             {
@@ -434,7 +425,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
 
                 //
-                // urrentMethod = MethodAccess(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
+                // urrentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
                 //
 
                 statements.Add
@@ -447,7 +438,7 @@ namespace Solti.Utils.Proxy.Internals
                             ToIdentifierName(CurrentMethod),
                             InvokeMethod
                             (
-                                METHOD_ACCESS,
+                                RESOLVE_METHOD,
                                 target: null,
                                 castTargetTo: null,
                                 Argument
@@ -556,24 +547,24 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly PropertyInfo FProp = Properties["IInterface.Prop"]; <br/>
-        ///                                                                             <br/>
-        /// TResult IInterface.Prop                                                     <br/>
-        /// {                                                                           <br/>
-        ///     get                                                                     <br/>
-        ///     {                                                                       <br/>
-        ///         InvokeTarget = () => Target.Prop;                                   <br/>
-        ///         return (TResult) Invoke(FProp.GetMethod, new object[0], FProp);     <br/>
-        ///     }                                                                       <br/>
-        ///     set                                                                     <br/>
-        ///     {                                                                       <br/>
-        ///         InvokeTarget = () =>                                                <br/>
-        ///         {                                                                   <br/>
-        ///           Target.Prop = value;                                              <br/>
-        ///           return null;                                                      <br/>
-        ///         };                                                                  <br/>
-        ///         Invoke(FProp.SetMethod, new object[]{ value }, FProp);              <br/>
-        ///     }                                                                       <br/>
+        /// private static readonly PropertyInfo FProp = (PropertyInfo) ResolveMember(1234); <br/>
+        ///                                                                                  <br/>
+        /// TResult IInterface.Prop                                                          <br/>
+        /// {                                                                                <br/>
+        ///     get                                                                          <br/>
+        ///     {                                                                            <br/>
+        ///         InvokeTarget = () => Target.Prop;                                        <br/>
+        ///         return (TResult) Invoke(FProp.GetMethod, new object[0], FProp);          <br/>
+        ///     }                                                                            <br/>
+        ///     set                                                                          <br/>
+        ///     {                                                                            <br/>
+        ///         InvokeTarget = () =>                                                     <br/>
+        ///         {                                                                        <br/>
+        ///           Target.Prop = value;                                                   <br/>
+        ///           return null;                                                           <br/>
+        ///         };                                                                       <br/>
+        ///         Invoke(FProp.SetMethod, new object[]{ value }, FProp);                   <br/>
+        ///     }                                                                            <br/>
         /// }
         /// </summary>
         internal class PropertyInterceptorFactory : IInterceptorFactory
@@ -707,14 +698,14 @@ namespace Solti.Utils.Proxy.Internals
 
             public IEnumerable<MemberDeclarationSyntax> Build() 
             {
-                yield return DeclareField<PropertyInfo>(RelatedField, PROPERTIES, Property);
+                yield return DeclareField<PropertyInfo>(RelatedField, Property.MetadataToken);
 
                 yield return DeclareProperty();
             }
         }
 
         /// <summary>
-        /// private static readonly PropertyInfo FItem = Properties["IInterface.Item"];             <br/>
+        /// private static readonly PropertyInfo FItem = (PropertyInfo) ResolveMember(1234);        <br/>
         ///                                                                                         <br/>
         /// TResult IInterface.this[TParam1 p1, TPAram2 p2]                                         <br/>
         /// {                                                                                       <br/>
@@ -758,20 +749,20 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly EventInfo FEvent = Events["IInterface.Event"];  <br/>
-        ///                                                                         <br/>
-        /// event EventType IInterface.Event                                        <br/>
-        /// {                                                                       <br/>
-        ///     add                                                                 <br/>
-        ///     {                                                                   <br/>
-        ///         InvokeTarget = () => Target.Event += value;                     <br/>
-        ///         Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);        <br/>
-        ///     }                                                                   <br/>
-        ///     remove                                                              <br/>
-        ///     {                                                                   <br/>
-        ///         InvokeTarget = () => Target.Event -= value;                     <br/>
-        ///         Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);     <br/>
-        ///     }                                                                   <br/>
+        /// private static readonly EventInfo FEvent = (EventInfo) ResolveMember(1234); <br/>
+        ///                                                                             <br/>
+        /// event EventType IInterface.Event                                            <br/>
+        /// {                                                                           <br/>
+        ///     add                                                                     <br/>
+        ///     {                                                                       <br/>
+        ///         InvokeTarget = () => Target.Event += value;                         <br/>
+        ///         Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);            <br/>
+        ///     }                                                                       <br/>
+        ///     remove                                                                  <br/>
+        ///     {                                                                       <br/>
+        ///         InvokeTarget = () => Target.Event -= value;                         <br/>
+        ///         Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);         <br/>
+        ///     }                                                                       <br/>
         /// }
         /// </summary>
         internal sealed class EventInterceptorFactory : IInterceptorFactory
@@ -845,7 +836,7 @@ namespace Solti.Utils.Proxy.Internals
 
             public IEnumerable<MemberDeclarationSyntax> Build()
             {
-                yield return DeclareField<EventInfo>(RelatedField, EVENTS, Event);
+                yield return DeclareField<EventInfo>(RelatedField, Event.MetadataToken);
 
                 yield return DeclareEvent
                 (

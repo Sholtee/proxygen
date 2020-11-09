@@ -3,7 +3,7 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
     get
     {
         this.InvokeTarget = () => this.Target[index];
-        return (System.Int32)this.Invoke(GeneratedProxy.FItem0.GetMethod, new System.Object[]{index}, GeneratedProxy.FItem0);
+        return (System.Int32)this.Invoke(GeneratedProxy.Field385880004.GetMethod, new System.Object[]{index}, GeneratedProxy.Field385880004);
     }
 
     set
@@ -15,6 +15,6 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
         }
 
         ;
-        this.Invoke(GeneratedProxy.FItem0.SetMethod, new System.Object[]{index, value}, GeneratedProxy.FItem0);
+        this.Invoke(GeneratedProxy.Field385880004.SetMethod, new System.Object[]{index, value}, GeneratedProxy.Field385880004);
     }
 }

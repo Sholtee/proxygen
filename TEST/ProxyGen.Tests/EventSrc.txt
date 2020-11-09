@@ -9,7 +9,7 @@ event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDe
         }
 
         ;
-        this.Invoke(GeneratedProxy.FEvent0.AddMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
+        this.Invoke(GeneratedProxy.Field335544323.AddMethod, new System.Object[]{value}, GeneratedProxy.Field335544323);
     }
 
     remove
@@ -21,6 +21,6 @@ event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDe
         }
 
         ;
-        this.Invoke(GeneratedProxy.FEvent0.RemoveMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
+        this.Invoke(GeneratedProxy.Field335544323.RemoveMethod, new System.Object[]{value}, GeneratedProxy.Field335544323);
     }
 }

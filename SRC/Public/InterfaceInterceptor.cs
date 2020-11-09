@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Solti.Utils.Proxy
 {
@@ -27,7 +28,8 @@ namespace Solti.Utils.Proxy
         /// <param name="methodAccess">The expression to be processed.</param>
         /// <returns>The extracted <see cref="MethodInfo"/> instance.</returns>
         /// <remarks>This is an internal method, don't use it.</remarks>
-        protected internal static MethodInfo MethodAccess(Expression<Action> methodAccess)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected internal static MethodInfo ResolveMethod(Expression<Action> methodAccess)
         {
             if (methodAccess == null)
                 throw new ArgumentNullException(nameof(methodAccess));
@@ -35,39 +37,17 @@ namespace Solti.Utils.Proxy
             return (MethodInfo) MemberInfoExtensions.ExtractFrom(methodAccess);
         }
 
-        //
-        // Ez itt NEM mukodik write-only property-kre
-        //
-/*
-        protected internal static PropertyInfo PropertyAccess<TResult>(Expression<Func<TResult>> propertyAccess) => (PropertyInfo) ((MemberExpression) propertyAccess.Body).Member;
-*/
-        //
-        // Ez mukodne viszont forditas ideju kifejezesek nem tartalmazhatnak ertekadast (lasd: http://blog.ashmind.com/2007/09/07/expression-tree-limitations-in-c-30/) 
-        // tehat pl: "() => i.Prop = 0" hiaba helyes nem fog fordulni.
-        //
-/*
-        protected internal static PropertyInfo PropertyAccess(Expression<Action> propertyAccess) => (PropertyInfo) ((MemberExpression) ((BinaryExpression) propertyAccess.Body).Left).Member;
-*/
-        //
-        // Szoval marad a mersekelten szep megoldas (esemenyeket pedig amugy sem lehet kitalalni kifejezesek segitsegevel):
-        //
+        private static readonly IReadOnlyDictionary<int, MemberInfo> FMembers = typeof(TInterface)
+            .ListMembers<MemberInfo>()
+            .Distinct()
+            .ToDictionary(x => x.MetadataToken);
 
         /// <summary>
-        /// All the <typeparamref name="TInterface"/> properties.
+        /// Resolves a member by its metadata token.
         /// </summary>
-        protected internal static readonly IReadOnlyDictionary<string, PropertyInfo> Properties = typeof(TInterface).ListMembers<PropertyInfo>()
-            //
-            // Tekintsuk a kovetkezot: IA: IB, IC ahol IB: IC -> Distinct()
-            //
-            .Distinct()
-            .ToDictionary(prop => prop.GetFullName());
-
-        /// <summary>
-        /// All the <typeparamref name="TInterface"/> events.
-        /// </summary>
-        protected internal static readonly IReadOnlyDictionary<string, EventInfo> Events = typeof(TInterface).ListMembers<EventInfo>()
-            .Distinct()
-            .ToDictionary(ev => ev.GetFullName());
+        /// <remarks>This is an internal method, don't use it.</remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected internal static MemberInfo ResolveMember(int metadataToken) => FMembers[metadataToken]; // typeof(TInterface).Module.ResolveMember(metadataToken);
 
         /// <summary>
         /// The target of this interceptor.

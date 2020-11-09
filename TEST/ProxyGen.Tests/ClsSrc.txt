@@ -10,7 +10,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
         System.Reflection.MethodInfo currentMethod;
         System.String dummy_b;
         TT dummy_c = default(TT);
-        currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
+        currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
         this.InvokeTarget = () =>
         {
             System.Int32 cb_a = (System.Int32)args[0];
@@ -34,7 +34,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
     {
         System.Object[] args = new System.Object[0];
         System.Reflection.MethodInfo currentMethod;
-        currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Bar());
+        currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(() => this.Target.Bar());
         this.InvokeTarget = () =>
         {
             System.Object result;
@@ -47,13 +47,13 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
         System.Object result = this.Invoke(currentMethod, args, currentMethod);
     }
 
-    private static readonly System.Reflection.PropertyInfo FProp0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.Properties["Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop"];
+    private static readonly System.Reflection.PropertyInfo Field385875984 = (System.Reflection.PropertyInfo)Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMember(385875984);
     System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop
     {
         get
         {
             this.InvokeTarget = () => this.Target.Prop;
-            return (System.Int32)this.Invoke(GeneratedProxy.FProp0.GetMethod, new System.Object[0], GeneratedProxy.FProp0);
+            return (System.Int32)this.Invoke(GeneratedProxy.Field385875984.GetMethod, new System.Object[0], GeneratedProxy.Field385875984);
         }
 
         set
@@ -65,11 +65,11 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
             }
 
             ;
-            this.Invoke(GeneratedProxy.FProp0.SetMethod, new System.Object[]{value}, GeneratedProxy.FProp0);
+            this.Invoke(GeneratedProxy.Field385875984.SetMethod, new System.Object[]{value}, GeneratedProxy.Field385875984);
         }
     }
 
-    private static readonly System.Reflection.EventInfo FEvent0 = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.Events["Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event"];
+    private static readonly System.Reflection.EventInfo Field335544323 = (System.Reflection.EventInfo)Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMember(335544323);
     event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event
     {
         add
@@ -81,7 +81,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
             }
 
             ;
-            this.Invoke(GeneratedProxy.FEvent0.AddMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
+            this.Invoke(GeneratedProxy.Field335544323.AddMethod, new System.Object[]{value}, GeneratedProxy.Field335544323);
         }
 
         remove
@@ -93,7 +93,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
             }
 
             ;
-            this.Invoke(GeneratedProxy.FEvent0.RemoveMethod, new System.Object[]{value}, GeneratedProxy.FEvent0);
+            this.Invoke(GeneratedProxy.Field335544323.RemoveMethod, new System.Object[]{value}, GeneratedProxy.Field335544323);
         }
     }
 }

@@ -48,6 +48,9 @@ namespace Solti.Utils.Proxy.Internals
                     return member.Member;
                 case MethodCallExpression call:
                     return call.Method;
+                case BinaryExpression binary:
+                    body = binary.Left;
+                    goto start;
                 default:
                     Debug.Fail("Unknown body");
                     return null!;

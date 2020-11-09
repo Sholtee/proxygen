@@ -4,7 +4,7 @@ System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase
     System.Reflection.MethodInfo currentMethod;
     System.String dummy_b;
     TT dummy_c = default(TT);
-    currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
+    currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
     this.InvokeTarget = () =>
     {
         System.Int32 cb_a = (System.Int32)args[0];
