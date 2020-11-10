@@ -29,13 +29,8 @@ namespace Solti.Utils.Proxy
         /// <returns>The extracted <see cref="MethodInfo"/> instance.</returns>
         /// <remarks>This is an internal method, don't use it.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal static MethodInfo ResolveMethod(Expression<Action> methodAccess)
-        {
-            if (methodAccess == null)
-                throw new ArgumentNullException(nameof(methodAccess));
-
-            return (MethodInfo) MemberInfoExtensions.ExtractFrom(methodAccess);
-        }
+        protected internal static MethodInfo ResolveMethod(Expression<Action> methodAccess) => 
+            (MethodInfo) MemberInfoExtensions.ExtractFrom(methodAccess ?? throw new ArgumentNullException(nameof(methodAccess)));
 
         private static readonly IReadOnlyDictionary<int, MemberInfo> FMembers = typeof(TInterface)
             .ListMembers<MemberInfo>()
@@ -48,6 +43,20 @@ namespace Solti.Utils.Proxy
         /// <remarks>This is an internal method, don't use it.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected internal static MemberInfo ResolveMember(int metadataToken) => FMembers[metadataToken]; // typeof(TInterface).Module.ResolveMember(metadataToken);
+
+        /// <summary>
+        /// Extracts the <see cref="PropertyInfo"/> from the given expression.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected internal static PropertyInfo ResolvePropertySet(Action propertyAccess) => // nem lehet expression: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+            (PropertyInfo) MemberInfoExtensions.ExtractFrom((propertyAccess ?? throw new ArgumentNullException(nameof(propertyAccess))).Method, MemberTypes.Property)!;
+
+        /// <summary>
+        /// Extracts the <see cref="PropertyInfo"/> from the given expression.
+        /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected internal static PropertyInfo ResolvePropertyGet(Func<object?> propertyAccess) => // indexer kifejezeskbol csak a metodust lehet kifejteni property-t nem
+            (PropertyInfo) MemberInfoExtensions.ExtractFrom((propertyAccess ?? throw new ArgumentNullException(nameof(propertyAccess))).Method, MemberTypes.Property)!;
 
         /// <summary>
         /// The target of this interceptor.

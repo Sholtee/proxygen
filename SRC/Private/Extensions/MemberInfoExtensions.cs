@@ -8,7 +8,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
+
+using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -64,6 +67,33 @@ namespace Solti.Utils.Proxy.Internals
         public static MemberInfo ExtractFrom<T>(Expression<Func<T>> expr) => DoExtractFrom(expr);
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
+
+        public static MemberInfo ExtractFrom(MethodInfo method, MemberTypes memberType) // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+        {
+            Instruction? call = method.GetInstructions().SingleOrDefault(instruction => instruction.OpCode == OpCodes.Callvirt);
+
+            if (call != null)
+            {
+                method = (MethodInfo) call.Operand;
+
+                switch (memberType) 
+                {
+                    case MemberTypes.Property:
+                        PropertyInfo? property = method.DeclaringType.GetProperties().SingleOrDefault(prop => prop.SetMethod == method || prop.GetMethod == method);
+                        if (property != null) return property;
+                        break;
+                    case MemberTypes.Event:
+                        EventInfo? evt = method.DeclaringType.GetEvents().SingleOrDefault(evt => evt.AddMethod == method || evt.RemoveMethod == method);
+                        if (evt != null) return evt;
+                        break;
+                    case MemberTypes.Method:
+                        return method;
+                }
+            }
+
+            Debug.Fail("Member could not be determined");
+            return null!;
+        }
 
         public static bool SignatureEquals(this MemberInfo self, MemberInfo that) 
         {

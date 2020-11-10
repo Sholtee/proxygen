@@ -112,6 +112,14 @@ namespace Solti.Utils.Proxy.Internals
             //
             .Replace(',', '_');
 
+        protected internal static MemberAccessExpressionSyntax SimpleMemberAccess(ExpressionSyntax target, string member) =>
+            MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                target,
+                IdentifierName(member)
+            );
+
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,6 +31,8 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly MethodInfo
             INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
             RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)),
+            RESOLVE_PROPERTY_SET = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolvePropertySet(default!)),
+            RESOLVE_PROPERTY_GET = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolvePropertyGet(default!)),
             RESOLVE_MEMBER = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMember(default));
 
         private static readonly PropertyInfo
@@ -547,14 +550,13 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly PropertyInfo FProp = (PropertyInfo) ResolveMember(1234); <br/>
-        ///                                                                                  <br/>
         /// TResult IInterface.Prop                                                          <br/>
         /// {                                                                                <br/>
         ///     get                                                                          <br/>
         ///     {                                                                            <br/>
         ///         InvokeTarget = () => Target.Prop;                                        <br/>
-        ///         return (TResult) Invoke(FProp.GetMethod, new object[0], FProp);          <br/>
+        ///         PropertyInfo prop = ResolvePropertyGet(() => Target.Prop);               <br/>
+        ///         return (TResult) Invoke(prop.GetMethod, new object[0], prop);            <br/>
         ///     }                                                                            <br/>
         ///     set                                                                          <br/>
         ///     {                                                                            <br/>
@@ -563,7 +565,8 @@ namespace Solti.Utils.Proxy.Internals
         ///           Target.Prop = value;                                                   <br/>
         ///           return null;                                                           <br/>
         ///         };                                                                       <br/>
-        ///         Invoke(FProp.SetMethod, new object[]{ value }, FProp);                   <br/>
+        ///         PropertyInfo prop = ResolvePropertySet(() => Target.Prop = value);       <br/>
+        ///         Invoke(prop.SetMethod, new object[]{ value }, prop);                     <br/>
         ///     }                                                                            <br/>
         /// }
         /// </summary>
@@ -571,14 +574,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             public PropertyInfo Property { get; }
 
-            public IdentifierNameSyntax RelatedField { get; }
-
             public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
 
             public PropertyInterceptorFactory(PropertyInfo property, ProxySyntaxFactory<TInterface, TInterceptor> owner) 
             {
                 Property = property;
-                RelatedField = GenerateFieldName(property);
                 Owner = owner;
             }
 
@@ -618,50 +618,100 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             /// <summary>
-            /// return (TResult) this.Invoke(FProp.GetMethod, new object[0], FProp);
+            /// PropertyInfo prop = ResolvePropertyGet(() => Target.Prop);            <br/>
+            /// return (TResult) this.Invoke(prop.GetMethod, new object[0], prop);
             /// </summary>
-            internal StatementSyntax CallInvokeAndReturn(params ParameterSyntax[] paramz) => ReturnResult
-            (
-                Property.PropertyType,
-                InvokeMethod
+            internal IEnumerable<StatementSyntax> CallInvokeAndReturn(params ParameterSyntax[] paramz) 
+            {
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
                 (
-                    INVOKE,
+                    RESOLVE_PROPERTY_GET,
                     target: null,
                     castTargetTo: null,
-                    arguments: new ExpressionSyntax[]
-                    {
-                        Owner.StaticMemberAccess(RelatedField, nameof(PropertyInfo.GetMethod)), // FProp.GetMethod,
-                        CreateArray<object>(paramz // new object[0] | new object[] {p1, p2}
-                            .Select(param => IdentifierName(param.Identifier))
-                            .Cast<ExpressionSyntax>()
-                            .ToArray()),
-                        Owner.StaticMemberName(RelatedField) // FProp
-                    }.Select(Argument).ToArray()
-                )
-            );
+                    Argument
+                    (
+                        expression: BuildPropertyGetter()
+                    )
+                ));
+
+                yield return prop;
+
+                yield return ReturnResult
+                (
+                    Property.PropertyType,
+                    InvokeMethod
+                    (
+                        INVOKE,
+                        target: null,
+                        castTargetTo: null,
+                        arguments: new ExpressionSyntax[]
+                        {
+                            SimpleMemberAccess // prop.GetMethod
+                            (
+                                ToIdentifierName(prop),  
+                                nameof(PropertyInfo.GetMethod)
+                            ), 
+                            CreateArray<object>(paramz // new object[0] | new object[] {index1, index2, ...}
+                                .Select(param => IdentifierName(param.Identifier))
+                                .Cast<ExpressionSyntax>()
+                                .ToArray()),
+                            ToIdentifierName(prop) // prop
+                        }.Select(Argument).ToArray()
+                    )
+                );
+            }
 
             /// <summary>
-            /// this.Invoke(FProp.SetMethod, new object[]{ value }, FProp);
+            /// PropertyInfo prop = ResolvePropertySet(() => Target.Prop = value);  <br/>
+            /// this.Invoke(prop.SetMethod, new object[]{ value }, prop);
             /// </summary>
-            internal StatementSyntax CallInvoke(params ParameterSyntax[] paramz) => ExpressionStatement
-            (
-                InvokeMethod
+            internal IEnumerable<StatementSyntax> CallInvoke(params ParameterSyntax[] paramz)
+            {
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
                 (
-                    INVOKE,
+                    RESOLVE_PROPERTY_SET,
                     target: null,
                     castTargetTo: null,
-                    arguments: new ExpressionSyntax[]
-                    {
-                        Owner.StaticMemberAccess(RelatedField, nameof(PropertyInfo.SetMethod)), // FProp.SetMethod
-                        CreateArray<object>(paramz //  new object[] {value} | new object[] {p1, p2, value}
-                            .Select(param => IdentifierName(param.Identifier))
-                            .Append(IdentifierName(Value))
-                            .Cast<ExpressionSyntax>()
-                            .ToArray()),
-                        Owner.StaticMemberName(RelatedField) // FProp
-                    }.Select(Argument).ToArray()
-                )
-            );
+                    Argument
+                    (
+                        expression: ParenthesizedLambdaExpression().WithExpressionBody
+                        (     
+                            expressionBody: AssignmentExpression
+                            (
+                                kind: SyntaxKind.SimpleAssignmentExpression,
+                                left: PropertyAccess(Property, TARGET),
+                                right: IdentifierName(Value)
+                            )
+                        )
+                    )
+                ));
+
+                yield return prop;
+
+                yield return ExpressionStatement
+                (
+                    InvokeMethod
+                    (
+                        INVOKE,
+                        target: null,
+                        castTargetTo: null,
+                        arguments: new ExpressionSyntax[]
+                        {
+                            SimpleMemberAccess // prop.SetMethod
+                            (
+                                ToIdentifierName(prop),
+                                nameof(PropertyInfo.SetMethod)
+                            ),
+                            CreateArray<object>(paramz //  new object[] {value} | new object[] {index1, index2, ..., value}
+                                .Select(param => IdentifierName(param.Identifier))
+                                .Append(IdentifierName(Value))
+                                .Cast<ExpressionSyntax>()
+                                .ToArray()),
+                            ToIdentifierName(prop) // prop
+                        }.Select(Argument).ToArray()
+                    )
+                );
+            }
 
             /// <summary>
             /// InvokeTarget = () => { ... };
@@ -686,33 +736,34 @@ namespace Solti.Utils.Proxy.Internals
                 property: Property,
                 getBody: Block
                 (
-                    AssignCallback(BuildPropertyGetter()),
-                    CallInvokeAndReturn()
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildPropertyGetter())
+                    }.Concat(CallInvokeAndReturn())
                 ),
                 setBody: Block
                 (
-                    AssignCallback(BuildPropertySetter()),
-                    CallInvoke()
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildPropertySetter())
+                    }.Concat(CallInvoke())
                 )
             );
 
             public IEnumerable<MemberDeclarationSyntax> Build() 
             {
-                yield return DeclareField<PropertyInfo>(RelatedField, Property.MetadataToken);
-
                 yield return DeclareProperty();
             }
         }
 
         /// <summary>
-        /// private static readonly PropertyInfo FItem = (PropertyInfo) ResolveMember(1234);        <br/>
-        ///                                                                                         <br/>
         /// TResult IInterface.this[TParam1 p1, TPAram2 p2]                                         <br/>
         /// {                                                                                       <br/>
         ///     get                                                                                 <br/>
         ///     {                                                                                   <br/>
         ///         InvokeTarget = () => Target.Prop[p1, p2];                                       <br/>
-        ///         return (TResult) Invoke(FItem.GetMethod, new System.Object[]{p1, p2}, FItem);   <br/>
+        ///         PropertyInfo prop = ResolvePropertyGet(() => Target.Prop[p1, p2]);              <br/>
+        ///         return (TResult) Invoke(prop.GetMethod, new System.Object[]{p1, p2}, prop);     <br/>
         ///     }                                                                                   <br/>
         ///     set                                                                                 <br/>
         ///     {                                                                                   <br/>
@@ -721,7 +772,8 @@ namespace Solti.Utils.Proxy.Internals
         ///           Target.Prop[p1, p2] = value;                                                  <br/>
         ///           return null;                                                                  <br/>
         ///         };                                                                              <br/>
-        ///         Invoke(FItem.SetMethod, new System.Object[]{ p1, p2, value }, FItem);           <br/>
+        ///         PropertyInfo prop = ResolvePropertySet(() => Target.Prop[p1, p2] = value);      <br/>
+        ///         Invoke(prop.SetMethod, new System.Object[]{ p1, p2, value }, prop);             <br/>
         ///     }                                                                                   <br/>
         /// }
         /// </summary>
@@ -737,13 +789,17 @@ namespace Solti.Utils.Proxy.Internals
                 property: Property,
                 getBody: paramz => Block
                 (
-                    AssignCallback(BuildPropertyGetter()),
-                    CallInvokeAndReturn(paramz.ToArray())
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildPropertyGetter())
+                    }.Concat(CallInvokeAndReturn(paramz.ToArray()))
                 ),
                 setBody: paramz => Block
                 (
-                    AssignCallback(BuildPropertySetter()),
-                    CallInvoke(paramz.ToArray())
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildPropertySetter())
+                    }.Concat(CallInvoke(paramz.ToArray()))
                 )
             );
         }

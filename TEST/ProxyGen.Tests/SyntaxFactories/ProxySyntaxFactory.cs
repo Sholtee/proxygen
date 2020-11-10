@@ -176,10 +176,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void CallInvokeAndReturn_ShouldCallTheInvokeMethodAgainstTheDesiredProperty() =>
-            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).CallInvokeAndReturn().NormalizeWhitespace().ToFullString(), Is.EqualTo($"return (System.Int32)this.Invoke(GeneratedProxy.Field{Prop.MetadataToken}.GetMethod, new System.Object[0], GeneratedProxy.Field{Prop.MetadataToken});"));
+            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).CallInvokeAndReturn().Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("return (System.Int32)this.Invoke(prop.GetMethod, new System.Object[0], prop);"));
         
         [Test]
         public void CallInvoke_ShouldCallTheInvokeMethodAgainstTheDesiredProperty() =>
-            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).CallInvoke().NormalizeWhitespace().ToFullString(), Is.EqualTo($"this.Invoke(GeneratedProxy.Field{Prop.MetadataToken}.SetMethod, new System.Object[]{{value}}, GeneratedProxy.Field{Prop.MetadataToken});"));
+            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).CallInvoke().Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("this.Invoke(prop.SetMethod, new System.Object[]{value}, prop);"));
     }
 }
