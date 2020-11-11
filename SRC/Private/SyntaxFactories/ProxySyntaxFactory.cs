@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -29,10 +28,10 @@ namespace Solti.Utils.Proxy.Internals
             TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!));
 
         private static readonly MethodInfo
-            INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
-            RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)),
+            INVOKE           = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
+            RESOLVE_METHOD   = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)),
             RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!)),
-            RESOLVE_MEMBER = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMember(default));
+            RESOLVE_EVENT    = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
 
         private static readonly PropertyInfo
             INVOKE_TARGET = (PropertyInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.InvokeTarget!);
@@ -45,38 +44,6 @@ namespace Solti.Utils.Proxy.Internals
             }
             return name;
         }
-
-        private static IdentifierNameSyntax GenerateFieldName<TMember>(TMember current) where TMember: MemberInfo => IdentifierName($"Field{current.MetadataToken}");
-
-        private static FieldDeclarationSyntax DeclareField<TFiled>(IdentifierNameSyntax fieldName, int metadataToken) =>
-            DeclareField<TFiled>
-            (
-                name: fieldName.Identifier.Text,
-                initializer: CastExpression
-                (
-                    CreateType(typeof(TFiled)),
-                    InvokeMethod
-                    (
-                        RESOLVE_MEMBER, 
-                        null, 
-                        null,
-                        Argument
-                        (
-                            LiteralExpression
-                            (
-                                SyntaxKind.NumericLiteralExpression,
-                                Literal(metadataToken)
-                            )
-                        )
-                    )
-                ),
-                modifiers: new[]
-                {
-                    SyntaxKind.PrivateKeyword,
-                    SyntaxKind.StaticKeyword,
-                    SyntaxKind.ReadOnlyKeyword
-                }
-            );
 
         /// <summary>
         /// GeneratedClass.StaticMember
@@ -666,7 +633,7 @@ namespace Solti.Utils.Proxy.Internals
             /// </summary>
             internal IEnumerable<StatementSyntax> CallInvoke(params ParameterSyntax[] paramz)
             {
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), nameof(prop), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -796,19 +763,19 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly EventInfo FEvent = (EventInfo) ResolveMember(1234); <br/>
-        ///                                                                             <br/>
         /// event EventType IInterface.Event                                            <br/>
         /// {                                                                           <br/>
         ///     add                                                                     <br/>
         ///     {                                                                       <br/>
         ///         InvokeTarget = () => Target.Event += value;                         <br/>
-        ///         Invoke(FEvent.AddMethod, new object[]{ value }, FEvent);            <br/>
+        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
+        ///         Invoke(evt.AddMethod, new object[]{ value }, evt);                  <br/>
         ///     }                                                                       <br/>
         ///     remove                                                                  <br/>
         ///     {                                                                       <br/>
         ///         InvokeTarget = () => Target.Event -= value;                         <br/>
-        ///         Invoke(FEvent.RemoveMethod, new object[]{ value }, FEvent);         <br/>
+        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
+        ///         Invoke(evt.RemoveMethod, new object[]{ value }, evt);               <br/>
         ///     }                                                                       <br/>
         /// }
         /// </summary>
@@ -816,14 +783,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             public EventInfo Event { get; }
 
-            public IdentifierNameSyntax RelatedField { get; }
-
             public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
 
             public EventInterceptorFactory(EventInfo @event, ProxySyntaxFactory<TInterface, TInterceptor> owner)
             {
                 Event = @event;
-                RelatedField = GenerateFieldName(@event);
                 Owner = owner;
             }
 
@@ -850,23 +814,44 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             /// <summary>
-            /// this.Invoke(FEvent.AddMethod, new System.Object[]{ value }, FEvent);
+            /// EventInfo evt = ResolveEvent(InvokeTarget);                    <br/>
+            /// this.Invoke(evt.AddMethod, new System.Object[]{ value }, evt);
             /// </summary>
-            internal StatementSyntax CallInvoke(bool add) => ExpressionStatement
-            (
-                InvokeMethod
+            internal IEnumerable<StatementSyntax> CallInvoke(bool add)
+            {
+                LocalDeclarationStatementSyntax evt = DeclareLocal(typeof(EventInfo), nameof(evt), InvokeMethod
                 (
-                    INVOKE,
+                    RESOLVE_EVENT,
                     target: null,
                     castTargetTo: null,
-                    arguments: new ExpressionSyntax[]
-                    {
-                        Owner.StaticMemberAccess(RelatedField, add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)), // FEvent.[Add|Remove]Method
-                        CreateArray<object>(IdentifierName(Value)),
-                        Owner.StaticMemberName(RelatedField) // FEvent
-                    }.Select(Argument).ToArray()
-                )
-            );
+                    Argument
+                    (
+                        expression: PropertyAccess(INVOKE_TARGET, null)
+                    )
+                ));
+
+                yield return evt;
+
+                yield return ExpressionStatement
+                (
+                    InvokeMethod
+                    (
+                        INVOKE,
+                        target: null,
+                        castTargetTo: null,
+                        arguments: new ExpressionSyntax[]
+                        {
+                            SimpleMemberAccess // evt.[Add|Remove]Method
+                            (
+                                ToIdentifierName(evt),
+                                add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)
+                            ),
+                            CreateArray<object>(IdentifierName(Value)),
+                            ToIdentifierName(evt) // evt
+                        }.Select(Argument).ToArray()
+                    )
+                );
+            }
 
             /// <summary>
             /// InvokeTarget = () => ...;
@@ -883,20 +868,22 @@ namespace Solti.Utils.Proxy.Internals
 
             public IEnumerable<MemberDeclarationSyntax> Build()
             {
-                yield return DeclareField<EventInfo>(RelatedField, Event.MetadataToken);
-
                 yield return DeclareEvent
                 (
                     @event: Event,
                     addBody: Block
                     (
-                        AssignCallback(BuildRegister(add: true)),
-                        CallInvoke(add: true)
+                        new StatementSyntax[]
+                        {
+                            AssignCallback(BuildRegister(add: true))
+                        }.Concat(CallInvoke(add: true))
                     ),
                     removeBody: Block
                     (
-                        AssignCallback(BuildRegister(add: false)),
-                        CallInvoke(add: false)
+                        new StatementSyntax[]
+                        {
+                            AssignCallback(BuildRegister(add: false))
+                        }.Concat(CallInvoke(add: false))
                     )
                 );
             }

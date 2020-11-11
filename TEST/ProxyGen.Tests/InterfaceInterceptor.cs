@@ -27,13 +27,6 @@ namespace Solti.Utils.Proxy.Tests
         private interface IDescendant2 : IList { }
 
         [Test]
-        public void ResolveMember_ShouldResolveTheMemberByToken() 
-        {
-            PropertyInfo prop = typeof(IDescendant).ListMembers<PropertyInfo>().Single(x => x.Name == nameof(IDescendant.Prop)); // GetProperty() nem mukodne mert az osbol kerdezzuk le
-            Assert.AreSame(prop, InterfaceInterceptor<IDescendant>.ResolveMember(prop.MetadataToken));
-        }
-
-        [Test]
         public void ResolveProperty_ShouldResolveIndexer() 
         {
             IDescendant2 i = null;
