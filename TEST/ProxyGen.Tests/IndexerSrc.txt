@@ -3,7 +3,7 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
     get
     {
         this.InvokeTarget = () => this.Target[index];
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolvePropertyGet(() => this.Target[index]);
+        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolveProperty(this.InvokeTarget);
         return (System.Int32)this.Invoke(prop.GetMethod, new System.Object[]{index}, prop);
     }
 
@@ -16,7 +16,7 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
         }
 
         ;
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolvePropertySet(() => this.Target[index] = value);
+        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolveProperty(this.InvokeTarget);
         this.Invoke(prop.SetMethod, new System.Object[]{index, value}, prop);
     }
 }

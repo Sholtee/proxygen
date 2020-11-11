@@ -31,8 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly MethodInfo
             INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!)),
             RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)),
-            RESOLVE_PROPERTY_SET = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolvePropertySet(default!)),
-            RESOLVE_PROPERTY_GET = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolvePropertyGet(default!)),
+            RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!)),
             RESOLVE_MEMBER = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMember(default));
 
         private static readonly PropertyInfo
@@ -555,7 +554,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     get                                                                          <br/>
         ///     {                                                                            <br/>
         ///         InvokeTarget = () => Target.Prop;                                        <br/>
-        ///         PropertyInfo prop = ResolvePropertyGet(() => Target.Prop);               <br/>
+        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
         ///         return (TResult) Invoke(prop.GetMethod, new object[0], prop);            <br/>
         ///     }                                                                            <br/>
         ///     set                                                                          <br/>
@@ -565,7 +564,7 @@ namespace Solti.Utils.Proxy.Internals
         ///           Target.Prop = value;                                                   <br/>
         ///           return null;                                                           <br/>
         ///         };                                                                       <br/>
-        ///         PropertyInfo prop = ResolvePropertySet(() => Target.Prop = value);       <br/>
+        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
         ///         Invoke(prop.SetMethod, new object[]{ value }, prop);                     <br/>
         ///     }                                                                            <br/>
         /// }
@@ -618,19 +617,19 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             /// <summary>
-            /// PropertyInfo prop = ResolvePropertyGet(() => Target.Prop);            <br/>
+            /// PropertyInfo prop = ResolveProperty(InvokeTarget);                 <br/>
             /// return (TResult) this.Invoke(prop.GetMethod, new object[0], prop);
             /// </summary>
             internal IEnumerable<StatementSyntax> CallInvokeAndReturn(params ParameterSyntax[] paramz) 
             {
                 LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
                 (
-                    RESOLVE_PROPERTY_GET,
+                    RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: BuildPropertyGetter()
+                        expression: PropertyAccess(INVOKE_TARGET, null)
                     )
                 ));
 
@@ -662,27 +661,19 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             /// <summary>
-            /// PropertyInfo prop = ResolvePropertySet(() => Target.Prop = value);  <br/>
+            /// PropertyInfo prop = ResolvePropertySet(InvokeTarget);     <br/>
             /// this.Invoke(prop.SetMethod, new object[]{ value }, prop);
             /// </summary>
             internal IEnumerable<StatementSyntax> CallInvoke(params ParameterSyntax[] paramz)
             {
                 LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
                 (
-                    RESOLVE_PROPERTY_SET,
+                    RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: ParenthesizedLambdaExpression().WithExpressionBody
-                        (     
-                            expressionBody: AssignmentExpression
-                            (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: PropertyAccess(Property, TARGET),
-                                right: IdentifierName(Value)
-                            )
-                        )
+                        expression: PropertyAccess(INVOKE_TARGET, null)
                     )
                 ));
 
@@ -762,7 +753,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     get                                                                                 <br/>
         ///     {                                                                                   <br/>
         ///         InvokeTarget = () => Target.Prop[p1, p2];                                       <br/>
-        ///         PropertyInfo prop = ResolvePropertyGet(() => Target.Prop[p1, p2]);              <br/>
+        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                              <br/>
         ///         return (TResult) Invoke(prop.GetMethod, new System.Object[]{p1, p2}, prop);     <br/>
         ///     }                                                                                   <br/>
         ///     set                                                                                 <br/>
@@ -772,7 +763,7 @@ namespace Solti.Utils.Proxy.Internals
         ///           Target.Prop[p1, p2] = value;                                                  <br/>
         ///           return null;                                                                  <br/>
         ///         };                                                                              <br/>
-        ///         PropertyInfo prop = ResolvePropertySet(() => Target.Prop[p1, p2] = value);      <br/>
+        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                              <br/>
         ///         Invoke(prop.SetMethod, new System.Object[]{ p1, p2, value }, prop);             <br/>
         ///     }                                                                                   <br/>
         /// }

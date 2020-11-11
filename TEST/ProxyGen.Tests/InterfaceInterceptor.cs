@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IDescendant2 i = null;
 
-            PropertyInfo prop = InterfaceInterceptor<IDescendant2>.ResolvePropertySet(() => i[0] = default);
+            PropertyInfo prop = InterfaceInterceptor<IDescendant2>.ResolveProperty(() => i[0] = default);
             Assert.That(prop.Name, Is.EqualTo("Item"));
         }
 
@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IList<string> i = null;
 
-            PropertyInfo prop = InterfaceInterceptor<IList<string>>.ResolvePropertySet(() => i[0] = default);
+            PropertyInfo prop = InterfaceInterceptor<IList<string>>.ResolveProperty(() => i[0] = default);
             Assert.That(prop.Name, Is.EqualTo("Item"));
         }
 
@@ -56,7 +56,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IDescendant i = null;
 
-            PropertyInfo prop = InterfaceInterceptor<IDescendant>.ResolvePropertySet(() => i.Prop = default);
+            PropertyInfo prop = InterfaceInterceptor<IDescendant>.ResolveProperty(() => i.Prop = default);
             Assert.That(prop.Name, Is.EqualTo("Prop"));
         }
     }

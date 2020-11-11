@@ -48,14 +48,7 @@ namespace Solti.Utils.Proxy
         /// Extracts the <see cref="PropertyInfo"/> from the given expression.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal static PropertyInfo ResolvePropertySet(Action propertyAccess) => // nem lehet expression: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
-            (PropertyInfo) MemberInfoExtensions.ExtractFrom((propertyAccess ?? throw new ArgumentNullException(nameof(propertyAccess))).Method, MemberTypes.Property)!;
-
-        /// <summary>
-        /// Extracts the <see cref="PropertyInfo"/> from the given expression.
-        /// </summary>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal static PropertyInfo ResolvePropertyGet(Func<object?> propertyAccess) => // indexer kifejezeskbol csak a metodust lehet kifejteni property-t nem
+        protected internal static PropertyInfo ResolveProperty(Func<object?> propertyAccess) => // nem lehet expression: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
             (PropertyInfo) MemberInfoExtensions.ExtractFrom((propertyAccess ?? throw new ArgumentNullException(nameof(propertyAccess))).Method, MemberTypes.Property)!;
 
         /// <summary>
