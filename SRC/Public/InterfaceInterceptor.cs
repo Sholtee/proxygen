@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -21,18 +20,18 @@ namespace Solti.Utils.Proxy
     public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?> where TInterface: class
     {
         /// <summary>
-        /// Extracts the <see cref="MethodInfo"/> from the given expression.
+        /// Extracts the <see cref="MethodInfo"/> from the given delegate.
         /// </summary>
-        /// <param name="methodAccess">The expression to be processed.</param>
         /// <returns>The extracted <see cref="MethodInfo"/> instance.</returns>
         /// <remarks>This is an internal method, don't use it.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected internal static MethodInfo ResolveMethod(Expression<Action> methodAccess) => 
-            (MethodInfo) MemberInfoExtensions.ExtractFrom(methodAccess ?? throw new ArgumentNullException(nameof(methodAccess)));
+        protected internal static MethodInfo ResolveMethod(Func<object?> methodAccess) => 
+            (MethodInfo) MemberInfoExtensions.ExtractFrom((methodAccess ?? throw new ArgumentNullException(nameof(methodAccess))).Method, MemberTypes.Method)!;
 
         /// <summary>
         /// Extracts the <see cref="PropertyInfo"/> from the given delegate.
         /// </summary>
+        /// <remarks>This is an internal method, don't use it.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected internal static PropertyInfo ResolveProperty(Func<object?> propertyAccess) => // nem lehet expression: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
             (PropertyInfo) MemberInfoExtensions.ExtractFrom((propertyAccess ?? throw new ArgumentNullException(nameof(propertyAccess))).Method, MemberTypes.Property)!;
@@ -40,6 +39,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Extracts the <see cref="EventInfo"/> from the given delegate.
         /// </summary>
+        /// <remarks>This is an internal method, don't use it.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected internal static EventInfo ResolveEvent(Func<object?> eventAccess) => // nem lehet expression: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
             (EventInfo) MemberInfoExtensions.ExtractFrom((eventAccess ?? throw new ArgumentNullException(nameof(eventAccess))).Method, MemberTypes.Event)!;

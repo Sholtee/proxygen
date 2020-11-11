@@ -144,8 +144,8 @@ namespace Solti.Utils.Proxy.Internals
                 ? DeclareIndexer
                 (
                     property: ifaceProperty,
-                    getBody: paramz => getBody,
-                    setBody: paramz => setBody,
+                    getBody: getBody,
+                    setBody: setBody,
                     forceInlining: true
                 )
                 : (MemberDeclarationSyntax) DeclareProperty

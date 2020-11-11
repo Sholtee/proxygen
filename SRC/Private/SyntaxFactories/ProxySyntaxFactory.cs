@@ -36,9 +36,9 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly PropertyInfo
             INVOKE_TARGET = (PropertyInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.InvokeTarget!);
 
-        private static string EnsureUnused(string name, MethodInfo method) 
+        private static string EnsureUnused(string name, IEnumerable<ParameterInfo> parameters) 
         {
-            for (IReadOnlyList<ParameterInfo> paramz = method.GetParameters(); paramz.Any(param => param.Name == name);)
+            while (parameters.Any(param => param.Name == name))
             {
                 name = $"_{name}";
             }
@@ -123,7 +123,7 @@ namespace Solti.Utils.Proxy.Internals
 
         internal interface IInterceptorFactory
         {
-            IEnumerable<MemberDeclarationSyntax> Build();
+            MemberDeclarationSyntax Build();
         }
 
         /// <summary>
@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Internals
                 LocalArgs = DeclareCallbackLocals().ToArray();
             }
 
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method);
+            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method.GetParameters());
 
             /// <summary>
             /// System.String cb_a;    <br/>
@@ -299,11 +299,6 @@ namespace Solti.Utils.Proxy.Internals
         /// {                                                                                                    <br/>
         ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
         ///                                                                                                      <br/>
-        ///     T2 dummy_para2 = default(T2);                                                                    <br/>
-        ///     T3 dummy_para3;                                                                                  <br/>
-        ///     MethodInfo currentMethod;                                                                        <br/>
-        ///     currentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4)); <br/>
-        ///                                                                                                      <br/>
         ///     InvokeTarget = () =>                                                                             <br/>
         ///     {                                                                                                <br/>
         ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
@@ -317,7 +312,8 @@ namespace Solti.Utils.Proxy.Internals
         ///         return result;                                                                               <br/>
         ///     };                                                                                               <br/>         
         ///                                                                                                      <br/>
-        ///     System.Object result = Invoke(currentMethod, args, currentMethod);                               <br/>
+        ///     MethodInfo method = ResolveMethod(InvokeTarget);                                                 <br/>
+        ///     System.Object result = Invoke(method, args, method);                                             <br/>
         ///                                                                                                      <br/>
         ///     para2 = (T2) args[1];                                                                            <br/>
         ///     para3 = (T3) args[2];                                                                            <br/>
@@ -331,8 +327,6 @@ namespace Solti.Utils.Proxy.Internals
 
             public LocalDeclarationStatementSyntax ArgsArray { get; }
 
-            public LocalDeclarationStatementSyntax CurrentMethod { get; }
-
             public MethodInterceptorFactory(MethodInfo method) 
             {
                 //
@@ -344,10 +338,9 @@ namespace Solti.Utils.Proxy.Internals
 
                 Method = method;
                 ArgsArray = CreateArgumentsArray();
-                CurrentMethod = DeclareLocal<MethodInfo>(GetLocalName("currentMethod"));
             }
 
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method);
+            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method.GetParameters());
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
@@ -363,81 +356,6 @@ namespace Solti.Utils.Proxy.Internals
                     ? DefaultExpression(CreateType(param.ParameterType)) 
                     : (ExpressionSyntax) IdentifierName(param.Name))
                 .ToArray()));
-
-            /// <summary>
-            /// T2 dummy_para2 = default(T2);                                                                    <br/>
-            /// T3 dummy_para3;                                                                                  <br/>
-            /// currentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
-            /// </summary>
-            internal IEnumerable<StatementSyntax> AcquireMethodInfo()
-            {
-                IReadOnlyList<ParameterInfo> paramz = Method.GetParameters();
-
-                var statements = new List<StatementSyntax>();
-
-                //
-                // T2 dummy_para2 = default(T2);
-                // T3 dummy_para3;
-                //
-
-                statements.AddRange
-                (
-                    paramz.Where(param => param.ParameterType.IsByRef).Select(param => DeclareLocal
-                    (
-                        type: param.ParameterType,
-                        name: GetDummyName(param),
-                        initializer: param.IsOut ? null : DefaultExpression
-                        (
-                            type: CreateType(param.ParameterType)
-                        )
-                    ))
-                );
-
-                //
-                // urrentMethod = ResolveMethod(() => Target.Foo(para1, ref dummy_para2, out dummy_para3, para4));
-                //
-
-                statements.Add
-                (
-                    ExpressionStatement
-                    (
-                        AssignmentExpression
-                        (
-                            SyntaxKind.SimpleAssignmentExpression, 
-                            ToIdentifierName(CurrentMethod),
-                            InvokeMethod
-                            (
-                                RESOLVE_METHOD,
-                                target: null,
-                                castTargetTo: null,
-                                Argument
-                                (
-                                    expression: ParenthesizedLambdaExpression
-                                    (
-                                        parameterList: ParameterList(), // Roslyn 3.4.0 felrobban ha nincs parameter lista (3.3.X-nel meg opcionalis volt)
-                                        body: InvokeMethod
-                                        (
-                                            Method, 
-                                            TARGET,
-                                            castTargetTo: null,
-
-                                            //
-                                            // GetDummyName() azert kell mert ByRef parameterek nem szerepelhetnek kifejezesekben.
-                                            //
-
-                                            arguments: paramz.Select(param => param.ParameterType.IsByRef ? GetDummyName(param) : param.Name).ToArray()
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
-
-                return statements;
-
-                string GetDummyName(ParameterInfo param) => GetLocalName($"dummy_{param.Name}");
-            }
 
             /// <summary>
             /// InvokeTarget = () => { ... };
@@ -488,15 +406,25 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            public IEnumerable<MemberDeclarationSyntax> Build() 
+            public MemberDeclarationSyntax Build() 
             {
-                LocalDeclarationStatementSyntax result = CallInvoke(GetLocalName("result"), CurrentMethod, ArgsArray, CurrentMethod);
+                LocalDeclarationStatementSyntax
+                    method = DeclareLocal<MethodInfo>(GetLocalName(nameof(method)), InvokeMethod
+                    (
+                        RESOLVE_METHOD,
+                        target: null,
+                        castTargetTo: null,
+                        Argument
+                        (
+                            expression: PropertyAccess(INVOKE_TARGET, null)
+                        )
+                    )),
+                    result = CallInvoke(GetLocalName(nameof(result)), method, ArgsArray, method);
 
                 IEnumerable<StatementSyntax> statements = new List<StatementSyntax>()
                     .Append(ArgsArray)
-                    .Append(CurrentMethod)
-                    .Concat(AcquireMethodInfo())
                     .Append(AssignCallback())
+                    .Append(method)
                     .Append(result)
                     .Concat(AssignByRefParameters());
 
@@ -505,7 +433,7 @@ namespace Solti.Utils.Proxy.Internals
                     ReturnResult(Method.ReturnType, result)
                 );
 
-                yield return DeclareMethod(Method).WithBody
+                return DeclareMethod(Method).WithBody
                 (
                     body: Block
                     (
@@ -587,9 +515,9 @@ namespace Solti.Utils.Proxy.Internals
             /// PropertyInfo prop = ResolveProperty(InvokeTarget);                 <br/>
             /// return (TResult) this.Invoke(prop.GetMethod, new object[0], prop);
             /// </summary>
-            internal IEnumerable<StatementSyntax> CallInvokeAndReturn(params ParameterSyntax[] paramz) 
+            internal IEnumerable<StatementSyntax> CallInvokeAndReturn() 
             {
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), "prop", InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetIndexParameters()), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -617,9 +545,9 @@ namespace Solti.Utils.Proxy.Internals
                                 ToIdentifierName(prop),  
                                 nameof(PropertyInfo.GetMethod)
                             ), 
-                            CreateArray<object>(paramz // new object[0] | new object[] {index1, index2, ...}
-                                .Select(param => IdentifierName(param.Identifier))
-                                .Cast<ExpressionSyntax>()
+                            CreateArray<object>(Property // new object[0] | new object[] {index1, index2, ...}
+                                .GetIndexParameters()                           
+                                .Select(param => IdentifierName(param.Name))
                                 .ToArray()),
                             ToIdentifierName(prop) // prop
                         }.Select(Argument).ToArray()
@@ -631,9 +559,9 @@ namespace Solti.Utils.Proxy.Internals
             /// PropertyInfo prop = ResolvePropertySet(InvokeTarget);     <br/>
             /// this.Invoke(prop.SetMethod, new object[]{ value }, prop);
             /// </summary>
-            internal IEnumerable<StatementSyntax> CallInvoke(params ParameterSyntax[] paramz)
+            internal IEnumerable<StatementSyntax> CallInvoke()
             {
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), nameof(prop), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetIndexParameters()), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -660,10 +588,10 @@ namespace Solti.Utils.Proxy.Internals
                                 ToIdentifierName(prop),
                                 nameof(PropertyInfo.SetMethod)
                             ),
-                            CreateArray<object>(paramz //  new object[] {value} | new object[] {index1, index2, ..., value}
-                                .Select(param => IdentifierName(param.Identifier))
+                            CreateArray<object>(Property //  new object[] {value} | new object[] {index1, index2, ..., value}
+                                .GetIndexParameters()
+                                .Select(param => IdentifierName(param.Name))
                                 .Append(IdentifierName(Value))
-                                .Cast<ExpressionSyntax>()
                                 .ToArray()),
                             ToIdentifierName(prop) // prop
                         }.Select(Argument).ToArray()
@@ -708,10 +636,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            public IEnumerable<MemberDeclarationSyntax> Build() 
-            {
-                yield return DeclareProperty();
-            }
+            public MemberDeclarationSyntax Build() => DeclareProperty();
         }
 
         /// <summary>
@@ -745,19 +670,19 @@ namespace Solti.Utils.Proxy.Internals
             protected override MemberDeclarationSyntax DeclareProperty() => DeclareIndexer
             (
                 property: Property,
-                getBody: paramz => Block
+                getBody: Block
                 (
                     new StatementSyntax[]
                     {
                         AssignCallback(BuildPropertyGetter())
-                    }.Concat(CallInvokeAndReturn(paramz.ToArray()))
+                    }.Concat(CallInvokeAndReturn())
                 ),
-                setBody: paramz => Block
+                setBody: Block
                 (
                     new StatementSyntax[]
                     {
                         AssignCallback(BuildPropertySetter())
-                    }.Concat(CallInvoke(paramz.ToArray()))
+                    }.Concat(CallInvoke())
                 )
             );
         }
@@ -866,27 +791,24 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            public IEnumerable<MemberDeclarationSyntax> Build()
-            {
-                yield return DeclareEvent
+            public MemberDeclarationSyntax Build() => DeclareEvent
+            (
+                @event: Event,
+                addBody: Block
                 (
-                    @event: Event,
-                    addBody: Block
-                    (
-                        new StatementSyntax[]
-                        {
-                            AssignCallback(BuildRegister(add: true))
-                        }.Concat(CallInvoke(add: true))
-                    ),
-                    removeBody: Block
-                    (
-                        new StatementSyntax[]
-                        {
-                            AssignCallback(BuildRegister(add: false))
-                        }.Concat(CallInvoke(add: false))
-                    )
-                );
-            }
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildRegister(add: true))
+                    }.Concat(CallInvoke(add: true))
+                ),
+                removeBody: Block
+                (
+                    new StatementSyntax[]
+                    {
+                        AssignCallback(BuildRegister(add: false))
+                    }.Concat(CallInvoke(add: false))
+                )
+            );
         }
         #endregion
 
@@ -950,7 +872,7 @@ namespace Solti.Utils.Proxy.Internals
                     //
 
                     .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && filter(m))
-                    .SelectMany
+                    .Select
                     (
                         member => interceptorFactory(member).Build()
                     )

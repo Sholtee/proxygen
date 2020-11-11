@@ -355,7 +355,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                          <br/>
         /// }                                   <br/>
         /// </summary>
-        protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode>? getBody = null, Func<IReadOnlyList<ParameterSyntax>, CSharpSyntaxNode>? setBody = null, bool forceInlining = false)
+        protected internal static IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
             Debug.Assert(property.IsIndexer());
@@ -391,10 +391,10 @@ namespace Solti.Utils.Proxy.Internals
             List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
 
             if (property.CanRead && getBody != null)
-                accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody(result.ParameterList.Parameters), forceInlining));
+                accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
 
             if (property.CanWrite && setBody != null)
-                accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody(result.ParameterList.Parameters), forceInlining));
+                accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
             return !accessors.Any() ? result : result.WithAccessorList
             (

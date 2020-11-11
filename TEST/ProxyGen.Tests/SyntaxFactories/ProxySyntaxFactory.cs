@@ -101,21 +101,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void CallbackLambdaExpressionFactory_ShouldCreateTheProperLambda() =>
             Assert.That(new CallbackLambdaExpressionFactory(Foo, DeclareLocal<object[]>("args")).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
 
-        public static (MethodInfo Method, int StatementCount, string Expected)[] InspectedMethods = new[]
-        {
-            (Foo, 3, "currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));"),
-            (Bar, 1, "currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(() => this.Target.Bar());")
-        };
-
-        [TestCaseSource(nameof(InspectedMethods))]
-        public void AcquireMethodInfo_ShouldGetAMethodInfoInstance((MethodInfo Method, int StatementCount, string Expected) para)
-        {
-            IReadOnlyList<StatementSyntax> statements = new MethodInterceptorFactory(para.Method).AcquireMethodInfo().ToArray();
-
-            Assert.That(statements.Count, Is.EqualTo(para.StatementCount));
-            Assert.That(statements.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
-        }
-
         [Test]
         public void CallInvoke_ShouldCallTheInvokeMetehodOnThis() =>
             Assert.That
@@ -148,15 +133,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(Methods))]
         public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
-            Assert.That(new MethodInterceptorFactory(para.Method).Build().Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
+            Assert.That(new MethodInterceptorFactory(para.Method).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test() =>
-            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).Build().Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
+            Assert.That(new PropertyInterceptorFactory(Prop, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
 
         [Test]
         public void GenerateProxyIndexer_Test() =>
-            Assert.That(new Internals.ProxySyntaxFactory<IList<int>, InterfaceInterceptor<IList<int>>>.IndexedPropertyInterceptorFactory(Indexer, new Internals.ProxySyntaxFactory<IList<int>, InterfaceInterceptor<IList<int>>>()).Build().Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
+            Assert.That(new Internals.ProxySyntaxFactory<IList<int>, InterfaceInterceptor<IList<int>>>.IndexedPropertyInterceptorFactory(Indexer, new Internals.ProxySyntaxFactory<IList<int>, InterfaceInterceptor<IList<int>>>()).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
 
         [Test]
         public void GenerateProxyClass_Test() =>
@@ -164,7 +149,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateProxyEvent_Test() =>
-            Assert.That(new EventInterceptorFactory(Event, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).Build().Last().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
+            Assert.That(new EventInterceptorFactory(Event, new Internals.ProxySyntaxFactory<IFoo<int>, FooInterceptor>()).Build().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
 
         [Test]
         public void BuildPropertyGetter_ShouldCreateTheProperLambda() =>
