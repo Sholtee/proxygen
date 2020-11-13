@@ -33,12 +33,20 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string GeneratedClassName { get; } = "GeneratedProxy";
 
-        protected bool AddReference(Assembly asm) 
+        protected void AddReference(Type type) 
         {
+            if (type.IsGenericTypeDefinition)
+                return;
+
+            Assembly asm = type.Assembly;
+            
             if (string.IsNullOrEmpty(asm.Location))
                 throw new NotSupportedException(Resources.DYNAMIC_ASM);
 
-            return FReferences.Add(asm);
+            foreach (Type genericArg in type.GetGenericArguments() /*ures tomb ha "type" nem generikus*/)
+                AddReference(genericArg);
+
+            FReferences.Add(asm);
         }
 
         protected internal virtual ConstructorDeclarationSyntax DeclareCtor(ConstructorInfo ctor) => ConstructorDeclaration
@@ -206,7 +214,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type == typeof(void)) return PredefinedType(Token(SyntaxKind.VoidKeyword));
 
-            AddReference(type.Assembly);
+            AddReference(type);
 
             //
             // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
