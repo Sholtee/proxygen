@@ -45,6 +45,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class EventInterceptorFactory : IInterceptorFactory
         {
+            private static readonly MethodInfo
+                RESOLVE_EVENT = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
+
             public EventInfo Event { get; }
 
             public EventInterceptorFactory(EventInfo @event) => Event = @event;

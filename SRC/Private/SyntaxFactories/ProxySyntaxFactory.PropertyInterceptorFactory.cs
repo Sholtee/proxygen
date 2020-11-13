@@ -45,6 +45,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal class PropertyInterceptorFactory : IInterceptorFactory
         {
+            private static readonly MethodInfo
+                RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
+
             public PropertyInfo Property { get; }
 
             public PropertyInterceptorFactory(PropertyInfo property) => Property = property;

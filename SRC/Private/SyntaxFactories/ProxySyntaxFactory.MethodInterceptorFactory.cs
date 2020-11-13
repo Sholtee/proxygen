@@ -48,6 +48,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class MethodInterceptorFactory : IInterceptorFactory
         {
+            private static readonly MethodInfo
+                RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!));
+
             public MethodInfo Method { get; }
 
             public LocalDeclarationStatementSyntax ArgsArray { get; }
