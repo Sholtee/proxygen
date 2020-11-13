@@ -17,9 +17,7 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
             args[1] = (System.Object)cb_b;
             args[2] = (System.Object)cb_c;
             return result;
-        }
-
-        ;
+        };
         System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
         System.Object result = this.Invoke(method, args, method);
         b = (System.String)args[1];
@@ -36,33 +34,39 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
             result = null;
             this.Target.Bar();
             return result;
-        }
-
-        ;
+        };
         System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
-        System.Object result = this.Invoke(method, args, method);
+        this.Invoke(method, args, method);
     }
 
     System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop
     {
         get
         {
-            this.InvokeTarget = () => this.Target.Prop;
+            System.Object[] args = new System.Object[0];
+            this.InvokeTarget = () =>
+            {
+                System.Object result;
+                result = this.Target.Prop;
+                return result;
+            };
             System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
-            return (System.Int32)this.Invoke(prop.GetMethod, new System.Object[0], prop);
+            return (System.Int32)this.Invoke(prop.GetMethod, args, prop);
         }
 
         set
         {
+            System.Object[] args = new System.Object[]{value};
             this.InvokeTarget = () =>
             {
-                this.Target.Prop = value;
-                return null;
-            }
-
-            ;
+                System.Int32 cb_value = (System.Int32)args[0];
+                System.Object result;
+                this.Target.Prop = cb_value;
+                result = null;
+                return result;
+            };
             System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
-            this.Invoke(prop.SetMethod, new System.Object[]{value}, prop);
+            this.Invoke(prop.SetMethod, args, prop);
         }
     }
 
@@ -70,28 +74,32 @@ internal sealed class GeneratedProxy : Solti.Utils.Proxy.SyntaxFactories.Tests.P
     {
         add
         {
+            System.Object[] args = new System.Object[]{value};
             this.InvokeTarget = () =>
             {
-                this.Target.Event += value;
-                return null;
-            }
-
-            ;
+                Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> cb_value = (Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32>)args[0];
+                System.Object result;
+                this.Target.Event += cb_value;
+                result = null;
+                return result;
+            };
             System.Reflection.EventInfo evt = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveEvent(this.InvokeTarget);
-            this.Invoke(evt.AddMethod, new System.Object[]{value}, evt);
+            this.Invoke(evt.AddMethod, args, evt);
         }
 
         remove
         {
+            System.Object[] args = new System.Object[]{value};
             this.InvokeTarget = () =>
             {
-                this.Target.Event -= value;
-                return null;
-            }
-
-            ;
+                Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> cb_value = (Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32>)args[0];
+                System.Object result;
+                this.Target.Event -= cb_value;
+                result = null;
+                return result;
+            };
             System.Reflection.EventInfo evt = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveEvent(this.InvokeTarget);
-            this.Invoke(evt.RemoveMethod, new System.Object[]{value}, evt);
+            this.Invoke(evt.RemoveMethod, args, evt);
         }
     }
 }

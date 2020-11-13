@@ -7,9 +7,7 @@ void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<Sy
         result = null;
         this.Target.Bar();
         return result;
-    }
-
-    ;
+    };
     System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
-    System.Object result = this.Invoke(method, args, method);
+    this.Invoke(method, args, method);
 }

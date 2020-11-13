@@ -186,11 +186,11 @@ namespace Solti.Utils.Proxy.Internals
                 ifaceEvent, 
                 addBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: true, castTargetTo)
+                    expression: RegisterEvent(targetEvent, TARGET, add: true, IdentifierName(Value), castTargetTo)
                 ),
                 removeBody: ArrowExpressionClause
                 (
-                    expression: RegisterEvent(targetEvent, TARGET, add: false, castTargetTo)
+                    expression: RegisterEvent(targetEvent, TARGET, add: false, IdentifierName(Value), castTargetTo)
                 ),
                 forceInlining: true
             );

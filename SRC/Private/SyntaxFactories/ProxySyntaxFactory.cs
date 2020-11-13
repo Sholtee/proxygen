@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal class ProxySyntaxFactory<TInterface, TInterceptor>: ProxySyntaxFactoryBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory<TInterface, TInterceptor>: ProxySyntaxFactoryBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         #region Private
         private static readonly MemberAccessExpressionSyntax
@@ -44,52 +44,27 @@ namespace Solti.Utils.Proxy.Internals
             }
             return name;
         }
-
-        /// <summary>
-        /// GeneratedClass.StaticMember
-        /// </summary>
-        private MemberAccessExpressionSyntax StaticMemberName(SimpleNameSyntax name) =>
-            //
-            // A generalt osztaly nincs nevter alatt
-            //
-
-            MemberAccessExpression
-            (
-                SyntaxKind.SimpleMemberAccessExpression,
-                IdentifierName(GeneratedClassName),
-                name
-            );
-
-        /// <summary>
-        /// GeneratedClass.StaticMember.Member
-        /// </summary>
-        private MemberAccessExpressionSyntax StaticMemberAccess(SimpleNameSyntax name, string member) =>
-            MemberAccessExpression
-            (
-                SyntaxKind.SimpleMemberAccessExpression,
-                StaticMemberName(name),
-                IdentifierName(member)
-            );
         #endregion
 
         #region Internal
         /// <summary>
-        /// object result = Invoke(...);
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
+        /// {                                                                                       <br/>
+        ///   ...                                                                                   <br/>
+        ///   object[] args = new object[]{para1, para2, default(T3), para4};                       <br/>
+        ///   ...                                                                                   <br/>
+        /// }
         /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params ExpressionSyntax[] arguments) =>
-            DeclareLocal<object>(variableName, InvokeMethod
-            (
-                INVOKE,
-                target: null,
-                castTargetTo: null,
-                arguments: arguments.Select(Argument).ToArray()
-            ));
+        internal static LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method)
+        {
+            ParameterInfo[] paramz = method.GetParameters();
 
-        /// <summary>
-        /// object result = Invoke(var1, var2, ..., varN);
-        /// </summary>
-        internal static LocalDeclarationStatementSyntax CallInvoke(string variableName, params LocalDeclarationStatementSyntax[] arguments) =>
-            CallInvoke(variableName, arguments.Select(arg => (ExpressionSyntax)ToIdentifierName(arg)).ToArray());
+            return DeclareLocal<object[]>(EnsureUnused("args", paramz), CreateArray<object>(paramz
+                .Select(param => param.IsOut
+                    ? DefaultExpression(CreateType(param.ParameterType))
+                    : (ExpressionSyntax) IdentifierName(param.Name))
+                .ToArray()));
+        }
 
         /// <summary>
         /// return;          <br/>
@@ -121,694 +96,96 @@ namespace Solti.Utils.Proxy.Internals
         internal static ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
             ReturnResult(returnType, ToIdentifierName(result));
 
+
+        /// <summary>
+        /// InvokeTarget = ...;
+        /// </summary>
+        internal static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
+        (
+            expression: AssignmentExpression
+            (
+                kind: SyntaxKind.SimpleAssignmentExpression,
+                left: PropertyAccess(INVOKE_TARGET, null, null),
+                right: lambda
+            )
+        );
+
+        /// <summary>
+        /// System.String cb_a;    <br/>
+        /// TT cb_b = (TT)args[1];
+        /// </summary>
+        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
+            .Select((param, i) => new { Parameter = param, Index = i })
+
+            //
+            // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
+            // erteket.
+            //
+
+            .Select
+            (
+                p => DeclareLocal
+                (
+                    p.Parameter.ParameterType,
+                    EnsureUnused($"cb_{p.Parameter.Name}", paramz),
+                    p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
+                    (
+                        type: CreateType(p.Parameter.ParameterType),
+                        expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
+                        (
+                            argumentList: BracketedArgumentList
+                            (
+                                SingletonSeparatedList
+                                (
+                                    Argument
+                                    (
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+
+        /// <summary>
+        /// () =>                                          <br/>
+        /// {                                              <br/>
+        ///     System.Int32 cb_a = (System.Int32)args[0]; <br/>
+        ///     System.String cb_b;                        <br/>
+        ///     TT cb_c = (TT)args[2];                     <br/>
+        ///     System.Object result;                      <br/>
+        ///     result = ...;                              <br/>
+        ///     return result;                             <br/>
+        /// };   
+        /// </summary>
+        internal static LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax, IEnumerable<StatementSyntax>> invocationFactory)
+        {
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz).ToArray();
+
+            LocalDeclarationStatementSyntax result = DeclareLocal(typeof(object), EnsureUnused(nameof(result), paramz));
+
+            var statements = new List<StatementSyntax>();
+            statements.AddRange(locals);
+            statements.Add(result);
+            statements.AddRange
+            (
+                invocationFactory(locals, result)
+            );
+            statements.Add
+            (
+                ReturnResult(null, result)
+            );
+
+            return ParenthesizedLambdaExpression
+            (
+                Block(statements)
+            );
+        }
+
         internal interface IInterceptorFactory
         {
             MemberDeclarationSyntax Build();
-        }
-
-        /// <summary>
-        /// () =>                                                        <br/>
-        /// {                                                            <br/>
-        ///     System.Int32 cb_a = (System.Int32)args[0];               <br/>
-        ///     System.String cb_b;                                      <br/>
-        ///     TT cb_c = (TT)args[2];                                   <br/>
-        ///     System.Object result;                                    <br/>
-        ///     result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);  <br/>
-        ///                                                              <br/>
-        ///     args[1] = (System.Object)cb_b;                           <br/>
-        ///     args[2] = (System.Object)cb_c;                           <br/>
-        ///     return result;                                           <br/>
-        /// };   
-        /// </summary>
-        internal sealed class CallbackLambdaExpressionFactory
-        {
-            public MethodInfo Method { get; }
-
-            public LocalDeclarationStatementSyntax ArgsArray { get; }
-
-            public LocalDeclarationStatementSyntax Result { get; }
-
-            public IReadOnlyList<LocalDeclarationStatementSyntax> LocalArgs { get; }
-
-            public CallbackLambdaExpressionFactory(MethodInfo method, LocalDeclarationStatementSyntax argsArray)
-            {
-                Method    = method;
-                ArgsArray = argsArray;
-                Result    = DeclareLocal(typeof(object), GetLocalName("result"));
-                LocalArgs = DeclareCallbackLocals().ToArray();
-            }
-
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method.GetParameters());
-
-            /// <summary>
-            /// System.String cb_a;    <br/>
-            /// TT cb_b = (TT)args[1];
-            /// </summary>
-            internal IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals()
-            {
-                IdentifierNameSyntax array = ToIdentifierName(ArgsArray);
-
-                return Method
-                    .GetParameters()
-                    .Select((param, i) => new { Parameter = param, Index = i })
-
-                    //
-                    // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
-                    // erteket.
-                    //
-
-                    .Select
-                    (
-                        p => DeclareLocal
-                        (
-                            p.Parameter.ParameterType, 
-                            GetLocalName($"cb_{p.Parameter.Name}"),
-                            p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
-                            (
-                                type: CreateType(p.Parameter.ParameterType),
-                                expression: ElementAccessExpression(array).WithArgumentList
-                                (
-                                    argumentList: BracketedArgumentList
-                                    (
-                                        SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
-                                    )
-                                )
-                            )
-                        )
-                    );
-            }
-
-            /// <summary>
-            /// System.Object result = this.Target(...);
-            /// 
-            /// OR
-            /// 
-            /// System.Object result = null;
-            /// this.Target(...);
-            /// </summary>
-            internal IEnumerable<StatementSyntax> CallTarget()
-            {
-                InvocationExpressionSyntax invocation = InvokeMethod(
-                    Method,
-                    TARGET,
-                    castTargetTo: null,
-                    arguments: LocalArgs.Select
-                    (
-                        arg => Argument(ToIdentifierName(arg))
-                    ).ToArray());
-
-                yield return ExpressionStatement
-                (
-                    AssignmentExpression
-                    (
-                        SyntaxKind.SimpleAssignmentExpression,
-                        ToIdentifierName(Result),
-                        Method.ReturnType != typeof(void)
-                            ? (ExpressionSyntax) invocation
-                            : LiteralExpression(SyntaxKind.NullLiteralExpression)
-                    )
-                );
-        
-                if (Method.ReturnType == typeof(void))
-                    yield return ExpressionStatement(invocation);
-            }
-
-            /// <summary>
-            /// args[0] = (System.Object)cb_a // ref
-            /// args[2] = (TT)cb_c // out
-            /// </summary>
-            internal IEnumerable<StatementSyntax> ReassignArgsArray()
-            {
-                IReadOnlyList<ParameterInfo> paramz = Method.GetParameters();
-
-                Debug.Assert(LocalArgs.Count == paramz.Count);
-
-                return Method
-                    .GetParameters()
-                    .Select((param, i) => new { Parameter = param, Index = i })
-                    .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
-                    .Select
-                    (
-                        p => ExpressionStatement
-                        (
-                            expression: AssignmentExpression
-                            (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: ElementAccessExpression(ToIdentifierName(ArgsArray)).WithArgumentList
-                                (
-                                    argumentList: BracketedArgumentList
-                                    (
-                                        SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
-                                    )
-                                ),
-                                right: CastExpression
-                                (
-                                    type: CreateType(typeof(object)),
-                                    ToIdentifierName(LocalArgs[p.Index])
-                                )
-                            )
-                        )
-                    );
-
-            }
-
-            public LambdaExpressionSyntax Build() => ParenthesizedLambdaExpression
-            (
-                Block
-                (
-                    LocalArgs.Cast<StatementSyntax>()
-                        .Append(Result)
-                        .Concat
-                        (
-                            CallTarget()
-                        )
-                        .Concat
-                        (
-                            ReassignArgsArray()
-                        )
-                        .Append
-                        (
-                            ReturnResult(null, Result)
-                        )
-                )
-            );
-        }
-
-        /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)               <br/>
-        /// {                                                                                                    <br/>
-        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
-        ///                                                                                                      <br/>
-        ///     InvokeTarget = () =>                                                                             <br/>
-        ///     {                                                                                                <br/>
-        ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
-        ///         System.String cb_b;                                                                          <br/>
-        ///         TT cb_c = (TT)args[2];                                                                       <br/>
-        ///         System.Object result;                                                                        <br/>
-        ///         result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);                                      <br/>
-        ///                                                                                                      <br/>
-        ///         args[1] = (System.Object)cb_b;                                                               <br/>
-        ///         args[2] = (System.Object)cb_c;                                                               <br/>
-        ///         return result;                                                                               <br/>
-        ///     };                                                                                               <br/>         
-        ///                                                                                                      <br/>
-        ///     MethodInfo method = ResolveMethod(InvokeTarget);                                                 <br/>
-        ///     System.Object result = Invoke(method, args, method);                                             <br/>
-        ///                                                                                                      <br/>
-        ///     para2 = (T2) args[1];                                                                            <br/>
-        ///     para3 = (T3) args[2];                                                                            <br/>
-        ///                                                                                                      <br/>
-        ///     return (TResult) result;                                                                         <br/>
-        /// }
-        /// </summary>
-        internal sealed class MethodInterceptorFactory : IInterceptorFactory
-        {
-            public MethodInfo Method { get; }
-
-            public LocalDeclarationStatementSyntax ArgsArray { get; }
-
-            public MethodInterceptorFactory(MethodInfo method) 
-            {
-                //
-                // "ref" visszateres nem tamogatott.
-                //
-
-                if (method.ReturnType.IsByRef)
-                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
-
-                Method = method;
-                ArgsArray = CreateArgumentsArray();
-            }
-
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method.GetParameters());
-
-            /// <summary>
-            /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
-            /// {                                                                                       <br/>
-            ///   ...                                                                                   <br/>
-            ///   object[] args = new object[]{para1, para2, default(T3), para4};                       <br/>
-            ///   ...                                                                                   <br/>
-            /// }
-            /// </summary>
-            internal LocalDeclarationStatementSyntax CreateArgumentsArray() => DeclareLocal<object[]>(GetLocalName("args"), CreateArray<object>(Method
-                .GetParameters()
-                .Select(param => param.IsOut 
-                    ? DefaultExpression(CreateType(param.ParameterType)) 
-                    : (ExpressionSyntax) IdentifierName(param.Name))
-                .ToArray()));
-
-            /// <summary>
-            /// InvokeTarget = () => { ... };
-            /// </summary>
-            internal StatementSyntax AssignCallback() => ExpressionStatement
-            (
-                expression: AssignmentExpression
-                (
-                    kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccess(INVOKE_TARGET, null),
-                    right: new CallbackLambdaExpressionFactory(Method, ArgsArray).Build()
-                )
-            );
-
-            /// <summary>
-            /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
-            /// {                                                                                        <br/>
-            ///   ...                                                                                    <br/>
-            ///   para2 = (T2) args[1];                                                                  <br/>
-            ///   para3 = (T3) args[2];                                                                  <br/>
-            ///   ...                                                                                    <br/>
-            /// }
-            /// </summary>
-            internal IEnumerable<ExpressionStatementSyntax> AssignByRefParameters() => Method
-                .GetParameters()
-                .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
-                .Select
-                (
-                    p => ExpressionStatement
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: IdentifierName(p.Parameter.Name),
-                            right: CastExpression
-                            (
-                                type: CreateType(p.Parameter.ParameterType),
-                                expression: ElementAccessExpression(ToIdentifierName(ArgsArray)).WithArgumentList
-                                (
-                                    argumentList: BracketedArgumentList
-                                    (
-                                        SingletonSeparatedList(Argument(LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))))
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
-
-            public MemberDeclarationSyntax Build() 
-            {
-                LocalDeclarationStatementSyntax
-                    method = DeclareLocal<MethodInfo>(GetLocalName(nameof(method)), InvokeMethod
-                    (
-                        RESOLVE_METHOD,
-                        target: null,
-                        castTargetTo: null,
-                        Argument
-                        (
-                            expression: PropertyAccess(INVOKE_TARGET, null)
-                        )
-                    )),
-                    result = CallInvoke(GetLocalName(nameof(result)), method, ArgsArray, method);
-
-                IEnumerable<StatementSyntax> statements = new List<StatementSyntax>()
-                    .Append(ArgsArray)
-                    .Append(AssignCallback())
-                    .Append(method)
-                    .Append(result)
-                    .Concat(AssignByRefParameters());
-
-                if (Method.ReturnType != typeof(void)) statements = statements.Append
-                (
-                    ReturnResult(Method.ReturnType, result)
-                );
-
-                return DeclareMethod(Method).WithBody
-                (
-                    body: Block
-                    (
-                        statements: List(statements)
-                    )
-                );
-            }
-        }
-
-        /// <summary>
-        /// TResult IInterface.Prop                                                          <br/>
-        /// {                                                                                <br/>
-        ///     get                                                                          <br/>
-        ///     {                                                                            <br/>
-        ///         InvokeTarget = () => Target.Prop;                                        <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
-        ///         return (TResult) Invoke(prop.GetMethod, new object[0], prop);            <br/>
-        ///     }                                                                            <br/>
-        ///     set                                                                          <br/>
-        ///     {                                                                            <br/>
-        ///         InvokeTarget = () =>                                                     <br/>
-        ///         {                                                                        <br/>
-        ///           Target.Prop = value;                                                   <br/>
-        ///           return null;                                                           <br/>
-        ///         };                                                                       <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
-        ///         Invoke(prop.SetMethod, new object[]{ value }, prop);                     <br/>
-        ///     }                                                                            <br/>
-        /// }
-        /// </summary>
-        internal class PropertyInterceptorFactory : IInterceptorFactory
-        {
-            public PropertyInfo Property { get; }
-
-            public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
-
-            public PropertyInterceptorFactory(PropertyInfo property, ProxySyntaxFactory<TInterface, TInterceptor> owner) 
-            {
-                Property = property;
-                Owner = owner;
-            }
-
-            /// <summary>
-            /// () => Target.Prop;
-            /// </summary>
-            internal LambdaExpressionSyntax BuildPropertyGetter() => ParenthesizedLambdaExpression
-            (
-                PropertyAccess(Property, TARGET)
-            );
-
-            /// <summary>
-            /// () =>                     <br/>
-            /// {                         <br/>
-            ///     Target.Prop = value;  <br/>
-            ///     return null;          <br/>
-            /// };  
-            /// </summary>
-            internal LambdaExpressionSyntax BuildPropertySetter() => ParenthesizedLambdaExpression
-            (
-                Block
-                (
-                    ExpressionStatement
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: PropertyAccess(Property, TARGET),
-                            right: IdentifierName(Value)
-                        )
-                    ),
-                    ReturnStatement
-                    (
-                        LiteralExpression(SyntaxKind.NullLiteralExpression)
-                    )
-                )
-            );
-
-            /// <summary>
-            /// PropertyInfo prop = ResolveProperty(InvokeTarget);                 <br/>
-            /// return (TResult) this.Invoke(prop.GetMethod, new object[0], prop);
-            /// </summary>
-            internal IEnumerable<StatementSyntax> CallInvokeAndReturn() 
-            {
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetIndexParameters()), InvokeMethod
-                (
-                    RESOLVE_PROPERTY,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null)
-                    )
-                ));
-
-                yield return prop;
-
-                yield return ReturnResult
-                (
-                    Property.PropertyType,
-                    InvokeMethod
-                    (
-                        INVOKE,
-                        target: null,
-                        castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // prop.GetMethod
-                            (
-                                ToIdentifierName(prop),  
-                                nameof(PropertyInfo.GetMethod)
-                            ), 
-                            CreateArray<object>(Property // new object[0] | new object[] {index1, index2, ...}
-                                .GetIndexParameters()                           
-                                .Select(param => IdentifierName(param.Name))
-                                .ToArray()),
-                            ToIdentifierName(prop) // prop
-                        }.Select(Argument).ToArray()
-                    )
-                );
-            }
-
-            /// <summary>
-            /// PropertyInfo prop = ResolvePropertySet(InvokeTarget);     <br/>
-            /// this.Invoke(prop.SetMethod, new object[]{ value }, prop);
-            /// </summary>
-            internal IEnumerable<StatementSyntax> CallInvoke()
-            {
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetIndexParameters()), InvokeMethod
-                (
-                    RESOLVE_PROPERTY,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null)
-                    )
-                ));
-
-                yield return prop;
-
-                yield return ExpressionStatement
-                (
-                    InvokeMethod
-                    (
-                        INVOKE,
-                        target: null,
-                        castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // prop.SetMethod
-                            (
-                                ToIdentifierName(prop),
-                                nameof(PropertyInfo.SetMethod)
-                            ),
-                            CreateArray<object>(Property //  new object[] {value} | new object[] {index1, index2, ..., value}
-                                .GetIndexParameters()
-                                .Select(param => IdentifierName(param.Name))
-                                .Append(IdentifierName(Value))
-                                .ToArray()),
-                            ToIdentifierName(prop) // prop
-                        }.Select(Argument).ToArray()
-                    )
-                );
-            }
-
-            /// <summary>
-            /// InvokeTarget = () => { ... };
-            /// </summary>
-            protected static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
-            (
-                expression: AssignmentExpression
-                (
-                    kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccess(INVOKE_TARGET, null),
-                    right: lambda
-                )
-            );
-
-            //
-            // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-            // figyelmen kivul lesz hagyva.
-            //
-
-            protected virtual MemberDeclarationSyntax DeclareProperty() => ProxySyntaxFactoryBase.DeclareProperty
-            (
-                property: Property,
-                getBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildPropertyGetter())
-                    }.Concat(CallInvokeAndReturn())
-                ),
-                setBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildPropertySetter())
-                    }.Concat(CallInvoke())
-                )
-            );
-
-            public MemberDeclarationSyntax Build() => DeclareProperty();
-        }
-
-        /// <summary>
-        /// TResult IInterface.this[TParam1 p1, TPAram2 p2]                                         <br/>
-        /// {                                                                                       <br/>
-        ///     get                                                                                 <br/>
-        ///     {                                                                                   <br/>
-        ///         InvokeTarget = () => Target.Prop[p1, p2];                                       <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                              <br/>
-        ///         return (TResult) Invoke(prop.GetMethod, new System.Object[]{p1, p2}, prop);     <br/>
-        ///     }                                                                                   <br/>
-        ///     set                                                                                 <br/>
-        ///     {                                                                                   <br/>
-        ///         InvokeTarget = () =>                                                            <br/>
-        ///         {                                                                               <br/>
-        ///           Target.Prop[p1, p2] = value;                                                  <br/>
-        ///           return null;                                                                  <br/>
-        ///         };                                                                              <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                              <br/>
-        ///         Invoke(prop.SetMethod, new System.Object[]{ p1, p2, value }, prop);             <br/>
-        ///     }                                                                                   <br/>
-        /// }
-        /// </summary>
-        internal sealed class IndexedPropertyInterceptorFactory : PropertyInterceptorFactory
-        {
-            public IndexedPropertyInterceptorFactory(PropertyInfo property, ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(property, owner)
-            {
-                Debug.Assert(property.IsIndexer());
-            }
-
-            protected override MemberDeclarationSyntax DeclareProperty() => DeclareIndexer
-            (
-                property: Property,
-                getBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildPropertyGetter())
-                    }.Concat(CallInvokeAndReturn())
-                ),
-                setBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildPropertySetter())
-                    }.Concat(CallInvoke())
-                )
-            );
-        }
-
-        /// <summary>
-        /// event EventType IInterface.Event                                            <br/>
-        /// {                                                                           <br/>
-        ///     add                                                                     <br/>
-        ///     {                                                                       <br/>
-        ///         InvokeTarget = () => Target.Event += value;                         <br/>
-        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
-        ///         Invoke(evt.AddMethod, new object[]{ value }, evt);                  <br/>
-        ///     }                                                                       <br/>
-        ///     remove                                                                  <br/>
-        ///     {                                                                       <br/>
-        ///         InvokeTarget = () => Target.Event -= value;                         <br/>
-        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
-        ///         Invoke(evt.RemoveMethod, new object[]{ value }, evt);               <br/>
-        ///     }                                                                       <br/>
-        /// }
-        /// </summary>
-        internal sealed class EventInterceptorFactory : IInterceptorFactory
-        {
-            public EventInfo Event { get; }
-
-            public ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
-
-            public EventInterceptorFactory(EventInfo @event, ProxySyntaxFactory<TInterface, TInterceptor> owner)
-            {
-                Event = @event;
-                Owner = owner;
-            }
-
-            /// <summary>
-            /// () => 
-            /// {
-            ///   Target.Event [+|-]= value;
-            ///   return null;
-            /// }
-            /// </summary>
-            internal LambdaExpressionSyntax BuildRegister(bool add) => ParenthesizedLambdaExpression
-            (
-                Block
-                (
-                    ExpressionStatement
-                    (
-                        RegisterEvent(Event, TARGET, add)
-                    ),
-                    ReturnStatement
-                    (
-                        LiteralExpression(SyntaxKind.NullLiteralExpression)
-                    )
-                )
-            );
-
-            /// <summary>
-            /// EventInfo evt = ResolveEvent(InvokeTarget);                    <br/>
-            /// this.Invoke(evt.AddMethod, new System.Object[]{ value }, evt);
-            /// </summary>
-            internal IEnumerable<StatementSyntax> CallInvoke(bool add)
-            {
-                LocalDeclarationStatementSyntax evt = DeclareLocal(typeof(EventInfo), nameof(evt), InvokeMethod
-                (
-                    RESOLVE_EVENT,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null)
-                    )
-                ));
-
-                yield return evt;
-
-                yield return ExpressionStatement
-                (
-                    InvokeMethod
-                    (
-                        INVOKE,
-                        target: null,
-                        castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // evt.[Add|Remove]Method
-                            (
-                                ToIdentifierName(evt),
-                                add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)
-                            ),
-                            CreateArray<object>(IdentifierName(Value)),
-                            ToIdentifierName(evt) // evt
-                        }.Select(Argument).ToArray()
-                    )
-                );
-            }
-
-            /// <summary>
-            /// InvokeTarget = () => ...;
-            /// </summary>
-            private static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
-            (
-                expression: AssignmentExpression
-                (
-                    kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccess(INVOKE_TARGET, null),
-                    right: lambda
-                )
-            );
-
-            public MemberDeclarationSyntax Build() => DeclareEvent
-            (
-                @event: Event,
-                addBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildRegister(add: true))
-                    }.Concat(CallInvoke(add: true))
-                ),
-                removeBody: Block
-                (
-                    new StatementSyntax[]
-                    {
-                        AssignCallback(BuildRegister(add: false))
-                    }.Concat(CallInvoke(add: false))
-                )
-            );
         }
         #endregion
 
@@ -855,10 +232,10 @@ namespace Solti.Utils.Proxy.Internals
                 m => new MethodInterceptorFactory(m));
             DeclareMembers<PropertyInfo>(
                 p => true,
-                p => p.IsIndexer() ? new IndexedPropertyInterceptorFactory(p, this) : new PropertyInterceptorFactory(p, this));
+                p => p.IsIndexer() ? new IndexerInterceptorFactory(p) : new PropertyInterceptorFactory(p));
             DeclareMembers<EventInfo>(
                 e => true,
-                e => new EventInterceptorFactory(e, this));
+                e => new EventInterceptorFactory(e));
 
             return cls.WithMembers(List(members));
 

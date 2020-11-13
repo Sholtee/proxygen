@@ -157,15 +157,6 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// [target | this | Namespace.Type].Prop[...]
-        /// </summary>
-        protected internal static ElementAccessExpressionSyntax ElementAccess(ExpressionSyntax? target, MemberInfo prop) =>
-            ElementAccessExpression
-            (
-                MemberAccess(target, prop)
-            );
-
-        /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
         protected internal static LocalDeclarationStatementSyntax DeclareLocal(Type type, string name, ExpressionSyntax? initializer = null)
@@ -479,9 +470,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// target.Event [+|-]= value;
+        /// target.Event [+|-]= ...;
         /// </summary>
-        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax? target, bool add, Type? castTargetTo = null) => AssignmentExpression
+        protected internal static AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax? target, bool add, ExpressionSyntax right, Type? castTargetTo = null) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccess
@@ -490,7 +481,7 @@ namespace Solti.Utils.Proxy.Internals
                 @event,
                 castTargetTo
             ),
-            right: IdentifierName(Value)
+            right: right
         );
 
         /// <summary>
@@ -500,7 +491,16 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null) => !property.IsIndexer() 
+        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null) => PropertyAccess(property, target, castTargetTo, property.GetIndexParameters().Select(param => Argument(IdentifierName(param.Name))));
+
+        /// <summary>
+        /// target.Property           <br/>
+        ///                           <br/>
+        /// OR                        <br/>
+        ///                           <br/>
+        /// target.Propery[index]
+        /// </summary>
+        protected internal static ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.IsIndexer()
             ? MemberAccess
             (
                 target,
@@ -512,7 +512,7 @@ namespace Solti.Utils.Proxy.Internals
                 AmendTarget(target, property, castTargetTo),
                 BracketedArgumentList
                 (
-                    arguments: property.GetIndexParameters().ToSyntaxList(param => Argument(IdentifierName(param.Name)))
+                    arguments: indices!.ToSyntaxList()
                 )
             );
 
