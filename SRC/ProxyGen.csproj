@@ -7,7 +7,7 @@
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release;Perf</Configurations>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
