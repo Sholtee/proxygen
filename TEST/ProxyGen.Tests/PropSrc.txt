@@ -6,7 +6,7 @@ System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase
         this.InvokeTarget = () =>
         {
             System.Object result;
-            result = this.Target.Prop;
+            result = (System.Object)this.Target.Prop;
             return result;
         };
         System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
@@ -19,10 +19,8 @@ System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase
         this.InvokeTarget = () =>
         {
             System.Int32 cb_value = (System.Int32)args[0];
-            System.Object result;
             this.Target.Prop = cb_value;
-            result = null;
-            return result;
+            return null;
         };
         System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
         this.Invoke(prop.SetMethod, args, prop);

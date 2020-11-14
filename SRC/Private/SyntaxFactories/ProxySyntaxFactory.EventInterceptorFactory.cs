@@ -64,21 +64,12 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        targetMethod.GetParameters(),
+                        targetMethod,
                         (locals, result) => new StatementSyntax[]
                         {
                             ExpressionStatement
                             (
                                 RegisterEvent(Event, TARGET, add, ToIdentifierName(locals.Single()))
-                            ),
-                            ExpressionStatement
-                            (
-                                AssignmentExpression
-                                (
-                                    SyntaxKind.SimpleAssignmentExpression,
-                                    ToIdentifierName(result),
-                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
-                                )
                             )
                         }
                     )

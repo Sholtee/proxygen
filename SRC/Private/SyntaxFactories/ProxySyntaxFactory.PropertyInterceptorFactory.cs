@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        Property.GetMethod.GetParameters(),
+                        Property.GetMethod,
                         (locals, result) => new StatementSyntax[] 
                         {
                             ExpressionStatement
@@ -72,15 +72,19 @@ namespace Solti.Utils.Proxy.Internals
                                 AssignmentExpression
                                 (
                                     SyntaxKind.SimpleAssignmentExpression,
-                                    ToIdentifierName(result),
-                                    PropertyAccess(Property, TARGET, null, locals.Select(arg => Argument(ToIdentifierName(arg))))
+                                    ToIdentifierName(result!),
+                                    CastExpression
+                                    (
+                                        CreateType<object>(),
+                                        PropertyAccess(Property, TARGET, null, locals.Select(arg => Argument(ToIdentifierName(arg))))
+                                    )
                                 )
                             )
                         }
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetMethod.GetParameters()), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -127,7 +131,7 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        Property.SetMethod.GetParameters(),
+                        Property.SetMethod,
                         (locals, result) => new StatementSyntax[]
                         {
                             ExpressionStatement
@@ -144,21 +148,12 @@ namespace Solti.Utils.Proxy.Internals
                                         .Select(arg => Argument(ToIdentifierName(arg)))),
                                     right: ToIdentifierName(locals[locals.Count - 1])
                                 )
-                            ),
-                            ExpressionStatement
-                            (
-                                AssignmentExpression
-                                (
-                                    SyntaxKind.SimpleAssignmentExpression,
-                                    ToIdentifierName(result),
-                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
-                                )
                             )
                         }
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.SetMethod.GetParameters()), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.SetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,

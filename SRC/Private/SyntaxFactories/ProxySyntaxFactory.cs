@@ -39,6 +39,8 @@ namespace Solti.Utils.Proxy.Internals
             }
             return name;
         }
+
+        private static string EnsureUnused(string name, MethodBase method) => EnsureUnused(name, method.GetParameters());
         #endregion
 
         #region Internal
@@ -149,28 +151,54 @@ namespace Solti.Utils.Proxy.Internals
         ///     System.Int32 cb_a = (System.Int32)args[0]; <br/>
         ///     System.String cb_b;                        <br/>
         ///     TT cb_c = (TT)args[2];                     <br/>
+        ///                                                <br/>
         ///     System.Object result;                      <br/>
         ///     result = ...;                              <br/>
         ///     return result;                             <br/>
+        ///                                                <br/>
+        ///     OR                                         <br/>
+        ///                                                <br/>
+        ///     ...;                                       <br/>
+        ///     return null;                               <br/>
         /// };   
         /// </summary>
-        internal static LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax, IEnumerable<StatementSyntax>> invocationFactory)
+        internal static LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, MethodInfo method, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax?, IEnumerable<StatementSyntax>> invocationFactory)
         {
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz).ToArray();
-
-            LocalDeclarationStatementSyntax result = DeclareLocal(typeof(object), EnsureUnused(nameof(result), paramz));
+            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
 
             var statements = new List<StatementSyntax>();
+
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz).ToArray();
             statements.AddRange(locals);
-            statements.Add(result);
-            statements.AddRange
-            (
-                invocationFactory(locals, result)
-            );
-            statements.Add
-            (
-                ReturnResult(null, result)
-            );
+
+            if (method.ReturnType != typeof(void))
+            {
+                LocalDeclarationStatementSyntax result = DeclareLocal(typeof(object), EnsureUnused(nameof(result), paramz));
+
+                statements.Add(result);
+                statements.AddRange
+                (
+                    invocationFactory(locals, result)
+                );
+                statements.Add
+                (
+                    ReturnResult(null, result)
+                );
+            }
+            else 
+            {
+                statements.AddRange
+                (
+                    invocationFactory(locals, null)
+                );
+                statements.Add
+                (
+                    ReturnStatement
+                    (
+                        LiteralExpression(SyntaxKind.NullLiteralExpression)
+                    )
+                );
+            }
 
             return ParenthesizedLambdaExpression
             (

@@ -68,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
                 ArgsArray = CreateArgumentsArray(method);
             }
 
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method.GetParameters());
+            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method);
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
@@ -137,7 +137,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            internal LambdaExpressionSyntax DeclareCallback() => ProxySyntaxFactory<TInterface, TInterceptor>.DeclareCallback(ArgsArray, Method.GetParameters(), (locals, result) =>
+            internal LambdaExpressionSyntax DeclareCallback() => ProxySyntaxFactory<TInterface, TInterceptor>.DeclareCallback(ArgsArray, Method, (locals, result) =>
             {
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
@@ -155,20 +155,20 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ExpressionStatement
                     (
-                        AssignmentExpression
-                        (
-                            SyntaxKind.SimpleAssignmentExpression,
-                            ToIdentifierName(result),
-                            Method.ReturnType != typeof(void)
-                                ? (ExpressionSyntax) invocation
-                                : LiteralExpression(SyntaxKind.NullLiteralExpression)
-                        )
+                        Method.ReturnType != typeof(void)
+                            ? AssignmentExpression
+                            (
+                                SyntaxKind.SimpleAssignmentExpression,
+                                ToIdentifierName(result!),
+                                CastExpression
+                                (
+                                    CreateType<object>(),
+                                    invocation
+                                )
+                            )
+                            : (ExpressionSyntax) invocation
                     )
                 );
-
-                if (Method.ReturnType == typeof(void))
-                    body.Add(ExpressionStatement(invocation));
-
                 body.AddRange
                 (
                     ReassignArgsArray(locals)
@@ -177,26 +177,19 @@ namespace Solti.Utils.Proxy.Internals
                 return body;
             });
 
-            /// <summary>
-            /// [object result =] Invoke(...);
-            /// </summary>
-            internal static StatementSyntax CallInvoke(string? variableName, params ExpressionSyntax[] arguments)
-            {
-                InvocationExpressionSyntax invocation = InvokeMethod
-                (
-                    INVOKE,
-                    target: null,
-                    castTargetTo: null,
-                    arguments: arguments.Select(Argument).ToArray()
-                );
-
-                return string.IsNullOrEmpty(variableName)
-                    ? ExpressionStatement(invocation)
-                    : (StatementSyntax) DeclareLocal<object>(variableName!, invocation);
-            }
-
             public MemberDeclarationSyntax Build() 
             {
+                var statements = new List<StatementSyntax>();
+
+                statements.Add(ArgsArray);
+                statements.Add
+                (
+                    AssignCallback
+                    (
+                        DeclareCallback()
+                    )
+                );
+
                 LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(GetLocalName(nameof(method)), InvokeMethod
                 (
                     RESOLVE_METHOD,
@@ -207,35 +200,40 @@ namespace Solti.Utils.Proxy.Internals
                         expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
-
-                StatementSyntax result = CallInvoke
-                (
-                    Method.ReturnType != typeof(void) 
-                        ? GetLocalName(nameof(result)) 
-                        : null, 
-                    ToIdentifierName(method), 
-                    ToIdentifierName(ArgsArray), 
-                    ToIdentifierName(method)
-                );
-
-                var statements = new List<StatementSyntax>();
-                statements.Add(ArgsArray);
-                statements.Add
-                (
-                    AssignCallback
-                    (
-                        DeclareCallback()
-                    )
-                );
                 statements.Add(method);
-                statements.Add(result);
-                statements.AddRange(AssignByRefParameters());
 
-                if (Method.ReturnType != typeof(void)) statements.Add
+                InvocationExpressionSyntax invocation = InvokeMethod
                 (
-                    ReturnResult(Method.ReturnType, (LocalDeclarationStatementSyntax) result)
+                    INVOKE,
+                    target: null,
+                    castTargetTo: null,
+                    Argument(ToIdentifierName(method)), Argument(ToIdentifierName(ArgsArray)), Argument(ToIdentifierName(method))
                 );
 
+                if (Method.ReturnType != typeof(void))
+                {
+                    LocalDeclarationStatementSyntax result = DeclareLocal<object>
+                    (
+                        GetLocalName(nameof(result)),
+                        invocation
+                    );
+
+                    statements.Add(result);
+                    statements.AddRange(AssignByRefParameters());
+                    statements.Add
+                    (
+                        ReturnResult(Method.ReturnType, result)
+                    );
+                }
+                else 
+                {
+                    statements.Add
+                    (
+                        ExpressionStatement(invocation)
+                    );
+                    statements.AddRange(AssignByRefParameters());
+                }
+                
                 return DeclareMethod(Method).WithBody
                 (
                     body: Block(statements)
