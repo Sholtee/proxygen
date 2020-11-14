@@ -48,27 +48,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class MethodInterceptorFactory : IInterceptorFactory
         {
+            #region Internals
             private static readonly MethodInfo
                 RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!));
-
-            public MethodInfo Method { get; }
-
-            public LocalDeclarationStatementSyntax ArgsArray { get; }
-
-            public MethodInterceptorFactory(MethodInfo method) 
-            {
-                //
-                // "ref" visszateres nem tamogatott.
-                //
-
-                if (method.ReturnType.IsByRef)
-                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
-
-                Method = method;
-                ArgsArray = CreateArgumentsArray(method);
-            }
-
-            private string GetLocalName(string possibleName) => EnsureUnused(possibleName, Method);
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
@@ -79,8 +61,7 @@ namespace Solti.Utils.Proxy.Internals
             ///   ...                                                                                    <br/>
             /// }
             /// </summary>
-            internal IEnumerable<ExpressionStatementSyntax> AssignByRefParameters() => Method
-                .GetParameters()
+            internal static IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IReadOnlyList<ParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
                 .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
                 .Select
@@ -94,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
                             right: CastExpression
                             (
                                 type: CreateType(p.Parameter.ParameterType),
-                                expression: ElementAccessExpression(ToIdentifierName(ArgsArray)).WithArgumentList
+                                expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
                                 (
                                     argumentList: BracketedArgumentList
                                     (
@@ -107,11 +88,10 @@ namespace Solti.Utils.Proxy.Internals
                 );
 
             /// <summary>
-            /// args[0] = (System.Object)cb_a // ref
+            /// args[0] = (System.Object)cb_a // ref <br/>
             /// args[2] = (TT)cb_c // out
             /// </summary>
-            internal IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<LocalDeclarationStatementSyntax> locals) => Method
-                .GetParameters()
+            internal static IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<ParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
                 .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
                 .Select
@@ -121,7 +101,7 @@ namespace Solti.Utils.Proxy.Internals
                         expression: AssignmentExpression
                         (
                             kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: ElementAccessExpression(ToIdentifierName(ArgsArray)).WithArgumentList
+                            left: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
                             (
                                 argumentList: BracketedArgumentList
                                 (
@@ -137,11 +117,11 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            internal LambdaExpressionSyntax DeclareCallback() => ProxySyntaxFactory<TInterface, TInterceptor>.DeclareCallback(ArgsArray, Method, (locals, result) =>
+            internal static LambdaExpressionSyntax BuildCallback(MethodInfo method, LocalDeclarationStatementSyntax argsArray) => DeclareCallback(argsArray, method, (locals, result) =>
             {
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
-                    Method,
+                    method,
                     TARGET,
                     castTargetTo: null,
                     arguments: locals.Select
@@ -150,12 +130,12 @@ namespace Solti.Utils.Proxy.Internals
                     ).ToArray()
                 );
 
-                List<StatementSyntax> body = new List<StatementSyntax>();
+                var body = new List<StatementSyntax>();
                 body.Add
                 (
                     ExpressionStatement
                     (
-                        Method.ReturnType != typeof(void)
+                        method.ReturnType != typeof(void)
                             ? AssignmentExpression
                             (
                                 SyntaxKind.SimpleAssignmentExpression,
@@ -171,26 +151,28 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 body.AddRange
                 (
-                    ReassignArgsArray(locals)
+                    ReassignArgsArray(method.GetParameters(), argsArray, locals)
                 );
 
                 return body;
             });
 
-            public MemberDeclarationSyntax Build() 
+            internal static IEnumerable<StatementSyntax> BuildBody(MethodInfo methodInfo) 
             {
                 var statements = new List<StatementSyntax>();
 
-                statements.Add(ArgsArray);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(methodInfo);
+
+                statements.Add(argsArray);
                 statements.Add
                 (
                     AssignCallback
                     (
-                        DeclareCallback()
+                        BuildCallback(methodInfo, argsArray)
                     )
                 );
 
-                LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(GetLocalName(nameof(method)), InvokeMethod
+                LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(EnsureUnused(nameof(method), methodInfo), InvokeMethod
                 (
                     RESOLVE_METHOD,
                     target: null,
@@ -207,36 +189,56 @@ namespace Solti.Utils.Proxy.Internals
                     INVOKE,
                     target: null,
                     castTargetTo: null,
-                    Argument(ToIdentifierName(method)), Argument(ToIdentifierName(ArgsArray)), Argument(ToIdentifierName(method))
+                    Argument(ToIdentifierName(method)), Argument(ToIdentifierName(argsArray)), Argument(ToIdentifierName(method))
                 );
 
-                if (Method.ReturnType != typeof(void))
+                if (methodInfo.ReturnType != typeof(void))
                 {
                     LocalDeclarationStatementSyntax result = DeclareLocal<object>
                     (
-                        GetLocalName(nameof(result)),
+                        EnsureUnused(nameof(result), methodInfo),
                         invocation
                     );
 
                     statements.Add(result);
-                    statements.AddRange(AssignByRefParameters());
+                    statements.AddRange(AssignByRefParameters(methodInfo.GetParameters(), argsArray));
                     statements.Add
                     (
-                        ReturnResult(Method.ReturnType, result)
+                        ReturnResult(methodInfo.ReturnType, result)
                     );
                 }
-                else 
+                else
                 {
                     statements.Add
                     (
                         ExpressionStatement(invocation)
                     );
-                    statements.AddRange(AssignByRefParameters());
+                    statements.AddRange(AssignByRefParameters(methodInfo.GetParameters(), argsArray));
                 }
-                
-                return DeclareMethod(Method).WithBody
+
+                return statements;
+            }
+            #endregion
+
+            public bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName;
+
+            public MemberDeclarationSyntax Build(MemberInfo member) 
+            {
+                MethodInfo method = (MethodInfo) member;
+
+                //
+                // "ref" visszateres nem tamogatott.
+                //
+
+                if (method.ReturnType.IsByRef)
+                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
+             
+                return DeclareMethod(method).WithBody
                 (
-                    body: Block(statements)
+                    body: Block
+                    (
+                        BuildBody(method)
+                    )
                 );
             }
         }

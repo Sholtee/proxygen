@@ -111,7 +111,7 @@ namespace Solti.Utils.Proxy.Internals
         /// System.String cb_a;    <br/>
         /// TT cb_b = (TT)args[1];
         /// </summary>
-        internal static IEnumerable<LocalDeclarationStatementSyntax> DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
+        internal static LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
             .Select((param, i) => new { Parameter = param, Index = i })
 
             //
@@ -143,7 +143,8 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 )
-            );
+            )
+            .ToArray();
 
         /// <summary>
         /// () =>                                          <br/>
@@ -168,7 +169,7 @@ namespace Solti.Utils.Proxy.Internals
 
             var statements = new List<StatementSyntax>();
 
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz).ToArray();
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz);
             statements.AddRange(locals);
 
             if (method.ReturnType != typeof(void))
@@ -205,14 +206,17 @@ namespace Solti.Utils.Proxy.Internals
                 Block(statements)
             );
         }
-
-        internal interface IInterceptorFactory
-        {
-            MemberDeclarationSyntax Build();
-        }
         #endregion
 
-        public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy"; 
+        public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy";
+
+        private static IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; } = new List<IInterceptorFactory> 
+        {
+            new MethodInterceptorFactory(),
+            new PropertyInterceptorFactory(),
+            new IndexerInterceptorFactory(),
+            new EventInterceptorFactory()
+        };
 
         protected internal override ClassDeclarationSyntax GenerateProxyClass()
         {
@@ -250,32 +254,25 @@ namespace Solti.Utils.Proxy.Internals
                 interceptorType.GetPublicConstructors().Select(DeclareCtor)
             );
 
-            DeclareMembers<MethodInfo>(
-                m => !m.IsSpecialName, 
-                m => new MethodInterceptorFactory(m));
-            DeclareMembers<PropertyInfo>(
-                p => true,
-                p => p.IsIndexer() ? new IndexerInterceptorFactory(p) : new PropertyInterceptorFactory(p));
-            DeclareMembers<EventInfo>(
-                e => true,
-                e => new EventInterceptorFactory(e));
-
-            return cls.WithMembers(List(members));
-
-            void DeclareMembers<TMember>(Func<TMember, bool> filter, Func<TMember, IInterceptorFactory> interceptorFactory) where TMember : MemberInfo => members.AddRange
+            members.AddRange
             (
+#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                 interfaceType
-                    .ListMembers<TMember>()
+                    .ListMembers<MemberInfo>()
 
                     //
                     // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
                     //
 
-                    .Where(m => !implementedInterfaces.Contains(m.DeclaringType) && filter(m))
-                    .Select
-                    (
-                        member => interceptorFactory(member).Build()
-                    )
+                    .Where(m => !implementedInterfaces.Contains(m.DeclaringType))
+                    .Select(m => InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m))
+                    .Where(m => m != null)
+#pragma warning restore CS8620
+            );
+
+            return cls.WithMembers
+            (
+                List(members)
             );
         }
     }

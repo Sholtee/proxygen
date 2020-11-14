@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -48,13 +47,9 @@ namespace Solti.Utils.Proxy.Internals
             private static readonly MethodInfo
                 RESOLVE_EVENT = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
 
-            public EventInfo Event { get; }
-
-            public EventInterceptorFactory(EventInfo @event) => Event = @event;
-
-            internal IEnumerable<StatementSyntax> Build(bool add) 
+            private static IEnumerable<StatementSyntax> Build(EventInfo member, bool add) 
             {
-                MethodInfo targetMethod = add ? Event.AddMethod : Event.RemoveMethod;
+                MethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
                 yield return argsArray;
@@ -69,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                         {
                             ExpressionStatement
                             (
-                                RegisterEvent(Event, TARGET, add, ToIdentifierName(locals.Single()))
+                                RegisterEvent(member, TARGET, add, ToIdentifierName(locals.Single()))
                             )
                         }
                     )
@@ -109,18 +104,25 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public MemberDeclarationSyntax Build() => DeclareEvent
-            (
-                @event: Event,
-                addBody: Block
+            public bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface;
+
+            public MemberDeclarationSyntax Build(MemberInfo member)
+            {
+                EventInfo evt = (EventInfo) member;
+
+                return DeclareEvent
                 (
-                    Build(add: true)
-                ),
-                removeBody: Block
-                (
-                    Build(add: false)
-                )
-            );
+                    @event: evt,
+                    addBody: Block
+                    (
+                        Build(evt, add: true)
+                    ),
+                    removeBody: Block
+                    (
+                        Build(evt, add: false)
+                    )
+                );
+            }
         }
     }
 }

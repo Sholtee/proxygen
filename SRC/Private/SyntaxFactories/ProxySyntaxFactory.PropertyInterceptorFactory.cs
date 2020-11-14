@@ -48,15 +48,11 @@ namespace Solti.Utils.Proxy.Internals
             private static readonly MethodInfo
                 RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
 
-            public PropertyInfo Property { get; }
-
-            public PropertyInterceptorFactory(PropertyInfo property) => Property = property;
-
-            internal IEnumerable<StatementSyntax> BuildGet() 
+            protected static IEnumerable<StatementSyntax> BuildGet(PropertyInfo property) 
             {
-                if (!Property.CanRead) yield break;
+                if (!property.CanRead) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(Property.GetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
 
                 yield return AssignCallback
@@ -64,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        Property.GetMethod,
+                        property.GetMethod,
                         (locals, result) => new StatementSyntax[] 
                         {
                             ExpressionStatement
@@ -76,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals
                                     CastExpression
                                     (
                                         CreateType<object>(),
-                                        PropertyAccess(Property, TARGET, null, locals.Select(arg => Argument(ToIdentifierName(arg))))
+                                        PropertyAccess(property, TARGET, null, locals.Select(arg => Argument(ToIdentifierName(arg))))
                                     )
                                 )
                             )
@@ -84,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.GetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.GetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -99,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ReturnResult
                 (
-                    Property.PropertyType,
+                    property.PropertyType,
                     InvokeMethod
                     (
                         INVOKE,
@@ -119,11 +115,11 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            internal IEnumerable<StatementSyntax> BuildSet()
+            protected static IEnumerable<StatementSyntax> BuildSet(PropertyInfo property)
             {
-                if (!Property.CanWrite) yield break;
+                if (!property.CanWrite) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(Property.SetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
 
                 yield return AssignCallback
@@ -131,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        Property.SetMethod,
+                        property.SetMethod,
                         (locals, result) => new StatementSyntax[]
                         {
                             ExpressionStatement
@@ -139,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
                                 expression: AssignmentExpression
                                 (
                                     kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: PropertyAccess(Property, TARGET, null, locals
+                                    left: PropertyAccess(property, TARGET, null, locals
 #if NETSTANDARD2_0
                                         .Take(locals.Count - 1)
 #else
@@ -153,7 +149,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), Property.SetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.SetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
@@ -187,25 +183,30 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
+            public virtual bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer();
+
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
             //
 
-            protected virtual MemberDeclarationSyntax DeclareProperty() => ProxySyntaxFactoryBase.DeclareProperty
-            (
-                property: Property,
-                getBody: Block
-                (
-                    BuildGet()
-                ),
-                setBody: Block
-                (
-                    BuildSet()
-                )
-            );
+            public virtual MemberDeclarationSyntax Build(MemberInfo member)
+            {
+                PropertyInfo property = (PropertyInfo) member;
 
-            public MemberDeclarationSyntax Build() => DeclareProperty();
+                return DeclareProperty
+                (
+                    property: property,
+                    getBody: Block
+                    (
+                        BuildGet(property)
+                    ),
+                    setBody: Block
+                    (
+                        BuildSet(property)
+                    )
+                );
+            }
         }
     }
 }

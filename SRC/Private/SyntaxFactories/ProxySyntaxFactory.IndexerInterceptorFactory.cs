@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Diagnostics;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -36,20 +35,25 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class IndexerInterceptorFactory : PropertyInterceptorFactory
         {
-            public IndexerInterceptorFactory(PropertyInfo property) : base(property) => Debug.Assert(property.IsIndexer());
+            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && prop.IsIndexer();
 
-            protected override MemberDeclarationSyntax DeclareProperty() => DeclareIndexer
-            (
-                property: Property,
-                getBody: Block
+            public override MemberDeclarationSyntax Build(MemberInfo member)
+            {
+                PropertyInfo prop = (PropertyInfo) member;
+
+                return DeclareIndexer
                 (
-                    BuildGet()
-                ),
-                setBody: Block
-                (
-                    BuildSet()
-                )
-            );
+                    property: prop,
+                    getBody: Block
+                    (
+                        BuildGet(prop)
+                    ),
+                    setBody: Block
+                    (
+                        BuildSet(prop)
+                    )
+                );
+            }
         }
     }
 }
