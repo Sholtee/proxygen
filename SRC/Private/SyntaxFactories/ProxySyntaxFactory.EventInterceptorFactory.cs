@@ -104,7 +104,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface;
+            public bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface && !AlreadyImplemented(evt);
 
             public MemberDeclarationSyntax Build(MemberInfo member)
             {

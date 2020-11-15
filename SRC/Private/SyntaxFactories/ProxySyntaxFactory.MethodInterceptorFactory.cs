@@ -220,7 +220,7 @@ namespace Solti.Utils.Proxy.Internals
             }
             #endregion
 
-            public bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName;
+            public bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName && !AlreadyImplemented(method);
 
             public MemberDeclarationSyntax Build(MemberInfo member) 
             {

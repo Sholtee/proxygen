@@ -208,6 +208,12 @@ namespace Solti.Utils.Proxy.Internals
         }
         #endregion
 
+        //
+        // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
+        //
+
+        private static bool AlreadyImplemented(MemberInfo member) => typeof(TInterceptor).GetInterfaces().Contains(member.DeclaringType);
+
         public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy";
 
         private static IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; } = new List<IInterceptorFactory> 
@@ -247,8 +253,6 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            HashSet<Type> implementedInterfaces = new HashSet<Type>(interceptorType.GetInterfaces());
-
             List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
             (
                 interceptorType.GetPublicConstructors().Select(DeclareCtor)
@@ -259,12 +263,6 @@ namespace Solti.Utils.Proxy.Internals
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                 interfaceType
                     .ListMembers<MemberInfo>()
-
-                    //
-                    // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
-                    //
-
-                    .Where(m => !implementedInterfaces.Contains(m.DeclaringType))
                     .Select(m => InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m))
                     .Where(m => m != null)
 #pragma warning restore CS8620
