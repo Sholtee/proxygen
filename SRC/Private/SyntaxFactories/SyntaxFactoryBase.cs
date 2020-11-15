@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public IReadOnlyCollection<MemberDeclarationSyntax> Members => FMembers;
 
-        public IReadOnlyCollection<MetadataReference> References => FReferences
+        public IReadOnlyCollection<MetadataReference> GetReferences() => FReferences
             .Select(asm => MetadataReference.CreateFromFile(asm.Location))
             .ToArray();
 
