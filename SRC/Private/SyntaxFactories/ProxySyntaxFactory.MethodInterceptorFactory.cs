@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                         <br/>
         /// }
         /// </summary>
-        internal sealed class MethodInterceptorFactory : IInterceptorFactory
+        internal sealed class MethodInterceptorFactory : InterceptorFactoryBase
         {
             #region Internals
             private static readonly MethodInfo
@@ -220,9 +220,9 @@ namespace Solti.Utils.Proxy.Internals
             }
             #endregion
 
-            public bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName && !AlreadyImplemented(method);
+            public override bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName && !AlreadyImplemented(method);
 
-            public MemberDeclarationSyntax Build(MemberInfo member) 
+            public override MemberDeclarationSyntax Build(MemberInfo member) 
             {
                 MethodInfo method = (MethodInfo) member;
 

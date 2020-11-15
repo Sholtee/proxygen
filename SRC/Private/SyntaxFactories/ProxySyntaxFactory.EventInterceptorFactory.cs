@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                       <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : IInterceptorFactory
+        internal sealed class EventInterceptorFactory : InterceptorFactoryBase
         {
             private static readonly MethodInfo
                 RESOLVE_EVENT = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
@@ -104,9 +104,9 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface && !AlreadyImplemented(evt);
+            public override bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface && !AlreadyImplemented(evt);
 
-            public MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(MemberInfo member)
             {
                 EventInfo evt = (EventInfo) member;
 

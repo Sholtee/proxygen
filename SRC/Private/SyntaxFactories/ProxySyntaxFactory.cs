@@ -208,12 +208,6 @@ namespace Solti.Utils.Proxy.Internals
         }
         #endregion
 
-        //
-        // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
-        //
-
-        private static bool AlreadyImplemented(MemberInfo member) => typeof(TInterceptor).GetInterfaces().Contains(member.DeclaringType);
-
         public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy";
 
         private static IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; } = new List<IInterceptorFactory> 

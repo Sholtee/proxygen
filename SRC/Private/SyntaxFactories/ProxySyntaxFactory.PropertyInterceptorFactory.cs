@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                            <br/>
         /// }
         /// </summary>
-        internal class PropertyInterceptorFactory : IInterceptorFactory
+        internal class PropertyInterceptorFactory : InterceptorFactoryBase
         {
             private static readonly MethodInfo
                 RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
@@ -183,14 +183,14 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public virtual bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer() && !AlreadyImplemented(prop);
+            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer() && !AlreadyImplemented(prop);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
             //
 
-            public virtual MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(MemberInfo member)
             {
                 PropertyInfo property = (PropertyInfo) member;
 
