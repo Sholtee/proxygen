@@ -95,55 +95,6 @@ namespace Solti.Utils.Proxy.Internals
             return null!;
         }
 
-        public static bool SignatureEquals(this MemberInfo self, MemberInfo that) 
-        {
-            if (ReferenceEquals(self, that)) // igaz ha mindketto NULL  
-                return true;
-
-            if (self == null || that == null) 
-                return false;
-
-            if (self.StrippedName() != that.StrippedName()) 
-                return false;
-
-            if (self is MethodInfo methodA && that is MethodInfo methodB)
-            {
-                methodA = EnsureNotSpecialized(methodA);
-                methodB = EnsureNotSpecialized(methodB);
-
-                return
-                    methodA.GetGenericArguments().SequenceEqual(methodB.GetGenericArguments(), ArgumentComparer.Instance) &&
-                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance) &&
-                    ArgumentComparer.Instance.Equals(methodA.ReturnType, methodB.ReturnType); // visszateres lehet generikus => ArgumentComparer
-            }
-
-            if (self is PropertyInfo propA && that is PropertyInfo propB)
-                return
-                    propA.PropertyType == propB.PropertyType &&
-                    propA.CanWrite == propB.CanWrite         &&
-                    propA.CanRead == propB.CanRead           &&
-
-                    //
-                    // Indexer property-knel meg kell egyezniuk az index parameterek
-                    // sorrendjenek es tipusanak.
-                    //
-
-                    propA
-                        .GetIndexParameters()
-                        .Select(p => p.ParameterType)
-                        .SequenceEqual
-                        (
-                            propB.GetIndexParameters().Select(p => p.ParameterType)
-                        );
-
-            if (self is EventInfo evtA && that is EventInfo evtB)
-                return evtA.EventHandlerType == evtB.EventHandlerType;
-
-            return false;
-        }
-
-        private static MethodInfo EnsureNotSpecialized(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
-
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van
         //
