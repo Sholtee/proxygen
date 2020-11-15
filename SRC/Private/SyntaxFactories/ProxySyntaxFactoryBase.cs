@@ -647,6 +647,8 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
+        protected internal static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument(ToIdentifierName(variable));
+
         /// <summary>
         /// target.Foo(..., ref ..., ...)
         /// </summary>

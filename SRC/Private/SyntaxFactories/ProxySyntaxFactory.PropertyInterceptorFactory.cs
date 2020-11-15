@@ -72,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals
                                     CastExpression
                                     (
                                         CreateType<object>(),
-                                        PropertyAccess(property, TARGET, null, locals.Select(arg => Argument(ToIdentifierName(arg))))
+                                        PropertyAccess(property, TARGET, null, locals.Select(ToArgument))
                                     )
                                 )
                             )
@@ -141,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
 #else
                                         .SkipLast(1)
 #endif
-                                        .Select(arg => Argument(ToIdentifierName(arg)))),
+                                        .Select(ToArgument)),
                                     right: ToIdentifierName(locals[locals.Count - 1])
                                 )
                             )

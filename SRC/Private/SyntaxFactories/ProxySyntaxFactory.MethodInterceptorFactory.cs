@@ -124,10 +124,7 @@ namespace Solti.Utils.Proxy.Internals
                     method,
                     TARGET,
                     castTargetTo: null,
-                    arguments: locals.Select
-                    (
-                        arg => Argument(ToIdentifierName(arg))
-                    ).ToArray()
+                    arguments: locals.Select(ToArgument).ToArray()
                 );
 
                 var body = new List<StatementSyntax>();
@@ -189,7 +186,7 @@ namespace Solti.Utils.Proxy.Internals
                     INVOKE,
                     target: null,
                     castTargetTo: null,
-                    Argument(ToIdentifierName(method)), Argument(ToIdentifierName(argsArray)), Argument(ToIdentifierName(method))
+                    ToArgument(method), ToArgument(argsArray), ToArgument(method)
                 );
 
                 if (methodInfo.ReturnType != typeof(void))
