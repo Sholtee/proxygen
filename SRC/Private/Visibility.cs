@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -13,12 +14,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
-    using static ProxySyntaxFactoryBase; // TODO: torolni
 
     internal static class Visibility
     {
@@ -108,22 +106,9 @@ namespace Solti.Utils.Proxy.Internals
             // using t = Namespace.Type;
             //
 
-            CompilationUnitSyntax unitToCheck = CompilationUnit().WithUsings
-            (
-                usings: SingletonList
-                (
-                    UsingDirective
-                    (
-                        name: (NameSyntax) CreateType(type)
-                    )
-                    .WithAlias
-                    (
-                        alias: NameEquals(IdentifierName("t"))
-                    )
-                )
-            );
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) context = new VisibilityCheckSyntaxFactory(type).GetContext();
 
-            Debug.WriteLine(unitToCheck.NormalizeWhitespace().ToFullString());
+            Debug.WriteLine(context.Unit.NormalizeWhitespace().ToFullString());
 
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -132,14 +117,10 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     CSharpSyntaxTree.Create
                     (
-                        root: unitToCheck
+                        root: context.Unit
                     )
                 },
-                references: Runtime
-                    .Assemblies
-                    .Concat(type.GetReferences())  // NE "Append(type.Assembly())" legyen mert specializalt tipusnal a generikus argumentumok szerelvenyei is kellenek
-                    .Distinct()
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location ?? throw new NotSupportedException(Resources.DYNAMIC_ASM))),
+                references: context.References,
                 options: CompilationOptionsFactory.Create()
             );
 
