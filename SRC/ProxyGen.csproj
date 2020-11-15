@@ -33,7 +33,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.*">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
