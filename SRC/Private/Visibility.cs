@@ -96,7 +96,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static void Check(Type type, string assemblyName) // TODO: nem kene megszolitani a forditot hozza (meg akkor se ha csak diagnosztikakat kerunk le)
+        public static void Check(Type type, string assemblyName) // FIXME: nyilt generikusokra nem mukodik (igaz egyelore nem is kell)
         {
             //
             // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
@@ -106,9 +106,9 @@ namespace Solti.Utils.Proxy.Internals
             // using t = Namespace.Type;
             //
 
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) context = new VisibilityCheckSyntaxFactory(type).GetContext();
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) = new VisibilityCheckSyntaxFactory(type).GetContext();
 
-            Debug.WriteLine(context.Unit.NormalizeWhitespace().ToFullString());
+            Debug.WriteLine(Unit.NormalizeWhitespace().ToFullString());
 
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -117,10 +117,10 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     CSharpSyntaxTree.Create
                     (
-                        root: context.Unit
+                        root: Unit
                     )
                 },
-                references: context.References,
+                references: References,
                 options: CompilationOptionsFactory.Create()
             );
 

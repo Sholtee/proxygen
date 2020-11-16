@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal abstract class SyntaxFactoryBase
+    internal class SyntaxFactoryBase
     {
         private readonly HashSet<Assembly> FReferences = new HashSet<Assembly>(Runtime.Assemblies);
 
@@ -39,6 +39,50 @@ namespace Solti.Utils.Proxy.Internals
             FReferences.Add(asm);
         }
 
+        /// <summary>
+        /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
+        /// Namespace.ParentType[T] -> Namespace.ParentType[T]
+        /// </summary>
+        protected internal virtual NameSyntax GetQualifiedName(Type type)
+        {
+            //
+            // GetFriendlyName() lezart generikusokat nem eszi meg
+            //
+
+            IReadOnlyList<string> parts = (type.IsGenericType ? type.GetGenericTypeDefinition() : type)
+                .GetFriendlyName()
+                .Split('.');
+
+            return parts
+                //
+                // Nevter, szulo osztaly (beagyazott tipus eseten)
+                //
+#if NETSTANDARD2_0
+                .Take(parts.Count - 1)
+#else
+                .SkipLast(1)
+#endif
+                .Select(IdentifierName)
+
+                //
+                // Tipus neve
+                //
+
+                .Append
+                (
+                    CreateTypeName(parts[parts.Count - 1], type.GetOwnGenericArguments())
+                )
+                .Qualify();
+
+            NameSyntax CreateTypeName(string name, IEnumerable<Type> genericArguments) => !genericArguments.Any() ? IdentifierName(name) : GenericName(name).WithTypeArgumentList
+            (
+                typeArgumentList: TypeArgumentList
+                (
+                    arguments: genericArguments.ToSyntaxList(CreateType)
+                )
+            );
+        }
+
         protected internal virtual TypeSyntax CreateType(Type type) 
         {
             if (type.IsByRef) type = type.GetElementType();
@@ -51,40 +95,11 @@ namespace Solti.Utils.Proxy.Internals
             // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
             //
 
-            if (type.IsNested && !type.IsGenericParameter)
-            {
-                IEnumerable<Type> parts = type.GetEnclosingTypes();
-
-                if (!type.IsGenericType) 
-                    return parts
-                        .Append(type)
-                        .Select(type => type.GetQualifiedName())
-                        .Qualify();
-
-                //
-                // "Cica<T>.Mica<TT>.Kutya" eseten "Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
-                // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>". Ami azert lassuk be igy eleg szopas.
-                //
-
-                return parts.Append(type.GetGenericTypeDefinition()).Select(type =>
-                {
-                    IEnumerable<Type> ownGAs = type.GetOwnGenericArguments();
-
-                    //
-                    // Beagyazott tipusnal a GetQualifiedName() a rovid nevet fogja feldolgozni: 
-                    // "Cica<T>.Mica<TT>.Kutya<T, TT>" -> "Kutya".
-                    //
-
-                    return ownGAs.Any()
-                        ? type.GetQualifiedName(name => CreateGenericName(name, ownGAs))
-                        : type.GetQualifiedName();
-                }).Qualify();
-            }
-
-            if (type.IsGenericType) 
-                return type
-                    .GetGenericTypeDefinition()
-                    .GetQualifiedName(name => CreateGenericName(name, type.GetGenericArguments()));
+            if (type.IsNested && !type.IsGenericParameter) return type
+                .GetEnclosingTypes()
+                .Append(type)
+                .Select(GetQualifiedName)
+                .Qualify();
 
             if (type.IsArray) return ArrayType
             (
@@ -96,23 +111,17 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     node: ArrayRankSpecifier
                     (
-                        sizes: Enumerable.Repeat(0, type.GetArrayRank()).ToSyntaxList(_ => (ExpressionSyntax) OmittedArraySizeExpression())
+                        sizes: Enumerable
+                            .Repeat(0, type.GetArrayRank())
+                            .ToSyntaxList(_ => (ExpressionSyntax) OmittedArraySizeExpression())
                     )
                 )
             );
 
-            return type.GetQualifiedName();
-
-            NameSyntax CreateGenericName(string name, IEnumerable<Type> genericArguments) => GenericName(name).WithTypeArgumentList
-            (
-                typeArgumentList: TypeArgumentList
-                (
-                    arguments: genericArguments.ToSyntaxList(CreateType)
-                )
-            );
+            return GetQualifiedName(type);
         }
 
-        protected abstract CompilationUnitSyntax GenerateProxyUnit(CancellationToken cancellation);
+        protected virtual CompilationUnitSyntax GenerateProxyUnit(CancellationToken cancellation) => throw new NotImplementedException();
 
         public (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) GetContext(CancellationToken cancellation = default) => 
         (

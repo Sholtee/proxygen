@@ -62,8 +62,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(CicaNested<List<int>>.Mica<string>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Collections.Generic.List<System.Int32>>.Mica<System.String>.Hajj")]
         [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Int32>.Mica.Hajj<System.String, System.Object>")]
         public void CreateType_ShouldHandleNestedTypes(Type type, string expected) =>
-            Assert.That(CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
-
+            Assert.That(new SyntaxFactoryBase().CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
         [Test]
         public void DeclareProperty_ShouldDoWhatTheNameSuggests() =>

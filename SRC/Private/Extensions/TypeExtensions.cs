@@ -145,16 +145,30 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<Type> GetEnclosingTypes(this Type type)
+        public static IEnumerable<Type> GetParents(this Type type)
         {
-            return GetParentsInternal().Reverse();
+            //
+            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
+            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
+            // Ami azert lassuk be igy eleg szopas.
+            //
 
-            IEnumerable<Type> GetParentsInternal()
+            IEnumerable<Type> genericArgs = type.GetGenericArguments();
+
+            for (Type parent = type; (parent = parent.DeclaringType) != null;)
             {
-                for (Type parent = type.DeclaringType; parent != null; parent = parent.DeclaringType)
-                    yield return parent;
+                int gaCount = parent.GetGenericArguments().Length;
+
+                yield return gaCount == 0
+                    ? parent
+                    : parent.MakeGenericType
+                    (
+                        genericArgs.Take(gaCount).ToArray()
+                    );
             }
         }
+
+        public static IEnumerable<Type> GetEnclosingTypes(this Type type) => type.GetParents().Reverse();
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
@@ -164,9 +178,19 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
-            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition);
+            if (!src.IsGenericType) yield break;
 
-            foreach (Type ga in src.GetGenericArguments()) 
+            //
+            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
+            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
+            // Ami azert lassuk be igy eleg szopas.
+            //
+
+            IReadOnlyList<Type> 
+                closedArgs = src.GetGenericArguments(),
+                openArgs = (src = src.GetGenericTypeDefinition()).GetGenericArguments();
+
+            for(int i = 0; i < openArgs.Count; i++)
             {
                 bool own = true;
                 for (Type? parent = src; (parent = parent.DeclaringType) != null;)
@@ -174,12 +198,12 @@ namespace Solti.Utils.Proxy.Internals
                     // Ha "parent" nem generikus akkor a GetGenericArguments() ures tombot ad vissza
                     //
 
-                    if (parent.GetGenericArguments().Contains(ga, ArgumentComparer.Instance))
+                    if (parent.GetGenericArguments().Contains(openArgs[i], ArgumentComparer.Instance))
                     {
                         own = false;
                         break;
                     }
-                if (own) yield return ga;
+                if (own) yield return closedArgs[i];
             } 
         }
 

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -51,7 +50,6 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static SeparatedSyntaxList<TNode> ToSyntaxList<TNode>(this IEnumerable<TNode> src) where TNode : SyntaxNode => ToSyntaxList(src, x => x);
 
-
         /// <summary>
         /// Name1.Name2.Name3.....
         /// </summary>
@@ -64,39 +62,5 @@ namespace Solti.Utils.Proxy.Internals
 #endif
             right: (SimpleNameSyntax) parts.Last()
         );
-
-        /// <summary>
-        /// Namespace.ParentType[T].NestedType[TT]
-        /// </summary>
-        public static NameSyntax GetQualifiedName(this Type type, Func<string, NameSyntax>? typeNameFactory = null)
-        {
-            Debug.Assert(!type.IsGenericType || type.IsGenericTypeDefinition);
-
-            return Parts2QualifiedName
-            (
-                parts: type.GetFriendlyName().Split('.'),
-                factory: typeNameFactory ?? IdentifierName
-            );
-
-            static NameSyntax Parts2QualifiedName(IEnumerable<string> parts, Func<string, NameSyntax> factory) => Qualify
-            (
-                parts
-                    //
-                    // Nevter, szulo osztaly (beagyazott tipus eseten)
-                    //
-#if NETSTANDARD2_0
-                    .Take(parts.Count() - 1)
-#else
-                    .SkipLast(1)
-#endif
-                    .Select(IdentifierName)
-
-                    //
-                    // Tipus neve
-                    //
-
-                    .Append(factory(parts.Last()))
-            );
-        }
     }
 }
