@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Abstractions
 
         internal Task<Type> GenerateTypeAsync(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => 
         {
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) = SyntaxFactory.GetContext();
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = SyntaxFactory.GetContext();
 
             return ExtractType
             (

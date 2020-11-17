@@ -106,7 +106,7 @@ namespace Solti.Utils.Proxy.Internals
             // using t = Namespace.Type;
             //
 
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) = new VisibilityCheckSyntaxFactory(type).GetContext();
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = new VisibilityCheckSyntaxFactory(type).GetContext();
 
             Debug.WriteLine(Unit.NormalizeWhitespace().ToFullString());
 

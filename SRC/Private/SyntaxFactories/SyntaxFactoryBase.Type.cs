@@ -22,32 +22,44 @@ namespace Solti.Utils.Proxy.Internals
     {
         private readonly HashSet<Assembly> FReferences = new HashSet<Assembly>(Runtime.Assemblies);
 
-        protected internal void AddReference(Type type) 
+        private readonly HashSet<Type> FTypes = new HashSet<Type>();
+
+        protected internal void AddType(Type type) 
         {
             if (type.IsGenericTypeDefinition)
                 return;
 
-            HashSet<Type> types = new HashSet<Type>();
-            Traverse(type);
+            if (!FTypes.Add(type)) return; // korkoros referencia fix
 
-            void Traverse(Type type)
-            {
-                if (!types.Add(type)) return; // korkoros referencia fix
+            Assembly asm = type.Assembly;
 
-                Assembly asm = type.Assembly;
+            if (string.IsNullOrEmpty(asm.Location))
+                throw new NotSupportedException(Resources.DYNAMIC_ASM);
 
-                if (string.IsNullOrEmpty(asm.Location))
-                    throw new NotSupportedException(Resources.DYNAMIC_ASM);
+            FReferences.Add(asm);
 
-                FReferences.Add(asm);
+            //
+            // Generikus parameterek szerepelhetnek masik szerelvenyben.
+            //
 
-                //
-                // Generikus parameterek szerepelhetnek masik szerelvenyben.
-                //
+            foreach (Type genericArg in type.GetGenericArguments())
+                AddType(genericArg);
+  
+            //
+            // Az os (osztaly) szerepelhet masik szerelvenyben. "BaseType" csak az os osztalyokat adja vissza
+            // megvalositott interfaceket nem.
+            //
 
-                foreach (Type genericArg in type.GetGenericArguments())
-                    Traverse(genericArg);
-            }
+            foreach (Type @base in type.GetBaseTypes())
+                AddType(@base);
+
+            //
+            // "os" interface-ek szarmazhatnak masik szerelvenybol. A GetInterfaces() az osszes "os"-t
+            // visszaadja.
+            //
+
+            foreach (Type iface in type.GetInterfaces())
+                AddType(iface);
         }
 
         /// <summary>
@@ -98,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             if (type.IsByRef) type = type.GetElementType();
 
-            AddReference(type);
+            AddType(type);
 
             return type switch
             {
