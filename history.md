@@ -44,3 +44,13 @@
   - *done:* Reduced reference count in the generated assembly
 - 3.1.4
   - *fixed:* Possible stack overflow
+- 4.0.0-preview1
+  - *breaking:* New `Interfaceinterceptor` layout (though it affects the internal parts only)
+  - *breaking:* Removed `TypeGenerator.References` property
+  - *breaking:* New `ISyntaxFactory` layout
+  - *ontroduced:* `IProxySyntaxFactory` interface
+  - *introduced:* `ConcurrentInterfaceinterceptor` class
+  - *done:* More efficient generated code
+  - *done:* Enhanced emit process
+  - *done:* Interceptors can modify *event* and *property* arguments
+  
