@@ -48,7 +48,7 @@
   - *breaking:* New `Interfaceinterceptor` layout (though it affects the internal parts only)
   - *breaking:* Removed `TypeGenerator.References` property
   - *breaking:* New `ISyntaxFactory` layout
-  - *ontroduced:* `IProxySyntaxFactory` interface
+  - *introduced:* `IProxySyntaxFactory` interface
   - *introduced:* `ConcurrentInterfaceinterceptor` class
   - *done:* More efficient generated code
   - *done:* Enhanced emit process
