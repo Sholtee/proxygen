@@ -15,13 +15,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Abstractions;
 
-    internal partial class SyntaxFactoryBase: ISyntaxFactory
+    internal partial class SyntaxFactoryBase : ISyntaxFactory
     {
+        private (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References)? FContext;
+
         protected virtual CompilationUnitSyntax GenerateProxyUnit(CancellationToken cancellation) => throw new NotImplementedException();
 
         public virtual string? AssemblyName { get; }
 
-        public (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) GetContext(CancellationToken cancellation = default) => 
+        public (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) GetContext(CancellationToken cancellation = default) =>  FContext ??=
         (
             GenerateProxyUnit(cancellation),
             FReferences
