@@ -48,16 +48,16 @@ namespace Solti.Utils.Proxy.Internals
             private static readonly MethodInfo
                 RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
 
-            protected static IEnumerable<StatementSyntax> BuildGet(PropertyInfo property) 
+            protected IEnumerable<StatementSyntax> BuildGet(PropertyInfo property) 
             {
                 if (!property.CanRead) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
+                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
 
-                yield return AssignCallback
+                yield return Owner.AssignCallback
                 (
-                    DeclareCallback
+                    Owner.DeclareCallback
                     (
                         argsArray,
                         property.GetMethod,
@@ -71,8 +71,8 @@ namespace Solti.Utils.Proxy.Internals
                                     ToIdentifierName(result!),
                                     CastExpression
                                     (
-                                        CreateType<object>(),
-                                        PropertyAccess(property, TARGET, null, locals.Select(ToArgument))
+                                        Owner.CreateType<object>(),
+                                        Owner.PropertyAccess(property, Owner.TARGET, null, locals.Select(ToArgument))
                                     )
                                 )
                             )
@@ -80,23 +80,23 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.GetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.GetMethod), Owner.InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
                 yield return prop;
 
-                yield return ReturnResult
+                yield return Owner.ReturnResult
                 (
                     property.PropertyType,
-                    InvokeMethod
+                    Owner.InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -115,16 +115,16 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            protected static IEnumerable<StatementSyntax> BuildSet(PropertyInfo property)
+            protected IEnumerable<StatementSyntax> BuildSet(PropertyInfo property)
             {
                 if (!property.CanWrite) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
+                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
 
-                yield return AssignCallback
+                yield return Owner.AssignCallback
                 (
-                    DeclareCallback
+                    Owner.DeclareCallback
                     (
                         argsArray,
                         property.SetMethod,
@@ -135,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
                                 expression: AssignmentExpression
                                 (
                                     kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: PropertyAccess(property, TARGET, null, locals
+                                    left: Owner.PropertyAccess(property, Owner.TARGET, null, locals
 #if NETSTANDARD2_0
                                         .Take(locals.Count - 1)
 #else
@@ -149,14 +149,14 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.SetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.SetMethod), Owner.InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    InvokeMethod
+                    Owner.InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -183,6 +183,8 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
+            public PropertyInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
+
             public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer() && !AlreadyImplemented(prop);
 
             //
@@ -194,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 PropertyInfo property = (PropertyInfo) member;
 
-                return DeclareProperty
+                return Owner.DeclareProperty
                 (
                     property: property,
                     getBody: Block

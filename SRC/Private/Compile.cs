@@ -28,20 +28,11 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyList<Assembly> references, CancellationToken cancellation = default)
+        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, CancellationToken cancellation = default)
         {
             Debug.WriteLine(root.NormalizeWhitespace().ToFullString());
 
-            references = Runtime
-                .Assemblies
-                .Concat(references)
-#if IGNORE_VISIBILITY
-                .Append(typeof(IgnoresAccessChecksToAttribute).Assembly())
-#endif
-                .Distinct()
-                .ToArray();
-
-            Debug.WriteLine(string.Join(Environment.NewLine, references));
+            Debug.WriteLine(string.Join(Environment.NewLine, references.Select(r => r.Display)));
 
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -53,8 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                         root: root
                     )
                 },
-                references: references 
-                    .Select(asm => MetadataReference.CreateFromFile(asm.Location ?? throw new NotSupportedException(Resources.DYNAMIC_ASM))),
+                references: references,
                 options: CompilationOptionsFactory.Create()
             );
 

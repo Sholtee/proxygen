@@ -14,6 +14,10 @@ namespace Solti.Utils.Proxy.Internals
     {
         internal abstract class InterceptorFactoryBase : IInterceptorFactory
         {
+            protected ProxySyntaxFactory<TInterface, TInterceptor> Owner { get; }
+
+            protected InterceptorFactoryBase(ProxySyntaxFactory<TInterface, TInterceptor> owner) => Owner = owner;
+
             public abstract MemberDeclarationSyntax Build(MemberInfo member);
 
             //

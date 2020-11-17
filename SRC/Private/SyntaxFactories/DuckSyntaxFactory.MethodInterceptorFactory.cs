@@ -89,10 +89,10 @@ namespace Solti.Utils.Proxy.Internals
                 // maskepp vannak elnvezve.
                 //
 
-                ExpressionSyntax invocation = InvokeMethod
+                ExpressionSyntax invocation = Owner.InvokeMethod
                 (
                     ifaceMethod,
-                    TARGET,
+                    Owner.TARGET,
                     castTargetTo: targetMethod.GetAccessModifiers() == AccessModifiers.Explicit
                         ? targetMethod.GetDeclaringType()
                         : null,
@@ -104,7 +104,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (ifaceMethod.ReturnType.IsByRef) invocation = RefExpression(invocation);
 
-                return DeclareMethod(ifaceMethod, forceInlining: true)
+                return Owner.DeclareMethod(ifaceMethod, forceInlining: true)
                     .WithExpressionBody
                     (
                         expressionBody: ArrowExpressionClause(invocation)

@@ -35,13 +35,15 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class IndexerInterceptorFactory : PropertyInterceptorFactory
         {
+            public IndexerInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
+
             public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && prop.IsIndexer() && !AlreadyImplemented(prop);
 
             public override MemberDeclarationSyntax Build(MemberInfo member)
             {
                 PropertyInfo prop = (PropertyInfo) member;
 
-                return DeclareIndexer
+                return Owner.DeclareIndexer
                 (
                     property: prop,
                     getBody: Block

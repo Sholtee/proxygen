@@ -4,9 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -24,19 +21,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public override IReadOnlyList<Assembly> References { get; } = new[]
-            {
-                typeof(DuckBase<>).Assembly
-            }
-            .Concat(typeof(TInterface).GetReferences())
-            .Concat(typeof(TTarget).GetReferences())
-            .Distinct()
-            .ToArray();
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public override ISyntaxFactory SyntaxFactory { get; } = new DuckSyntaxFactory<TInterface, TTarget>();
+        public override IProxySyntaxFactory SyntaxFactory { get; } = new DuckSyntaxFactory<TInterface, TTarget>();
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.

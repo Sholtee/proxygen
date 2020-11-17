@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -49,10 +48,10 @@ namespace Solti.Utils.Proxy.Internals
                 // maskepp vannak elnvezve a parameterei.
                 //
 
-                ExpressionSyntax propertyAccess = PropertyAccess
+                ExpressionSyntax propertyAccess = Owner.PropertyAccess
                 (
                     ifaceProperty,
-                    TARGET,
+                    Owner.TARGET,
                     castTargetTo: accessor.GetAccessModifiers() == AccessModifiers.Explicit
                         ? accessor.GetDeclaringType()
                         : null
@@ -79,14 +78,14 @@ namespace Solti.Utils.Proxy.Internals
                     );
 
                 return ifaceProperty.IsIndexer()
-                    ? DeclareIndexer
+                    ? Owner.DeclareIndexer
                     (
                         property: ifaceProperty,
                         getBody: getBody,
                         setBody: setBody,
                         forceInlining: true
                     )
-                    : (MemberDeclarationSyntax) DeclareProperty
+                    : (MemberDeclarationSyntax) Owner.DeclareProperty
                     (
                         property: ifaceProperty,
                         getBody: getBody,

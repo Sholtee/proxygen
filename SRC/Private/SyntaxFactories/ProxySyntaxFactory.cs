@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,11 +20,11 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ProxySyntaxFactory<TInterface, TInterceptor>: ProxySyntaxFactoryBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         #region Private
-        private static readonly MemberAccessExpressionSyntax
-            //
-            // this.Target
-            //
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!));
+        //
+        // this.Target
+        //
+
+        private readonly MemberAccessExpressionSyntax TARGET;
 
         private static readonly MethodInfo
             INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!));
@@ -41,6 +42,8 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private static string EnsureUnused(string name, MethodBase method) => EnsureUnused(name, method.GetParameters());
+
+        private IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; }
         #endregion
 
         #region Internal
@@ -52,7 +55,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   ...                                                                                   <br/>
         /// }
         /// </summary>
-        internal static LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method)
+        internal LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method)
         {
             ParameterInfo[] paramz = method.GetParameters();
 
@@ -70,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
         ///                  <br/>
         /// return (T) ...;
         /// </summary>
-        internal static ReturnStatementSyntax ReturnResult(Type? returnType, ExpressionSyntax result) => ReturnStatement
+        internal ReturnStatementSyntax ReturnResult(Type? returnType, ExpressionSyntax result) => ReturnStatement
         (
             expression: returnType == typeof(void)
                 ? null
@@ -90,14 +93,14 @@ namespace Solti.Utils.Proxy.Internals
         ///                     <br/>
         /// return (T) result;
         /// </summary>
-        internal static ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
+        internal ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
             ReturnResult(returnType, ToIdentifierName(result));
 
 
         /// <summary>
         /// InvokeTarget = ...;
         /// </summary>
-        internal static StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
+        internal StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
         (
             expression: AssignmentExpression
             (
@@ -111,7 +114,7 @@ namespace Solti.Utils.Proxy.Internals
         /// System.String cb_a;    <br/>
         /// TT cb_b = (TT)args[1];
         /// </summary>
-        internal static LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
+        internal LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
             .Select((param, i) => new { Parameter = param, Index = i })
 
             //
@@ -163,7 +166,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     return null;                               <br/>
         /// };   
         /// </summary>
-        internal static LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, MethodInfo method, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax?, IEnumerable<StatementSyntax>> invocationFactory)
+        internal LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, MethodInfo method, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax?, IEnumerable<StatementSyntax>> invocationFactory)
         {
             IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
 
@@ -210,15 +213,20 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy";
 
-        private static IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; } = new List<IInterceptorFactory> 
+        public ProxySyntaxFactory() 
         {
-            new MethodInterceptorFactory(),
-            new PropertyInterceptorFactory(),
-            new IndexerInterceptorFactory(),
-            new EventInterceptorFactory()
-        };
+            InterceptorFactories = new List<IInterceptorFactory>
+            {
+                new MethodInterceptorFactory(this),
+                new PropertyInterceptorFactory(this),
+                new IndexerInterceptorFactory(this),
+                new EventInterceptorFactory(this)
+            };
 
-        protected internal override ClassDeclarationSyntax GenerateProxyClass()
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!));
+        }
+
+        protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
         {
             Type
                 interfaceType   = typeof(TInterface),
@@ -226,7 +234,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Debug.Assert(interfaceType.IsInterface);
 
-            ClassDeclarationSyntax cls = ClassDeclaration(GeneratedClassName)
+            ClassDeclarationSyntax cls = ClassDeclaration(ProxyClassName)
             .WithModifiers
             (
                 modifiers: TokenList
@@ -257,7 +265,11 @@ namespace Solti.Utils.Proxy.Internals
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                 interfaceType
                     .ListMembers<MemberInfo>()
-                    .Select(m => InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m))
+                    .Select(m => 
+                    {
+                        cancellation.ThrowIfCancellationRequested();
+                        return InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m);
+                    })
                     .Where(m => m != null)
 #pragma warning restore CS8620
             );

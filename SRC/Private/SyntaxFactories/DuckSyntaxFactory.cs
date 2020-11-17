@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,11 +19,11 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class DuckSyntaxFactory<TInterface, TTarget> : ProxySyntaxFactoryBase
     {
-        private static readonly MemberAccessExpressionSyntax
-            //
-            // this.Target
-            //
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!));
+        //
+        // this.Target
+        //
+
+        private readonly MemberAccessExpressionSyntax TARGET;
 
         public DuckSyntaxFactory() 
         {
@@ -32,11 +33,13 @@ namespace Solti.Utils.Proxy.Internals
                 new PropertyInterceptorFactory(this),
                 new EventInterceptorFactory(this)
             };
+
+            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!));
         }
 
         private IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; }
 
-        protected internal override ClassDeclarationSyntax GenerateProxyClass()
+        protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
         {
             Type 
                 interfaceType = typeof(TInterface),
@@ -48,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (
-                identifier: GeneratedClassName
+                identifier: ProxyClassName
             )
             .WithModifiers
             (
@@ -66,7 +69,10 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    new[] { @base, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
+                    new[] { @base, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
+                    (
+                        CreateType(t)
+                    ))
                 )
             );
 
@@ -80,7 +86,11 @@ namespace Solti.Utils.Proxy.Internals
 #pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
                 interfaceType
                     .ListMembers<MemberInfo>()
-                    .Select(m => InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m))
+                    .Select(m => 
+                    {
+                        cancellation.ThrowIfCancellationRequested();
+                        return InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m);
+                    })
                     .Where(m => m != null)
 #pragma warning restore CS8620
             );

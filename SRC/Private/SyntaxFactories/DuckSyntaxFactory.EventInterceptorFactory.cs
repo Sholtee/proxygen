@@ -45,16 +45,16 @@ namespace Solti.Utils.Proxy.Internals
 
                 Type? castTargetTo = accessor!.GetAccessModifiers() == AccessModifiers.Explicit ? accessor!.GetDeclaringType() : null;
 
-                return DeclareEvent
+                return Owner.DeclareEvent
                 (
                     ifaceEvt,
                     addBody: ArrowExpressionClause
                     (
-                        expression: RegisterEvent(targetEvt, TARGET, add: true, IdentifierName(Value), castTargetTo)
+                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: true, IdentifierName(Value), castTargetTo)
                     ),
                     removeBody: ArrowExpressionClause
                     (
-                        expression: RegisterEvent(targetEvt, TARGET, add: false, IdentifierName(Value), castTargetTo)
+                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: false, IdentifierName(Value), castTargetTo)
                     ),
                     forceInlining: true
                 );

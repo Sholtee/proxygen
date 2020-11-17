@@ -107,7 +107,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateDuckClass_ShouldGenerateTheDesiredClass() =>
-            Assert.That(new DuckSyntaxFactory<IFoo<int>, GoodFoo<int>>().GenerateProxyClass().NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt")));
+            Assert.That(new DuckSyntaxFactory<IFoo<int>, GoodFoo<int>>().GetContext().Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt")));
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
