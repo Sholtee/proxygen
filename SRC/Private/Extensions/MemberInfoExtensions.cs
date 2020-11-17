@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -19,23 +18,14 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static string GetFullName(this MemberInfo src) => $"{new SyntaxFactoryBase().CreateType(src.DeclaringType).ToFullString()}.{src.Name}";
 
-        public static bool IsStatic(this MemberInfo src) 
+        public static bool IsStatic(this MemberInfo src) => src switch
         {
-            switch (src)
-            {
-                case MethodInfo method:
-                    return method.IsStatic;
-                case FieldInfo field:
-                    return field.IsStatic;
-                case PropertyInfo property:
-                    return (property.GetMethod ?? property.SetMethod ?? throw new InvalidOperationException()).IsStatic;
-                case EventInfo @event:
-                    return (@event.AddMethod ?? @event.RemoveMethod ?? throw new InvalidOperationException()).IsStatic;
-                default:
-                    Debug.Fail("Unknown member type");
-                    return false;
-            }
-        }
+            MethodInfo method => method.IsStatic,
+            FieldInfo field => field.IsStatic,
+            PropertyInfo property => (property.GetMethod ?? property.SetMethod ?? throw new InvalidOperationException()).IsStatic,
+            EventInfo @event => (@event.AddMethod ?? @event.RemoveMethod ?? throw new InvalidOperationException()).IsStatic,
+            _ => throw new NotSupportedException()
+        };
 
         private static MemberInfo DoExtractFrom(LambdaExpression expr) 
         {
@@ -54,9 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                 case BinaryExpression binary:
                     body = binary.Left;
                     goto start;
-                default:
-                    Debug.Fail("Unknown body");
-                    return null!;
+                default: throw new NotSupportedException();
             }
         }
 
@@ -91,8 +79,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            Debug.Fail("Member could not be determined");
-            return null!;
+            throw new NotSupportedException();
         }
 
         //
