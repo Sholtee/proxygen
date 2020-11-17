@@ -4,10 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -25,21 +21,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public override IReadOnlyList<Assembly> References { get; } = new[]
-            {
-                typeof(Expression<>).Assembly,
-                typeof(MethodInfo).Assembly,
-            }
-            .Concat(typeof(TInterface).GetReferences())
-            .Concat(typeof(TInterceptor).GetReferences()) // az interceptor konstruktora miatt lehetnek uj referenciak
-            .Distinct()
-            .ToArray();
-
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public override ISyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory<TInterface, TInterceptor>();
+        public override IProxySyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory<TInterface, TInterceptor>();
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.

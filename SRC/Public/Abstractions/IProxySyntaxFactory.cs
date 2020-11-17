@@ -1,18 +1,19 @@
 ﻿/********************************************************************************
-* ITypeGenerator.cs                                                             *
+* IProxySyntaxFactory.cs                                                        *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+
 namespace Solti.Utils.Proxy.Abstractions
 {
     /// <summary>
-    /// Describes a type generator.
+    /// Describes an abstract proxy syntax factory.
     /// </summary>
-    public interface ITypeGenerator
+    public interface IProxySyntaxFactory : ISyntaxFactory
     {
         /// <summary>
-        /// The factory that provides the class definition.
+        /// Returns the class name of the proxy.
         /// </summary>
-        IProxySyntaxFactory SyntaxFactory { get; }
+        string ProxyClassName { get; }
     }
 }

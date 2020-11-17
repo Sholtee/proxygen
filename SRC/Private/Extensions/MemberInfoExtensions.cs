@@ -8,13 +8,16 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Emit;
 using System.Text.RegularExpressions;
+
+using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class MemberInfoExtensions
     {
-        public static string GetFullName(this MemberInfo src) => $"{ProxySyntaxFactoryBase.CreateType(src.DeclaringType).ToFullString()}.{src.Name}";
+        public static string GetFullName(this MemberInfo src) => $"{new SyntaxFactoryBase().CreateType(src.DeclaringType).ToFullString()}.{src.Name}";
 
         public static bool IsStatic(this MemberInfo src) 
         {
@@ -48,6 +51,9 @@ namespace Solti.Utils.Proxy.Internals
                     return member.Member;
                 case MethodCallExpression call:
                     return call.Method;
+                case BinaryExpression binary:
+                    body = binary.Left;
+                    goto start;
                 default:
                     Debug.Fail("Unknown body");
                     return null!;
@@ -62,54 +68,32 @@ namespace Solti.Utils.Proxy.Internals
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
 
-        public static bool SignatureEquals(this MemberInfo self, MemberInfo that) 
+        public static MemberInfo ExtractFrom(MethodInfo method, MemberTypes memberType) // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         {
-            if (ReferenceEquals(self, that)) // igaz ha mindketto NULL  
-                return true;
+            Instruction? call = method.GetInstructions().SingleOrDefault(instruction => instruction.OpCode == OpCodes.Callvirt);
 
-            if (self == null || that == null) 
-                return false;
-
-            if (self.StrippedName() != that.StrippedName()) 
-                return false;
-
-            if (self is MethodInfo methodA && that is MethodInfo methodB)
+            if (call != null)
             {
-                methodA = EnsureNotSpecialized(methodA);
-                methodB = EnsureNotSpecialized(methodB);
+                method = (MethodInfo) call.Operand;
 
-                return
-                    methodA.GetGenericArguments().SequenceEqual(methodB.GetGenericArguments(), ArgumentComparer.Instance) &&
-                    methodA.GetParameters().SequenceEqual(methodB.GetParameters(), ParameterComparer.Instance) &&
-                    ArgumentComparer.Instance.Equals(methodA.ReturnType, methodB.ReturnType); // visszateres lehet generikus => ArgumentComparer
+                switch (memberType) 
+                {
+                    case MemberTypes.Property:
+                        PropertyInfo? property = method.DeclaringType.GetProperties().SingleOrDefault(prop => prop.SetMethod == method || prop.GetMethod == method);
+                        if (property != null) return property;
+                        break;
+                    case MemberTypes.Event:
+                        EventInfo? evt = method.DeclaringType.GetEvents().SingleOrDefault(evt => evt.AddMethod == method || evt.RemoveMethod == method);
+                        if (evt != null) return evt;
+                        break;
+                    case MemberTypes.Method:
+                        return method;
+                }
             }
 
-            if (self is PropertyInfo propA && that is PropertyInfo propB)
-                return
-                    propA.PropertyType == propB.PropertyType &&
-                    propA.CanWrite == propB.CanWrite         &&
-                    propA.CanRead == propB.CanRead           &&
-
-                    //
-                    // Indexer property-knel meg kell egyezniuk az index parameterek
-                    // sorrendjenek es tipusanak.
-                    //
-
-                    propA
-                        .GetIndexParameters()
-                        .Select(p => p.ParameterType)
-                        .SequenceEqual
-                        (
-                            propB.GetIndexParameters().Select(p => p.ParameterType)
-                        );
-
-            if (self is EventInfo evtA && that is EventInfo evtB)
-                return evtA.EventHandlerType == evtB.EventHandlerType;
-
-            return false;
+            Debug.Fail("Member could not be determined");
+            return null!;
         }
-
-        private static MethodInfo EnsureNotSpecialized(MethodInfo method) => method.IsGenericMethod ? method.GetGenericMethodDefinition() : method;
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

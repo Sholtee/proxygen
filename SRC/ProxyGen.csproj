@@ -3,11 +3,11 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Denes Solti</Authors>
-    <Version>3.1.4</Version>
+    <Version>4.0.0-preview1</Version>
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release;Perf</Configurations>
-    <LangVersion>8</LangVersion>
+    <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -33,7 +33,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(CI)' == ''">
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.*">
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.*">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -41,6 +41,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.*" />
+    <PackageReference Include="Mono.Reflection" Version="2.*" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.*" />
     <PackageReference Include="System.Runtime.Loader" Version="4.*" />
     <PackageReference Include="Solti.Utils.Primitives" Version="1.*" />
@@ -66,7 +67,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <None Include="..\icon.png" Pack="true" PackagePath=""/>
+    <None Include="..\icon.png" Pack="true" PackagePath="" />
   </ItemGroup>
   
   <PropertyGroup>

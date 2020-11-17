@@ -4,9 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Reflection;
 
-using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using NUnit.Framework;
@@ -32,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 )
             );
 
-            Exception ex = Assert.Throws<Exception>(() => Compile.ToAssembly(unit, "cica", null, new Assembly[0]));
+            Exception ex = Assert.Throws<Exception>(() => Compile.ToAssembly(unit, "cica", null, Array.Empty<MetadataReference>()));
 
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);

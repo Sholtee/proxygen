@@ -17,7 +17,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
-    using static Internals.ProxySyntaxFactoryBase;
 
     [TestFixture]
     public sealed class ProxySyntaxFactoryBaseTests : ProxySyntaxFactoryTestsBase
@@ -25,7 +24,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(string[]), "System.String[] param;")]
         [TestCase(typeof(object), "System.Object param;")]
         public void DeclareLocal_ShouldDeclareTheDesiredLocalVariable(Type paramType, string expected) =>
-            Assert.That(DeclareLocal(paramType, "param").NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareLocal(paramType, "param").NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
         [TestCase(typeof(object), "System.Object")]
         [TestCase(typeof(int[]), "System.Int32[]")]
@@ -35,7 +34,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(IEnumerable<int>[]), "System.Collections.Generic.IEnumerable<System.Int32>[]")]
         [TestCase(typeof(IEnumerable<IEnumerable<string>>), "System.Collections.Generic.IEnumerable<System.Collections.Generic.IEnumerable<System.String>>")]
         public void CreateType_ShouldHandleNonNestedTypes(Type type, string expected) =>
-            Assert.That(CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+            Assert.That(new ProxySyntaxFactoryBase().CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
         private class CicaNested<T>
         {
@@ -62,24 +61,19 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(CicaNested<List<int>>.Mica<string>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Collections.Generic.List<System.Int32>>.Mica<System.String>.Hajj")]
         [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Int32>.Mica.Hajj<System.String, System.Object>")]
         public void CreateType_ShouldHandleNestedTypes(Type type, string expected) =>
-            Assert.That(CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
-
+            Assert.That(new ProxySyntaxFactoryBase().CreateType(type).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
         [Test]
         public void DeclareProperty_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
-
-        [Test]
-        public void DeclareField_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareField<EventInfo>("FEvent", LiteralExpression(SyntaxKind.NullLiteralExpression), SyntaxKind.PrivateKeyword, SyntaxKind.StaticKeyword, SyntaxKind.ReadOnlyKeyword).NormalizeWhitespace().ToFullString(), Is.EqualTo("private static readonly System.Reflection.EventInfo FEvent = null;"));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
 
         [Test]
         public void DeclareEvent_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(DeclareEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
 
         [Test]
         public void DeclareMethod_ShouldHandleParamsModifier() =>
-            Assert.That(DeclareMethod((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IParams.Foo(params System.Int32[] paramz)"));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareMethod((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IParams.Foo(params System.Int32[] paramz)"));
 
         private interface IParams
         {
@@ -89,11 +83,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void DeclareMethod_ShouldSupportRefKeywords() =>
             // ref retval miatt a MemberInfoExtensions-s csoda itt nem jo
-            Assert.That(DeclareMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
 
         [Test]
         public void InvokeMethod_ShouldSupportRefKeywords() =>
-            Assert.That(InvokeMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public), IdentifierName("target"),  null, "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
+            Assert.That(new ProxySyntaxFactoryBase().InvokeMethod(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public), IdentifierName("target"),  null, "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
 
         private static void GenericMethod<T>(T a) { }
 
@@ -105,7 +99,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(GenericMethods))]
         public void InvokeMethod_ShouldSupportGenerics((MethodInfo Method, string Expected) param) =>
-            Assert.That(InvokeMethod(param.Method, null, null, "a").NormalizeWhitespace().ToFullString(), Is.EqualTo(param.Expected));
+            Assert.That(new ProxySyntaxFactoryBase().InvokeMethod(param.Method, null, null, "a").NormalizeWhitespace().ToFullString(), Is.EqualTo(param.Expected));
 
         private interface IRefInterface
         {
@@ -120,7 +114,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(MethodsHavingNullableRetVal))]
         public void DeclareMethod_ShouldSupportNullables((MethodInfo Method, string Expected) param) =>
-            Assert.That(DeclareMethod(param.Method).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
+            Assert.That(new ProxySyntaxFactoryBase().DeclareMethod(param.Method).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
 
         private interface INullable 
         {

@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using System.Reflection;
@@ -15,9 +14,6 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    using Primitives.Patterns;
-    using Proxy.Tests.External;
-
     [TestFixture]
     public sealed class TypeExtensionsTests
     {
@@ -135,125 +131,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.AreEqual("System.Int32", refType.GetFriendlyName());
         }
-
-        private class MyInterceptor : InterfaceInterceptor<IDbConnection> 
-        {
-            public MyInterceptor() : base(null) { }
-        }
-
-        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences 
-        {
-            get 
-            {
-                yield return (typeof(InterfaceInterceptor<>), new[] { typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
-                yield return (typeof(InterfaceInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly });
-                yield return (typeof(ExternalInterceptor<IInterface>), new[] { typeof(TypeExtensionsTests).Assembly, typeof(ExternalInterceptor<>).Assembly, typeof(object).Assembly, typeof(InterfaceInterceptor<>).Assembly });
-                yield return (typeof(MyInterceptor), new[] { typeof(TypeExtensionsTests).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
-                yield return (typeof(Disposable), new[] { typeof(Disposable).Assembly, typeof(object).Assembly 
- #if NETCOREAPP2_2
-                    , typeof(IAsyncDisposable).Assembly
-#endif               
-                });
-                yield return (typeof(IList), new[] { typeof(IList).Assembly });
-                yield return (typeof(IDisposableEx), new[] { typeof(IDisposableEx).Assembly, typeof(IDisposable).Assembly
-#if NETCOREAPP2_2
-                    , typeof(IAsyncDisposable).Assembly
-#endif
-                });
-                yield return (typeof(IList<>), new[] { typeof(IList<>).Assembly });
-                yield return (typeof(IList<int>), new[] { typeof(IList<>).Assembly });
-                yield return (typeof(IList<IDisposableEx>), new[] { typeof(IList<>).Assembly, typeof(IDisposableEx).Assembly 
-#if NETCOREAPP2_2
-                    , typeof(IAsyncDisposable).Assembly
-#endif           
-                });
-            }
-        }
-
-        [TestCaseSource(nameof(TypeReferences))]
-        public void GetBasicReferences_ShouldReturnTheDeclaringAssemblyOfTheSourceTypeAndItsAncestors((Type Type, IEnumerable<Assembly> References) data) 
-        {
-            IEnumerable<Assembly>
-                refs = data.References.OrderBy(x => x.FullName),
-                returned = data.Type.GetBasicReferences().OrderBy(x => x.FullName);
-
-            Assert.That(returned.SequenceEqual(refs));
-        }
-
-        private class DummyClass_1 
-        {
-            public DummyClass_1(IDisposable p) { }
-            public List<int> Method(IDbConnection conn) => null;
-            public IComponent Prop { get; }
-        }
-
-        public interface IInterface_1
-        {
-        }
-
-        public interface IInterface_2
-        {
-            IInterface_1 Interface1 { get; }
-        }
-
-        public interface IInterface_3<T>
-        {
-            IInterface_1 Interface1 { get; }
-        }
-
-        public class DummyClass_2 : InterfaceInterceptor<IInterface_2>
-        {
-            public DummyClass_2(IInterface_3<int> dependency, IInterface_2 target) : base(target)
-            {
-                Dependency = dependency;
-            }
-
-            public IInterface_3<int> Dependency { get; }
-        }
-
-        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences2
-        {
-            get
-            {
-                yield return (typeof(DummyClass_1), new[] { typeof(DummyClass_1).Assembly, typeof(IDisposable).Assembly, typeof(IDbConnection).Assembly, typeof(IComponent).Assembly });
-                yield return (typeof(DummyClass_2), new[] { typeof(DummyClass_2).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(int).Assembly});
-                yield return (typeof(IList<IDbConnection>), new[] { typeof(IList<>).Assembly, typeof(IDbConnection).Assembly });
-                yield return (typeof(ExternalInterceptor<>), new[] { typeof(ExternalInterceptor<>).Assembly, typeof(InterfaceInterceptor<>).Assembly, typeof(object).Assembly, typeof(IDbConnection).Assembly });
-            }
-        }
-
-        [TestCaseSource(nameof(TypeReferences2))]
-        public void GetReferences_ShouldReturnTheDeclaringAssemblyOfAllTheMemberParameters((Type Type, IEnumerable<Assembly> References) data) 
-        {
-            IEnumerable<Assembly>
-                refs = data.References.OrderBy(x => x.FullName),
-                returned = data.Type.GetReferences().OrderBy(x => x.FullName);
-
-            Assert.That(returned.SequenceEqual(refs));
-        }
-
-        private class SelfReferencingClass 
-        {
-            public SelfReferencingClass SelfReference { get; }
-        }
-
-        private interface ISelfReferencingIface : IComposite<ISelfReferencingIface> { }
-
-        public static IEnumerable<(Type, IEnumerable<Assembly>)> TypeReferences3
-        {
-            get
-            {
-                yield return (typeof(SelfReferencingClass), new[] { typeof(SelfReferencingClass).Assembly, typeof(Object).Assembly });
-                yield return (typeof(ISelfReferencingIface), new[] { typeof(IComposite<>).Assembly, typeof(ISelfReferencingIface).Assembly, typeof(Object).Assembly 
-#if NETCOREAPP2_2
-                    , typeof(IAsyncDisposable).Assembly
-#endif    
-                });
-            }
-        }
-
-        [TestCaseSource(nameof(TypeReferences3))]
-        public void GetReferences_ShouldHandleSelfReferences((Type Type, IEnumerable<Assembly> References) data) => Assert.That(data.Type.GetReferences().OrderBy(x => x.FullName).SequenceEqual(data.References.OrderBy(x => x.FullName)));
 
         [Test]
         public void GetEnclosingTypes_ShouldReturnTheParentTypes() =>

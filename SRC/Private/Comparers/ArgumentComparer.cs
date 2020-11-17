@@ -15,7 +15,6 @@ namespace Solti.Utils.Proxy.Internals
     // testzoleges "T"-re.
     //
 
-    [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "The class is passed as a type parameter that has a new constraint.")]
     internal sealed class ArgumentComparer : ComparerBase<ArgumentComparer, Type>
     {
         //

@@ -11,6 +11,9 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
 namespace Solti.Utils.Proxy.Abstractions
 {
     using Internals;
@@ -30,26 +33,31 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type? FType;
 
-        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.GeneratedClassName, throwOnError: true);
+        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.ProxyClassName, throwOnError: true);
 
         internal string? CacheFile => CacheDirectory != null 
-            ? Path.Combine(CacheDirectory, $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName)}.dll")
+            ? Path.Combine(CacheDirectory, $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll")
             : null;
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Task<Type> GenerateTypeAsync(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => ExtractType
-        (
-            Compile.ToAssembly
+        internal Task<Type> GenerateTypeAsync(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => 
+        {
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = SyntaxFactory.GetContext();
+
+            return ExtractType
             (
-                root: SyntaxFactory.GenerateProxyUnit(),
-                asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName,
-                outputFile: CacheFile,
-                references: References
-            )
-        ), default, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+                 Compile.ToAssembly
+                 (
+                     root: Unit,
+                     asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName!,
+                     outputFile: CacheFile,
+                     references: References
+                 )
+            );
+        }, default, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
         internal static async Task<Type> GetGeneratedTypeAsync()
         {
@@ -103,12 +111,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public abstract IReadOnlyList<Assembly> References { get; }
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public abstract ISyntaxFactory SyntaxFactory { get; }
+        public abstract IProxySyntaxFactory SyntaxFactory { get; }
 
         /// <summary>
         /// The (optional) cache directory to be used to store the generated assembly.
@@ -127,7 +130,7 @@ namespace Solti.Utils.Proxy.Abstractions
         protected void CheckVisibility(Type type)
         {
 #if !IGNORE_VISIBILITY
-            Visibility.Check(type, SyntaxFactory.AssemblyName);
+            Visibility.Check(type, SyntaxFactory.AssemblyName!);
 #endif
         }
     }

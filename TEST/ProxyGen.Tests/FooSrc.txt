@@ -1,24 +1,19 @@
 System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
 {
     System.Object[] args = new System.Object[]{a, default(System.String), c};
-    System.Reflection.MethodInfo currentMethod;
-    System.String dummy_b;
-    TT dummy_c = default(TT);
-    currentMethod = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.MethodAccess(() => this.Target.Foo<TT>(a, out dummy_b, ref dummy_c));
     this.InvokeTarget = () =>
     {
         System.Int32 cb_a = (System.Int32)args[0];
         System.String cb_b;
         TT cb_c = (TT)args[2];
         System.Object result;
-        result = this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
+        result = (System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
         args[1] = (System.Object)cb_b;
         args[2] = (System.Object)cb_c;
         return result;
-    }
-
-    ;
-    System.Object result = this.Invoke(currentMethod, args, currentMethod);
+    };
+    System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
+    System.Object result = this.Invoke(method, args, method);
     b = (System.String)args[1];
     c = (TT)args[2];
     return (System.Int32)result;

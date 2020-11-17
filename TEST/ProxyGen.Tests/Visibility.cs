@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -31,6 +32,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.DoesNotThrow(() => Visibility.Check(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass), AnnotatedAssembly));
             Assert.Throws<MemberAccessException>(() => Visibility.Check(typeof(PrivateClass), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
             Assert.Throws<MemberAccessException>(() => Visibility.Check(typeof(PrivateClass), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+           // Assert.DoesNotThrow(() => Visibility.Check(typeof(IList<>), NonAnnotatedAssembly));
+            Assert.DoesNotThrow(() => Visibility.Check(typeof(IList<object>), NonAnnotatedAssembly));
         }
 
         internal interface IInternalInterface { }

@@ -3,29 +3,28 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
+using System.Threading;
+
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Abstractions
 {
     /// <summary>
-    /// Describes a syntax factory that is responsible for defining a class.
+    /// Describes an abstract syntax factory.
     /// </summary>
-    /// <remarks>Each factory should define only one class.</remarks>
     public interface ISyntaxFactory
     {
         /// <summary>
-        /// The name of the assembly that contains the defined class.
+        /// If the syntax should be compiled, this property returns the name of containing assembly.
         /// </summary>
-        string AssemblyName { get; }
-
-        /// <summary>
-        /// The name of the defined class.
-        /// </summary>
-        string GeneratedClassName { get; }
+        string? AssemblyName { get; }
 
         /// <summary>
         /// Returns the compilation unit (namespace, class defintion, etc) of the defined class.
         /// </summary>
-        CompilationUnitSyntax GenerateProxyUnit();
+        (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, IReadOnlyCollection<Type> Types) GetContext(CancellationToken cancellation = default);
     }
 }

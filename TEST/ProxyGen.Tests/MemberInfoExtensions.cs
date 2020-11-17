@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using NUnit.Framework;
@@ -58,25 +57,5 @@ namespace Solti.Utils.Proxy.Internals.Tests
             [SelectAttirubte]
             public int Method(ref string x) => throw new NotImplementedException();
         }
-
-        public static (MemberInfo, MemberInfo)[] FooMembers = new[] 
-        {
-            GetFooMemberPair<MethodInfo>(),
-            GetFooMemberPair<PropertyInfo>()
-        };
-
-        private static (MemberInfo, MemberInfo) GetFooMemberPair<TMember>() where TMember : MemberInfo 
-        {
-            TMember[] members = typeof(Foo)
-                .ListMembers<TMember>(includeNonPublic: true)
-                .Where(member => member.GetCustomAttribute<SelectAttirubte>() != null)
-                .ToArray();
-
-            return (members[0], members[1]);
-        }
-
-        [TestCaseSource(nameof(FooMembers))]
-        public void SignatureEquals_ShouldSupportExlicitImplementations((MemberInfo, MemberInfo) pair) =>
-            Assert.That(pair.Item1.SignatureEquals(pair.Item2));
     }
 }
