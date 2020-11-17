@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Interface ITypeGenerator
+    <title>Interface IProxySyntaxFactory
    | ProxyGen </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Interface ITypeGenerator
+    <meta name="title" content="Interface IProxySyntaxFactory
    | ProxyGen ">
     <meta name="generator" content="docfx 2.46.0.0">
     
@@ -37,30 +37,39 @@
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Abstractions.IProxySyntaxFactory">
   
   
-  <h1 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator" class="text-break">Interface ITypeGenerator
+  <h1 id="Solti_Utils_Proxy_Abstractions_IProxySyntaxFactory" data-uid="Solti.Utils.Proxy.Abstractions.IProxySyntaxFactory" class="text-break">Interface IProxySyntaxFactory
   </h1>
-  <div class="markdown level0 summary"><p>Describes a type generator.</p>
+  <div class="markdown level0 summary"><p>Describes an abstract proxy syntax factory.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.html#Solti_Utils_Proxy_Abstractions_ISyntaxFactory_AssemblyName">ISyntaxFactory.AssemblyName</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.html#Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GetContext_System_Threading_CancellationToken_">ISyntaxFactory.GetContext(CancellationToken)</a>
+    </div>
+  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Abstractions.html">Solti.Utils.Proxy.Abstractions</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
-  <h5 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_syntax">Syntax</h5>
+  <h5 id="Solti_Utils_Proxy_Abstractions_IProxySyntaxFactory_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public interface ITypeGenerator</code></pre>
+    <pre><code class="lang-csharp hljs">public interface IProxySyntaxFactory : ISyntaxFactory</code></pre>
   </div>
   <h3 id="properties">Properties
   </h3>
-  <a id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory_" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.SyntaxFactory*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_ITypeGenerator_SyntaxFactory" data-uid="Solti.Utils.Proxy.Abstractions.ITypeGenerator.SyntaxFactory">SyntaxFactory</h4>
-  <div class="markdown level1 summary"><p>The factory that provides the class definition.</p>
+  <a id="Solti_Utils_Proxy_Abstractions_IProxySyntaxFactory_ProxyClassName_" data-uid="Solti.Utils.Proxy.Abstractions.IProxySyntaxFactory.ProxyClassName*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_IProxySyntaxFactory_ProxyClassName" data-uid="Solti.Utils.Proxy.Abstractions.IProxySyntaxFactory.ProxyClassName">ProxyClassName</h4>
+  <div class="markdown level1 summary"><p>Returns the class name of the proxy.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">IProxySyntaxFactory SyntaxFactory { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">string ProxyClassName { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -72,7 +81,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="Solti.Utils.Proxy.Abstractions.IProxySyntaxFactory.html">IProxySyntaxFactory</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
         <td></td>
       </tr>
     </tbody>

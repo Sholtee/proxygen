@@ -42,7 +42,7 @@
   
   <h1 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory" class="text-break">Interface ISyntaxFactory
   </h1>
-  <div class="markdown level0 summary"><p>Describes a syntax factory that is responsible for defining a class.</p>
+  <div class="markdown level0 summary"><p>Describes an abstract syntax factory.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Abstractions.html">Solti.Utils.Proxy.Abstractions</a></h6>
@@ -51,14 +51,11 @@
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">public interface ISyntaxFactory</code></pre>
   </div>
-  <h5 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks"><p>Each factory should define only one class.</p>
-</div>
   <h3 id="properties">Properties
   </h3>
   <a id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_AssemblyName_" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.AssemblyName*"></a>
   <h4 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_AssemblyName" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.AssemblyName">AssemblyName</h4>
-  <div class="markdown level1 summary"><p>The name of the assembly that contains the defined class.</p>
+  <div class="markdown level1 summary"><p>If the syntax should be compiled, this property returns the name of containing assembly.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -80,41 +77,34 @@
       </tr>
     </tbody>
   </table>
-  <a id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GeneratedClassName_" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GeneratedClassName*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GeneratedClassName" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GeneratedClassName">GeneratedClassName</h4>
-  <div class="markdown level1 summary"><p>The name of the defined class.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">string GeneratedClassName { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="methods">Methods
   </h3>
-  <a id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GenerateProxyUnit_" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GenerateProxyUnit*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GenerateProxyUnit" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GenerateProxyUnit">GenerateProxyUnit()</h4>
+  <a id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GetContext_" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GetContext*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_ISyntaxFactory_GetContext_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Abstractions.ISyntaxFactory.GetContext(System.Threading.CancellationToken)">GetContext(CancellationToken)</h4>
   <div class="markdown level1 summary"><p>Returns the compilation unit (namespace, class defintion, etc) of the defined class.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">CompilationUnitSyntax GenerateProxyUnit()</code></pre>
+    <pre><code class="lang-csharp hljs">(CompilationUnitSyntax Unit, IReadOnlyCollection&lt;MetadataReference&gt; References, IReadOnlyCollection&lt;Type&gt; Types) GetContext(CancellationToken cancellation = default(CancellationToken))</code></pre>
   </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
+        <td><span class="parametername">cancellation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
@@ -125,7 +115,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/microsoft.codeanalysis.csharp.syntax.compilationunitsyntax">CompilationUnitSyntax</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.valuetuple-3">ValueTuple</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/microsoft.codeanalysis.csharp.syntax.compilationunitsyntax">CompilationUnitSyntax</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/microsoft.codeanalysis.metadatareference">MetadataReference</a>&gt;, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.collections.generic.ireadonlycollection-1">IReadOnlyCollection</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
