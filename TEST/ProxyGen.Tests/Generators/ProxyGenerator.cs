@@ -101,6 +101,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
+        public void GeneratedProxy_ShouldWorkWithGenerics() =>
+            Assert.DoesNotThrowAsync(() => CreateProxy<IList<List<object>>, InterfaceInterceptor<IList<List<object>>>>(new List<List<object>>()));
+
+        [Test]
         public async Task GeneratedProxy_ShouldWorkWithOverloadedProperties()
         {
             //
