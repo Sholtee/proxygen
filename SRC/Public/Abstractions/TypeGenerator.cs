@@ -21,10 +21,11 @@ namespace Solti.Utils.Proxy.Abstractions
     /// <summary>
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>
-    /// <remarks>Generators can not be instantiated. To access the create type use the <see cref="GeneratedType"/> property.</remarks>
+    /// <remarks>Generators can not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType(string?)"/> or <see cref="GetGeneratedTypeAsync(string?, CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
+        #region Private
         //
         // Szal biztos: https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim?view=netcore-3.1#thread-safety
         //
@@ -34,91 +35,60 @@ namespace Solti.Utils.Proxy.Abstractions
         private static Type? FType;
 
         private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.ProxyClassName, throwOnError: true);
+        #endregion
 
-        internal string? CacheFile => CacheDirectory != null 
-            ? Path.Combine(CacheDirectory, $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll")
-            : null;
+        #region Internal
+        internal string? CacheFileName => $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll";
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Task<Type> GenerateTypeAsync(string? assemblyNameOverride = default) => Task.Factory.StartNew(() => 
+        internal Type GenerateTypeCore(string? outputFile = default, string? assemblyNameOverride = default, CancellationToken cancellation = default)
         {
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = SyntaxFactory.GetContext();
+            (CompilationUnitSyntax unit, IReadOnlyCollection<MetadataReference> references, _) = SyntaxFactory.GetContext(cancellation);
 
             return ExtractType
             (
                  Compile.ToAssembly
                  (
-                     root: Unit,
+                     root: unit,
                      asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName!,
-                     outputFile: CacheFile,
-                     references: References
+                     outputFile,
+                     references,
+                     cancellation
                  )
             );
-        }, default, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
-        internal static async Task<Type> GetGeneratedTypeAsync()
-        {
-            if (FType != null) return FType;
-
-            await FLock.WaitAsync().ConfigureAwait(false);
-
-            try
-            {
-                if (FType == null)
-                {
-                    var self = new TDescendant();
-                    self.DoCheck();
-
-                    if (!self.TryLoadType(out FType))
-                        FType = await self.GenerateTypeAsync().ConfigureAwait(false);
-                }
-
-                return FType!;
-            }
-            finally { FLock.Release(); }
         }
 
-        internal bool TryLoadType(out Type? type) 
+        internal static Type GenerateType(string? cacheDir, CancellationToken cancellation = default) 
         {
-            string? cacheFile = CacheFile;
+            var self = new TDescendant();
+            self.DoCheck();
 
+            string? cacheFile = !string.IsNullOrEmpty(cacheDir)
+                ? Path.Combine(cacheDir, self.CacheFileName)
+                : null;
+
+            return self.TryLoadType(cacheFile, out Type result)
+                ? result
+                : self.GenerateTypeCore(cacheFile, null, cancellation);
+        }
+
+        internal bool TryLoadType(string? cacheFile, out Type type)
+        {
             if (cacheFile != null && File.Exists(cacheFile))
             {
                 type = ExtractType(Assembly.LoadFile(cacheFile));
                 return true;
             }
 
-            type = null;
+            type = null!;
             return false;
         }
+        #endregion
 
-        /// <summary>
-        /// The genrated <see cref="Type"/>.
-        /// </summary>
-        /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
-        [Obsolete("Use GeneratedTypeAsync instead")]
-        public static Type GeneratedType => GeneratedTypeAsync.GetAwaiter().GetResult();
-
-        /// <summary>
-        /// The genrated <see cref="Type"/>.
-        /// </summary>
-        /// <remarks>The returned <see cref="Type"/> is assembled only once so you can read this property multiple times.</remarks>
-        public static Task<Type> GeneratedTypeAsync => GetGeneratedTypeAsync();
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public abstract IProxySyntaxFactory SyntaxFactory { get; }
-
-        /// <summary>
-        /// The (optional) cache directory to be used to store the generated assembly.
-        /// </summary>
-        /// <remarks>Every product version should have its own cache directory to prevent unexpected <see cref="TypeLoadException"/>s.</remarks>
-        public static string? CacheDirectory { get; set; }
-
+        #region Protected
         /// <summary>
         /// Override to invoke your own checks.
         /// </summary>
@@ -133,5 +103,47 @@ namespace Solti.Utils.Proxy.Abstractions
             Visibility.Check(type, SyntaxFactory.AssemblyName!);
 #endif
         }
+        #endregion
+
+        #region Public
+        /// <summary>
+        /// Gets the generated <see cref="Type"/> asynchronously .
+        /// </summary>
+        /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
+        public static async Task<Type> GetGeneratedTypeAsync(string? cacheDir = default, CancellationToken cancellation = default)
+        {
+            if (FType != null) return FType;
+
+            await FLock.WaitAsync(cancellation).ConfigureAwait(false);
+
+            try
+            {
+                return FType ??= GenerateType(cacheDir, cancellation);
+            }
+            finally { FLock.Release(); }
+        }
+
+        /// <summary>
+        /// Gets the generated <see cref="Type"/>.
+        /// </summary>
+        /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
+        public static Type GetGeneratedType(string? cacheDir = null) 
+        {
+            if (FType != null) return FType;
+
+            FLock.Wait();
+
+            try
+            {
+                return FType ??= GenerateType(cacheDir);
+            }
+            finally { FLock.Release(); }
+        }
+
+        /// <summary>
+        /// See <see cref="ITypeGenerator"/>.
+        /// </summary>
+        public abstract IProxySyntaxFactory SyntaxFactory { get; }
+        #endregion
     }
 }

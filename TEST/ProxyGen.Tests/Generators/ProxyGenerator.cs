@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Moq;
@@ -60,7 +61,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class
         {
-            Type generated = await ProxyGenerator<TInterface, TInterceptor>.GeneratedTypeAsync;
+            Type generated = await ProxyGenerator<TInterface, TInterceptor>.GetGeneratedTypeAsync();
 
             ConstructorInfo ctor;
 
@@ -425,14 +426,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
             .Where(t => t.IsInterface && !t.ContainsGenericParameters);
 
         [TestCaseSource(nameof(RandomInterfaces))]
-        public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrowAsync(() => (Task)
+        public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
             typeof(ProxyGenerator<,>)
                 .MakeGenericType
                 (
                     iface,
                     typeof(InterfaceInterceptor<>).MakeGenericType(iface)
                 )
-                .InvokeMember("GeneratedTypeAsync", BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.GetProperty, null, null, new object[0]));
+                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { null }));
 
         [Test]
         public async Task ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 
@@ -440,14 +441,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.CacheDirectory = tmpDir;
-
-            string cacheFile = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>().CacheFile;
+            string cacheFile = Path.Combine(tmpDir, new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>().CacheFileName);
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
            
-            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GeneratedTypeAsync;
+            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GetGeneratedTypeAsync(tmpDir);
 
             Assert.That(File.Exists(cacheFile));               
         }
@@ -455,11 +454,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet() 
         {
-            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string 
+                cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                cacheFile = Path.Combine(
+                    cacheDir,
+                    new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFileName);
 
-            string cacheFile = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFile;
-
-            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GeneratedTypeAsync;
+            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync(cacheDir);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

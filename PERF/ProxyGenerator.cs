@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
 
@@ -23,7 +22,7 @@ namespace Solti.Utils.Proxy.Perf
         }
 
         [Benchmark]
-        public async Task AssemblingProxyType() =>
-            await new ProxyGenerator<IInterface, InterfaceProxy>().GenerateTypeAsync(Guid.NewGuid().ToString());
+        public void AssemblingProxyType() =>
+            new ProxyGenerator<IInterface, InterfaceProxy>().GenerateTypeCore(null, Guid.NewGuid().ToString());
     }
 }

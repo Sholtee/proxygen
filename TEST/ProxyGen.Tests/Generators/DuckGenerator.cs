@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GeneratedTypeAsync, target);
+            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GetGeneratedTypeAsync(), target);
 
         [Test]
         public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -158,11 +158,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldDistinguishByName() =>
-            Assert.DoesNotThrowAsync(() => DuckGenerator<IBar, MyBar>.GeneratedTypeAsync);
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IBar, MyBar>.GetGeneratedTypeAsync());
 
         [Test]
         public void DuckGenerator_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.ThrowsAsync<AmbiguousMatchException>(() => DuckGenerator<IBar, MultipleBaz>.GeneratedTypeAsync);
+            Assert.ThrowsAsync<AmbiguousMatchException>(() => DuckGenerator<IBar, MultipleBaz>.GetGeneratedTypeAsync());
 
         public class MultipleBaz : IBar
         {
@@ -183,9 +183,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
             };
 
             // anonim objektumok mindig internal-ok
-            Assert.DoesNotThrowAsync(() => (Task) typeof(DuckGenerator<,>)
+            Assert.DoesNotThrow(() => typeof(DuckGenerator<,>)
                 .MakeGenericType(typeof(IProps), anon.GetType())
-                .InvokeMember("GeneratedTypeAsync", BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.GetProperty, null, null, new object[0]));
+                .InvokeMember(nameof(DuckGenerator<object, object>.GetGeneratedType), BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { null }));
         }
 
         public interface IProps 
@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldWorkWithGenericTypes() =>
-            Assert.DoesNotThrowAsync(() => DuckGenerator<IGeneric<int>, Generic<int>>.GeneratedTypeAsync);
+            Assert.DoesNotThrowAsync(() => DuckGenerator<IGeneric<int>, Generic<int>>.GetGeneratedTypeAsync());
 
         public interface IGeneric<T> { T Foo(); }
 
@@ -211,14 +211,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            DuckGenerator<IGeneric<Guid>, Generic<Guid>>.CacheDirectory = tmpDir;
-
-            string cacheFile = new DuckGenerator<IGeneric<Guid>, Generic<Guid>>().CacheFile;
+            string cacheFile = Path.Combine(tmpDir, new DuckGenerator<IGeneric<Guid>, Generic<Guid>>().CacheFileName);
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GeneratedTypeAsync;
+            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GetGeneratedTypeAsync(tmpDir);
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -226,11 +224,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            DuckGenerator<IGeneric<object>, Generic<object>>.CacheDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            string
+                cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                cacheFile = Path.Combine(
+                    cacheDir, 
+                    new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFileName);
 
-            string cacheFile = new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFile;
-
-            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GeneratedTypeAsync;
+            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GetGeneratedTypeAsync(cacheDir);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
