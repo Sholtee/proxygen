@@ -102,92 +102,10 @@
     </tbody>
   </table>
   <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks"><p>Generators can not be instantiated. To access the create type use the <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType">GeneratedType</a> property.</p>
+  <div class="markdown level0 remarks"><p>Generators can not be instantiated. To access the created <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> use the <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedType_System_String_">GetGeneratedType(String)</a> or <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_System_String_System_Threading_CancellationToken_">GetGeneratedTypeAsync(String, CancellationToken)</a> method.</p>
 </div>
   <h3 id="properties">Properties
   </h3>
-  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CacheDirectory_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CacheDirectory" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.CacheDirectory">CacheDirectory</h4>
-  <div class="markdown level1 summary"><p>The (optional) cache directory to be used to store the generated assembly.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static string CacheDirectory { get; set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_CacheDirectory_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>Every product version should have its own cache directory to prevent unexpected <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.typeloadexception">TypeLoadException</a>s.</p>
-</div>
-  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedType">GeneratedType</h4>
-  <div class="markdown level1 summary"><p>The genrated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Obsolete(&quot;Use GeneratedTypeAsync instead&quot;)]
-public static Type GeneratedType { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedType_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is assembled only once so you can read this property multiple times.</p>
-</div>
-  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedTypeAsync_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync*"></a>
-  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedTypeAsync" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GeneratedTypeAsync">GeneratedTypeAsync</h4>
-  <div class="markdown level1 summary"><p>The genrated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Task&lt;Type&gt; GeneratedTypeAsync { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GeneratedTypeAsync_remarks">Remarks</h5>
-  <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is assembled only once so you can read this property multiple times.</p>
-</div>
   <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_SyntaxFactory_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.SyntaxFactory*"></a>
   <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_SyntaxFactory" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.SyntaxFactory">SyntaxFactory</h4>
   <div class="markdown level1 summary"><p>See <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html">ITypeGenerator</a>.</p>
@@ -249,6 +167,99 @@ public static Type GeneratedType { get; }</code></pre>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">protected virtual void DoCheck()</code></pre>
   </div>
+  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedType_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedType*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedType_System_String_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedType(System.String)">GetGeneratedType(String)</h4>
+  <div class="markdown level1 summary"><p>Gets the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Type GetGeneratedType(string cacheDir = null)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">cacheDir</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedType_System_String__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is generated only once.</p>
+</div>
+  <a id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync*"></a>
+  <h4 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_System_String_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Abstractions.TypeGenerator`1.GetGeneratedTypeAsync(System.String,System.Threading.CancellationToken)">GetGeneratedTypeAsync(String, CancellationToken)</h4>
+  <div class="markdown level1 summary"><p>Gets the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> asynchronously .</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Task&lt;Type&gt; GetGeneratedTypeAsync(string cacheDir = null, CancellationToken cancellation = default(CancellationToken))</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td><span class="parametername">cacheDir</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
+        <td><span class="parametername">cancellation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Solti_Utils_Proxy_Abstractions_TypeGenerator_1_GetGeneratedTypeAsync_System_String_System_Threading_CancellationToken__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is generated only once.</p>
+</div>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="Solti.Utils.Proxy.Abstractions.ITypeGenerator.html">ITypeGenerator</a>
