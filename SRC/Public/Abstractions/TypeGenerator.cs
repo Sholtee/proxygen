@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Abstractions
         #endregion
 
         #region Internal
-        internal string? CacheFileName => $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll";
+        internal string CacheFileName => $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll";
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
