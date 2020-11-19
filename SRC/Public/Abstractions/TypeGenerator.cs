@@ -66,25 +66,22 @@ namespace Solti.Utils.Proxy.Abstractions
             var self = new TDescendant();
             self.DoCheck();
 
-            string? cacheFile = !string.IsNullOrEmpty(cacheDir)
-                ? Path.Combine(cacheDir, self.CacheFileName)
-                : null;
+            string? cacheFile = null;
 
-            return self.TryLoadType(cacheFile, out Type result)
-                ? result
-                : self.GenerateTypeCore(cacheFile, null, cancellation);
-        }
-
-        internal bool TryLoadType(string? cacheFile, out Type type)
-        {
-            if (cacheFile != null && File.Exists(cacheFile))
+            if (!string.IsNullOrEmpty(cacheDir))
             {
-                type = ExtractType(Assembly.LoadFile(cacheFile));
-                return true;
+                cacheFile = Path.Combine(cacheDir, self.CacheFileName);
+
+                if (File.Exists(cacheFile)) return self.ExtractType
+                (
+                    Assembly.LoadFile(cacheFile)
+                );
+
+                if (!Directory.Exists(cacheDir))
+                    Directory.CreateDirectory(cacheDir);
             }
 
-            type = null!;
-            return false;
+            return self.GenerateTypeCore(cacheFile, null, cancellation);
         }
         #endregion
 
