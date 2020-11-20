@@ -97,6 +97,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A generator can not be generic..
+        /// </summary>
+        internal static string GENERIC_GENERATOR {
+            get {
+                return ResourceManager.GetString("GENERIC_GENERATOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The method (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
         /// </summary>
         internal static string IVT_REQUIRED {
@@ -138,6 +147,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string NOT_A_CLASS {
             get {
                 return ResourceManager.GetString("NOT_A_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter must be a TypeGenerator descendant..
+        /// </summary>
+        internal static string NOT_A_GENERATOR {
+            get {
+                return ResourceManager.GetString("NOT_A_GENERATOR", resourceCulture);
             }
         }
         

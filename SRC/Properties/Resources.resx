@@ -129,6 +129,9 @@
   <data name="DYNAMIC_ASM" xml:space="preserve">
     <value>Dynamic assemblies are not supported.</value>
   </data>
+  <data name="GENERIC_GENERATOR" xml:space="preserve">
+    <value>A generator can not be generic.</value>
+  </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="NOT_A_CLASS" xml:space="preserve">
     <value>The type must be a class.</value>
+  </data>
+  <data name="NOT_A_GENERATOR" xml:space="preserve">
+    <value>The parameter must be a TypeGenerator descendant.</value>
   </data>
   <data name="NO_PUBLIC_CTOR" xml:space="preserve">
     <value>At least one public constructor should be declared on {0}.</value>
