@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Assembly asm = type.Assembly;
 
-            if (string.IsNullOrEmpty(asm.Location))
+            if (asm.IsDynamic)
                 throw new NotSupportedException(Resources.DYNAMIC_ASM);
 
             FReferences.Add(asm);
