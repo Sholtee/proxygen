@@ -37,7 +37,6 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     AttributeList
                     (
-
                         new[] 
                         {
                             CreateAttribute<AssemblyTitleAttribute>(AsLiteral(AssemblyName!)),
