@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 options: CompilationOptionsFactory.Create()
             );
 
-            AttributeSyntax[] attributes = ProxyEmbedder.GetAttributes<AssemblyTitleAttribute>(compilation).ToArray();
+            AttributeSyntax[] attributes = new ProxyEmbedder(compilation, default).GetAttributes<AssemblyTitleAttribute>().ToArray();
             Assert.That(attributes.Length, Is.EqualTo(1));
         }
 
@@ -81,13 +81,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 options: CompilationOptionsFactory.Create()
             );
 
-            var res = ProxyEmbedder.GetAOTGenerators(compilation).ToArray();
+            var res = new ProxyEmbedder(compilation, default).GetAOTGenerators().ToArray();
 
             Assert.That(res.Length, Is.EqualTo(1));
-            Assert.That(res.Single().Generator, Is.EqualTo(typeof(ProxyGenerator<,>)));
-            Assert.That(res[0].GenericArguments.Count, Is.EqualTo(2));
-            Assert.That(res[0].GenericArguments.First().ToDisplayString(), Is.EqualTo("System.Collections.Generic.IList<int>"));
-            Assert.That(res[0].GenericArguments.Last().ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>"));
+            Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.ProxyGenerator<System.Collections.Generic.IList<int>, Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>>"));
         }
     }
 }
