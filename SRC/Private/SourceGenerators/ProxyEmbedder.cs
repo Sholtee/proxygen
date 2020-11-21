@@ -53,19 +53,14 @@ namespace Solti.Utils.Proxy.Internals
 
         internal IEnumerable<INamedTypeSymbol> GetAOTGenerators() 
         {
-            foreach(AttributeSyntax attr in GetAttributes<EmbedGeneratedTypeAttribute>())
+            foreach(AttributeData attr in Compilation.Assembly.GetAttributes().Where(attr => Is(attr.AttributeClass, typeof(EmbedGeneratedTypeAttribute))))
             {
-                if (attr.ArgumentList!.Arguments.Single().Expression is TypeOfExpressionSyntax expr) // parametere nem NULL?
-                {
-                    SemanticModel sm = Compilation.GetSemanticModel(attr.SyntaxTree);
+                if (attr.ConstructorArguments.Single().Value is INamedTypeSymbol arg) 
+                {   
+                    INamedTypeSymbol genericTypeDefinition = arg.OriginalDefinition;
 
-                    if (sm.GetTypeInfo(expr.Type, Cancellation).Type is INamedTypeSymbol named)
-                    {
-                        INamedTypeSymbol genericTypeDefinition = named.OriginalDefinition;
-
-                        if (Generators.Any(generator => Is(genericTypeDefinition, generator)))
-                            yield return named;
-                    }
+                    if (Generators.Any(generator => Is(genericTypeDefinition, generator)))
+                        yield return arg;
                 }
             }
         }

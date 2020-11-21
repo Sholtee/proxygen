@@ -18,11 +18,17 @@ using Solti.Utils.Proxy;
 using Solti.Utils.Proxy.Attributes;
 using Solti.Utils.Proxy.Generators;
 
-[assembly: EmbedGeneratedType(typeof(IList<>)), EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+[assembly: 
+    EmbedGeneratedType(typeof(IList<>)), 
+    EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>)),
+    EmbedGeneratedType(typeof(ProxyGenerator<Solti.Utils.Proxy.Internals.Tests.IMyService, InterfaceInterceptor<Solti.Utils.Proxy.Internals.Tests.IMyService>>))
+]
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Abstractions;
+
+    public interface IMyService { }
 
     [TestFixture]
     public class ProxyEmbedderTests
