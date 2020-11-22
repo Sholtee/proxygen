@@ -25,9 +25,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void GetFullName_ShouldDoWhatTheNameSuggests((MemberInfo Member, string Expected) param) =>
             Assert.That(param.Member.GetFullName(), Is.EqualTo(param.Expected));
 
-        internal static (IMemberInfo Member, bool IsStatic)[] StaticNonStatic = new[]
+        public static (object Member, bool IsStatic)[] StaticNonStatic = new[]
         {
-            ((IMemberInfo) MetadataPropertyInfo.CreateFrom(typeof(AppDomain).GetProperty(nameof(AppDomain.CurrentDomain), BindingFlags.Static | BindingFlags.Public)), true),
+            ((object) MetadataPropertyInfo.CreateFrom(typeof(AppDomain).GetProperty(nameof(AppDomain.CurrentDomain), BindingFlags.Static | BindingFlags.Public)), true),
             (MetadataMethodInfo.CreateFrom(typeof(AppDomain).GetMethod(nameof(AppDomain.GetCurrentThreadId), BindingFlags.Static | BindingFlags.Public)), true),
             (MetadataMethodInfo.CreateFrom(typeof(MemberInfoExtensionsTests).GetMethod(nameof(GetFullName_ShouldDoWhatTheNameSuggests))), false),
             (MetadataPropertyInfo.CreateFrom(typeof(List<>).GetProperty(nameof(List<object>.Count))), false),
@@ -35,8 +35,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         };
 
         [TestCaseSource(nameof(StaticNonStatic))]
-        internal void IsStatic_ShouldDoWhatTheNameSuggests((IMemberInfo Member, bool IsStatic) param)
-            => Assert.That(param.Member.IsStatic, Is.EqualTo(param.IsStatic));
+        public void IsStatic_ShouldDoWhatTheNameSuggests((object Member, bool IsStatic) param)
+            => Assert.That(((IMemberInfo) param.Member).IsStatic, Is.EqualTo(param.IsStatic));
 
         private interface IFoo
         {

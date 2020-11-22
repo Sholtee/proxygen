@@ -28,18 +28,19 @@ namespace Solti.Utils.Proxy.Internals
         {
             Type reflectedType = src.ReflectedType;
 
-            foreach (Type iface in reflectedType.GetInterfaces())
-            {
-                InterfaceMapping mapping = reflectedType.GetInterfaceMap(iface);
+            if (!reflectedType.IsInterface)
+                foreach (Type iface in reflectedType.GetInterfaces())
+                {
+                    InterfaceMapping mapping = reflectedType.GetInterfaceMap(iface);
 
-                //
-                // Ha a metodus resze egy interface implementacionak akkor ezt az interface-t
-                // tekintjuk deklaralo tipusnak.
-                //
+                    //
+                    // Ha a metodus resze egy interface implementacionak akkor ezt az interface-t
+                    // tekintjuk deklaralo tipusnak.
+                    //
 
-                if (mapping.TargetMethods.Contains(src))
-                    return iface;
-            }
+                    if (mapping.TargetMethods.Contains(src))
+                        return iface;
+                }
 
             return src.DeclaringType;
         }

@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this Type src)
         {
-            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition);
+            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition || !src.GetOwnGenericArguments().Any());
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
 

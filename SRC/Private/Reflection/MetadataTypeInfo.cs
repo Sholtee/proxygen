@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         public static ITypeInfo CreateFrom(Type underlyingType) => underlyingType switch
         {
             _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
-            _ when underlyingType.IsGenericType => new MetadataGenericTypeInfo(underlyingType),
+            _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
             _ => new MetadataTypeInfo(underlyingType)
         };
 
@@ -98,7 +98,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
-            .ListMembers<ConstructorInfo>()
+            .GetPublicConstructors()
             .Select(MetadataMethodInfo.CreateFrom)
             .Cast<IConstructorInfo>()
             .ToArray();
@@ -120,7 +120,7 @@ namespace Solti.Utils.Proxy.Internals
 
             public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
-            IGeneric IGeneric.GenericDefinition => GenericDefinition.GenericDefinition;
+            IGeneric IGeneric.GenericDefinition => GenericDefinition;
         }
 
         private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 
