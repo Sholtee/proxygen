@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         public string Name => UnderLyingEvent.StrippedName();
 
         private ITypeInfo? FDeclaringType;
-        public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderLyingEvent.DeclaringType);
+        public ITypeInfo DeclaringType => FDeclaringType ??= (AddMethod ?? RemoveMethod!).DeclaringType;
 
         private IMethodInfo? FAddMethod;
         public IMethodInfo AddMethod => FAddMethod ??= MetadataMethodInfo.CreateFrom(UnderLyingEvent.AddMethod);

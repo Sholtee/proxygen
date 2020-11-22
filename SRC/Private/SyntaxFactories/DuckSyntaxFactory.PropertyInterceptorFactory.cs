@@ -26,6 +26,8 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class PropertyInterceptorFactory : InterceptorFactoryBase
         {
+            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IPropertyInfo;
+
             public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
                 IPropertyInfo

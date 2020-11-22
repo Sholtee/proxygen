@@ -34,8 +34,8 @@ namespace Solti.Utils.Proxy.Internals
                 @base = MetadataTypeInfo.CreateFrom(typeof(DuckBase<TTarget>));
 
             Debug.Assert(interfaceType.IsInterface);
-            Debug.Assert(interfaceType is not IGenericTypeInfo genericIface || genericIface.IsGenericDefinition);
-            Debug.Assert(@base is not IGenericTypeInfo genericBase || genericBase.IsGenericDefinition);
+            Debug.Assert(interfaceType is not IGenericTypeInfo genericIface || !genericIface.IsGenericDefinition);
+            Debug.Assert(@base is not IGenericTypeInfo genericBase || !genericBase.IsGenericDefinition);
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (

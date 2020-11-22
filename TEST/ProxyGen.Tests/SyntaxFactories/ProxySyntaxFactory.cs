@@ -32,9 +32,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             }
         }
 
-        internal static (IMethodInfo Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
+        public static (object Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
-            (Foo, "System.Object[] args = new System.Object[]{a, default(System.String), c};"),
+            ((object) Foo, "System.Object[] args = new System.Object[]{a, default(System.String), c};"),
             (Bar, "System.Object[] args = new System.Object[0];")
         };
 
@@ -44,8 +44,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void Setup() => Generator = new ProxySyntaxFactory<IFoo<int>, FooInterceptor>();
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
-        public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
-            Assert.That(Generator.CreateArgumentsArray(MetadataMethodInfo.CreateFrom(para.Method)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+        public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
+            Assert.That(Generator.CreateArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
@@ -97,15 +97,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para) =>
             Assert.That(Generator.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), Generator.DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
-        internal static (IMethodInfo Method, string File)[] Methods = new[]
+        public static (object Method, string File)[] Methods = new[]
         {
-            (Foo, "FooSrc.txt"),
+            ((object) Foo, "FooSrc.txt"),
             (Bar, "BarSrc.txt")
         };
 
         [TestCaseSource(nameof(Methods))]
-        public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
-            Assert.That(new MethodInterceptorFactory().Build(MetadataMethodInfo.CreateFrom(para.Method)).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
+        public void GenerateProxyMethod_Test((object Method, string File) para) =>
+            Assert.That(new MethodInterceptorFactory().Build((IMethodInfo) para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test() =>

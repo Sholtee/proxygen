@@ -75,6 +75,8 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
+            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IMethodInfo method && !method.IsSpecial;
+
             public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
                 IMethodInfo

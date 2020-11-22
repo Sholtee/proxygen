@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
             public string Name => UnderLyingMethod.StrippedName();
 
             private ITypeInfo? FDeclaringType;
-            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderLyingMethod.DeclaringType);
+            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderLyingMethod.GetDeclaringType());
 
             public bool IsStatic => UnderLyingMethod.IsStatic;
 

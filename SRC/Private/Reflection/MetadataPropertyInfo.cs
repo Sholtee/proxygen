@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderLyingProperty.PropertyType);
 
         private ITypeInfo? FDeclaringType;
-        public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderLyingProperty.DeclaringType);
+        public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
         private IReadOnlyList<IParameterInfo>? FIndices;
         public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderLyingProperty
