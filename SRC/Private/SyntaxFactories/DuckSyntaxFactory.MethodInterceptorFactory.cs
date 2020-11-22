@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,8 +22,6 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class MethodInterceptorFactory : InterceptorFactoryBase
         {
-            public MethodInterceptorFactory(DuckSyntaxFactory<TInterface, TTarget> owner) : base(owner) {}
-
             //
             // - int A.Foo([in|ref|out] int p) == int B.Foo([in|ref|out] int cica)
             // - TCica A.Bar<TCica>() == TKutya B.Bar<TKutya>()
@@ -33,24 +30,29 @@ namespace Solti.Utils.Proxy.Internals
             // - TCica A.BarBaz<TCica, TMica>() != TMutya B.BarBaz<TKutya, TMutya>()
             //
 
-            protected override bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember) 
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) 
             {
                 return
-                    targetMember.StrippedName() == ifaceMember.StrippedName() &&
-                    ExtractParameters((MethodInfo) targetMember).SequenceEqual(ExtractParameters((MethodInfo) ifaceMember));
+                    targetMember.Name == ifaceMember.Name &&
+                    ExtractParameters((IMethodInfo) targetMember).SequenceEqual(ExtractParameters((IMethodInfo) ifaceMember));
 
-                static IEnumerable<object> ExtractParameters(MethodInfo method) 
+                static IEnumerable<object> ExtractParameters(IMethodInfo method) 
                 {
-                    IReadOnlyDictionary<Type, string> unifiedGenerics = method
-                        .GetGenericArguments()
-                        .Select((type, i) => new 
-                        { 
-                            Type = type, 
-                            Name = $"T{i}" 
-                        })
-                        .ToDictionary(x => x.Type, x => x.Name);
+                    IReadOnlyDictionary<ITypeInfo, string> unifiedGenerics;
 
-                    return new[] { method.ReturnParameter }.Concat(method.GetParameters()).Select(param => new 
+                    if (method is IGenericMethodInfo genericMethod) 
+                        unifiedGenerics = genericMethod
+                            .GenericArguments
+                            .Select((type, i) => new
+                            {
+                                Type = type,
+                                Name = $"T{i}"
+                            })
+                            .ToDictionary(x => x.Type, x => x.Name);
+                    else
+                        unifiedGenerics = new Dictionary<ITypeInfo, string>();
+
+                    return new[] { method.ReturnValue }.Concat(method.Parameters).Select(param => new 
                     {
                         //
                         // List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
@@ -59,10 +61,11 @@ namespace Solti.Utils.Proxy.Internals
                         // hasznaljuk h eltero nevu nyilt generikusokat is tudjunk vizsgalni.
                         //
 
-                        Name = unifiedGenerics.TryGetValue(param.ParameterType, out string name) 
+                        Name = unifiedGenerics.TryGetValue(param.Type, out string name) 
                             ? name 
-                            : param.ParameterType.FullName,
-                        param.Attributes // IN, OUT, stb
+                            : param.Type.Name,
+
+                        param.Kind
 
                         //
                         // Parameter neve nem erdekel bennunket (azonos tipussal es attributumokkal ket parametert
@@ -72,47 +75,45 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
-                MethodInfo
-                    ifaceMethod = (MethodInfo) member,
-                    targetMethod = GetTargetMember(ifaceMethod);
+                IMethodInfo
+                    ifaceMethod = (IMethodInfo) member,
+                    targetMethod = GetTargetMember(ifaceMethod, MetadataTypeInfo.CreateFrom(typeof(TTarget)).Methods);
 
                 //
                 // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
                 //
 
-                Visibility.Check(targetMethod, Owner.AssemblyName);
+                Visibility.Check(targetMethod, AssemblyName);
 
                 //
                 // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
                 // maskepp vannak elnvezve.
                 //
 
-                ExpressionSyntax invocation = Owner.InvokeMethod
+                ExpressionSyntax invocation = InvokeMethod
                 (
                     ifaceMethod,
-                    Owner.TARGET,
-                    castTargetTo: targetMethod.GetAccessModifiers() == AccessModifiers.Explicit
-                        ? targetMethod.GetDeclaringType()
+                    TARGET,
+                    castTargetTo: targetMethod.AccessModifiers == AccessModifiers.Explicit
+                        ? targetMethod.DeclaringType
                         : null,
                     arguments: ifaceMethod
-                        .GetParameters()
+                        .Parameters
                         .Select(para => para.Name)
                         .ToArray()
                 );
 
-                if (ifaceMethod.ReturnType.IsByRef) invocation = RefExpression(invocation);
+                if (ifaceMethod.ReturnValue.Type.IsByRef) invocation = RefExpression(invocation);
 
-                return Owner.DeclareMethod(ifaceMethod, forceInlining: true)
+                return DeclareMethod(ifaceMethod, forceInlining: true)
                     .WithExpressionBody
                     (
                         expressionBody: ArrowExpressionClause(invocation)
                     )
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
             }
-
-            public override bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName;
         }
     }
 }

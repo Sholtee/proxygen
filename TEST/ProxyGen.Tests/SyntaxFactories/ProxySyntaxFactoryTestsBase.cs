@@ -3,10 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Reflection;
-
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
+    using Internals;
+
     public class ProxySyntaxFactoryTestsBase
     {
         public delegate void TestDelegate<in T>(object sender, T eventArg);
@@ -19,12 +19,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             event TestDelegate<T> Event;
         }
 
-        protected static EventInfo Event { get; } = typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event));
+        internal static IEventInfo Event { get; } = MetadataEventInfo.CreateFrom(typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event)));
 
-        protected static PropertyInfo Prop { get; } = typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop));
+        internal static IPropertyInfo Prop { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop)));
 
-        protected static MethodInfo Foo { get; } = typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo));
+        internal static IMethodInfo Foo { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo)));
 
-        protected static MethodInfo Bar { get; } = typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Bar));
+        internal static IMethodInfo Bar { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Bar)));
     }
 }

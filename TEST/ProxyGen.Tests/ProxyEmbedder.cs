@@ -6,11 +6,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using NUnit.Framework;
 
@@ -26,38 +24,11 @@ using Solti.Utils.Proxy.Generators;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    using Abstractions;
-
     public interface IMyService { }
 
     [TestFixture]
     public class ProxyEmbedderTests
     {
-        [Test]
-        public void GetAttributes_ShouldReturnAllTheAttributes() 
-        {
-            IProxySyntaxFactory fact = new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>().SyntaxFactory;
-
-            (CompilationUnitSyntax unit, IReadOnlyCollection<MetadataReference> references, IReadOnlyCollection<Type> _) = fact.GetContext();
-
-            CSharpCompilation compilation = CSharpCompilation.Create
-            (
-                assemblyName: fact.AssemblyName,
-                syntaxTrees: new[]
-                {
-                    CSharpSyntaxTree.Create
-                    (
-                        root: unit
-                    )
-                },
-                references: references,
-                options: CompilationOptionsFactory.Create()
-            );
-
-            AttributeSyntax[] attributes = new ProxyEmbedder(compilation, default).GetAttributes<AssemblyTitleAttribute>().ToArray();
-            Assert.That(attributes.Length, Is.EqualTo(1));
-        }
-
         [Test]
         public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations() 
         {

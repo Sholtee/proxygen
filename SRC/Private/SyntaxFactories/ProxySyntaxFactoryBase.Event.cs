@@ -3,11 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,14 +23,14 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove{...}                        <br/>
         /// }                                    <br/>
         /// </summary>
-        protected internal virtual EventDeclarationSyntax DeclareEvent(EventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
+        protected internal virtual EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface);
 
             EventDeclarationSyntax result = EventDeclaration
             (
-                type: CreateType(@event.EventHandlerType),
-                identifier: Identifier(@event.StrippedName())
+                type: CreateType(@event.Type),
+                identifier: Identifier(@event.Name)
             )
             .WithExplicitInterfaceSpecifier
             (
@@ -59,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Event [+|-]= ...;
         /// </summary>
-        protected internal AssignmentExpressionSyntax RegisterEvent(EventInfo @event, ExpressionSyntax? target, bool add, ExpressionSyntax right, Type? castTargetTo = null) => AssignmentExpression
+        protected internal AssignmentExpressionSyntax RegisterEvent(IEventInfo @event, ExpressionSyntax? target, bool add, ExpressionSyntax right, ITypeInfo? castTargetTo = null) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccess

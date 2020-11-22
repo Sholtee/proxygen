@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -25,29 +24,18 @@ namespace Solti.Utils.Proxy.Internals
 
         private readonly MemberAccessExpressionSyntax TARGET;
 
-        public DuckSyntaxFactory() 
-        {
-            InterceptorFactories = new List<IInterceptorFactory>
-            {
-                new MethodInterceptorFactory(this),
-                new PropertyInterceptorFactory(this),
-                new EventInterceptorFactory(this)
-            };
-
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!));
-        }
-
-        private IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; }
+        public DuckSyntaxFactory() =>
+            TARGET = MemberAccess(null, MetadataPropertyInfo.CreateFrom((PropertyInfo) MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!)));
 
         protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
         {
-            Type 
-                interfaceType = typeof(TInterface),
-                @base = typeof(DuckBase<TTarget>);
+            ITypeInfo 
+                interfaceType = MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                @base = MetadataTypeInfo.CreateFrom(typeof(DuckBase<TTarget>));
 
             Debug.Assert(interfaceType.IsInterface);
-            Debug.Assert(!interfaceType.IsGenericTypeDefinition);
-            Debug.Assert(!@base.IsGenericTypeDefinition);
+            Debug.Assert(interfaceType is not IGenericTypeInfo genericIface || genericIface.IsGenericDefinition);
+            Debug.Assert(@base is not IGenericTypeInfo genericBase || genericBase.IsGenericDefinition);
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (
@@ -78,22 +66,12 @@ namespace Solti.Utils.Proxy.Internals
 
             List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
             (
-                @base.GetPublicConstructors().Select(DeclareCtor)
+                @base.Constructors.Select(DeclareCtor)
             );
 
-            members.AddRange
-            (
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                interfaceType
-                    .ListMembers<MemberInfo>()
-                    .Select(m => 
-                    {
-                        cancellation.ThrowIfCancellationRequested();
-                        return InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m);
-                    })
-                    .Where(m => m != null)
-#pragma warning restore CS8620
-            );
+            members.AddRange(BuildMembers<MethodInterceptorFactory>(interfaceType.Methods, cancellation));
+            members.AddRange(BuildMembers<PropertyInterceptorFactory>(interfaceType.Properties, cancellation));
+            members.AddRange(BuildMembers<EventInterceptorFactory>(interfaceType.Events, cancellation));
 
             return cls.WithMembers
             (

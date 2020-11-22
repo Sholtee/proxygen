@@ -3,11 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -25,7 +23,15 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null) => PropertyAccess(property, target, castTargetTo, property.GetIndexParameters().Select(param => Argument(IdentifierName(param.Name))));
+        protected internal ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null) => PropertyAccess
+        (
+            property, 
+            target, 
+            castTargetTo, 
+            property
+                .Indices
+                .Select(param => Argument(IdentifierName(param.Name)))
+        );
 
         /// <summary>
         /// target.Property           <br/>
@@ -34,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal ExpressionSyntax PropertyAccess(PropertyInfo property, ExpressionSyntax? target, Type? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.IsIndexer()
+        protected internal ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.Indices.Any()
             ? MemberAccess
             (
                 target,
@@ -57,26 +63,26 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}             <br/>
         /// }                      <br/>
         /// </summary>
-        protected internal virtual PropertyDeclarationSyntax DeclareProperty(PropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        protected internal virtual PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
 
             PropertyDeclarationSyntax result = PropertyDeclaration
             (
-                type: CreateType(property.PropertyType),
-                identifier: Identifier(property.StrippedName())
+                type: CreateType(property.Type),
+                identifier: Identifier(property.Name)
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax)CreateType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(property.DeclaringType))
             );
 
             List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
 
-            if (property.CanRead && getBody != null)
+            if (property.GetMethod != null && getBody != null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
 
-            if (property.CanWrite && setBody != null)
+            if (property.SetMethod != null && setBody != null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
             return !accessors.Any() ? result : result.WithAccessorList
@@ -95,26 +101,24 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                             <br/>
         /// }                                      <br/>
         /// </summary>
-        protected internal virtual IndexerDeclarationSyntax DeclareIndexer(PropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        protected internal virtual IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
-            Debug.Assert(property.IsIndexer());
-
-            ParameterInfo[] indices = property.GetIndexParameters();
+            Debug.Assert(property.Indices.Any());
 
             IndexerDeclarationSyntax result = IndexerDeclaration
             (
-                type: CreateType(property.PropertyType)
+                type: CreateType(property.Type)
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax)CreateType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(property.DeclaringType))
             )
             .WithParameterList
             (
                 parameterList: BracketedParameterList
                 (
-                    parameters: indices.ToSyntaxList
+                    parameters: property.Indices.ToSyntaxList
                     (
                         index => Parameter
                         (
@@ -122,7 +126,7 @@ namespace Solti.Utils.Proxy.Internals
                         )
                         .WithType
                         (
-                            type: CreateType(index.ParameterType)
+                            type: CreateType(index.Type)
                         )
                     )
                 )
@@ -130,10 +134,10 @@ namespace Solti.Utils.Proxy.Internals
 
             List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
 
-            if (property.CanRead && getBody != null)
+            if (property.GetMethod != null && getBody != null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
 
-            if (property.CanWrite && setBody != null)
+            if (property.SetMethod != null && setBody != null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
             return !accessors.Any() ? result : result.WithAccessorList

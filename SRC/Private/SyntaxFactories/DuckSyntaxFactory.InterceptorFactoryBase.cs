@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -15,23 +16,18 @@ namespace Solti.Utils.Proxy.Internals
 
     internal partial class DuckSyntaxFactory<TInterface, TTarget>
     {
-        internal abstract class InterceptorFactoryBase : IInterceptorFactory
+        internal abstract class InterceptorFactoryBase : DuckSyntaxFactory<TInterface, TTarget>, IInterceptorFactory
         {
-            public DuckSyntaxFactory<TInterface, TTarget> Owner { get; }
+            protected abstract bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember);
 
-            public InterceptorFactoryBase(DuckSyntaxFactory<TInterface, TTarget> owner) => Owner = owner;
-
-            protected abstract bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember);
-
-            protected TMember GetTargetMember<TMember>(TMember ifaceMember) where TMember : MemberInfo 
+            protected TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers) where TMember : IMemberInfo 
             {
-                TMember[] possibleTargets = typeof(TTarget)
-                  .ListMembers<TMember>(includeNonPublic: true)
+                TMember[] possibleTargets = targetMembers
                   .Where(targetMember => SignatureEquals(targetMember, ifaceMember))
                   .ToArray();
 
                 if (!possibleTargets.Any())
-                    throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.GetFullName()));
+                    throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
 
                 //
                 // Lehet tobb implementacio is pl.:
@@ -39,14 +35,14 @@ namespace Solti.Utils.Proxy.Internals
                 //
 
                 if (possibleTargets.Length > 1)
-                    throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.GetFullName()));
+                    throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.Name));
 
                 return possibleTargets[0];
             }
 
-            public abstract MemberDeclarationSyntax Build(MemberInfo member);
+            public virtual bool IsCompatible(IMemberInfo member) => member.DeclaringType.IsInterface;
 
-            public abstract bool IsCompatible(MemberInfo member);
+            public abstract MemberDeclarationSyntax Build(IMemberInfo member);
         }
     }
 }

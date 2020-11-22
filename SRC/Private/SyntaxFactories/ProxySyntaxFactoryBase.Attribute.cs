@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         SimpleMemberAccess
                         (
-                            CreateType<MethodImplOptions>(),
+                            CreateType(MetadataTypeInfo.CreateFrom(typeof(MethodImplOptions))),
                             nameof(MethodImplOptions.AggressiveInlining)
                         )
                     )                 
@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
 
         AttributeSyntax CreateAttribute<TAttribute>(ExpressionSyntax param) where TAttribute : Attribute => Attribute
         (
-            (NameSyntax) CreateType<TAttribute>()
+            (NameSyntax) CreateType(MetadataTypeInfo.CreateFrom(typeof(TAttribute)))
         )
         .WithArgumentList
         (

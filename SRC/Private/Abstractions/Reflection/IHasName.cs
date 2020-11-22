@@ -1,15 +1,12 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* IHasName.cs                                                                   *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    internal interface IHasName
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        string Name { get; }
     }
 }

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,33 +26,31 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class PropertyInterceptorFactory : InterceptorFactoryBase
         {
-            public PropertyInterceptorFactory(DuckSyntaxFactory<TInterface, TTarget> owner) : base(owner) { }
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
-                PropertyInfo
-                    ifaceProperty = (PropertyInfo) member,
-                    targetProperty = GetTargetMember(ifaceProperty);
+                IPropertyInfo
+                    ifaceProperty = (IPropertyInfo) member,
+                    targetProperty = GetTargetMember(ifaceProperty, MetadataTypeInfo.CreateFrom(typeof(TTarget)).Properties);
 
                 //
                 // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
                 //
 
-                Visibility.Check(targetProperty, Owner.AssemblyName, checkGet: ifaceProperty.CanRead, checkSet: ifaceProperty.CanWrite);
+                Visibility.Check(targetProperty, AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
 
-                MethodInfo accessor = targetProperty.GetAccessors(nonPublic: true).First();
+                IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 
                 //
                 // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
                 // maskepp vannak elnvezve a parameterei.
                 //
 
-                ExpressionSyntax propertyAccess = Owner.PropertyAccess
+                ExpressionSyntax propertyAccess = PropertyAccess
                 (
                     ifaceProperty,
-                    Owner.TARGET,
-                    castTargetTo: accessor.GetAccessModifiers() == AccessModifiers.Explicit
-                        ? accessor.GetDeclaringType()
+                    TARGET,
+                    castTargetTo: accessor.AccessModifiers == AccessModifiers.Explicit
+                        ? accessor.DeclaringType
                         : null
                 );
 
@@ -77,15 +74,15 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     );
 
-                return ifaceProperty.IsIndexer()
-                    ? Owner.DeclareIndexer
+                return ifaceProperty.Indices.Any()
+                    ? DeclareIndexer
                     (
                         property: ifaceProperty,
                         getBody: getBody,
                         setBody: setBody,
                         forceInlining: true
                     )
-                    : (MemberDeclarationSyntax) Owner.DeclareProperty
+                    : (MemberDeclarationSyntax) DeclareProperty
                     (
                         property: ifaceProperty,
                         getBody: getBody,
@@ -94,36 +91,32 @@ namespace Solti.Utils.Proxy.Internals
                     );
             }
 
-            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface;
-
-            protected override bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember)
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
-                PropertyInfo
-                    targetProp = (PropertyInfo) targetMember,
-                    ifaceProp = (PropertyInfo) ifaceMember;
+                IPropertyInfo
+                    targetProp = (IPropertyInfo) targetMember,
+                    ifaceProp  = (IPropertyInfo) ifaceMember;
 
                 return
-                    targetProp.PropertyType == ifaceProp.PropertyType &&
+                    targetProp.Type.Equals(ifaceProp.Type) &&
 
                     //
                     // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
                     // az olvasast is.
                     //
 
-                    (!ifaceProp.CanWrite || targetProp.CanWrite) &&
-                    (!ifaceProp.CanRead || targetProp.CanRead) &&
+                    (ifaceProp.SetMethod == null || targetProp.SetMethod != null) &&
+                    (ifaceProp.GetMethod == null || targetProp.GetMethod != null) &&
 
                     //
                     // Indexer property-knel meg kell egyezniuk az index parameterek
                     // sorrendjenek es tipusanak.
                     //
 
-                    targetProp
-                        .GetIndexParameters()
-                        .Select(p => p.ParameterType)
+                    targetProp.Indices.Select(p => p.Type)
                         .SequenceEqual
                         (
-                            ifaceProp.GetIndexParameters().Select(p => p.ParameterType)
+                            ifaceProp.Indices.Select(p => p.Type)
                         );
             }
         }

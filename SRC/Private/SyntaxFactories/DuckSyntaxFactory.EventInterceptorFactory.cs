@@ -3,10 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-using System.Diagnostics;
-using System.Reflection;
-
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -26,49 +22,46 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class EventInterceptorFactory : InterceptorFactoryBase
         {
-            public EventInterceptorFactory(DuckSyntaxFactory<TInterface, TTarget> owner) : base(owner) { }
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
-                EventInfo
-                    ifaceEvt = (EventInfo) member,
-                    targetEvt = GetTargetMember(ifaceEvt);
+                IEventInfo
+                    ifaceEvt  = (IEventInfo) member,
+                    targetEvt = GetTargetMember(ifaceEvt, MetadataTypeInfo.CreateFrom(typeof(TTarget)).Events);
 
                 //
                 // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
                 //
 
-                Visibility.Check(targetEvt, Owner.AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
+                Visibility.Check(targetEvt, AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
 
-                MethodInfo accessor = (ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod)!;
-                Debug.Assert(accessor != null);
+                IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
 
-                Type? castTargetTo = accessor!.GetAccessModifiers() == AccessModifiers.Explicit ? accessor!.GetDeclaringType() : null;
+                ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit ? accessor.DeclaringType : null;
 
-                return Owner.DeclareEvent
+                return DeclareEvent
                 (
                     ifaceEvt,
                     addBody: ArrowExpressionClause
                     (
-                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: true, IdentifierName(Value), castTargetTo)
+                        expression: RegisterEvent(targetEvt, TARGET, add: true, IdentifierName(Value), castTargetTo)
                     ),
                     removeBody: ArrowExpressionClause
                     (
-                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: false, IdentifierName(Value), castTargetTo)
+                        expression: RegisterEvent(targetEvt, TARGET, add: false, IdentifierName(Value), castTargetTo)
                     ),
                     forceInlining: true
                 );
             }
 
-            public override bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface;
+            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IEventInfo;
 
-            protected override bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember)
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
-                EventInfo
-                    targetEvt = (EventInfo) targetMember,
-                    ifaceEvt = (EventInfo) ifaceMember;
+                IEventInfo
+                    targetEvt = (IEventInfo) targetMember,
+                    ifaceEvt  = (IEventInfo) ifaceMember;
 
-                return targetEvt.EventHandlerType == ifaceEvt.EventHandlerType;
+                return targetEvt.Type.Equals(ifaceEvt.Type);
             }
         }
     }

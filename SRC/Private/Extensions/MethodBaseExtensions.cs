@@ -13,25 +13,16 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class MethodBaseExtensions
     {
-        public static AccessModifiers GetAccessModifiers(this MethodBase src) 
-        {          
-            if (src.IsFamily) return AccessModifiers.Protected;
-            if (src.IsAssembly) return AccessModifiers.Internal;
-            if (src.IsFamilyOrAssembly) return AccessModifiers.Protected | AccessModifiers.Internal;
-            if (src.IsPublic) return AccessModifiers.Public;
-            if (src.IsPrivate)
-            {
-                //
-                // Ha a metodus privat akkor biztos nem interface metodus.
-                //
-
-                if (src.GetDeclaringType().IsInterface) return AccessModifiers.Explicit;
-
-                return AccessModifiers.Private;
-            }
-
-            throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER);
-        }
+        public static AccessModifiers GetAccessModifiers(this MethodBase src) => src switch
+        {
+            _ when src.IsFamily => AccessModifiers.Protected,
+            _ when src.IsAssembly => AccessModifiers.Internal,
+            _ when src.IsFamilyOrAssembly => AccessModifiers.Protected | AccessModifiers.Internal,
+            _ when src.IsPublic => AccessModifiers.Public,
+            _ when src.IsPrivate && src.GetDeclaringType().IsInterface => AccessModifiers.Explicit,
+            _ when src.IsPrivate => AccessModifiers.Private,
+            _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
+        };
 
         public static Type GetDeclaringType(this MethodBase src) 
         {

@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,9 +13,9 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class VisibilityCheckSyntaxFactory : SyntaxFactoryBase
     {
-        public Type Type { get; }
+        public ITypeInfo Type { get; }
 
-        public VisibilityCheckSyntaxFactory(Type type) => Type = type;
+        public VisibilityCheckSyntaxFactory(ITypeInfo type) => Type = type;
 
         protected override CompilationUnitSyntax GenerateProxyUnit(CancellationToken cancellation) => CompilationUnit().WithUsings
         (

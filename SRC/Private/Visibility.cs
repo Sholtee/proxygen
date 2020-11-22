@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -20,30 +18,29 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Visibility
     {
-        public static void Check(MethodBase method, string assemblyName, bool allowProtected = false) 
+        public static void Check(IMethodInfo method, string assemblyName, bool allowProtected = false) 
         {
-            AccessModifiers am = method.GetAccessModifiers();
+            AccessModifiers am = method.AccessModifiers;
 
             if (am.HasFlag(AccessModifiers.Internal))
             {
                 bool grantedByAttr = method
                     .DeclaringType
-                    .Assembly
-                    .GetCustomAttributes<InternalsVisibleToAttribute>()
-                    .FirstOrDefault(ivt => ivt.AssemblyName == assemblyName) != null;
+                    .DeclaringAssembly
+                    .IsFriend(assemblyName);
 
                 if (grantedByAttr) return;
 
                 if (!am.HasFlag(AccessModifiers.Protected) /*protected-internal*/)
                 {
-                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.GetFullName(), assemblyName));
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
                 }
             }
 
             if (am.HasFlag(AccessModifiers.Protected)) 
             {
                 if (allowProtected) return;
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.GetFullName()));
+                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
             }
 
             //
@@ -53,16 +50,16 @@ namespace Solti.Utils.Proxy.Internals
             if (am == AccessModifiers.Explicit) return; // meg ha cast-olni is kell hozza de lathato
 
             if (am == AccessModifiers.Private)
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.GetFullName()));
+                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
 
             Debug.Assert(am == AccessModifiers.Public, $"Unknown AccessModifier: {am}");
         }
 
-        public static void Check(PropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
+        public static void Check(IPropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
         {
             if (checkGet) 
             {
-                MethodInfo get = property.GetMethod;
+                IMethodInfo? get = property.GetMethod;
                 Debug.Assert(get != null, "property.GetMethod == NULL");
 
                 Check(get!, assemblyName, allowProtected);
@@ -70,18 +67,18 @@ namespace Solti.Utils.Proxy.Internals
 
             if (checkSet)
             {
-                MethodInfo set = property.SetMethod;
+                IMethodInfo? set = property.SetMethod;
                 Debug.Assert(set != null, "property.SetMethod == NULL");
 
                 Check(set!, assemblyName, allowProtected);
             }
         }
 
-        public static void Check(EventInfo @event, string assemblyName, bool checkAdd = true, bool checkRemove = true, bool allowProtected = false) 
+        public static void Check(IEventInfo @event, string assemblyName, bool checkAdd = true, bool checkRemove = true, bool allowProtected = false) 
         {
             if (checkAdd)
             {
-                MethodInfo add = @event.AddMethod;
+                IMethodInfo? add = @event.AddMethod;
                 Debug.Assert(add != null, "event.AddMethod == NULL");
 
                 Check(add!, assemblyName, allowProtected);
@@ -89,14 +86,14 @@ namespace Solti.Utils.Proxy.Internals
 
             if (checkRemove)
             {
-                MethodInfo remove = @event.RemoveMethod;
+                IMethodInfo? remove = @event.RemoveMethod;
                 Debug.Assert(remove != null, "event.RemoveMethod == NULL");
 
                 Check(remove!, assemblyName, allowProtected);
             }
         }
 
-        public static void Check(Type type, string assemblyName) // FIXME: nyilt generikusokra nem mukodik (igaz egyelore nem is kell)
+        public static void Check(ITypeInfo type, string assemblyName) // FIXME: nyilt generikusokra nem mukodik (igaz egyelore nem is kell)
         {
             //
             // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
@@ -106,7 +103,7 @@ namespace Solti.Utils.Proxy.Internals
             // using t = Namespace.Type;
             //
 
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = new VisibilityCheckSyntaxFactory(type).GetContext();
+            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) = new VisibilityCheckSyntaxFactory(type).GetContext();
 
             Debug.WriteLine(Unit.NormalizeWhitespace().ToFullString());
 

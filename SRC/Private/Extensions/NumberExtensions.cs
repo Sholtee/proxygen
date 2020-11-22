@@ -1,15 +1,19 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* NumberExtensions.cs                                                           *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
+using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    internal static class NumberExtensions
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        public static IEnumerable<T> Times<T>(this int src, Func<T> factory) 
+        {
+            for (int i = 0; i < src; i++)
+                yield return factory();
+        }
     }
 }

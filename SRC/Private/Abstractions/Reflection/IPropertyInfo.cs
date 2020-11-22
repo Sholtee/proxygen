@@ -1,15 +1,16 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* IPropertyInfo.cs                                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    internal interface IPropertyInfo: IMemberInfo, IHasType
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        IMethodInfo? GetMethod { get; }
+        IMethodInfo? SetMethod { get; }
+        IReadOnlyList<IParameterInfo> Indices { get; }
     }
 }

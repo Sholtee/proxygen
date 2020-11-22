@@ -1,15 +1,12 @@
 ﻿/********************************************************************************
-* PropertyInfoExtensions.cs                                                     *
+* IHasType.cs                                                                   *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Linq;
-using System.Reflection;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal static class PropertyInfoExtensions
+    internal interface IHasType
     {
-        public static bool IsIndexer(this PropertyInfo src) => src.GetIndexParameters().Any();
+        ITypeInfo Type { get; }
     }
 }

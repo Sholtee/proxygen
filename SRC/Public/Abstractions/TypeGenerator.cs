@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Abstractions
 
         internal Type GenerateTypeCore(string? outputFile = default, string? assemblyNameOverride = default, CancellationToken cancellation = default)
         {
-            (CompilationUnitSyntax unit, IReadOnlyCollection<MetadataReference> references, _) = SyntaxFactory.GetContext(cancellation);
+            (CompilationUnitSyntax unit, IReadOnlyCollection<MetadataReference> references) = SyntaxFactory.GetContext(cancellation);
 
             return ExtractType
             (
@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Abstractions
         protected void CheckVisibility(Type type)
         {
 #if !IGNORE_VISIBILITY
-            Visibility.Check(type, SyntaxFactory.AssemblyName!);
+            Visibility.Check(MetadataTypeInfo.CreateFrom(type), SyntaxFactory.AssemblyName!);
 #endif
         }
         #endregion

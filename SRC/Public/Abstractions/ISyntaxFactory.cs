@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -25,6 +24,6 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// Returns the compilation unit (namespace, class defintion, etc) of the defined class.
         /// </summary>
-        (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, IReadOnlyCollection<Type> Types) GetContext(CancellationToken cancellation = default);
+        (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) GetContext(CancellationToken cancellation = default);
     }
 }

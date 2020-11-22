@@ -3,11 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,33 +19,29 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)
         /// </summary>
-        protected internal MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax? target, MethodInfo method, Type? castTargetTo = null)
-        {
-            string methodName = method.StrippedName();
+        protected internal MemberAccessExpressionSyntax MethodAccess(ExpressionSyntax? target, IMethodInfo method, ITypeInfo? castTargetTo = null) => SimpleMemberAccess
+        (
+            AmendTarget(target, method, castTargetTo),
 
-            return SimpleMemberAccess
-            (
-                AmendTarget(target, method, castTargetTo),
-                !method.IsGenericMethod
-                    ? (SimpleNameSyntax) IdentifierName(methodName)
-                    : (SimpleNameSyntax) GenericName(Identifier(methodName)).WithTypeArgumentList
+            method is not IGenericMethodInfo genericMethod
+                ? (SimpleNameSyntax) IdentifierName(method.Name)
+                : (SimpleNameSyntax) GenericName(Identifier(method.Name)).WithTypeArgumentList
+                (
+                    typeArgumentList: TypeArgumentList
                     (
-                        typeArgumentList: TypeArgumentList
-                        (
-                            arguments: method.GetGenericArguments().ToSyntaxList(CreateType)
-                        )
+                        arguments: genericMethod.GenericArguments.ToSyntaxList(CreateType)
                     )
-            );
-        }
+                )
+        );
 
         /// <summary>
         /// int IInterface.Foo[T](string a, ref T b)
         /// </summary>
-        protected internal virtual MethodDeclarationSyntax DeclareMethod(MethodInfo method, bool forceInlining = false)
+        protected internal virtual MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
         {
-            Type
+            ITypeInfo
                 declaringType = method.DeclaringType,
-                returnType = method.ReturnType;
+                returnType    = method.ReturnValue.Type;
 
             Debug.Assert(declaringType.IsInterface);
 
@@ -59,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
             MethodDeclarationSyntax result = MethodDeclaration
             (
                 returnType: returnTypeSytax,
-                identifier: Identifier(method.StrippedName())
+                identifier: Identifier(method.Name)
             )
             .WithExplicitInterfaceSpecifier
             (
@@ -69,16 +63,16 @@ namespace Solti.Utils.Proxy.Internals
             (
                 ParameterList
                 (
-                    parameters: method.GetParameters().ToSyntaxList(param =>
+                    parameters: method.Parameters.ToSyntaxList(param =>
                     {
                         ParameterSyntax parameter = Parameter(Identifier(param.Name)).WithType
                         (
-                            type: CreateType(param.ParameterType)
+                            type: CreateType(param.Type)
                         );
 
                         List<SyntaxKind> modifiers = new List<SyntaxKind>();
 
-                        switch (param.GetParameterKind())
+                        switch (param.Kind)
                         {
                             case ParameterKind.In:
                                 modifiers.Add(SyntaxKind.InKeyword);
@@ -102,11 +96,11 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            if (method.IsGenericMethod) result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
+            if (method is IGenericMethodInfo genericMethod) result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
             (
                 typeParameterList: TypeParameterList
                 (
-                    parameters: method.GetGenericArguments().ToSyntaxList(type => TypeParameter(CreateType(type).ToFullString()))
+                    parameters: genericMethod.GenericArguments.ToSyntaxList(type => TypeParameter(CreateType(type).ToFullString()))
                 )
             );
 
@@ -126,9 +120,9 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(..., ref ..., ...)
         /// </summary>
-        protected internal virtual InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax? target, Type? castTargetTo = null, params ArgumentSyntax[] arguments)
+        protected internal virtual InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
         {
-            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
             Debug.Assert(arguments.Length == paramz.Count);
 
@@ -147,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     arguments.ToSyntaxList
                     (
-                        (arg, i) => (paramz[i].GetParameterKind()) switch
+                        (arg, i) => (paramz[i].Kind) switch
                         {
                             ParameterKind.In => arg.WithRefKindKeyword
                             (
@@ -171,9 +165,9 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal virtual InvocationExpressionSyntax InvokeMethod(MethodInfo method, ExpressionSyntax? target, Type? castTargetTo = null, params string[] arguments)
+        protected internal virtual InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params string[] arguments)
         {
-            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
             Debug.Assert(arguments.Length == paramz.Count);
 
@@ -194,9 +188,9 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// TypeName(int a, string b, ...): base(a, b, ...){ }
         /// </summary>
-        protected internal virtual ConstructorDeclarationSyntax DeclareCtor(ConstructorInfo ctor)
+        protected internal virtual ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor)
         {
-            IReadOnlyList<ParameterInfo> paramz = ctor.GetParameters();
+            IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
             return ConstructorDeclaration
             (
@@ -219,7 +213,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                     .WithType
                     (
-                        type: CreateType(param.ParameterType)
+                        type: CreateType(param.Type)
                     ))
                 )
             )

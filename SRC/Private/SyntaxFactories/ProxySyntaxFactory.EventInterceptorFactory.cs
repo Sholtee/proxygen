@@ -44,19 +44,19 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class EventInterceptorFactory : InterceptorFactoryBase
         {
-            private static readonly MethodInfo
-                RESOLVE_EVENT = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
+            private static readonly IMethodInfo
+                RESOLVE_EVENT = MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!)));
 
-            private IEnumerable<StatementSyntax> Build(EventInfo member, bool add) 
+            private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
             {
-                MethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
+                IMethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(targetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         targetMethod,
@@ -64,20 +64,20 @@ namespace Solti.Utils.Proxy.Internals
                         {
                             ExpressionStatement
                             (
-                                Owner.RegisterEvent(member, Owner.TARGET, add, ToIdentifierName(locals.Single()))
+                                RegisterEvent(member, TARGET, add, ToIdentifierName(locals.Single()))
                             )
                         }
                     )
                 );
 
-                LocalDeclarationStatementSyntax evt = Owner.DeclareLocal(typeof(EventInfo), nameof(evt), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax evt = DeclareLocal<EventInfo>(nameof(evt), InvokeMethod
                 (
                     RESOLVE_EVENT,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    Owner.InvokeMethod
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -104,15 +104,13 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public EventInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
+            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IEventInfo;
 
-            public override bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface && !AlreadyImplemented(evt);
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
-                EventInfo evt = (EventInfo) member;
+                IEventInfo evt = (IEventInfo) member;
 
-                return Owner.DeclareEvent
+                return DeclareEvent
                 (
                     @event: evt,
                     addBody: Block

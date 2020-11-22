@@ -1,15 +1,12 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* IParameterInfo.cs                                                             *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    internal interface IParameterInfo: IHasName, IHasType
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        ParameterKind Kind { get; }
     }
 }

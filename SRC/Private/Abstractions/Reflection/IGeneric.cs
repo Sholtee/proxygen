@@ -1,15 +1,16 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* IGeneric.cs                                                                   *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    internal interface IGeneric 
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        bool IsGenericDefinition { get; }
+        IGeneric GenericDefinition { get; }
+        IReadOnlyList<ITypeInfo> GenericArguments { get; }
     }
 }

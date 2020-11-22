@@ -16,16 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class MemberInfoExtensions
     {
-        public static string GetFullName(this MemberInfo src) => $"{new SyntaxFactoryBase().CreateType(src.DeclaringType).ToFullString()}.{src.Name}";
-
-        public static bool IsStatic(this MemberInfo src) => src switch
-        {
-            MethodInfo method => method.IsStatic,
-            FieldInfo field => field.IsStatic,
-            PropertyInfo property => (property.GetMethod ?? property.SetMethod ?? throw new InvalidOperationException()).IsStatic,
-            EventInfo @event => (@event.AddMethod ?? @event.RemoveMethod ?? throw new InvalidOperationException()).IsStatic,
-            _ => throw new NotSupportedException()
-        };
+        public static string GetFullName(this MemberInfo src) => $"{new SyntaxFactoryBase().CreateType(MetadataTypeInfo.CreateFrom(src.DeclaringType)).ToFullString()}.{src.Name}";
 
         private static MemberInfo DoExtractFrom(LambdaExpression expr) 
         {

@@ -4,6 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -19,6 +21,17 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ProxySyntaxFactoryBase: SyntaxFactoryBase, IProxySyntaxFactory
     {
         public virtual string ProxyClassName { get; } = "GeneratedProxy";
+
+        protected static IEnumerable<MemberDeclarationSyntax> BuildMembers<TFactory>(IEnumerable<IMemberInfo> membersToBuild, CancellationToken cancellation) where TFactory : IInterceptorFactory, new()
+        {
+            cancellation.ThrowIfCancellationRequested();
+
+            IInterceptorFactory fact = new TFactory();
+
+            return membersToBuild
+                .Where(fact.IsCompatible)
+                .Select(fact.Build);
+        }
 
         protected virtual MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation) => throw new NotImplementedException();
 

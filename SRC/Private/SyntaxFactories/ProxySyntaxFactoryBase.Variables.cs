@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal virtual LocalDeclarationStatementSyntax DeclareLocal(Type type, string name, ExpressionSyntax? initializer = null)
+        protected internal virtual LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -46,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(typeof(T), name, initializer);
+        protected internal LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
 
         protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 

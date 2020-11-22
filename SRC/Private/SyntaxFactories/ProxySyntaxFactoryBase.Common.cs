@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        protected internal string GetSafeTypeName<T>() => CreateType<T>()
+        protected internal string GetSafeTypeName(ITypeInfo type) => CreateType(type)
             .ToFullString()
             //
             // Csak karaktert es ne karakterlancot csereljunk h az eredmenyt ne befolyasolja a
@@ -54,14 +54,16 @@ namespace Solti.Utils.Proxy.Internals
             //
             .Replace(',', '_');
 
+        protected internal string GetSafeTypeName<T>() => GetSafeTypeName(MetadataTypeInfo.CreateFrom(typeof(T)));
+
         /// <summary>
         /// new System.Object[] {..., ..., ...}
         /// </summary>
-        protected internal ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => ArrayCreationExpression
+        protected internal ArrayCreationExpressionSyntax CreateArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
         (
             type: ArrayType
             (
-                elementType: CreateType<T>()
+                elementType: CreateType(elementType)
             )
             .WithRankSpecifiers
             (
@@ -82,5 +84,10 @@ namespace Solti.Utils.Proxy.Internals
                 expressions: elements.ToSyntaxList()
             )
         );
+
+        /// <summary>
+        /// new System.Object[] {..., ..., ...}
+        /// </summary>
+        protected internal ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
     }
 }

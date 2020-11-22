@@ -45,19 +45,19 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal class PropertyInterceptorFactory : InterceptorFactoryBase
         {
-            private static readonly MethodInfo
-                RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
+            private static readonly IMethodInfo
+                RESOLVE_PROPERTY = MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!)));
 
-            protected IEnumerable<StatementSyntax> BuildGet(PropertyInfo property) 
+            protected IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
             {
-                if (!property.CanRead) yield break;
+                if (property.GetMethod == null) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.GetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         property.GetMethod,
@@ -71,8 +71,8 @@ namespace Solti.Utils.Proxy.Internals
                                     ToIdentifierName(result!),
                                     CastExpression
                                     (
-                                        Owner.CreateType<object>(),
-                                        Owner.PropertyAccess(property, Owner.TARGET, null, locals.Select(ToArgument))
+                                        CreateType<object>(),
+                                        PropertyAccess(property, TARGET, null, locals.Select(ToArgument))
                                     )
                                 )
                             )
@@ -80,23 +80,23 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.GetMethod), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.GetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
                 yield return prop;
 
-                yield return Owner.ReturnResult
+                yield return ReturnResult
                 (
-                    property.PropertyType,
-                    Owner.InvokeMethod
+                    property.Type,
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -115,16 +115,16 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            protected IEnumerable<StatementSyntax> BuildSet(PropertyInfo property)
+            protected IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
             {
-                if (!property.CanWrite) yield break;
+                if (property.SetMethod == null) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.SetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         property.SetMethod,
@@ -135,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
                                 expression: AssignmentExpression
                                 (
                                     kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: Owner.PropertyAccess(property, Owner.TARGET, null, locals
+                                    left: PropertyAccess(property, TARGET, null, locals
 #if NETSTANDARD2_0
                                         .Take(locals.Count - 1)
 #else
@@ -149,14 +149,14 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.SetMethod), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.SetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    Owner.InvokeMethod
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -183,20 +183,20 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public PropertyInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
+            protected virtual bool IsCompatible(IPropertyInfo prop) => !prop.Indices.Any();
 
-            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer() && !AlreadyImplemented(prop);
+            public sealed override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IPropertyInfo prop && IsCompatible(prop);
 
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
             //
 
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public override MemberDeclarationSyntax Build(IMemberInfo member)
             {
-                PropertyInfo property = (PropertyInfo) member;
+                IPropertyInfo property = (IPropertyInfo) member;
 
-                return Owner.DeclareProperty
+                return DeclareProperty
                 (
                     property: property,
                     getBody: Block

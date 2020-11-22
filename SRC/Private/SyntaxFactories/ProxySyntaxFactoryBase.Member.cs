@@ -16,13 +16,13 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactoryBase
     {
-        private ExpressionSyntax AmendTarget(ExpressionSyntax? target, MemberInfo member, Type? castTargetTo)
+        private ExpressionSyntax AmendTarget(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo)
         {
-            target ??= member.IsStatic() ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
+            target ??= member.IsStatic ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
 
             if (castTargetTo != null)
             {
-                Debug.Assert(!member.IsStatic());
+                Debug.Assert(!member.IsStatic);
 
                 target = ParenthesizedExpression
                 (
@@ -49,10 +49,10 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>
-        protected internal MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax? target, MemberInfo member, Type? castTargetTo = null) => SimpleMemberAccess
+        protected internal MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo = null) => SimpleMemberAccess
         (
             AmendTarget(target, member, castTargetTo),
-            member.StrippedName()
+            member.Name
         );
     }
 }

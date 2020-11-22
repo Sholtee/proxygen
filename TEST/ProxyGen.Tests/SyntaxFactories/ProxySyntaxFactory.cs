@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     [TestFixture]
     public sealed class ProxySyntaxFactoryTests : ProxySyntaxFactoryTestsBase
     {
-        private static PropertyInfo Indexer { get; } = typeof(IList<int>).GetProperty("Item");
+        private static IPropertyInfo Indexer { get; } = MetadataPropertyInfo.CreateFrom(typeof(IList<int>).GetProperty("Item"));
 
         internal class FooInterceptor : InterfaceInterceptor<IFoo<int>> // direkt internal
         {
@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             }
         }
 
-        public static (MethodInfo Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
+        internal static (IMethodInfo Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
             (Foo, "System.Object[] args = new System.Object[]{a, default(System.String), c};"),
             (Bar, "System.Object[] args = new System.Object[0];")
@@ -45,12 +45,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((MethodInfo Method, string Expected) para) =>
-            Assert.That(Generator.CreateArgumentsArray(para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(Generator.CreateArgumentsArray(MetadataMethodInfo.CreateFrom(para.Method)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            IReadOnlyList<ExpressionStatementSyntax> assignments = new MethodInterceptorFactory(Generator).AssignByRefParameters(Foo.GetParameters(), Generator.DeclareLocal<object[]>("args")).ToArray();
+            IReadOnlyList<ExpressionStatementSyntax> assignments = new MethodInterceptorFactory().AssignByRefParameters(Foo.Parameters, Generator.DeclareLocal<object[]>("args")).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
             Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (System.String)args[1];"));
@@ -60,7 +60,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void LocalArgs_ShouldBeDeclaredForEachArgument()
         {
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = Generator.DeclareCallbackLocals(Generator.DeclareLocal<object[]>("args"), Foo.GetParameters()).ToArray();
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = Generator.DeclareCallbackLocals(Generator.DeclareLocal<object[]>("args"), Foo.Parameters).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
             Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Int32 cb_a = (System.Int32)args[0];"));
@@ -71,11 +71,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ReassignArgsArray_ShouldCopyByRefArgumentsBack()
         {
-            IEnumerable<StatementSyntax> assigns = new MethodInterceptorFactory(Generator).ReassignArgsArray
+            IEnumerable<StatementSyntax> assigns = new MethodInterceptorFactory().ReassignArgsArray
             (
-                Foo.GetParameters(),
+                Foo.Parameters,
                 Generator.DeclareLocal<object[]>("args"),
-                Generator.DeclareCallbackLocals(Generator.CreateArgumentsArray(Foo), Foo.GetParameters())
+                Generator.DeclareCallbackLocals(Generator.CreateArgumentsArray(Foo), Foo.Parameters)
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));
@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void BuildCallback_ShouldCreateTheProperLambda() =>
-            Assert.That(new MethodInterceptorFactory(Generator).BuildCallback(Foo, Generator.DeclareLocal<object[]>("args")).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
+            Assert.That(new MethodInterceptorFactory().BuildCallback(Foo, Generator.DeclareLocal<object[]>("args")).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
         {
@@ -95,9 +95,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(ReturnTypes))]
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para) =>
-            Assert.That(Generator.ReturnResult(para.Type, Generator.DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(Generator.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), Generator.DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
-        public static (MethodInfo Method, string File)[] Methods = new[]
+        internal static (IMethodInfo Method, string File)[] Methods = new[]
         {
             (Foo, "FooSrc.txt"),
             (Bar, "BarSrc.txt")
@@ -105,15 +105,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(Methods))]
         public void GenerateProxyMethod_Test((MethodInfo Method, string File) para) =>
-            Assert.That(new MethodInterceptorFactory(Generator).Build(para.Method).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
+            Assert.That(new MethodInterceptorFactory().Build(MetadataMethodInfo.CreateFrom(para.Method)).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(para.File)));
 
         [Test]
         public void GenerateProxyProperty_Test() =>
-            Assert.That(new PropertyInterceptorFactory(Generator).Build(Prop).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
+            Assert.That(new PropertyInterceptorFactory().Build(Prop).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("PropSrc.txt")));
 
         [Test]
         public void GenerateProxyIndexer_Test() =>
-            Assert.That(new IndexerInterceptorFactory(Generator).Build(Indexer).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
+            Assert.That(new IndexerInterceptorFactory().Build(Indexer).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("IndexerSrc.txt")));
 
         [Test]
         public void GenerateProxyClass_Test() =>
@@ -121,6 +121,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateProxyEvent_Test() =>
-            Assert.That(new EventInterceptorFactory(Generator).Build(Event).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
+            Assert.That(new EventInterceptorFactory().Build(Event).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("EventSrc.txt")));
     }
 }
