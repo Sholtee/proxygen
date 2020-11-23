@@ -35,6 +35,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(proxy[0], Is.EqualTo(1986));
         }
 
+        public interface IGeneric
+        {
+            T Foo<T, TT>(T a, TT b);
+        }
+
+        public class Generic 
+        {
+            public B Foo<B, C>(B a, C b) => default;
+        }
+
+        [Test]
+        public void GeneratedDuck_ShouldWorkWithGenerics() => Assert.DoesNotThrowAsync(() => CreateDuck<IGeneric, Generic>(new Generic()));
+
         public interface IRef
         {
             ref object Foo(out string para);
