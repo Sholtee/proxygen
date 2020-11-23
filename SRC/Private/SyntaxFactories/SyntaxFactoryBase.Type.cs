@@ -20,10 +20,11 @@ namespace Solti.Utils.Proxy.Internals
     {
         private readonly HashSet<IAssemblyInfo> FReferences = new HashSet<IAssemblyInfo>
         (
-            Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom)
+            Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom),
+            IAssemblyInfoComparer.Instance
         );
 
-        private readonly HashSet<ITypeInfo> FTypes = new HashSet<ITypeInfo>();
+        private readonly HashSet<ITypeInfo> FTypes = new HashSet<ITypeInfo>(ITypeInfoComparer.Instance);
 
         protected internal void AddType(ITypeInfo type) 
         {

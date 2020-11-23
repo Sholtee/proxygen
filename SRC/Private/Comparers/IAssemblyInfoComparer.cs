@@ -1,17 +1,14 @@
 ﻿/********************************************************************************
-* IAssemblyInfo.cs                                                              *
+* IAssemblyInfoComparer.cs                                                      *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Reflection;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IAssemblyInfo 
+    using Primitives;
+
+    internal sealed class IAssemblyInfoComparer : ComparerBase<IAssemblyInfoComparer, IAssemblyInfo>
     {
-        string? Location { get; }
-        bool IsDynamic { get; }
-        AssemblyName Name { get; }
-        bool IsFriend(string asmName);
+        public override int GetHashCode(IAssemblyInfo obj) => obj.Name.ToString().GetHashCode();
     }
 }

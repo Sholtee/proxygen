@@ -103,6 +103,8 @@ namespace Solti.Utils.Proxy.Internals
             .Cast<IConstructorInfo>()
             .ToArray();
 
+        public string? AssemblyQualifiedName => UnderlyingType.AssemblyQualifiedName;
+
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }

@@ -28,5 +28,7 @@ namespace Solti.Utils.Proxy.Internals
         public string? Location => UnderLyingAssembly.IsDynamic ? null : UnderLyingAssembly.Location;
 
         public bool IsDynamic => UnderLyingAssembly.IsDynamic;
+
+        public AssemblyName Name => UnderLyingAssembly.GetName();
     }
 }
