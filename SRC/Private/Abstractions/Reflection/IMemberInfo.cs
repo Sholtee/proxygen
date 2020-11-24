@@ -5,7 +5,8 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IMemberInfo: IHasName
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IMemberInfo: IHasName
     {
         ITypeInfo DeclaringType { get; }
         bool IsStatic { get; }

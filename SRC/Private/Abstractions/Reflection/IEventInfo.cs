@@ -5,7 +5,8 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IEventInfo: IMemberInfo, IHasType
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IEventInfo: IMemberInfo, IHasType
     {
         IMethodInfo AddMethod { get; }
         IMethodInfo RemoveMethod { get; }

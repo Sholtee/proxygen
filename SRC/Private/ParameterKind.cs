@@ -5,7 +5,8 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
-    internal enum ParameterKind
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public enum ParameterKind
     {
         None,
         In,

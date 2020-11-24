@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* DuckSyntaxFactory.InterceptorFactoryBase.cs                                   *
+* DuckSyntaxFactory.DuckMemberSyntaxFactory.cs                                  *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,10 +15,12 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class DuckSyntaxFactory<TInterface, TTarget>
+    internal partial class DuckSyntaxFactory
     {
-        internal abstract class InterceptorFactoryBase : DuckSyntaxFactory<TInterface, TTarget>, IInterceptorFactory
+        internal abstract class DuckMemberSyntaxFactory : MemberSyntaxFactory
         {
+            protected IPropertyInfo TARGET;
+
             protected abstract bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember);
 
             protected TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers) where TMember : IMemberInfo 
@@ -40,9 +43,32 @@ namespace Solti.Utils.Proxy.Internals
                 return possibleTargets[0];
             }
 
-            public virtual bool IsCompatible(IMemberInfo member) => member.DeclaringType.IsInterface;
+            protected abstract IEnumerable<MemberDeclarationSyntax> Build();
 
-            public abstract MemberDeclarationSyntax Build(IMemberInfo member);
+            public ITypeInfo InterfaceType => SourceType;
+
+            public ITypeInfo TargetType { get; }
+
+            public string AssemblyName { get; }
+
+            public sealed override bool Build(CancellationToken cancellation)
+            {
+                if (Members is not null) return false;
+
+                Members = Build().ToArray();
+
+                return true;
+            }
+
+            public DuckMemberSyntaxFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType)
+            {
+                TargetType = owner.TargetType;
+                AssemblyName = owner.AssemblyName;
+
+                TARGET = ((ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(InterfaceType))
+                    .Properties
+                    .Single(prop => prop.Name == nameof(DuckBase<object>.Target));
+            }
         }
     }
 }

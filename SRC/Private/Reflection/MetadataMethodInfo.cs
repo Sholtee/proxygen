@@ -71,6 +71,16 @@ namespace Solti.Utils.Proxy.Internals
                 .ToArray();
 
             public IGeneric GenericDefinition => new MetadataGenericMethodInfo(UnderLyingMethod.GetGenericMethodDefinition());
+
+            public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericMethodInfo
+            (
+                UnderLyingMethod.MakeGenericMethod
+                (
+                    genericArgs
+                        .Select(arg => Type.GetType(arg.AssemblyQualifiedName, throwOnError: true))
+                        .ToArray()
+                )
+            );
         }
 
         private sealed class MetadataConstructorInfo : MetadataMethodBase<ConstructorInfo>, IConstructorInfo 

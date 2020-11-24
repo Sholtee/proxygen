@@ -1,9 +1,8 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactoryBase.Attribute.cs                                           *
+* MemberSyntaxFactory.Attribute.cs                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
@@ -13,7 +12,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactoryBase
+    internal partial class MemberSyntaxFactory
     {
         private SyntaxList<AttributeListSyntax> DeclareMethodImplAttributeToForceInlining() => SingletonList
         (
@@ -29,21 +28,6 @@ namespace Solti.Utils.Proxy.Internals
                             nameof(MethodImplOptions.AggressiveInlining)
                         )
                     )                 
-                )
-            )
-        );
-
-        AttributeSyntax CreateAttribute<TAttribute>(ExpressionSyntax param) where TAttribute : Attribute => Attribute
-        (
-            (NameSyntax) CreateType(MetadataTypeInfo.CreateFrom(typeof(TAttribute)))
-        )
-        .WithArgumentList
-        (
-            argumentList: AttributeArgumentList
-            (
-                arguments: SingletonSeparatedList
-                (
-                    AttributeArgument(param)
                 )
             )
         );

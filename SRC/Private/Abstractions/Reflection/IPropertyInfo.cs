@@ -7,7 +7,8 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IPropertyInfo: IMemberInfo, IHasType
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IPropertyInfo: IMemberInfo, IHasType
     {
         IMethodInfo? GetMethod { get; }
         IMethodInfo? SetMethod { get; }

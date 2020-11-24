@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactoryBase.Variables.cs                                           *
+* MemberSyntaxFactory.Variable.cs                                               *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -12,7 +12,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactoryBase
+    internal partial class MemberSyntaxFactory
     {
         /// <summary>
         /// System.Object paramName [= ...];

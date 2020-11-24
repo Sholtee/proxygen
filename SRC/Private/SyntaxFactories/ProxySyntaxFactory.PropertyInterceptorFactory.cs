@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// TResult IInterface.Prop                                                          <br/>
@@ -43,12 +44,12 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                            <br/>
         /// }
         /// </summary>
-        internal class PropertyInterceptorFactory : InterceptorFactoryBase
+        internal sealed class PropertyInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private static readonly IMethodInfo
-                RESOLVE_PROPERTY = MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!)));
+            private readonly IMethodInfo
+                RESOLVE_PROPERTY;
 
-            protected IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
+            private IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
             {
                 if (property.GetMethod == null) yield break;
 
@@ -72,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
                                     CastExpression
                                     (
                                         CreateType<object>(),
-                                        PropertyAccess(property, TARGET, null, locals.Select(ToArgument))
+                                        PropertyAccess(property, MemberAccess(null, TARGET), null, locals.Select(ToArgument))
                                     )
                                 )
                             )
@@ -115,7 +116,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            protected IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
+            private IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
             {
                 if (property.SetMethod == null) yield break;
 
@@ -135,7 +136,7 @@ namespace Solti.Utils.Proxy.Internals
                                 expression: AssignmentExpression
                                 (
                                     kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: PropertyAccess(property, TARGET, null, locals
+                                    left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
 #if NETSTANDARD2_0
                                         .Take(locals.Count - 1)
 #else
@@ -183,31 +184,40 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            protected virtual bool IsCompatible(IPropertyInfo prop) => !prop.Indices.Any();
-
-            public sealed override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IPropertyInfo prop && IsCompatible(prop);
-
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
             //
 
-            public override MemberDeclarationSyntax Build(IMemberInfo member)
-            {
-                IPropertyInfo property = (IPropertyInfo) member;
-
-                return DeclareProperty
+            private MemberDeclarationSyntax BuildProperty(IPropertyInfo property, Func<IPropertyInfo, CSharpSyntaxNode?, CSharpSyntaxNode?, bool, MemberDeclarationSyntax> fact) => fact
+            (
+                property,
+                Block
                 (
-                    property: property,
-                    getBody: Block
-                    (
-                        BuildGet(property)
-                    ),
-                    setBody: Block
-                    (
-                        BuildSet(property)
-                    )
-                );
+                    BuildGet(property)
+                ),
+                Block
+                (
+                    BuildSet(property)
+                ),
+                false
+            );
+
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+                .Properties
+                .Where(NotAlreadyImplemented)
+                .Select(prop => BuildProperty(prop, prop.Indices.Any() 
+                    ? DeclareIndexer 
+                    : DeclareProperty));
+
+            public PropertyInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
+            {
+                RESOLVE_PROPERTY = InterceptorType
+                    .Methods
+                    .Single(met =>
+                        met.DeclaringType is IGenericTypeInfo genericType &&
+                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
+                        met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
             }
         }
     }

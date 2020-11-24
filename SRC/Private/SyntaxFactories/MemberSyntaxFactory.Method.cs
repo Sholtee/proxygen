@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactoryBase.Method.cs.cs                                           *
+* MemberSyntaxFactory.Method.cs.cs                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -14,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactoryBase
+    internal partial class MemberSyntaxFactory
     {
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)
@@ -188,13 +188,13 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// TypeName(int a, string b, ...): base(a, b, ...){ }
         /// </summary>
-        protected internal virtual ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor)
+        protected internal virtual ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor, string className)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
             return ConstructorDeclaration
             (
-                identifier: Identifier(ProxyClassName)
+                identifier: Identifier(className)
             )
             .WithModifiers
             (

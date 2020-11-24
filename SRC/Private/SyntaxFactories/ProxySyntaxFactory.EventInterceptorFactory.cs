@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// event EventType IInterface.Event                                            <br/>
@@ -42,10 +43,10 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                       <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : InterceptorFactoryBase
+        internal sealed class EventInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private static readonly IMethodInfo
-                RESOLVE_EVENT = MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!)));
+            private readonly IMethodInfo
+                RESOLVE_EVENT;
 
             private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
             {
@@ -64,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
                         {
                             ExpressionStatement
                             (
-                                RegisterEvent(member, TARGET, add, ToIdentifierName(locals.Single()))
+                                RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()))
                             )
                         }
                     )
@@ -104,13 +105,20 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IEventInfo;
-
-            public override MemberDeclarationSyntax Build(IMemberInfo member)
+            public EventInterceptorFactory(ProxySyntaxFactory owner) : base(owner)
             {
-                IEventInfo evt = (IEventInfo) member;
+                RESOLVE_EVENT = InterceptorType
+                    .Methods
+                    .Single(met =>
+                        met.DeclaringType is IGenericTypeInfo genericType &&
+                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
+                        met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
+            }
 
-                return DeclareEvent
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+                .Events
+                .Where(NotAlreadyImplemented)
+                .Select(evt => DeclareEvent
                 (
                     @event: evt,
                     addBody: Block
@@ -121,8 +129,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         Build(evt, add: false)
                     )
-                );
-            }
+                ));
         }
     }
 }

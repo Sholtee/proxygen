@@ -123,6 +123,16 @@ namespace Solti.Utils.Proxy.Internals
             public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
             IGeneric IGeneric.GenericDefinition => GenericDefinition;
+
+            public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericTypeInfo
+            (
+                UnderlyingType.MakeGenericType
+                (
+                    genericArgs
+                        .Select(arg => Type.GetType(arg.AssemblyQualifiedName, throwOnError: true))
+                        .ToArray()
+                )
+            );
         }
 
         private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 

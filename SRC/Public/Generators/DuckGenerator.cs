@@ -19,9 +19,19 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class DuckGenerator<TInterface, TTarget>: TypeGenerator<DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
         /// <summary>
+        /// Creates a new <see cref="DuckGenerator{TInterface, TTarget}"/> instance
+        /// </summary>
+        public DuckGenerator() => SyntaxFactory = new DuckSyntaxFactory
+        (
+            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+            MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+            AssemblyName
+        );
+
+        /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public override IProxySyntaxFactory SyntaxFactory { get; } = new DuckSyntaxFactory<TInterface, TTarget>();
+        public override IUnitSyntaxFactory SyntaxFactory { get; }
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.
@@ -42,13 +52,11 @@ namespace Solti.Utils.Proxy.Generators
             if (type.ContainsGenericParameters) throw new InvalidOperationException();
         }
 
-        private void CheckTarget()
-        {
+        private void CheckTarget() =>
             //
             // Konstruktor parameterben atadasra kerul -> lathatonak kell lennie.
             //
 
             CheckVisibility(typeof(TTarget));
-        }
     }
 }

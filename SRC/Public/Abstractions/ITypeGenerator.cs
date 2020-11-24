@@ -5,6 +5,8 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Abstractions
 {
+    using Internals;
+
     /// <summary>
     /// Describes a type generator.
     /// </summary>
@@ -13,6 +15,6 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The factory that provides the class definition.
         /// </summary>
-        IProxySyntaxFactory SyntaxFactory { get; }
+        IUnitSyntaxFactory SyntaxFactory { get; }
     }
 }

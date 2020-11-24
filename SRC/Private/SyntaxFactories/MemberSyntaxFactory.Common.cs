@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactoryBase.Common                                                 *
+* MemberSyntaxFactory.Common                                                    *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -14,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactoryBase
+    internal partial class MemberSyntaxFactory
     {
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";

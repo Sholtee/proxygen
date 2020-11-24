@@ -1,15 +1,17 @@
 ﻿/********************************************************************************
-* IInterceptorFactory.cs                                                        *
+* IMemberSyntaxFactory.cs                                                       *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Collections.Generic;
+
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IInterceptorFactory
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IMemberSyntaxFactory : ISyntaxFactory 
     {
-        MemberDeclarationSyntax Build(IMemberInfo member);
-        bool IsCompatible(IMemberInfo member);
+        IReadOnlyCollection<MemberDeclarationSyntax>? Members { get; }
     }
 }

@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)               <br/>
@@ -46,11 +47,11 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                         <br/>
         /// }
         /// </summary>
-        internal sealed class MethodInterceptorFactory : InterceptorFactoryBase
+        internal sealed class MethodInterceptorFactory : ProxyMemberSyntaxFactory
         {
             #region Internals
-            private static readonly IMethodInfo
-                RESOLVE_METHOD = MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!)));
+            private readonly IMethodInfo
+                RESOLVE_METHOD;
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
@@ -122,7 +123,7 @@ namespace Solti.Utils.Proxy.Internals
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
                     method,
-                    TARGET,
+                    MemberAccess(null, TARGET),
                     castTargetTo: null,
                     arguments: locals.Select(ToArgument).ToArray()
                 );
@@ -198,7 +199,10 @@ namespace Solti.Utils.Proxy.Internals
                     );
 
                     statements.Add(result);
-                    statements.AddRange(AssignByRefParameters(methodInfo.Parameters, argsArray));
+                    statements.AddRange
+                    (
+                        AssignByRefParameters(methodInfo.Parameters, argsArray)
+                    );
                     statements.Add
                     (
                         ReturnResult(methodInfo.ReturnValue.Type, result)
@@ -210,34 +214,46 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         ExpressionStatement(invocation)
                     );
-                    statements.AddRange(AssignByRefParameters(methodInfo.Parameters, argsArray));
+                    statements.AddRange
+                    (
+                        AssignByRefParameters(methodInfo.Parameters, argsArray)
+                    );
                 }
 
                 return statements;
             }
             #endregion
 
-            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IMethodInfo method && !method.IsSpecial;
-
-            public override MemberDeclarationSyntax Build(IMemberInfo member) 
+            public MethodInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
             {
-                IMethodInfo method = (IMethodInfo) member;
-
-                //
-                // "ref" visszateres nem tamogatott.
-                //
-
-                if (method.ReturnValue.Type.IsByRef)
-                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
-             
-                return DeclareMethod(method).WithBody
-                (
-                    body: Block
-                    (
-                        BuildBody(method)
-                    )
-                );
+                RESOLVE_METHOD = InterceptorType
+                    .Methods
+                    .Single(met =>
+                        met.DeclaringType is IGenericTypeInfo genericType &&
+                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
+                        met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
             }
+
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+                .Methods
+                .Where(met => NotAlreadyImplemented(met) && !met.IsSpecial)
+                .Select(met =>
+                {
+                    //
+                    // "ref" visszateres nem tamogatott.
+                    //
+
+                    if (met.ReturnValue.Type.IsByRef)
+                        throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
+
+                    return DeclareMethod(met).WithBody
+                    (
+                        body: Block
+                        (
+                            BuildBody(met)
+                        )
+                    );
+                });
         }
     }
 }

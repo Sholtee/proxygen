@@ -6,8 +6,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -16,30 +14,38 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget> : ProxySyntaxFactoryBase
+    internal partial class DuckSyntaxFactory : ClassSyntaxFactory
     {
-        //
-        // this.Target
-        //
+        public ITypeInfo InterfaceType { get; }
 
-        private readonly MemberAccessExpressionSyntax TARGET;
+        public ITypeInfo TargetType { get; }
 
-        public DuckSyntaxFactory() =>
-            TARGET = MemberAccess(null, MetadataPropertyInfo.CreateFrom((PropertyInfo) MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!)));
+        public string AssemblyName { get; }
 
-        protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName) 
         {
-            ITypeInfo 
-                interfaceType = MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                @base = MetadataTypeInfo.CreateFrom(typeof(DuckBase<TTarget>));
-
             Debug.Assert(interfaceType.IsInterface);
-            Debug.Assert(interfaceType is not IGenericTypeInfo genericIface || !genericIface.IsGenericDefinition);
-            Debug.Assert(@base is not IGenericTypeInfo genericBase || !genericBase.IsGenericDefinition);
+
+            InterfaceType = interfaceType;
+            TargetType = targetType;
+            AssemblyName = assemblyName;
+
+            MemberSyntaxFactories = new IMemberSyntaxFactory[]
+            {
+                new ConstructorFactory(this),
+                new MethodInterceptorFactory(this),
+                new PropertyInterceptorFactory(this),
+                new EventInterceptorFactory(this)
+            };
+        }
+
+        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        {
+            ITypeInfo @base = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(InterfaceType);
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (
-                identifier: ProxyClassName
+                identifier: Classes.Single()
             )
             .WithModifiers
             (
@@ -57,28 +63,17 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    new[] { @base, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
+                    new[] { @base, InterfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
                     (
                         CreateType(t)
                     ))
                 )
             );
 
-            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
-            (
-                @base.Constructors.Select(DeclareCtor)
-            );
-
-            members.AddRange(BuildMembers<MethodInterceptorFactory>(interfaceType.Methods, cancellation));
-            members.AddRange(BuildMembers<PropertyInterceptorFactory>(interfaceType.Properties, cancellation));
-            members.AddRange(BuildMembers<EventInterceptorFactory>(interfaceType.Events, cancellation));
-
             return cls.WithMembers
             (
                 List(members)
             );
         }
-
-        public override string AssemblyName => $"{GetSafeTypeName<TTarget>()}_{GetSafeTypeName<TInterface>()}_Duck";
     }
 }

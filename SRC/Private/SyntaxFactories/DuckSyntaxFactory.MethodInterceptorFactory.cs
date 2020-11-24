@@ -14,13 +14,13 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget>
+    internal partial class DuckSyntaxFactory
     {
         /// <summary>
         /// [MethodImplAttribute(AggressiveInlining)]  <br/>
         /// ref TResult IFoo[TGeneric1].Bar[TGeneric2](TGeneric1 para1, ref T1 para2, out T2 para3, TGeneric2 para4) => ref Target.Foo[TGeneric2](para1, ref para2, out para3, para4);
         /// </summary>
-        internal sealed class MethodInterceptorFactory : InterceptorFactoryBase
+        internal sealed class MethodInterceptorFactory : DuckMemberSyntaxFactory
         {
             //
             // - int A.Foo([in|ref|out] int p) == int B.Foo([in|ref|out] int cica)
@@ -75,47 +75,48 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IMethodInfo method && !method.IsSpecial;
-
-            public override MemberDeclarationSyntax Build(IMemberInfo member)
+            protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                IMethodInfo
-                    ifaceMethod = (IMethodInfo) member,
-                    targetMethod = GetTargetMember(ifaceMethod, MetadataTypeInfo.CreateFrom(typeof(TTarget)).Methods);
+                foreach(IMethodInfo ifaceMethod in InterfaceType.Methods.Where(m => !m.IsSpecial))
+                {
+                    IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods);
 
-                //
-                // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
-                //
+                    //
+                    // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
+                    //
 
-                Visibility.Check(targetMethod, AssemblyName);
+                    Visibility.Check(targetMethod, AssemblyName);
 
-                //
-                // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
-                // maskepp vannak elnvezve.
-                //
+                    //
+                    // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
+                    // maskepp vannak elnvezve.
+                    //
 
-                ExpressionSyntax invocation = InvokeMethod
-                (
-                    ifaceMethod,
-                    TARGET,
-                    castTargetTo: targetMethod.AccessModifiers == AccessModifiers.Explicit
-                        ? targetMethod.DeclaringType
-                        : null,
-                    arguments: ifaceMethod
-                        .Parameters
-                        .Select(para => para.Name)
-                        .ToArray()
-                );
-
-                if (ifaceMethod.ReturnValue.Type.IsByRef) invocation = RefExpression(invocation);
-
-                return DeclareMethod(ifaceMethod, forceInlining: true)
-                    .WithExpressionBody
+                    ExpressionSyntax invocation = InvokeMethod
                     (
-                        expressionBody: ArrowExpressionClause(invocation)
-                    )
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                        ifaceMethod,
+                        MemberAccess(null, TARGET),
+                        castTargetTo: targetMethod.AccessModifiers == AccessModifiers.Explicit
+                            ? targetMethod.DeclaringType
+                            : null,
+                        arguments: ifaceMethod
+                            .Parameters
+                            .Select(para => para.Name)
+                            .ToArray()
+                    );
+
+                    if (ifaceMethod.ReturnValue.Type.IsByRef) invocation = RefExpression(invocation);
+
+                    yield return DeclareMethod(ifaceMethod, forceInlining: true)
+                        .WithExpressionBody
+                        (
+                            expressionBody: ArrowExpressionClause(invocation)
+                        )
+                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                }
             }
+
+            public MethodInterceptorFactory(DuckSyntaxFactory owner) : base(owner) { }
         }
     }
 }

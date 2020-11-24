@@ -21,7 +21,11 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public override IProxySyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory<TInterface, TInterceptor>();
+        public override IUnitSyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory
+        (
+            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+            MetadataTypeInfo.CreateFrom(typeof(TInterceptor))
+        );
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.

@@ -4,13 +4,11 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -103,9 +101,10 @@ namespace Solti.Utils.Proxy.Internals
             // using t = Namespace.Type;
             //
 
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) = new VisibilityCheckSyntaxFactory(type).GetContext();
+            IUnitSyntaxFactory fact = new VisibilityCheckSyntaxFactory(type);
+            fact.Build();
 
-            Debug.WriteLine(Unit.NormalizeWhitespace().ToFullString());
+            Debug.WriteLine(fact.Unit!.NormalizeWhitespace().ToFullString());
 
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -114,10 +113,10 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     CSharpSyntaxTree.Create
                     (
-                        root: Unit
+                        root: fact.Unit!
                     )
                 },
-                references: References,
+                references: fact.References!.Select(asm => MetadataReference.CreateFromFile(asm.Location!)),
                 options: CompilationOptionsFactory.Create()
             );
 

@@ -5,30 +5,16 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
-
     internal partial class SyntaxFactoryBase : ISyntaxFactory
     {
-        private (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References)? FContext;
+        public IReadOnlyCollection<ITypeInfo> Types => FTypes;
 
-        protected virtual CompilationUnitSyntax GenerateProxyUnit(CancellationToken cancellation) => throw new NotImplementedException();
+        public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
 
-        public virtual string? AssemblyName { get; }
-
-        public (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References) GetContext(CancellationToken cancellation = default) =>  FContext ??=
-        (
-            GenerateProxyUnit(cancellation),
-            FReferences
-                .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
-                .ToArray()
-        );
+        public virtual bool Build(CancellationToken cancellation) => throw new NotImplementedException();
     }
 }

@@ -4,12 +4,13 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Generic;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget>
+    internal partial class DuckSyntaxFactory
     {
         /// <summary>
         /// event TDelegate IFoo[System.Int32].Event     <br/>
@@ -20,40 +21,39 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove => Target.Event -= value;           <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : InterceptorFactoryBase
+        internal sealed class EventInterceptorFactory : DuckMemberSyntaxFactory
         {
-            public override MemberDeclarationSyntax Build(IMemberInfo member)
+            protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                IEventInfo
-                    ifaceEvt  = (IEventInfo) member,
-                    targetEvt = GetTargetMember(ifaceEvt, MetadataTypeInfo.CreateFrom(typeof(TTarget)).Events);
+                foreach (IEventInfo ifaceEvt in InterfaceType.Events)
+                {
+                    IEventInfo targetEvt = GetTargetMember(ifaceEvt, TargetType.Events);
 
-                //
-                // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
-                //
+                    //
+                    // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
+                    //
 
-                Visibility.Check(targetEvt, AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
+                    Visibility.Check(targetEvt, AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
 
-                IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
+                    IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
 
-                ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit ? accessor.DeclaringType : null;
+                    ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit ? accessor.DeclaringType : null;
 
-                return DeclareEvent
-                (
-                    ifaceEvt,
-                    addBody: ArrowExpressionClause
+                    yield return DeclareEvent
                     (
-                        expression: RegisterEvent(targetEvt, TARGET, add: true, IdentifierName(Value), castTargetTo)
-                    ),
-                    removeBody: ArrowExpressionClause
-                    (
-                        expression: RegisterEvent(targetEvt, TARGET, add: false, IdentifierName(Value), castTargetTo)
-                    ),
-                    forceInlining: true
-                );
+                        ifaceEvt,
+                        addBody: ArrowExpressionClause
+                        (
+                            expression: RegisterEvent(targetEvt, MemberAccess(null, TARGET), add: true, IdentifierName(Value), castTargetTo)
+                        ),
+                        removeBody: ArrowExpressionClause
+                        (
+                            expression: RegisterEvent(targetEvt, MemberAccess(null, TARGET), add: false, IdentifierName(Value), castTargetTo)
+                        ),
+                        forceInlining: true
+                    );
+                }
             }
-
-            public override bool IsCompatible(IMemberInfo member) => base.IsCompatible(member) && member is IEventInfo;
 
             protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
@@ -63,6 +63,8 @@ namespace Solti.Utils.Proxy.Internals
 
                 return targetEvt.Type.Equals(ifaceEvt.Type);
             }
+
+            public EventInterceptorFactory(DuckSyntaxFactory owner) : base(owner) { }
         }
     }
 }

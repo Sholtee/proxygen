@@ -7,7 +7,8 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IAssemblyInfo 
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IAssemblyInfo
     {
         string? Location { get; }
         bool IsDynamic { get; }

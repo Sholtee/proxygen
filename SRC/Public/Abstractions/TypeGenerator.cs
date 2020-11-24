@@ -4,15 +4,14 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Abstractions
 {
@@ -26,19 +25,15 @@ namespace Solti.Utils.Proxy.Abstractions
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
         #region Private
-        //
-        // Szal biztos: https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim?view=netcore-3.1#thread-safety
-        //
-
         private static readonly SemaphoreSlim FLock = new SemaphoreSlim(1, 1);
 
         private static Type? FType;
 
-        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.ProxyClassName, throwOnError: true);
+        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.Classes.Single(), throwOnError: true);
         #endregion
 
         #region Internal
-        internal string CacheFileName => $"{MD5Hash.CreateFromString(SyntaxFactory.AssemblyName!)}.dll";
+        internal string CacheFileName => $"{MD5Hash.CreateFromString(AssemblyName)}.dll";
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
@@ -46,16 +41,16 @@ namespace Solti.Utils.Proxy.Abstractions
 
         internal Type GenerateTypeCore(string? outputFile = default, string? assemblyNameOverride = default, CancellationToken cancellation = default)
         {
-            (CompilationUnitSyntax unit, IReadOnlyCollection<MetadataReference> references) = SyntaxFactory.GetContext(cancellation);
+            SyntaxFactory.Build(cancellation);
 
             return ExtractType
             (
                  Compile.ToAssembly
                  (
-                     root: unit,
-                     asmName: assemblyNameOverride ?? SyntaxFactory.AssemblyName!,
+                     SyntaxFactory.Unit!,
+                     asmName: assemblyNameOverride ?? AssemblyName,
                      outputFile,
-                     references,
+                     SyntaxFactory.References.Select(asm => MetadataReference.CreateFromFile(asm.Location!)).ToArray(),
                      cancellation
                  )
             );
@@ -97,7 +92,7 @@ namespace Solti.Utils.Proxy.Abstractions
         protected void CheckVisibility(Type type)
         {
 #if !IGNORE_VISIBILITY
-            Visibility.Check(MetadataTypeInfo.CreateFrom(type), SyntaxFactory.AssemblyName!);
+            Visibility.Check(MetadataTypeInfo.CreateFrom(type), AssemblyName);
 #endif
         }
         #endregion
@@ -138,9 +133,14 @@ namespace Solti.Utils.Proxy.Abstractions
         }
 
         /// <summary>
+        /// The name of the assembly that will contain the generated <see cref="Type"/>.
+        /// </summary>
+        public string AssemblyName { get; protected set; } = $"Generated_{typeof(TDescendant).GUID}";
+
+        /// <summary>
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        public abstract IProxySyntaxFactory SyntaxFactory { get; }
+        public abstract IUnitSyntaxFactory SyntaxFactory { get; }
         #endregion
     }
 }

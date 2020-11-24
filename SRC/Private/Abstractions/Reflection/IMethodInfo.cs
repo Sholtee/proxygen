@@ -7,7 +7,8 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IMethodInfo: IMemberInfo
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+    public interface IMethodInfo: IMemberInfo
     {
         IReadOnlyList<IParameterInfo> Parameters { get; }
         IParameterInfo ReturnValue { get; }
@@ -15,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
         AccessModifiers AccessModifiers { get; }
     }
 
-    internal interface IConstructorInfo : IMethodInfo { }
+    public interface IConstructorInfo : IMethodInfo { }
 
-    internal interface IGenericMethodInfo : IMethodInfo, IGeneric { }
+    public interface IGenericMethodInfo : IMethodInfo, IGeneric { }
 }
