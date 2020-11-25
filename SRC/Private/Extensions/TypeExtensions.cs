@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
 
-        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false) where TMember : MemberInfo
+        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false, bool includeStatic = false) where TMember : MemberInfo
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
@@ -48,6 +48,7 @@ namespace Solti.Utils.Proxy.Internals
           
             flags |= BindingFlags.FlattenHierarchy;
             if (includeNonPublic) flags |= BindingFlags.NonPublic;
+            if (includeStatic) flags |= BindingFlags.Static;
 
             return GetMembers(src);
 

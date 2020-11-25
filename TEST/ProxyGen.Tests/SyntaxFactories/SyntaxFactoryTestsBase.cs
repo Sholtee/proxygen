@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactoryTestsBase.cs                                                *
+* SyntaxFactoryTestsBase.cs                                                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -7,7 +7,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
 
-    public class ProxySyntaxFactoryTestsBase
+    public class SyntaxFactoryTestsBase
     {
         public delegate void TestDelegate<in T>(object sender, T eventArg);
 

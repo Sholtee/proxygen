@@ -234,9 +234,9 @@ namespace Solti.Utils.Proxy.Internals
                         met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
                 .Methods
-                .Where(met => NotAlreadyImplemented(met) && !met.IsSpecial)
+                .Where(met => !AlreadyImplemented(met) && !met.IsSpecial)
                 .Select(met =>
                 {
                     //

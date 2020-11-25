@@ -10,7 +10,7 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
             result = (System.Object)this.Target[cb_index];
             return result;
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
+        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolveProperty(this.InvokeTarget);
         return (System.Int32)this.Invoke(prop.GetMethod, args, prop);
     }
 
@@ -24,7 +24,7 @@ System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 in
             this.Target[cb_index] = cb_value;
             return null;
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
+        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<System.Int32>>.ResolveProperty(this.InvokeTarget);
         this.Invoke(prop.SetMethod, args, prop);
     }
 }

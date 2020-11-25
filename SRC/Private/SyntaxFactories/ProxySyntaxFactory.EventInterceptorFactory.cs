@@ -115,9 +115,9 @@ namespace Solti.Utils.Proxy.Internals
                         met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
                 .Events
-                .Where(NotAlreadyImplemented)
+                .Where(evt => !AlreadyImplemented(evt))
                 .Select(evt => DeclareEvent
                 (
                     @event: evt,

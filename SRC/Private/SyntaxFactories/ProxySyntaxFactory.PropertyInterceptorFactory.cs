@@ -203,9 +203,9 @@ namespace Solti.Utils.Proxy.Internals
                 false
             );
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => SourceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
                 .Properties
-                .Where(NotAlreadyImplemented)
+                .Where(prop => !AlreadyImplemented(prop))
                 .Select(prop => BuildProperty(prop, prop.Indices.Any() 
                     ? DeclareIndexer 
                     : DeclareProperty));

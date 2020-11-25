@@ -132,6 +132,9 @@
   <data name="GENERIC_GENERATOR" xml:space="preserve">
     <value>A generator can not be generic.</value>
   </data>
+  <data name="GENERIC_IFACE" xml:space="preserve">
+    <value>Target interface can not be generic</value>
+  </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>
@@ -140,6 +143,9 @@
   </data>
   <data name="MISSING_IMPLEMENTATION" xml:space="preserve">
     <value>The target does not implement the member: {0}</value>
+  </data>
+  <data name="NOT_AN_INTERCEPTOR" xml:space="preserve">
+    <value>The type must be a InterfaceInterceptor descendant.</value>
   </data>
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>

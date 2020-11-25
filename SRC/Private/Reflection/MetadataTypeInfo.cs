@@ -80,19 +80,19 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
-            .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/)
+            .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Select(MetadataPropertyInfo.CreateFrom)
             .ToArray();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
-            .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/)
+            .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
-            .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/)
+            .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 

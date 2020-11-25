@@ -3,8 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,6 +14,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class DuckSyntaxFactory : ClassSyntaxFactory
     {
         public ITypeInfo InterfaceType { get; }
@@ -24,7 +26,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName) 
         {
-            Debug.Assert(interfaceType.IsInterface);
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
             TargetType = targetType;
@@ -41,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
-            ITypeInfo @base = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(InterfaceType);
+            ITypeInfo @base = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(TargetType);
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (

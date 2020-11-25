@@ -18,9 +18,9 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
-        internal abstract class ProxyMemberSyntaxFactory: MemberSyntaxFactory
+        internal class ProxyMemberSyntaxFactory: MemberSyntaxFactory
         {
-            #region Internal
+            #region Protected
             protected internal readonly IPropertyInfo
                 TARGET,
                 INVOKE_TARGET;
@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
             // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
             //
 
-            protected bool NotAlreadyImplemented(IMemberInfo member) => !InterceptorType
+            protected bool AlreadyImplemented(IMemberInfo member) => InterceptorType
                 .Interfaces
                 .Contains(member.DeclaringType);
 
@@ -215,9 +215,9 @@ namespace Solti.Utils.Proxy.Internals
                     Block(statements)
                 );
             }
+            
+            protected virtual IEnumerable<MemberDeclarationSyntax> Build() => throw new NotImplementedException();
             #endregion
-
-            protected abstract IEnumerable<MemberDeclarationSyntax> Build();
 
             public sealed override bool Build(CancellationToken cancellation)
             {

@@ -1,4 +1,4 @@
-System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
+System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
 {
     System.Object[] args = new System.Object[]{a, default(System.String), c};
     this.InvokeTarget = () =>
@@ -12,7 +12,7 @@ System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase
         args[2] = (System.Object)cb_c;
         return result;
     };
-    System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
+    System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
     System.Object result = this.Invoke(method, args, method);
     b = (System.String)args[1];
     c = (TT)args[2];

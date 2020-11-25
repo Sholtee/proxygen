@@ -3,8 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -14,6 +14,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ProxySyntaxFactory: ClassSyntaxFactory
     {
         public ITypeInfo InterfaceType { get; }
@@ -22,11 +24,27 @@ namespace Solti.Utils.Proxy.Internals
 
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType) 
         {
-            Debug.Assert(interfaceType.IsInterface);
-            Debug.Assert(interceptorType.Bases.Any(b => 
-                b is IGenericTypeInfo generic && 
-                generic.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
-                generic.GenericArguments.Single().Equals(interfaceType)));
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
+
+            if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
+
+            //
+            // Append() hivas azon percerz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
+            //
+
+            if (!interceptorType.Bases.Append(interceptorType).Any(
+                b =>
+                    b is IGenericTypeInfo genericBase &&
+                    genericBase
+                        .GenericDefinition
+                        .Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
+                    genericBase.GenericArguments.Single().Equals(interfaceType)))
+                throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
+
+            if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_GENERATOR, nameof(interceptorType));
 
             InterfaceType = interfaceType;
             InterceptorType = interceptorType;
