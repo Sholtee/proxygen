@@ -203,16 +203,16 @@ namespace Solti.Utils.Proxy.Internals
                 false
             );
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
                 .Properties
                 .Where(prop => !AlreadyImplemented(prop))
                 .Select(prop => BuildProperty(prop, prop.Indices.Any() 
                     ? DeclareIndexer 
                     : DeclareProperty));
 
-            public PropertyInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
+            public PropertyInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_PROPERTY = Owner.BaseInterceptorType
+                RESOLVE_PROPERTY = Context.BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
             }

@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
             // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
             //
 
-            protected bool AlreadyImplemented(IMemberInfo member) => Owner.InterceptorType
+            protected bool AlreadyImplemented(IMemberInfo member) => Context.InterceptorType
                 .Interfaces
                 .Contains(member.DeclaringType);
 
@@ -227,21 +227,21 @@ namespace Solti.Utils.Proxy.Internals
                 return true;
             }
 
-            public ProxySyntaxFactory Owner { get; }
+            public IProxyContext Context { get; }
 
-            public ProxyMemberSyntaxFactory(ProxySyntaxFactory owner) : base(owner.InterfaceType)
+            public ProxyMemberSyntaxFactory(IProxyContext context) : base(context.InterfaceType)
             {
-                Owner = owner;
+                Context = context;
 
-                TARGET = Owner.BaseInterceptorType
+                TARGET = Context.BaseInterceptorType
                     .Properties
                     .Single(prop => prop.Name == nameof(InterfaceInterceptor<object>.Target));
 
-                INVOKE_TARGET = Owner.BaseInterceptorType
+                INVOKE_TARGET = Context.BaseInterceptorType
                     .Properties
                     .Single(prop => prop.Name == nameof(InterfaceInterceptor<object>.InvokeTarget));
 
-                INVOKE = Owner.BaseInterceptorType
+                INVOKE = Context.BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.Invoke));
             }

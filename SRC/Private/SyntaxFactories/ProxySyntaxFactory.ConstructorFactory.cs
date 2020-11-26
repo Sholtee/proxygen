@@ -12,9 +12,9 @@ namespace Solti.Utils.Proxy.Internals
     {
         internal sealed class ConstructorFactory : MemberSyntaxFactory
         {
-            public ProxySyntaxFactory Owner { get; }
+            public IProxyContext Context { get; }
 
-            public ConstructorFactory(ProxySyntaxFactory owner) : base(owner.InterceptorType) => Owner = owner;
+            public ConstructorFactory(IProxyContext context) : base(context.InterceptorType) => Context = context;
 
             public override bool Build(CancellationToken cancellation)
             {
@@ -22,10 +22,10 @@ namespace Solti.Utils.Proxy.Internals
 
                 cancellation.ThrowIfCancellationRequested();
 
-                Members = Owner
+                Members = Context
                     .InterceptorType
                     .Constructors
-                    .Select(ctor => DeclareCtor(ctor, Owner.Classes.Single()))
+                    .Select(ctor => DeclareCtor(ctor, Context.ClassName))
                     .ToArray();
 
                 return true;

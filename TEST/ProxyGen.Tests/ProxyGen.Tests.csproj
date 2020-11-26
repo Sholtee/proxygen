@@ -38,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="1b3f2fb7485186dad83c16b086f575d1.dll">
+    <None Update="Generated_4627888B64E68906D7FD5F9187BC0AC5.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BarSrc.txt">
@@ -56,7 +56,7 @@
     <None Update="EventSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="fa5d9f467363f2c469e3a897ea8ef088.dll">
+    <None Update="Generated_CB188DF8A82FB4A7602B5562F68568BF.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="FooSrc.txt">

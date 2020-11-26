@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
 
             protected abstract IEnumerable<MemberDeclarationSyntax> Build();
 
-            public DuckSyntaxFactory Owner { get; }
+            public IDuckContext Context { get; }
 
             public sealed override bool Build(CancellationToken cancellation)
             {
@@ -56,11 +56,12 @@ namespace Solti.Utils.Proxy.Internals
                 return true;
             }
 
-            public DuckMemberSyntaxFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType)
+            public DuckMemberSyntaxFactory(IDuckContext context) : base(context.InterfaceType)
             {
-                Owner = owner;
+                Context = context;
 
-                TARGET = Owner.BaseType
+                TARGET = Context
+                    .BaseType
                     .Properties
                     .Single(prop => prop.Name == nameof(DuckBase<object>.Target));
             }

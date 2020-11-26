@@ -104,14 +104,14 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public EventInterceptorFactory(ProxySyntaxFactory owner) : base(owner)
+            public EventInterceptorFactory(IProxyContext context) : base(context)
             {
-                RESOLVE_EVENT = Owner.BaseInterceptorType
+                RESOLVE_EVENT = Context.BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
                 .Events
                 .Where(evt => !AlreadyImplemented(evt))
                 .Select(evt => DeclareEvent

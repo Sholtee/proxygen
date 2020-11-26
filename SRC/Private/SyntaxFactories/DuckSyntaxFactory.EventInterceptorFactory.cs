@@ -25,15 +25,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                foreach (IEventInfo ifaceEvt in Owner.InterfaceType.Events)
+                foreach (IEventInfo ifaceEvt in Context.InterfaceType.Events)
                 {
-                    IEventInfo targetEvt = GetTargetMember(ifaceEvt, Owner.TargetType.Events);
+                    IEventInfo targetEvt = GetTargetMember(ifaceEvt, Context.TargetType.Events);
 
                     //
                     // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetEvt, Owner.AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
+                    Visibility.Check(targetEvt, Context.AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
 
                     IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
 
@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                 return targetEvt.Type.Equals(ifaceEvt.Type) && !targetEvt.IsStatic;
             }
 
-            public EventInterceptorFactory(DuckSyntaxFactory owner) : base(owner) { }
+            public EventInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }
 }

@@ -223,14 +223,14 @@ namespace Solti.Utils.Proxy.Internals
             }
             #endregion
 
-            public MethodInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
+            public MethodInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_METHOD = Owner.BaseInterceptorType
+                RESOLVE_METHOD = Context.BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
                 .Methods
                 .Where(met => !AlreadyImplemented(met) && !met.IsSpecial)
                 .Select(met =>

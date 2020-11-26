@@ -16,13 +16,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory: ClassSyntaxFactory
+    internal partial class ProxySyntaxFactory: ClassSyntaxFactory, IProxyContext
     {
         public ITypeInfo InterfaceType { get; }
 
         public ITypeInfo InterceptorType { get; }
 
         public ITypeInfo BaseInterceptorType { get; }  // ebbol kerdezzuk le az Invoke() stb tagokat, igy biztosan nem lesz utkozes
+
+        string IProxyContext.ClassName => Classes.Single();
 
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType) 
         {

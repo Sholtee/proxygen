@@ -16,13 +16,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class DuckSyntaxFactory : ClassSyntaxFactory
+    internal partial class DuckSyntaxFactory : ClassSyntaxFactory, IDuckContext
     {
         public ITypeInfo InterfaceType { get; }
 
         public ITypeInfo TargetType { get; }
 
         public ITypeInfo BaseType { get; }
+
+        string IDuckContext.ClassName => Classes.Single();
 
         public string AssemblyName { get; }
 

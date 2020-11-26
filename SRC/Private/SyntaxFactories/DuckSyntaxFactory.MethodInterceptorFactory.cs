@@ -78,15 +78,15 @@ namespace Solti.Utils.Proxy.Internals
 
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                foreach(IMethodInfo ifaceMethod in Owner.InterfaceType.Methods.Where(m => !m.IsSpecial))
+                foreach(IMethodInfo ifaceMethod in Context.InterfaceType.Methods.Where(m => !m.IsSpecial))
                 {
-                    IMethodInfo targetMethod = GetTargetMember(ifaceMethod, Owner.TargetType.Methods);
+                    IMethodInfo targetMethod = GetTargetMember(ifaceMethod, Context.TargetType.Methods);
 
                     //
                     // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetMethod, Owner.AssemblyName);
+                    Visibility.Check(targetMethod, Context.AssemblyName);
 
                     //
                     // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
@@ -117,7 +117,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            public MethodInterceptorFactory(DuckSyntaxFactory owner) : base(owner) { }
+            public MethodInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }
 }

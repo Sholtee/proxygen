@@ -29,15 +29,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                foreach(IPropertyInfo ifaceProperty in Owner.InterfaceType.Properties)
+                foreach(IPropertyInfo ifaceProperty in Context.InterfaceType.Properties)
                 {
-                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Owner.TargetType.Properties);
+                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Context.TargetType.Properties);
 
                     //
                     // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetProperty, Owner.AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
+                    Visibility.Check(targetProperty, Context.AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
 
                     IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 
@@ -124,7 +124,7 @@ namespace Solti.Utils.Proxy.Internals
                         );
             }
 
-            public PropertyInterceptorFactory(DuckSyntaxFactory owner) : base(owner) { }
+            public PropertyInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }
 }

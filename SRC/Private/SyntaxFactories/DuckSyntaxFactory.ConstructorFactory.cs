@@ -12,10 +12,10 @@ namespace Solti.Utils.Proxy.Internals
     {
         internal sealed class ConstructorFactory : MemberSyntaxFactory
         {
-            public DuckSyntaxFactory Owner { get; }
+            public IDuckContext Context { get; }
 
-            public ConstructorFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType) =>
-                Owner = owner;
+            public ConstructorFactory(IDuckContext context) : base(context.InterfaceType) =>
+                Context = context;
 
             public override bool Build(CancellationToken cancellation)
             {
@@ -23,10 +23,10 @@ namespace Solti.Utils.Proxy.Internals
 
                 cancellation.ThrowIfCancellationRequested();
 
-                Members = Owner
+                Members = Context
                     .BaseType
                     .Constructors
-                    .Select(ctor => DeclareCtor(ctor, Owner.Classes.Single()))
+                    .Select(ctor => DeclareCtor(ctor, Context.ClassName))
                     .ToArray();
 
                 return true;
