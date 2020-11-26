@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldValidate()
         {
-            Assert.ThrowsAsync<InvalidOperationException>(() => CreateDuck<object, object>(new object()));
+            Assert.ThrowsAsync<ArgumentException>(() => CreateDuck<object, object>(new object()));
             Assert.ThrowsAsync<MemberAccessException>(() => CreateDuck<IBar, Private>(new Private()));
         }
 

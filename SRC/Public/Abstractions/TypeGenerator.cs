@@ -58,7 +58,21 @@ namespace Solti.Utils.Proxy.Abstractions
 
         internal static Type GenerateType(string? cacheDir, CancellationToken cancellation = default) 
         {
-            var self = new TDescendant();
+            TDescendant self;
+            try
+            {           
+                self = new TDescendant();
+            }
+
+            //
+            // "new" operator hivasa Activator.CreateInstace() hvas valojaban
+            //
+
+            catch (TargetInvocationException ex)  when (ex.InnerException is not null)
+            {
+                throw ex.InnerException;
+            }
+
             self.DoCheck();
 
             string? cacheFile = null;
