@@ -13,8 +13,8 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.Internal_Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.IInternal_Duck")]
-[assembly: InternalsVisibleTo("<>f__AnonymousType0<System.Int32_System.String>_Solti.Utils.Proxy.Generators.Tests.DuckGeneratorTests.IProps_Duck")]
+[assembly: InternalsVisibleTo("Generated_3FD8CD4E32FF74587DE67E47464FDBB8")]
+[assembly: InternalsVisibleTo("Generated_2B8476F04A26B2134802394110B4FD70")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {

@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             string
                 separator = $",{Environment.NewLine}",
-                src = root.NormalizeWhitespace().ToFullString(),
+                src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
                 refs = string.Join(separator, references.Select(r => r.Display));
 
             Debug.WriteLine(src);

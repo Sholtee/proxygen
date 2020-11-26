@@ -14,13 +14,8 @@ namespace Solti.Utils.Proxy.Internals
         {
             public DuckSyntaxFactory Owner { get; }
 
-            public ITypeInfo Base { get; }
-
-            public ConstructorFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType)
-            {
+            public ConstructorFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType) =>
                 Owner = owner;
-                Base = (ITypeInfo) ((IGenericTypeInfo)MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(owner.TargetType);
-            }
 
             public override bool Build(CancellationToken cancellation)
             {
@@ -28,7 +23,8 @@ namespace Solti.Utils.Proxy.Internals
 
                 cancellation.ThrowIfCancellationRequested();
 
-                Members = Base
+                Members = Owner
+                    .BaseType
                     .Constructors
                     .Select(ctor => DeclareCtor(ctor, Owner.Classes.Single()))
                     .ToArray();

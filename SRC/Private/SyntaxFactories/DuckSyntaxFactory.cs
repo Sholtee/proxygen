@@ -22,6 +22,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo TargetType { get; }
 
+        public ITypeInfo BaseType { get; }
+
         public string AssemblyName { get; }
 
         public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName) 
@@ -31,6 +33,7 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;
             TargetType = targetType;
+            BaseType = (ITypeInfo) ((IGenericTypeInfo)MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
             AssemblyName = assemblyName;
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[]

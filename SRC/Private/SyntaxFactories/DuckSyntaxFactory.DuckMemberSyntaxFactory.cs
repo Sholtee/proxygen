@@ -60,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Owner = owner;
 
-                TARGET = ((ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(owner.TargetType))
+                TARGET = Owner.BaseType
                     .Properties
                     .Single(prop => prop.Name == nameof(DuckBase<object>.Target));
             }
