@@ -56,24 +56,24 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(Cica<>.Mica.Hajj<,>), "Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<T>.Mica.Hajj<TT, TTT>")]
         [TestCase(typeof(Cica<List<int>>.Mica<string>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<System.Collections.Generic.List<System.Int32>>.Mica<System.String>.Hajj")]
         [TestCase(typeof(Cica<int>.Mica.Hajj<string, object>), "Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<System.Int32>.Mica.Hajj<System.String, System.Object>")]
-        [TestCase(typeof(CicaNested<>.Mica<>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<T>.Mica<TT>.Hajj")]
-        [TestCase(typeof(CicaNested<>.Mica.Hajj<,>), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<T>.Mica.Hajj<TT, TTT>")]
-        [TestCase(typeof(CicaNested<List<int>>.Mica<string>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Collections.Generic.List<System.Int32>>.Mica<System.String>.Hajj")]
-        [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.CicaNested<System.Int32>.Mica.Hajj<System.String, System.Object>")]
+        [TestCase(typeof(CicaNested<>.Mica<>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<T>.Mica<TT>.Hajj")]
+        [TestCase(typeof(CicaNested<>.Mica.Hajj<,>), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<T>.Mica.Hajj<TT, TTT>")]
+        [TestCase(typeof(CicaNested<List<int>>.Mica<string>.Hajj), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<System.Collections.Generic.List<System.Int32>>.Mica<System.String>.Hajj")]
+        [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<System.Int32>.Mica.Hajj<System.String, System.Object>")]
         public void CreateType_ShouldHandleNestedTypes(Type type, string expected) =>
             Assert.That(new MemberSyntaxFactory(default).CreateType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
         [Test]
         public void DeclareProperty_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(new MemberSyntaxFactory(default).DeclareProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
+            Assert.That(new MemberSyntaxFactory(default).DeclareProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
 
         [Test]
         public void DeclareEvent_ShouldDoWhatTheNameSuggests() =>
-            Assert.That(new MemberSyntaxFactory(default).DeclareEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
+            Assert.That(new MemberSyntaxFactory(default).DeclareEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
 
         [Test]
         public void DeclareMethod_ShouldHandleParamsModifier() =>
-            Assert.That(new MemberSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default)))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IParams.Foo(params System.Int32[] paramz)"));
+            Assert.That(new MemberSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default)))).NormalizeWhitespace().ToString(), Is.EqualTo("void Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.IParams.Foo(params System.Int32[] paramz)"));
 
         private interface IParams
         {
@@ -83,7 +83,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void DeclareMethod_ShouldSupportRefKeywords() =>
             // ref retval miatt a MemberInfoExtensions-s csoda itt nem jo
-            Assert.That(new MemberSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public))).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
+            Assert.That(new MemberSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public))).NormalizeWhitespace().ToString(), Is.EqualTo("ref System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.IRefInterface.RefMethod(in System.Object a, out System.Object b, ref System.Object c)"));
 
         [Test]
         public void InvokeMethod_ShouldSupportRefKeywords() =>
@@ -93,8 +93,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, string Expected)[] GenericMethods = new[] 
         {
-           (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.GenericMethod<T>(a)"),
-           ( (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.GenericMethod<System.Int32>(a)")
+           (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.GenericMethod<T>(a)"),
+           ( (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.GenericMethod<System.Int32>(a)")
         };
 
         [TestCaseSource(nameof(GenericMethods))]
@@ -108,8 +108,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, string Expected)[] MethodsHavingNullableRetVal = new[]
         {
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Nullable()), "System.Nullable<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.INullable.Nullable()"),
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Object()), "System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryBaseTests.INullable.Object()")
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Nullable()), "System.Nullable<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.INullable.Nullable()"),
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Object()), "System.Object Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.INullable.Object()")
         };
 
         [TestCaseSource(nameof(MethodsHavingNullableRetVal))]

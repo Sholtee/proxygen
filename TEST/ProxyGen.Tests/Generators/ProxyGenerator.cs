@@ -9,13 +9,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Moq;
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.InternalInterfaceProxy_Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.IInternalInterface_Proxy")]
+[assembly: InternalsVisibleTo("Generated_4452045DEB0B8A8CD152DB473FEC7584")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -359,7 +358,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldValidate() 
         {
-            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<object, InterfaceInterceptor<object>>());
+            Assert.ThrowsAsync<ArgumentException>(() => CreateProxy<object, InterfaceInterceptor<object>>());
             Assert.ThrowsAsync<NotSupportedException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
@@ -463,6 +462,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync(cacheDir);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
+        }
+
+        private const string WIRED_NAME = "Generated_57CD2D6D2307EC3308C512780C8BF51F"; // amig a tipus nem valtozik addig ez sem valtozhat
+
+        [Test]
+        public void ProxyGenerator_ShouldGenerateUniqueAssemblyName() 
+        {
+            Assert.AreEqual(WIRED_NAME, new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>().AssemblyName);
+            Assert.AreNotEqual(WIRED_NAME, new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>().AssemblyName);
         }
     }
 }

@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -226,15 +225,12 @@ namespace Solti.Utils.Proxy.Internals
 
             public MethodInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
             {
-                RESOLVE_METHOD = InterceptorType
+                RESOLVE_METHOD = Owner.BaseInterceptorType
                     .Methods
-                    .Single(met =>
-                        met.DeclaringType is IGenericTypeInfo genericType &&
-                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
-                        met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
+                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
                 .Methods
                 .Where(met => !AlreadyImplemented(met) && !met.IsSpecial)
                 .Select(met =>

@@ -22,6 +22,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
+        public ITypeInfo BaseInterceptorType { get; }  // ebbol kerdezzuk le az Invoke() stb tagokat, igy biztosan nem lesz utkozes
+
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType) 
         {
             if (!interfaceType.IsInterface)
@@ -30,23 +32,20 @@ namespace Solti.Utils.Proxy.Internals
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
+            InterfaceType = interfaceType;
+
+            BaseInterceptorType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))).Close(interfaceType);
+
             //
             // Append() hivas azon percerz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
             //
 
-            if (!interceptorType.Bases.Append(interceptorType).Any(
-                b =>
-                    b is IGenericTypeInfo genericBase &&
-                    genericBase
-                        .GenericDefinition
-                        .Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
-                    genericBase.GenericArguments.Single().Equals(interfaceType)))
+            if (!interceptorType.Bases.Append(interceptorType).Any(BaseInterceptorType.Equals))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_GENERATOR, nameof(interceptorType));
 
-            InterfaceType = interfaceType;
             InterceptorType = interceptorType;
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[] 

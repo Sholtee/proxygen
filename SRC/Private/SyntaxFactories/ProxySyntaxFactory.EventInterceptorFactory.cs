@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -107,15 +106,12 @@ namespace Solti.Utils.Proxy.Internals
 
             public EventInterceptorFactory(ProxySyntaxFactory owner) : base(owner)
             {
-                RESOLVE_EVENT = InterceptorType
+                RESOLVE_EVENT = Owner.BaseInterceptorType
                     .Methods
-                    .Single(met =>
-                        met.DeclaringType is IGenericTypeInfo genericType &&
-                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
-                        met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
+                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
                 .Events
                 .Where(evt => !AlreadyImplemented(evt))
                 .Select(evt => DeclareEvent

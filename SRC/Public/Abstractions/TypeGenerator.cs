@@ -135,7 +135,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The name of the assembly that will contain the generated <see cref="Type"/>.
         /// </summary>
-        public string AssemblyName { get; protected set; } = $"Generated_{typeof(TDescendant).GUID}";
+        public string AssemblyName { get; protected set; } = $"Generated_{typeof(TDescendant).GetMD5HashCode()}";
 
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.

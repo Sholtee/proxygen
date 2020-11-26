@@ -203,7 +203,7 @@ namespace Solti.Utils.Proxy.Internals
                 false
             );
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> Build() => Owner.InterfaceType
                 .Properties
                 .Where(prop => !AlreadyImplemented(prop))
                 .Select(prop => BuildProperty(prop, prop.Indices.Any() 
@@ -212,12 +212,9 @@ namespace Solti.Utils.Proxy.Internals
 
             public PropertyInterceptorFactory(ProxySyntaxFactory owner) : base(owner) 
             {
-                RESOLVE_PROPERTY = InterceptorType
+                RESOLVE_PROPERTY = Owner.BaseInterceptorType
                     .Methods
-                    .Single(met =>
-                        met.DeclaringType is IGenericTypeInfo genericType &&
-                        genericType.GenericDefinition.Equals(MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))) &&
-                        met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
+                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
             }
         }
     }
