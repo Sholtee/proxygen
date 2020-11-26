@@ -29,15 +29,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                foreach(IPropertyInfo ifaceProperty in InterfaceType.Properties)
+                foreach(IPropertyInfo ifaceProperty in Owner.InterfaceType.Properties)
                 {
-                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType.Properties);
+                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Owner.TargetType.Properties);
 
                     //
                     // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetProperty, AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
+                    Visibility.Check(targetProperty, Owner.AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
 
                     IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 
@@ -101,6 +101,8 @@ namespace Solti.Utils.Proxy.Internals
 
                 return
                     targetProp.Type.Equals(ifaceProp.Type) &&
+
+                    !targetProp.IsStatic &&
 
                     //
                     // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne

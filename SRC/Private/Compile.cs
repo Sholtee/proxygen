@@ -30,9 +30,13 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, CancellationToken cancellation = default)
         {
-            Debug.WriteLine(root.NormalizeWhitespace().ToFullString());
+            string
+                separator = $",{Environment.NewLine}",
+                src = root.NormalizeWhitespace().ToFullString(),
+                refs = string.Join(separator, references.Select(r => r.Display));
 
-            Debug.WriteLine(string.Join(Environment.NewLine, references.Select(r => r.Display)));
+            Debug.WriteLine(src);
+            Debug.WriteLine(refs);
 
             CSharpCompilation compilation = CSharpCompilation.Create
             (
@@ -52,11 +56,11 @@ namespace Solti.Utils.Proxy.Internals
 
             EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
-            Debug.WriteLine(string.Join(Environment.NewLine, result.Diagnostics));
+            Debug.WriteLine(string.Join(separator, result.Diagnostics));
 
             if (!result.Success)
             {
-                string failures = string.Join($",{Environment.NewLine}", result
+                string failures = string.Join(separator, result
                     .Diagnostics
                     .Where(d => d.Severity == DiagnosticSeverity.Error));
 
@@ -65,8 +69,8 @@ namespace Solti.Utils.Proxy.Internals
                 IDictionary extra = ex.Data;
 
                 extra.Add(nameof(failures), failures);
-                extra.Add("src", root.NormalizeWhitespace().ToFullString());
-                extra.Add(nameof(references), references);
+                extra.Add(nameof(src), src);
+                extra.Add(nameof(references), refs);
 
                 throw ex;
             }

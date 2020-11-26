@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         internal abstract class DuckMemberSyntaxFactory : MemberSyntaxFactory
         {
-            protected IPropertyInfo TARGET;
+            protected internal readonly IPropertyInfo TARGET;
 
             protected abstract bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember);
 
@@ -45,11 +45,7 @@ namespace Solti.Utils.Proxy.Internals
 
             protected abstract IEnumerable<MemberDeclarationSyntax> Build();
 
-            public ITypeInfo InterfaceType => SourceType;
-
-            public ITypeInfo TargetType { get; }
-
-            public string AssemblyName { get; }
+            public DuckSyntaxFactory Owner { get; }
 
             public sealed override bool Build(CancellationToken cancellation)
             {
@@ -62,10 +58,9 @@ namespace Solti.Utils.Proxy.Internals
 
             public DuckMemberSyntaxFactory(DuckSyntaxFactory owner) : base(owner.InterfaceType)
             {
-                TargetType = owner.TargetType;
-                AssemblyName = owner.AssemblyName;
+                Owner = owner;
 
-                TARGET = ((ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(InterfaceType))
+                TARGET = ((ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(owner.TargetType))
                     .Properties
                     .Single(prop => prop.Name == nameof(DuckBase<object>.Target));
             }

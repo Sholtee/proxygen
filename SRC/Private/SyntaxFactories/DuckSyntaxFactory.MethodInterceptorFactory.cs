@@ -34,6 +34,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 return
                     targetMember.Name == ifaceMember.Name &&
+                    !targetMember.IsStatic &&
                     ExtractParameters((IMethodInfo) targetMember).SequenceEqual(ExtractParameters((IMethodInfo) ifaceMember));
 
                 static IEnumerable<object> ExtractParameters(IMethodInfo method) 
@@ -77,15 +78,15 @@ namespace Solti.Utils.Proxy.Internals
 
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {
-                foreach(IMethodInfo ifaceMethod in InterfaceType.Methods.Where(m => !m.IsSpecial))
+                foreach(IMethodInfo ifaceMethod in Owner.InterfaceType.Methods.Where(m => !m.IsSpecial))
                 {
-                    IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods);
+                    IMethodInfo targetMethod = GetTargetMember(ifaceMethod, Owner.TargetType.Methods);
 
                     //
                     // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetMethod, AssemblyName);
+                    Visibility.Check(targetMethod, Owner.AssemblyName);
 
                     //
                     // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
