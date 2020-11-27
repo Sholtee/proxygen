@@ -91,6 +91,26 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(properties.Length, Is.EqualTo(expectedLength));
         }
 
+        private interface IIFace : IA, IB { }
+
+        private interface IA: IC 
+        {
+            void Foo();
+        }
+
+        private interface IB: IC 
+        {
+            void Bar();
+        }
+
+        private interface IC 
+        {
+            void Baz();
+        }
+
+        [Test]
+        public void ListMembers_ShouldDistinct() => Assert.That(typeof(IIFace).ListMembers<MethodInfo>().Count(), Is.EqualTo(3));
+
         private class Class 
         {
             public class Nested { }
