@@ -31,8 +31,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (object Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
-            ((object) Foo, "System.Object[] args = new System.Object[]{a, default(System.String), c};"),
-            (Bar, "System.Object[] args = new System.Object[0];")
+            ((object) Foo, "global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};"),
+            (Bar, "global::System.Object[] args = new global::System.Object[0];")
         };
 
         private ProxySyntaxFactory Generator { get; set; }
@@ -55,7 +55,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             ).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
-            Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (System.String)args[1];"));
+            Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (global::System.String)args[1];"));
             Assert.That(assignments[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("c = (TT)args[2];"));
         }
 
@@ -67,8 +67,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = fact.DeclareCallbackLocals(fact.DeclareLocal<object[]>("args"), Foo.Parameters).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
-            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.Int32 cb_a = (System.Int32)args[0];"));
-            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("System.String cb_b;"));
+            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.Int32 cb_a = (global::System.Int32)args[0];"));
+            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.String cb_b;"));
             Assert.That(locals[2].NormalizeWhitespace().ToFullString(), Is.EqualTo("TT cb_c = (TT)args[2];"));
         }
 
@@ -85,8 +85,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));
-            Assert.That(assigns.First().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (System.Object)cb_b;"));
-            Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (System.Object)cb_c;"));
+            Assert.That(assigns.First().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (global::System.Object)cb_b;"));
+            Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (global::System.Object)cb_c;"));
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
         {
             (typeof(void), "@void", "return;"),
-            (typeof(List<int>), "result", "return (System.Collections.Generic.List<System.Int32>)result;")
+            (typeof(List<int>), "result", "return (global::System.Collections.Generic.List<global::System.Int32>)result;")
         };
 
         [TestCaseSource(nameof(ReturnTypes))]
@@ -122,7 +122,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             var fact = new MethodInterceptorFactory(Generator);
             fact.Build(default);
-            
+
             Assert.That(fact.Members, Is.Not.Null);
             Assert.That(fact.Members.Count, Is.EqualTo(2));
             Assert.That(fact.Members.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
@@ -165,6 +165,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void GenerateProxyClass_Test()
         {
             Generator.Build(default);
+
             Assert.That(Generator.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
         }
     }

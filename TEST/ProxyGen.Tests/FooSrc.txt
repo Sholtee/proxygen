@@ -1,20 +1,20 @@
-System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>.Foo<TT>(System.Int32 a, out System.String b, ref TT c)
+global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c)
 {
-    System.Object[] args = new System.Object[]{a, default(System.String), c};
+    global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};
     this.InvokeTarget = () =>
     {
-        System.Int32 cb_a = (System.Int32)args[0];
-        System.String cb_b;
+        global::System.Int32 cb_a = (global::System.Int32)args[0];
+        global::System.String cb_b;
         TT cb_c = (TT)args[2];
-        System.Object result;
-        result = (System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
-        args[1] = (System.Object)cb_b;
-        args[2] = (System.Object)cb_c;
+        global::System.Object result;
+        result = (global::System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
+        args[1] = (global::System.Object)cb_b;
+        args[2] = (global::System.Object)cb_c;
         return result;
     };
-    System.Reflection.MethodInfo method = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveMethod(this.InvokeTarget);
-    System.Object result = this.Invoke(method, args, method);
-    b = (System.String)args[1];
+    global::System.Reflection.MethodInfo method = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveMethod(this.InvokeTarget);
+    global::System.Object result = this.Invoke(method, args, method);
+    b = (global::System.String)args[1];
     c = (TT)args[2];
-    return (System.Int32)result;
+    return (global::System.Int32)result;
 }

@@ -16,9 +16,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
     {
         public static (MemberInfo Member, string Expected)[] Members = new[]
         {
-            ((MemberInfo) typeof(MemberInfoExtensionsTests).GetMethod(nameof(GetFullName_ShouldDoWhatTheNameSuggests)), "Solti.Utils.Proxy.Internals.Tests.MemberInfoExtensionsTests.GetFullName_ShouldDoWhatTheNameSuggests"),
-            ((MemberInfo) typeof(List<>).GetProperty(nameof(List<object>.Count)), "System.Collections.Generic.List<T>.Count"),
-            ((MemberInfo) typeof(List<object>).GetProperty(nameof(List<object>.Count)), "System.Collections.Generic.List<System.Object>.Count")
+            ((MemberInfo) typeof(MemberInfoExtensionsTests).GetMethod(nameof(GetFullName_ShouldDoWhatTheNameSuggests)), "global::Solti.Utils.Proxy.Internals.Tests.MemberInfoExtensionsTests.GetFullName_ShouldDoWhatTheNameSuggests"),
+            ((MemberInfo) typeof(List<>).GetProperty(nameof(List<object>.Count)), "global::System.Collections.Generic.List<T>.Count"),
+            ((MemberInfo) typeof(List<object>).GetProperty(nameof(List<object>.Count)), "global::System.Collections.Generic.List<global::System.Object>.Count")
         };
 
         [TestCaseSource(nameof(Members))]

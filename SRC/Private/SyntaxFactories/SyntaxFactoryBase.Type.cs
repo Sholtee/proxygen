@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -77,13 +78,22 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
-        /// Namespace.ParentType[T] -> Namespace.ParentType[T]
+        /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
         protected internal virtual NameSyntax GetQualifiedName(ITypeInfo type)
         {
             IReadOnlyList<string> parts = type.Name.Split(Type.Delimiter);
 
-            return parts
+            if (type.IsNested) 
+            {
+                Debug.Assert(parts.Count == 1);
+
+                return parts
+                    .Select(CreateTypeName)
+                    .Qualify();
+            }
+
+            NameSyntax[] names = parts
                 //
                 // Nevter
                 //
@@ -100,9 +110,24 @@ namespace Solti.Utils.Proxy.Internals
 
                 .Append
                 (
-                    CreateTypeName(parts[parts.Count - 1])
+                    CreateTypeName
+                    (
+                        parts[parts.Count - 1]
+                    )
                 )
-                .Qualify();
+                .ToArray();
+
+            //
+            // Ez jol kezeli azt az esetet is ha a tipus nincs nevter alatt
+            //
+
+            if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
+            (
+                IdentifierName(Token(SyntaxKind.GlobalKeyword)), 
+                (SimpleNameSyntax) names[0]
+            );
+
+            return names.Qualify();
 
             NameSyntax CreateTypeName(string name) => type is not IGenericTypeInfo genericType ? IdentifierName(name) : GenericName(name).WithTypeArgumentList
             (

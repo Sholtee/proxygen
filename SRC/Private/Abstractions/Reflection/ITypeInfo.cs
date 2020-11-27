@@ -14,6 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         bool IsVoid { get; }
         bool IsByRef { get; }
         bool IsNested { get; }
+        bool IsGenericParameter { get; }
         bool IsInterface { get; }
         string? AssemblyQualifiedName { get; }
         ITypeInfo? ElementType { get; }

@@ -1,28 +1,28 @@
-event Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32> Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>.Event
+event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event
 {
     add
     {
-        System.Object[] args = new System.Object[]{value};
+        global::System.Object[] args = new global::System.Object[]{value};
         this.InvokeTarget = () =>
         {
-            Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32> cb_value = (Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32>)args[0];
+            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> cb_value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
             this.Target.Event += cb_value;
             return null;
         };
-        System.Reflection.EventInfo evt = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveEvent(this.InvokeTarget);
+        global::System.Reflection.EventInfo evt = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveEvent(this.InvokeTarget);
         this.Invoke(evt.AddMethod, args, evt);
     }
 
     remove
     {
-        System.Object[] args = new System.Object[]{value};
+        global::System.Object[] args = new global::System.Object[]{value};
         this.InvokeTarget = () =>
         {
-            Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32> cb_value = (Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<System.Int32>)args[0];
+            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> cb_value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
             this.Target.Event -= cb_value;
             return null;
         };
-        System.Reflection.EventInfo evt = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveEvent(this.InvokeTarget);
+        global::System.Reflection.EventInfo evt = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveEvent(this.InvokeTarget);
         this.Invoke(evt.RemoveMethod, args, evt);
     }
 }

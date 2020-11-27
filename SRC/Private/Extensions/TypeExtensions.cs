@@ -153,7 +153,7 @@ namespace Solti.Utils.Proxy.Internals
 
             static void Hash(Type t, ICryptoTransform transform)
             {
-                if (t.AssemblyQualifiedName is null) return;
+                if (t.AssemblyQualifiedName is null) return; // TODO: FIXME: ez latszolag nyitot generikusoknal is NULL nem csak generikus parametereknel
 
                 byte[] inputBuffer = Encoding.UTF8.GetBytes(t.AssemblyQualifiedName);
 

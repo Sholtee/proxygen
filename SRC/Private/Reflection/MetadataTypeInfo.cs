@@ -105,6 +105,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public string? AssemblyQualifiedName => UnderlyingType.AssemblyQualifiedName;
 
+        public bool IsGenericParameter => UnderlyingType.IsGenericParameter;
+
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
