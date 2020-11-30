@@ -24,7 +24,8 @@ namespace Solti.Utils.Proxy.Generators
         public override IUnitSyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-            MetadataTypeInfo.CreateFrom(typeof(TInterceptor))
+            MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
+            OutputType.Module
         );
 
         /// <summary>

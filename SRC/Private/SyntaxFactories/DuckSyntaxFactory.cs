@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,19 +23,22 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseType { get; }
 
-        string IDuckContext.ClassName => Classes.Single();
-
         public string AssemblyName { get; }
 
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName) 
+        public override string ClassName { get; }
+
+        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
+
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-            BaseType = (ITypeInfo) ((IGenericTypeInfo)MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
+            BaseType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
             AssemblyName = assemblyName;
+            ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[]
             {
@@ -53,7 +55,7 @@ namespace Solti.Utils.Proxy.Internals
 
             ClassDeclarationSyntax cls = ClassDeclaration
             (
-                identifier: Classes.Single()
+                identifier: ClassName
             )
             .WithModifiers
             (

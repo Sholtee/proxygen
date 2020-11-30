@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private ProxySyntaxFactory Generator { get; set; }
 
         [SetUp]
-        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)));
+        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), OutputType.Module);
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
@@ -142,7 +142,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyIndexer_Test()
         {
-            var fact = new PropertyInterceptorFactory(new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IList<int>)), MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>))));
+            var fact = new PropertyInterceptorFactory(new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IList<int>)), MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), OutputType.Module));
             fact.Build(default);
 
             Assert.That(fact.Members, Is.Not.Null);

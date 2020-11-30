@@ -5,12 +5,9 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
@@ -127,43 +124,6 @@ namespace Solti.Utils.Proxy.Internals
                 throw new InvalidOperationException(Resources.NO_PUBLIC_CTOR);
 
             return constructors;
-        }
-
-        //
-        // A "GUID" property generikus tipus lezart es nyitott valtozatanal ugyanaz
-        //
-
-        [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms")]
-        public static string GetMD5HashCode(this Type src) 
-        {
-            using MD5 md5 = MD5.Create();
-
-            Hash(src, md5);
-
-            md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-
-            StringBuilder sb = new StringBuilder();
-
-            for (int i = 0; i < md5.Hash.Length; i++)
-            {
-                sb.Append(md5.Hash[i].ToString("X2", null));
-            }
-
-            return sb.ToString();
-
-            static void Hash(Type t, ICryptoTransform transform)
-            {
-                if (t.AssemblyQualifiedName is null) return; // TODO: FIXME: ez latszolag nyitot generikusoknal is NULL nem csak generikus parametereknel
-
-                byte[] inputBuffer = Encoding.UTF8.GetBytes(t.AssemblyQualifiedName);
-
-                transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
-
-                foreach (Type ga in t.GetGenericArguments())
-                {
-                    Hash(ga, transform);
-                }
-            }
         }
     }
 }

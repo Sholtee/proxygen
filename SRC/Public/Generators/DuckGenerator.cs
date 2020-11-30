@@ -25,7 +25,8 @@ namespace Solti.Utils.Proxy.Generators
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)),
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-            AssemblyName
+            AssemblyName,
+            OutputType.Module
         );
 
         /// <summary>

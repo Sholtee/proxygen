@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type? FType;
 
-        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.Classes.Single(), throwOnError: true);
+        private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.DefinedClasses.Single(), throwOnError: true);
         #endregion
 
         #region Internal
@@ -149,7 +149,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The name of the assembly that will contain the generated <see cref="Type"/>.
         /// </summary>
-        public string AssemblyName { get; protected set; } = $"Generated_{typeof(TDescendant).GetMD5HashCode()}";
+        public string AssemblyName { get; protected set; } = $"Generated_{MetadataTypeInfo.CreateFrom(typeof(TDescendant)).GetMD5HashCode()}";
 
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.

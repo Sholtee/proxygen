@@ -24,9 +24,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseInterceptorType { get; }  // ebbol kerdezzuk le az Invoke() stb tagokat, igy biztosan nem lesz utkozes
 
-        string IProxyContext.ClassName => Classes.Single();
+        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
-        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType) 
+        public override string ClassName { get; }
+
+        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -34,13 +36,11 @@ namespace Solti.Utils.Proxy.Internals
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
-            InterfaceType = interfaceType;
+            //
+            // Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
+            //
 
             BaseInterceptorType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))).Close(interfaceType);
-
-            //
-            // Append() hivas azon percerz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
-            //
 
             if (!interceptorType.Bases.Append(interceptorType).Any(BaseInterceptorType.Equals))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
@@ -48,7 +48,9 @@ namespace Solti.Utils.Proxy.Internals
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_GENERATOR, nameof(interceptorType));
 
+            InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
+            ClassName = $"GeneratedClass_{InterceptorType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[] 
             {
@@ -61,7 +63,10 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
-            ClassDeclarationSyntax cls = ClassDeclaration(Classes.Single())
+            ClassDeclarationSyntax cls = ClassDeclaration
+            (
+                identifier: ClassName
+            )
             .WithModifiers
             (
                 modifiers: TokenList

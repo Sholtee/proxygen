@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public OutputType OutputType => OutputType.Unit;
 
-        public IReadOnlyCollection<string>? Classes => Array.Empty<string>();
+        public IReadOnlyCollection<string>? DefinedClasses => Array.Empty<string>();
 
         public VisibilityCheckSyntaxFactory(ITypeInfo type) => Type = type;
 
