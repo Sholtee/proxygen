@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
             _ => new MetadataTypeInfo(underlyingType)
         };
 
-        public override bool Equals(object obj) => obj is MetadataTypeInfo self && UnderlyingType.Equals(self.UnderlyingType);
+        public override bool Equals(object obj) => obj is MetadataTypeInfo that && UnderlyingType.Equals(that.UnderlyingType);
 
         public override int GetHashCode() => UnderlyingType.GetHashCode();
 

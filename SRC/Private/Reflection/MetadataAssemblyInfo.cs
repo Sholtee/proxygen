@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private MetadataAssemblyInfo(Assembly assembly) => UnderLyingAssembly = assembly;
 
-        public override bool Equals(object obj) => obj is MetadataAssemblyInfo self && UnderLyingAssembly.Equals(self.UnderLyingAssembly);
+        public override bool Equals(object obj) => obj is MetadataAssemblyInfo that && UnderLyingAssembly.Equals(that.UnderLyingAssembly);
 
         public override int GetHashCode() => UnderLyingAssembly.GetHashCode();
 
@@ -29,6 +29,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsDynamic => UnderLyingAssembly.IsDynamic;
 
-        public AssemblyName Name => UnderLyingAssembly.GetName();
+        public string Name => UnderLyingAssembly.GetName().ToString();
     }
 }

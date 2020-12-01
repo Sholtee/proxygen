@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
 
             public AccessModifiers AccessModifiers => UnderLyingMethod.GetAccessModifiers();
 
-            public override bool Equals(object obj) => obj is MetadataMethodBase<T> self && UnderLyingMethod.Equals(self.UnderLyingMethod);
+            public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderLyingMethod.Equals(that.UnderLyingMethod);
 
             public override int GetHashCode() => UnderLyingMethod.GetHashCode();
         }

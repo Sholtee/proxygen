@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         string? Location { get; }
         bool IsDynamic { get; }
-        AssemblyName Name { get; }
+        string Name { get; }
         bool IsFriend(string asmName);
     }
 }

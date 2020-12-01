@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IPropertyInfo CreateFrom(PropertyInfo prop) => new MetadataPropertyInfo(prop);
 
-        public override bool Equals(object obj) => obj is MetadataPropertyInfo self && UnderLyingProperty.Equals(self.UnderLyingProperty);
+        public override bool Equals(object obj) => obj is MetadataPropertyInfo that && UnderLyingProperty.Equals(that.UnderLyingProperty);
 
         public override int GetHashCode() => UnderLyingProperty.GetHashCode();
     }
