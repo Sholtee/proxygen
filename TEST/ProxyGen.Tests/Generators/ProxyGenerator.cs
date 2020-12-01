@@ -102,6 +102,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
+        public async Task GeneratedProxy_ShouldWorkWithTuples()
+        {
+            IList<(string Foo, object Bar)> proxy = await CreateProxy<IList<(string Foo, object Bar)>, InterfaceInterceptor<IList<(string Foo, object Bar)>>>(new List<(string Foo, object Bar)>());
+
+            Assert.DoesNotThrow(() => proxy.Add(("...", 1)));
+        }
+
+        [Test]
         public void GeneratedProxy_ShouldWorkWithGenerics() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IList<List<object>>, InterfaceInterceptor<IList<List<object>>>>(new List<List<object>>()));
 
