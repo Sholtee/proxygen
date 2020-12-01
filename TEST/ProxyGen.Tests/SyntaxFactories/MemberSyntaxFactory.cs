@@ -33,6 +33,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(IEnumerable<int[]>), "global::System.Collections.Generic.IEnumerable<global::System.Int32[]>")]
         [TestCase(typeof(IEnumerable<int>[]), "global::System.Collections.Generic.IEnumerable<global::System.Int32>[]")]
         [TestCase(typeof(IEnumerable<IEnumerable<string>>), "global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.IEnumerable<global::System.String>>")]
+        [TestCase(typeof((string Foo, object Bar)), "global::System.ValueTuple<global::System.String, global::System.Object>")]
         public void CreateType_ShouldHandleNonNestedTypes(Type type, string expected) =>
             Assert.That(new MemberSyntaxFactory(default).CreateType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
