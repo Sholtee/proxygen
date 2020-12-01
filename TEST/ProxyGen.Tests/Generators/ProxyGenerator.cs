@@ -432,7 +432,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     iface,
                     typeof(InterfaceInterceptor<>).MakeGenericType(iface)
                 )
-                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { null }));
+                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
 
         [Test]
         public async Task ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 
@@ -444,8 +444,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
-           
-            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GetGeneratedTypeAsync(tmpDir);
+
+            ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.CacheDir = tmpDir;
+            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GetGeneratedTypeAsync();
 
             Assert.That(File.Exists(cacheFile));               
         }
@@ -459,7 +460,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     cacheDir,
                     new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFileName);
 
-            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync(cacheDir);
+            ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.CacheDir = cacheDir;
+            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync();
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

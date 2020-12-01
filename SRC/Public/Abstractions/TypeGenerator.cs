@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Abstractions
     /// <summary>
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>
-    /// <remarks>Generators can not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType(string?)"/> or <see cref="GetGeneratedTypeAsync(string?, CancellationToken)"/> method.</remarks>
+    /// <remarks>Generators can not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
@@ -30,16 +30,60 @@ namespace Solti.Utils.Proxy.Abstractions
         private static Type? FType;
 
         private Type ExtractType(Assembly asm) => asm.GetType(SyntaxFactory.DefinedClasses.Single(), throwOnError: true);
+
+        private Type GenerateOrLoadType(CancellationToken cancellation = default)
+        {
+            DoCheck();
+
+            string? cacheFile = null;
+
+            if (!string.IsNullOrEmpty(CacheDir))
+            {
+                cacheFile = Path.Combine(CacheDir, CacheFileName);
+
+                if (File.Exists(cacheFile)) return ExtractType
+                (
+                    Assembly.LoadFile(cacheFile)
+                );
+
+                if (!Directory.Exists(CacheDir))
+                    Directory.CreateDirectory(CacheDir);
+            }
+
+            return GenerateType(cacheFile, null, cancellation);
+        }
+
+        private static Type GetGeneratedType(CancellationToken cancellation)
+        {
+            TDescendant self;
+            try
+            {
+                self = new TDescendant();
+            }
+
+            //
+            // "new" operator hivasa Activator.CreateInstace() hivas valojaban
+            //
+
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            {
+                throw ex.InnerException;
+            }
+
+            return self.GenerateOrLoadType(cancellation);
+        }
         #endregion
 
         #region Internal
-        internal string CacheFileName => $"{AssemblyName}.dll";
+        internal string CacheFileName => $"{AssemblyName}.dll"; // tesztekhez
+
+        internal static string? CacheDir { get; set; } = AppContext.GetData("AssemblyCacheDir") as string; // tesztekhez
 
         //
         // "assemblyNameOverride" parameter CSAK a teljesitmeny tesztek miatt szerepel.
         //
 
-        internal Type GenerateTypeCore(string? outputFile = default, string? assemblyNameOverride = default, CancellationToken cancellation = default)
+        internal Type GenerateType(string? outputFile = default, string? assemblyNameOverride = default, CancellationToken cancellation = default)
         {
             SyntaxFactory.Build(cancellation);
 
@@ -50,47 +94,13 @@ namespace Solti.Utils.Proxy.Abstractions
                      SyntaxFactory.Unit!,
                      asmName: assemblyNameOverride ?? AssemblyName,
                      outputFile,
-                     SyntaxFactory.References.Select(asm => MetadataReference.CreateFromFile(asm.Location!)).ToArray(),
+                     SyntaxFactory
+                        .References
+                        .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
+                        .ToArray(),
                      cancellation
                  )
             );
-        }
-
-        internal static Type GenerateType(string? cacheDir, CancellationToken cancellation = default) 
-        {
-            TDescendant self;
-            try
-            {           
-                self = new TDescendant();
-            }
-
-            //
-            // "new" operator hivasa Activator.CreateInstace() hvas valojaban
-            //
-
-            catch (TargetInvocationException ex)  when (ex.InnerException is not null)
-            {
-                throw ex.InnerException;
-            }
-
-            self.DoCheck();
-
-            string? cacheFile = null;
-
-            if (!string.IsNullOrEmpty(cacheDir))
-            {
-                cacheFile = Path.Combine(cacheDir, self.CacheFileName);
-
-                if (File.Exists(cacheFile)) return self.ExtractType
-                (
-                    Assembly.LoadFile(cacheFile)
-                );
-
-                if (!Directory.Exists(cacheDir))
-                    Directory.CreateDirectory(cacheDir);
-            }
-
-            return self.GenerateTypeCore(cacheFile, null, cancellation);
         }
         #endregion
 
@@ -116,7 +126,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public static async Task<Type> GetGeneratedTypeAsync(string? cacheDir = default, CancellationToken cancellation = default)
+        public static async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
         {
             if (FType != null) return FType;
 
@@ -124,7 +134,7 @@ namespace Solti.Utils.Proxy.Abstractions
 
             try
             {
-                return FType ??= GenerateType(cacheDir, cancellation);
+                return FType ??= GetGeneratedType(cancellation);
             }
             finally { FLock.Release(); }
         }
@@ -133,7 +143,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public static Type GetGeneratedType(string? cacheDir = null) 
+        public static Type GetGeneratedType() 
         {
             if (FType != null) return FType;
 
@@ -141,7 +151,7 @@ namespace Solti.Utils.Proxy.Abstractions
 
             try
             {
-                return FType ??= GenerateType(cacheDir);
+                return FType ??= GetGeneratedType(default);
             }
             finally { FLock.Release(); }
         }
@@ -149,7 +159,7 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// The name of the assembly that will contain the generated <see cref="Type"/>.
         /// </summary>
-        public string AssemblyName { get; protected set; } = $"Generated_{MetadataTypeInfo.CreateFrom(typeof(TDescendant)).GetMD5HashCode()}";
+        public virtual string AssemblyName { get; } = $"Generated_{MetadataTypeInfo.CreateFrom(typeof(TDescendant)).GetMD5HashCode()}";
 
         /// <summary>
         /// See <see cref="ITypeGenerator"/>.
