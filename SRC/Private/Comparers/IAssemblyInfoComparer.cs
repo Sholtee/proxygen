@@ -9,6 +9,6 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class IAssemblyInfoComparer : ComparerBase<IAssemblyInfoComparer, IAssemblyInfo>
     {
-        public override int GetHashCode(IAssemblyInfo obj) => obj.Name.ToString().GetHashCode();
+        public override int GetHashCode(IAssemblyInfo obj) => obj.Name.GetHashCode();
     }
 }
