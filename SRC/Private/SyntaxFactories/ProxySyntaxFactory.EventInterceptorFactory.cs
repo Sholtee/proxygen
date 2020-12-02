@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -72,10 +71,7 @@ namespace Solti.Utils.Proxy.Internals
                             );
                             body.Add
                             (
-                                ReturnStatement
-                                (
-                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
-                                )
+                                ReturnNull()
                             );
                         }
                     )

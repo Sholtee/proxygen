@@ -138,10 +138,7 @@ namespace Solti.Utils.Proxy.Internals
                     body.AddRange(argsArrayReassignment);
                     body.Add
                     (
-                        ReturnStatement
-                        (
-                            LiteralExpression(SyntaxKind.NullLiteralExpression)
-                        )
+                        ReturnNull()
                     );
                 }
                 else

@@ -101,6 +101,13 @@ namespace Solti.Utils.Proxy.Internals
             protected internal ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, LocalDeclarationStatementSyntax result) =>
                 ReturnResult(returnType, ToIdentifierName(result));
 
+            /// <summary>
+            /// return null;
+            /// </summary>
+            protected static internal ReturnStatementSyntax ReturnNull() => ReturnStatement
+            (
+                LiteralExpression(SyntaxKind.NullLiteralExpression)
+            );
 
             /// <summary>
             /// InvokeTarget = ...;
