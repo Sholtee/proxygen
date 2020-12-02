@@ -11,6 +11,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal static class INamedTypeSymbolExtensions
     {
         public static bool IsInterface(this INamedTypeSymbol src) => src.TypeKind == TypeKind.Interface;
@@ -64,6 +66,18 @@ namespace Solti.Utils.Proxy.Internals
             static IEnumerable<TMember> GetMembers(INamedTypeSymbol t) => t
                 .GetMembers()
                 .OfType<TMember>();
+        }
+
+        public static IEnumerable<IMethodSymbol> GetPublicConstructors(this INamedTypeSymbol src)
+        {
+            IEnumerable<IMethodSymbol> constructors = src
+                .InstanceConstructors
+                .Where(ctor => ctor.DeclaredAccessibility == Accessibility.Public);
+
+            if (!constructors.Any())
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.Name));
+
+            return constructors;
         }
     }
 }

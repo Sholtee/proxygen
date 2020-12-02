@@ -121,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             ConstructorInfo[] constructors = src.GetConstructors();
             if (!constructors.Any())
-                throw new InvalidOperationException(Resources.NO_PUBLIC_CTOR);
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src));
 
             return constructors;
         }
