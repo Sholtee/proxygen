@@ -3,6 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -22,5 +26,44 @@ namespace Solti.Utils.Proxy.Internals
 /*
         public static IEnumerable<ITypeSymbol> GetOwnGenericArguments(this INamedTypeSymbol src) => src.TypeArguments;
 */
+        public static IEnumerable<INamedTypeSymbol> GetParents(this INamedTypeSymbol src) 
+        {
+            for (INamedTypeSymbol parent = src; (parent = parent.ContainingType) != null;)
+            {
+                yield return parent;
+            }
+        }
+
+        public static IEnumerable<INamedTypeSymbol> GetEnclosingTypes(this INamedTypeSymbol src) => src.GetParents().Reverse();
+
+        public static IEnumerable<INamedTypeSymbol> GetBaseTypes(this INamedTypeSymbol src)
+        {
+            for (INamedTypeSymbol? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
+                yield return baseType;
+        }
+
+        public static IEnumerable<TMember> ListMembers<TMember>(this INamedTypeSymbol src, bool includeNonPublic = false, bool includeStatic = false) where TMember : ISymbol
+        {
+            if (src.IsInterface())
+                return src.AllInterfaces.Append(src).SelectMany(GetMembers);
+
+            //
+            // Nem publikus es statikus tagok nem tartozhatnak interface-ekhez
+            //
+
+            Func<TMember, bool> filter = m => !m.IsOverride;
+
+            if (!includeNonPublic)
+                filter = filter.And(m => m.DeclaredAccessibility == Accessibility.Public);
+
+            if (!includeStatic)
+                filter = filter.And(m => !m.IsStatic);
+
+            return src.GetBaseTypes().Append(src).SelectMany(GetMembers).Where(filter);
+
+            static IEnumerable<TMember> GetMembers(INamedTypeSymbol t) => t
+                .GetMembers()
+                .OfType<TMember>();
+        }
     }
 }

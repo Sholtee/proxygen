@@ -74,6 +74,58 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(tuple.GetFriendlyName(), Is.EqualTo("System.ValueTuple"));
         }
 
+        [TestCase
+        (@"
+            public interface IFoo 
+            {
+                void Foo();
+            }
+
+            public interface IBar: IFoo
+            {
+                void Bar();
+            }
+        ", "IBar")]
+        [TestCase
+        (@"
+            public abstract class FooCls 
+            {
+                public abstract void Foo();
+            }
+
+            public abstract class BarCls: FooCls
+            {
+                public abstract void Bar();
+            }
+        ", "BarCls")]
+        [TestCase
+        (@"
+            public class FooCls 
+            {
+                public virtual void Foo() {}
+            }
+
+            public class BarCls: FooCls
+            {
+                public override void Foo() {}
+                public void Bar() {}
+            }
+        ", "BarCls")]
+        public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy(string src, string cls)
+        {
+            CSharpCompilation compilation = CreateCompilation(src);
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            INamedTypeSymbol bar = visitor.AllTypeSymbols.Single(t => t.Name == cls);
+
+            IMethodSymbol[] methods = bar.ListMembers<IMethodSymbol>().ToArray();
+
+            Assert.That(methods.Count(m => m.Name == "Foo"), Is.EqualTo(1));
+            Assert.That(methods.Count(m => m.Name == "Bar"), Is.EqualTo(1));
+        }
+
         private class FindAllTypesVisitor : SymbolVisitor
         {
             public List<INamedTypeSymbol> AllTypeSymbols { get; } = new List<INamedTypeSymbol>();
