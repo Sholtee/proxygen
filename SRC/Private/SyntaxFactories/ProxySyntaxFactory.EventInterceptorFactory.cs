@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -60,12 +61,22 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         argsArray,
                         targetMethod,
-                        (locals, result) => new StatementSyntax[]
+                        (locals, body) =>
                         {
-                            ExpressionStatement
+                            body.Add
                             (
-                                RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()))
-                            )
+                                ExpressionStatement
+                                (
+                                    RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()))
+                                )
+                            );
+                            body.Add
+                            (
+                                ReturnStatement
+                                (
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                )
+                            );
                         }
                     )
                 );

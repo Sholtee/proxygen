@@ -171,7 +171,7 @@ namespace Solti.Utils.Proxy.Internals
             ///     return null;                               <br/>
             /// };   
             /// </summary>
-            protected internal LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IMethodInfo method, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax?, IEnumerable<StatementSyntax>> invocationFactory)
+            protected internal LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IMethodInfo method, Action<IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
             {
                 IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
@@ -180,34 +180,7 @@ namespace Solti.Utils.Proxy.Internals
                 IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz);
                 statements.AddRange(locals);
 
-                if (!method.ReturnValue.Type.IsVoid)
-                {
-                    LocalDeclarationStatementSyntax result = DeclareLocal<object>(EnsureUnused(nameof(result), paramz));
-
-                    statements.Add(result);
-                    statements.AddRange
-                    (
-                        invocationFactory(locals, result)
-                    );
-                    statements.Add
-                    (
-                        ReturnResult(null, result)
-                    );
-                }
-                else 
-                {
-                    statements.AddRange
-                    (
-                        invocationFactory(locals, null)
-                    );
-                    statements.Add
-                    (
-                        ReturnStatement
-                        (
-                            LiteralExpression(SyntaxKind.NullLiteralExpression)
-                        )
-                    );
-                }
+                invocationFactory(locals, statements);
 
                 return ParenthesizedLambdaExpression
                 (

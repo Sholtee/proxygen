@@ -26,7 +26,10 @@ namespace Solti.Utils.Proxy.Internals
 
             if (initializer != null) declarator = declarator.WithInitializer
             (
-                initializer: EqualsValueClause(initializer)
+                initializer: EqualsValueClause
+                (
+                    initializer
+                )
             );
 
             return LocalDeclarationStatement

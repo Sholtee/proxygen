@@ -6,9 +6,7 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
         this.InvokeTarget = () =>
         {
             global::System.Int32 cb_index = (global::System.Int32)args[0];
-            global::System.Object result;
-            result = (global::System.Object)this.Target[cb_index];
-            return result;
+            return (global::System.Object)this.Target[cb_index];
         };
         global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.Generic.IList<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
         return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);

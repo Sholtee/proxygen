@@ -5,9 +5,7 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
         global::System.Object[] args = new global::System.Object[0];
         this.InvokeTarget = () =>
         {
-            global::System.Object result;
-            result = (global::System.Object)this.Target.Prop;
-            return result;
+            return (global::System.Object)this.Target.Prop;
         };
         global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
         return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);

@@ -62,22 +62,19 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         argsArray,
                         property.GetMethod,
-                        (locals, result) => new StatementSyntax[] 
-                        {
-                            ExpressionStatement
+                        (locals, body) => body.Add
+                        (
+                            ReturnResult
                             (
-                                AssignmentExpression
+                                null,
+                                CastExpression
                                 (
-                                    SyntaxKind.SimpleAssignmentExpression,
-                                    ToIdentifierName(result!),
-                                    CastExpression
-                                    (
-                                        CreateType<object>(),
-                                        PropertyAccess(property, MemberAccess(null, TARGET), null, locals.Select(ToArgument))
-                                    )
+                                    CreateType<object>(),
+                                    PropertyAccess(property, MemberAccess(null, TARGET), null, locals.Select(ToArgument))
                                 )
                             )
-                        }
+
+                        )
                     )
                 );
 
@@ -129,23 +126,33 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         argsArray,
                         property.SetMethod,
-                        (locals, result) => new StatementSyntax[]
+                        (locals, body) =>
                         {
-                            ExpressionStatement
+                            body.Add
                             (
-                                expression: AssignmentExpression
+                                ExpressionStatement
                                 (
-                                    kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
+                                    expression: AssignmentExpression
+                                    (
+                                        kind: SyntaxKind.SimpleAssignmentExpression,
+                                        left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
 #if NETSTANDARD2_0
-                                        .Take(locals.Count - 1)
+                                            .Take(locals.Count - 1)
 #else
-                                        .SkipLast(1)
+                                            .SkipLast(1)
 #endif
-                                        .Select(ToArgument)),
-                                    right: ToIdentifierName(locals[locals.Count - 1])
+                                            .Select(ToArgument)),
+                                        right: ToIdentifierName(locals[locals.Count - 1])
+                                    )
                                 )
-                            )
+                            );
+                            body.Add
+                            (
+                                ReturnStatement
+                                (
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                )
+                            );
                         }
                     )
                 );

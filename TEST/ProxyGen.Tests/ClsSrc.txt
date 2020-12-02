@@ -13,8 +13,7 @@ internal sealed class GeneratedClass_F5C167ACE65B4ED544B1FDD3106A34B8 : global::
             global::System.Int32 cb_a = (global::System.Int32)args[0];
             global::System.String cb_b;
             TT cb_c = (TT)args[2];
-            global::System.Object result;
-            result = (global::System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
+            global::System.Object result = (global::System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
             args[1] = (global::System.Object)cb_b;
             args[2] = (global::System.Object)cb_c;
             return result;
@@ -45,9 +44,7 @@ internal sealed class GeneratedClass_F5C167ACE65B4ED544B1FDD3106A34B8 : global::
             global::System.Object[] args = new global::System.Object[0];
             this.InvokeTarget = () =>
             {
-                global::System.Object result;
-                result = (global::System.Object)this.Target.Prop;
-                return result;
+                return (global::System.Object)this.Target.Prop;
             };
             global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
             return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);

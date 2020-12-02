@@ -117,7 +117,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            internal LambdaExpressionSyntax BuildCallback(IMethodInfo method, LocalDeclarationStatementSyntax argsArray) => DeclareCallback(argsArray, method, (locals, result) =>
+            internal LambdaExpressionSyntax BuildCallback(IMethodInfo method, LocalDeclarationStatementSyntax argsArray) => DeclareCallback(argsArray, method, (locals, body) =>
             {
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
@@ -127,31 +127,41 @@ namespace Solti.Utils.Proxy.Internals
                     arguments: locals.Select(ToArgument).ToArray()
                 );
 
-                var body = new List<StatementSyntax>();
-                body.Add
-                (
-                    ExpressionStatement
-                    (
-                        !method.ReturnValue.Type.IsVoid
-                            ? AssignmentExpression
-                            (
-                                SyntaxKind.SimpleAssignmentExpression,
-                                ToIdentifierName(result!),
-                                CastExpression
-                                (
-                                    CreateType<object>(),
-                                    invocation
-                                )
-                            )
-                            : (ExpressionSyntax) invocation
-                    )
-                );
-                body.AddRange
-                (
-                    ReassignArgsArray(method.Parameters, argsArray, locals)
-                );
+                IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method.Parameters, argsArray, locals);
 
-                return body;
+                if (method.ReturnValue.Type.IsVoid)
+                {
+                    body.Add
+                    (
+                        ExpressionStatement(invocation)
+                    );
+                    body.AddRange(argsArrayReassignment);
+                    body.Add
+                    (
+                        ReturnStatement
+                        (
+                            LiteralExpression(SyntaxKind.NullLiteralExpression)
+                        )
+                    );
+                }
+                else
+                {
+                    LocalDeclarationStatementSyntax result = DeclareLocal<object>
+                    (
+                        EnsureUnused(nameof(result), method),
+                        CastExpression
+                        (
+                            CreateType<object>(),
+                            invocation
+                        )
+                    );
+                    body.Add(result);
+                    body.AddRange(argsArrayReassignment);
+                    body.Add
+                    (
+                        ReturnResult(null, result)
+                    );
+                }
             });
 
             internal IEnumerable<StatementSyntax> BuildBody(IMethodInfo methodInfo) 
