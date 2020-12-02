@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, Compilation.GetTypeByMetadataName(typeof(InternalsVisibleToAttribute).FullName)))
             .Any(ivt => ivt.ConstructorArguments.Single().Value is string str && str == asmName);
 
-        public override int GetHashCode() => UnderlyingSymbol.GetHashCode();
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
 
         public override bool Equals(object obj) => obj is SymbolAssemblyInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
     }
