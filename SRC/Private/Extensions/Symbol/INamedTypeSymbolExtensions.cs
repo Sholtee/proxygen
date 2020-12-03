@@ -17,12 +17,12 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static bool IsInterface(this INamedTypeSymbol src) => src.TypeKind == TypeKind.Interface;
 
-        public static string GetFriendlyName(this INamedTypeSymbol src)
-        {
-            if (src.ContainingType is not null) return src.Name;
-
-            return $"{src.ContainingNamespace}.{src.Name}";
-        }
+        public static string GetFriendlyName(this INamedTypeSymbol src) => src.ToDisplayString
+        (
+            new SymbolDisplayFormat(typeQualificationStyle: src.ContainingType is not null 
+                ? SymbolDisplayTypeQualificationStyle.NameOnly 
+                : SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
+        );
 
         public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.IsUnboundGenericType;
 /*
@@ -80,6 +80,15 @@ namespace Solti.Utils.Proxy.Internals
                 throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.Name));
 
             return constructors;
+        }
+
+        public static INamedTypeSymbol GetElementType(this INamedTypeSymbol src) => (INamedTypeSymbol) ((src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType ?? src);
+
+        public static string? GetAssemblyQualifiedName(this INamedTypeSymbol src) 
+        {
+            if (src.ContainingAssembly is null) return null;
+
+            return $"{src.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces))}, {src.ContainingAssembly.Identity}";
         }
     }
 }

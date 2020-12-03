@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Linq;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -58,6 +59,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
             INamedTypeSymbol tuple = (INamedTypeSymbol) visitor.AllTypeSymbols.Single(m => m.Name == "IMyInterface").Interfaces[0].TypeArguments.Single();
 
             Assert.That(tuple.GetFriendlyName(), Is.EqualTo("System.ValueTuple"));
+        }
+
+        [Test]
+        public void GetAssemblyQualifiedName_ShouldDoWhatTheNameSuggests()
+        {
+            Assembly thisAsm = typeof(INamedTypeSymbolExtensionsTests).Assembly;
+
+            CSharpCompilation compilation = CreateCompilation(string.Empty, thisAsm);
+
+            IAssemblySymbol asmSymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == thisAsm.Location));
+            INamedTypeSymbol typeSymbol = asmSymbol.GetTypeByMetadataName(typeof(INamedTypeSymbolExtensionsTests).FullName);
+
+            Assert.That(typeSymbol.GetAssemblyQualifiedName(), Is.EqualTo(typeof(INamedTypeSymbolExtensionsTests).AssemblyQualifiedName));
         }
 
         [TestCase
