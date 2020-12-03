@@ -41,7 +41,9 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<INamedTypeSymbol> GetBaseTypes(this INamedTypeSymbol src)
         {
             for (INamedTypeSymbol? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
+            {
                 yield return baseType;
+            }
         }
 
         public static IEnumerable<TMember> ListMembers<TMember>(this INamedTypeSymbol src, bool includeNonPublic = false, bool includeStatic = false) where TMember : ISymbol
