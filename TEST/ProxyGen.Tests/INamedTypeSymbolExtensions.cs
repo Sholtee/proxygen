@@ -48,6 +48,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             CSharpCompilation compilation = CreateCompilation
             (@"
+                using System.Collections.Generic;
                 public interface IMyInterface: IList<(string Cica, int Mica)>
                 {
                 }
@@ -93,6 +94,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             ITypeSymbol nested = visitor.AllTypeSymbols.Single(t => t.Name == "Nested");
             Assert.That(nested.IsNested());
+        }
+
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            public class MyClass<T>: List<T>
+            {
+            }
+        ", true)]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            public class MyClass: List<object>
+            {
+            }
+        ", false)]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            public class MyClass: List<string>
+            {
+            }
+        ", false)]
+        public void IsGenericParameter_ShouldReturnTrueIfTheTypeIsGenericParameter(string src, bool isGP)
+        {
+            CSharpCompilation compilation = CreateCompilation(src);
+           
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            ITypeSymbol ga = visitor.AllTypeSymbols.Single(t => t.Name == "MyClass").BaseType.TypeArguments.Single();
+            Assert.That(ga.IsGenericParameter(), Is.EqualTo(isGP));
         }
 
         [TestCase

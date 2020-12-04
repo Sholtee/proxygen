@@ -17,12 +17,18 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static bool IsInterface(this INamedTypeSymbol src) => src.TypeKind == TypeKind.Interface;
 
-        public static string GetFriendlyName(this INamedTypeSymbol src) => src.ToDisplayString
-        (
-            new SymbolDisplayFormat(typeQualificationStyle: src.ContainingType is not null 
-                ? SymbolDisplayTypeQualificationStyle.NameOnly 
-                : SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
-        );
+        public static string GetFriendlyName(this INamedTypeSymbol src) => src switch
+        {
+            _ when src.IsTupleType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen
+            _ when src.IsNested() => src.ToDisplayString
+            (
+                new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)
+            ),
+            _ => src.ToDisplayString
+            (
+                new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
+            )
+        };
 
         public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.IsUnboundGenericType;
 /*
@@ -94,5 +100,7 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
         public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericArgument();
+
+        public static bool IsGenericParameter(this ITypeSymbol src) => src.ContainingType is not null && src.BaseType is null && src.SpecialType != SpecialType.System_Object; 
     }
 }
