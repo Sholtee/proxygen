@@ -82,7 +82,7 @@ namespace Solti.Utils.Proxy.Internals
             return constructors;
         }
 
-        public static INamedTypeSymbol GetElementType(this INamedTypeSymbol src) => (INamedTypeSymbol) ((src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType ?? src);
+        public static INamedTypeSymbol? GetElementType(this INamedTypeSymbol src) => (INamedTypeSymbol?) ((src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType);
 
         public static string? GetAssemblyQualifiedName(this INamedTypeSymbol src) 
         {
@@ -90,5 +90,9 @@ namespace Solti.Utils.Proxy.Internals
 
             return $"{src.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces))}, {src.ContainingAssembly.Identity}";
         }
+
+        public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
+
+        public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericArgument();
     }
 }

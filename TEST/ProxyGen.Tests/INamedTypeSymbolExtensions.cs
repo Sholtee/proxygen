@@ -74,6 +74,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(typeSymbol.GetAssemblyQualifiedName(), Is.EqualTo(typeof(INamedTypeSymbolExtensionsTests).AssemblyQualifiedName));
         }
 
+        [Test]
+        public void IsNested_ShouldReturnTrueIfTheTypeIsNested() 
+        {
+            CSharpCompilation compilation = CreateCompilation
+            (@"
+                public class MyClass<T>
+                {
+                    private class Nested {}
+                }
+            ");
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            ITypeSymbol ga = visitor.AllTypeSymbols.Single(t => t.Name == "MyClass").TypeArguments.Single();
+            Assert.IsFalse(ga.IsNested());
+
+            ITypeSymbol nested = visitor.AllTypeSymbols.Single(t => t.Name == "Nested");
+            Assert.That(nested.IsNested());
+        }
+
         [TestCase
         (@"
             public interface IFoo 
