@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -15,15 +16,24 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class IXxXSymbolExtensionsTestsBase
     {
-        protected static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CSharpCompilation.Create
-        (
-            "cica",
-            new[]
-            {
-                CSharpSyntaxTree.ParseText(src)
-            },
-            Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location!))
-        );
+        protected static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) 
+        {
+            var result = CSharpCompilation.Create
+            (
+                "cica",
+                new[]
+                {
+                    CSharpSyntaxTree.ParseText(src)
+                },
+                Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location!)),
+                CompilationOptionsFactory.Create()
+            );
+
+            Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+            if (errors.Any()) throw new Exception("Bad source");
+
+            return result;
+        }
 
         protected class FindAllTypesVisitor : SymbolVisitor
         {
