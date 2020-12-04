@@ -179,5 +179,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(methods.Count(m => m.Name == "Foo"), Is.EqualTo(1));
             Assert.That(methods.Count(m => m.Name == "Bar"), Is.EqualTo(1));
         }
+
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            class MyList: List<int[]>{}
+        ", "System.Int32")]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            class MyList: List<int> {}
+        ", null)]
+        public void GetElementType_ShouldReturnTheProperElementType(string src, string element) 
+        {
+            CSharpCompilation compilation = CreateCompilation(src);
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            ITypeSymbol ga = visitor.AllTypeSymbols.Single(t => t.Name == "MyList").BaseType.TypeArguments.Single();
+
+            Assert.That(ga.GetElementType()?.GetFriendlyName(), Is.EqualTo(element));
+        }
     }
 }

@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static bool IsInterface(this INamedTypeSymbol src) => src.TypeKind == TypeKind.Interface;
 
-        public static string GetFriendlyName(this INamedTypeSymbol src) => src switch
+        public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
             _ when src.IsTupleType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen
             _ when src.IsNested() => src.ToDisplayString
@@ -88,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals
             return constructors;
         }
 
-        public static INamedTypeSymbol? GetElementType(this INamedTypeSymbol src) => (INamedTypeSymbol?) ((src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType);
+        public static ITypeSymbol? GetElementType(this ITypeSymbol src) => (src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType;
 
         public static string? GetAssemblyQualifiedName(this INamedTypeSymbol src) 
         {
