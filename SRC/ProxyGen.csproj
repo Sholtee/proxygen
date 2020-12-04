@@ -9,7 +9,9 @@
     <Configurations>Debug;Release;Perf</Configurations>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -31,13 +33,6 @@
     <Optimize>true</Optimize>
     <OutputPath>..\BIN\</OutputPath>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(CI)' == ''">
-    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.*">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.*" />
