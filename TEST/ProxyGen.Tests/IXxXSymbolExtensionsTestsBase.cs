@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                     CSharpSyntaxTree.ParseText(src)
                 },
-                Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location!)),
+                Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location)),
                 CompilationOptionsFactory.Create()
             );
 
