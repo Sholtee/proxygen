@@ -17,6 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         bool IsGenericParameter { get; }
         bool IsInterface { get; }
         string? AssemblyQualifiedName { get; }
+        string? FullName { get; }
         ITypeInfo? ElementType { get; }
         IReadOnlyList<ITypeInfo> EnclosingTypes { get; }
         IReadOnlyList<ITypeInfo> Interfaces { get; }

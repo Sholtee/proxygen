@@ -41,7 +41,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             public override void VisitNamespace(INamespaceSymbol symbol)
             {
-                Parallel.ForEach(symbol.GetMembers(), s => s.Accept(this));
+                foreach (INamespaceOrTypeSymbol sym in symbol.GetMembers()) 
+                {
+                    sym.Accept(this);
+                } 
             }
 
             public override void VisitNamedType(INamedTypeSymbol symbol)

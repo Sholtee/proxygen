@@ -1,8 +1,10 @@
 ﻿/********************************************************************************
-* INamedTypeSymbolExtensions.cs                                                 *
+* ITypeSymbolExtensions.cs                                                      *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -14,7 +16,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     [TestFixture]
-    public class INamedTypeSymbolExtensionsTests: IXxXSymbolExtensionsTestsBase
+    public class ITypeSymbolExtensionsTests : IXxXSymbolExtensionsTestsBase
     {
         [Test]
         public void GetFriendlyName_ShouldNotReturnNamespaceForNestedTypes()
@@ -62,17 +64,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(tuple.GetFriendlyName(), Is.EqualTo("System.ValueTuple"));
         }
 
-        [Test]
-        public void GetAssemblyQualifiedName_ShouldDoWhatTheNameSuggests()
+        private class Nested { }
+
+        private class NestedGeneric<T> 
         {
-            Assembly thisAsm = typeof(INamedTypeSymbolExtensionsTests).Assembly;
+            public class Nested { }
+        }
 
-            CSharpCompilation compilation = CreateCompilation(string.Empty, thisAsm);
+        [TestCase(typeof(ITypeSymbolExtensionsTests))]
+        [TestCase(typeof(Nested))]
+        [TestCase(typeof(List<>))]
+        [TestCase(typeof(NestedGeneric<>.Nested))]
+        public void GetAssemblyQualifiedName_ShouldDoWhatTheNameSuggests(Type type)
+        {
+            Assembly asm = type.Assembly;
 
-            IAssemblySymbol asmSymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == thisAsm.Location));
-            INamedTypeSymbol typeSymbol = asmSymbol.GetTypeByMetadataName(typeof(INamedTypeSymbolExtensionsTests).FullName);
+            CSharpCompilation compilation = CreateCompilation(string.Empty, asm);
 
-            Assert.That(typeSymbol.GetAssemblyQualifiedName(), Is.EqualTo(typeof(INamedTypeSymbolExtensionsTests).AssemblyQualifiedName));
+            IAssemblySymbol asmSymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location));
+            INamedTypeSymbol typeSymbol = asmSymbol.GetTypeByMetadataName(type.FullName);
+
+            Assert.That(typeSymbol.GetAssemblyQualifiedName(), Is.EqualTo(type.AssemblyQualifiedName));
         }
 
         [Test]
@@ -114,6 +126,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         (@"
             using System.Collections.Generic;
             public class MyClass: List<string>
+            {
+            }
+        ", false)]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
+            public class MyClass: List<List<string>>
             {
             }
         ", false)]

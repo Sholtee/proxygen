@@ -74,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals
         // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
         //
 
-        public bool IsNested => UnderlyingType.IsNested && !UnderlyingType.IsGenericParameter;
+        public bool IsNested => UnderlyingType.IsNested && !IsGenericParameter;
 
         public bool IsInterface => UnderlyingType.IsInterface;
 
@@ -106,6 +106,8 @@ namespace Solti.Utils.Proxy.Internals
         public string? AssemblyQualifiedName => UnderlyingType.AssemblyQualifiedName;
 
         public bool IsGenericParameter => UnderlyingType.IsGenericParameter;
+
+        public string? FullName => UnderlyingType.FullName;
 
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
