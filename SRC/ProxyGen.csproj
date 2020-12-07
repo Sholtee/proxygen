@@ -9,7 +9,7 @@
     <Configurations>Debug;Release;Perf</Configurations>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
-    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
