@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Generated_4452045DEB0B8A8CD152DB473FEC7584")]
+[assembly: InternalsVisibleTo("Generated_3414F45DAAE29C6B1A60FC2BB1653B46")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -466,7 +466,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        private const string WIRED_NAME = "Generated_57CD2D6D2307EC3308C512780C8BF51F"; // amig a tipus nem valtozik addig ez sem valtozhat
+        private const string WIRED_NAME = "Generated_D21B2B2F800C1FCEA906362887907084"; // amig a tipus nem valtozik addig ez sem valtozhat
 
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName() 

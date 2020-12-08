@@ -36,10 +36,14 @@ namespace Solti.Utils.Proxy.Internals
 
             static void Hash(ITypeInfo t, ICryptoTransform transform)
             {
-                if (t.AssemblyQualifiedName is null) // TODO: FIXME: ez latszolag nyitot generikusoknal is NULL nem csak generikus parametereknel
+                //
+                // Ez NE AssemblyQualifiedName legyen mert az valtozhat .NET verzionkent
+                //
+
+                if (t.FullName is null)
                     return;
 
-                byte[] inputBuffer = Encoding.UTF8.GetBytes(t.AssemblyQualifiedName);
+                byte[] inputBuffer = Encoding.UTF8.GetBytes(t.FullName);
 
                 transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
 
