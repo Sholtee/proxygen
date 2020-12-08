@@ -103,11 +103,11 @@ namespace Solti.Utils.Proxy.Internals
             .Cast<IConstructorInfo>()
             .ToArray();
 
-        public string? AssemblyQualifiedName => UnderlyingType.AssemblyQualifiedName;
+        public string? AssemblyQualifiedName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
 
         public bool IsGenericParameter => UnderlyingType.IsGenericParameter;
 
-        public string? FullName => UnderlyingType.FullName;
+        public string? FullName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).FullName;
 
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
@@ -128,15 +128,46 @@ namespace Solti.Utils.Proxy.Internals
 
             IGeneric IGeneric.GenericDefinition => GenericDefinition;
 
-            public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericTypeInfo
-            (
-                UnderlyingType.MakeGenericType
+            public IGeneric Close(params ITypeInfo[] genericArgs)
+            {
+                if (UnderlyingType.IsNested) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
+
+                return (IGeneric) CreateFrom
                 (
-                    genericArgs
-                        .Select(arg => Type.GetType(arg.AssemblyQualifiedName, throwOnError: true))
-                        .ToArray()
-                )
-            );
+                    UnderlyingType.MakeGenericType
+                    (
+                        genericArgs
+                            .Select(TypeInfoToMetadata)
+                            .ToArray()
+                    )
+                );
+            }
+        }
+
+        internal static Type TypeInfoToMetadata(ITypeInfo type)
+        {
+            //
+            // Az AssemblyQualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
+            //
+
+            Type queried = Type.GetType(type.AssemblyQualifiedName, throwOnError: true);
+
+            if (type is IGenericTypeInfo generic && generic.IsGenericDefinition)
+                return queried;
+
+            if (queried.IsGenericType)
+            {
+                Type[] gas = type
+                    .EnclosingTypes
+                    .Append(type)
+                    .OfType<IGenericTypeInfo>()
+                    .SelectMany(g => g.GenericArguments.Select(TypeInfoToMetadata))
+                    .ToArray();
+
+                return queried.MakeGenericType(gas);
+            }
+
+            return queried;
         }
 
         private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 

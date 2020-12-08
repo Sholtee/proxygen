@@ -13,10 +13,19 @@ namespace Solti.Utils.Proxy.Internals
         IAssemblyInfo DeclaringAssembly { get; }
         bool IsVoid { get; }
         bool IsByRef { get; }
+        /// <summary>
+        /// Returns true if the type is nested and not a generic parameter.
+        /// </summary>
         bool IsNested { get; }
         bool IsGenericParameter { get; }
         bool IsInterface { get; }
+        /// <summary>
+        /// The <see cref="FullName"/> of the type followed by the identity of the containing assembly. The result should not reflect the type arguments.
+        /// </summary>
         string? AssemblyQualifiedName { get; }
+        /// <summary>
+        /// The name of the type including its enclosing types and namespace. The result should not reflect the type arguments.
+        /// </summary>
         string? FullName { get; }
         ITypeInfo? ElementType { get; }
         IReadOnlyList<ITypeInfo> EnclosingTypes { get; }
