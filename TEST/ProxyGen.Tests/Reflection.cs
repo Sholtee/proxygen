@@ -91,11 +91,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             Compilation compilation = CreateCompilation(string.Empty, data.Type.Assembly);
 
-            var ti = (SymbolTypeInfo) SymbolTypeInfo.CreateFrom(null, compilation);
-
-            INamedTypeSymbol resolved = ti.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type));
+            INamedTypeSymbol resolved = SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type), compilation);
 
             Assert.That(resolved.ToString(), Is.EqualTo(data.Name));
+        }
+
+        [Test]
+        public void TypeInfoToSymbol_ShouldThrowIfTheTypeNotFound() 
+        {
+            Compilation compilation = CreateCompilation(string.Empty);
+            Assert.Throws<TypeLoadException>(() => SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(typeof(Generic<>)), compilation));
         }
 
         [TestCaseSource(nameof(Types))]

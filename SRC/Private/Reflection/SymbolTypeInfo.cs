@@ -11,6 +11,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal class SymbolTypeInfo : ITypeInfo
     {
         protected ITypeSymbol UnderlyingTypeSymbol { get; }
@@ -119,14 +121,14 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     UnderlyingTypeSymbol.Construct
                     (
-                        genericArgs.Select(TypeInfoToSymbol).ToArray()
+                        genericArgs.Select(ga => TypeInfoToSymbol(ga, Compilation)).ToArray()
                     ),
                     Compilation
                 );
             }
         }
 
-        internal INamedTypeSymbol TypeInfoToSymbol(ITypeInfo type)
+        internal static INamedTypeSymbol TypeInfoToSymbol(ITypeInfo type, Compilation compilation)
         {
             INamedTypeSymbol symbol;
 
@@ -134,7 +136,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 int arity = (type as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
 
-                symbol = TypeInfoToSymbol(type.EnclosingTypes.Last())
+                symbol = TypeInfoToSymbol(type.EnclosingTypes.Last(), compilation)
                     .GetTypeMembers(type.Name, arity)
                     .Single();
             }
@@ -144,14 +146,14 @@ namespace Solti.Utils.Proxy.Internals
                 // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
                 //
 
-                symbol = Compilation
-                    .GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException()) ?? throw new NotSupportedException();
+                symbol = compilation
+                    .GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException()) ?? throw new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, type.FullName));
 
             if (type is IGenericTypeInfo generic && !generic.IsGenericDefinition)
             {
                 INamedTypeSymbol[] gaSymbols = generic
                     .GenericArguments
-                    .Select(TypeInfoToSymbol)
+                    .Select(ga => TypeInfoToSymbol(ga, compilation))
                     .ToArray();
 
                 return symbol.Construct(gaSymbols);
