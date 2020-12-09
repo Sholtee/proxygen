@@ -44,9 +44,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsInterface => UnderlyingTypeSymbol.IsInterface();
 
-        public string? AssemblyQualifiedName => UnderlyingTypeSymbol is INamedTypeSymbol named ? named.GetAssemblyQualifiedName() : null;
+        public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingTypeSymbol.GetAssemblyQualifiedName() : null;
 
-        public string? FullName => UnderlyingTypeSymbol is INamedTypeSymbol named ? named.GetQualifiedMetadataName() : null;
+        public string? FullName => !IsGenericParameter ? UnderlyingTypeSymbol.GetQualifiedMetadataName() : null;
 
         private ITypeInfo? FElementType;
         public ITypeInfo? ElementType
@@ -128,7 +128,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        internal static INamedTypeSymbol TypeInfoToSymbol(ITypeInfo type, Compilation compilation)
+        internal static ITypeSymbol TypeInfoToSymbol(ITypeInfo type, Compilation compilation)
         {
             INamedTypeSymbol symbol;
 
@@ -141,6 +141,16 @@ namespace Solti.Utils.Proxy.Internals
                     .Single();
             }
             else
+            {
+                if (type is IArrayTypeInfo ar) 
+                {
+                    //
+                    // Tombot nem lehet lekerdezni nev alapjan
+                    //
+
+                    return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
+                }
+
                 //
                 // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
                 // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
@@ -148,10 +158,11 @@ namespace Solti.Utils.Proxy.Internals
 
                 symbol = compilation
                     .GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException()) ?? throw new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, type.FullName));
+            }
 
             if (type is IGenericTypeInfo generic && !generic.IsGenericDefinition)
             {
-                INamedTypeSymbol[] gaSymbols = generic
+                ITypeSymbol[] gaSymbols = generic
                     .GenericArguments
                     .Select(ga => TypeInfoToSymbol(ga, compilation))
                     .ToArray();

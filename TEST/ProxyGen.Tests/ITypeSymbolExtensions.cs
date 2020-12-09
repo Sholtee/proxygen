@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
 
@@ -48,20 +49,21 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void GetFriendlyName_ShouldWorkWithTuples() 
         {
-            CSharpCompilation compilation = CreateCompilation
-            (@"
-                using System.Collections.Generic;
-                public interface IMyInterface: IList<(string Cica, int Mica)>
-                {
-                }
-            ");
+            CSharpCompilation compilation = CreateCompilation(string.Empty);
 
-            var visitor = new FindAllTypesVisitor();
-            visitor.VisitNamespace(compilation.GlobalNamespace);
-
-            INamedTypeSymbol tuple = (INamedTypeSymbol) visitor.AllTypeSymbols.Single(m => m.Name == "IMyInterface").Interfaces[0].TypeArguments.Single();
+            INamedTypeSymbol tuple = compilation.CreateTupleTypeSymbol(new ITypeSymbol[] { compilation.GetSpecialType(SpecialType.System_String), compilation.GetSpecialType(SpecialType.System_Int32) }.ToImmutableArray(), new[] { "Cica", "Mica" }.ToImmutableArray());
 
             Assert.That(tuple.GetFriendlyName(), Is.EqualTo("System.ValueTuple"));
+        }
+
+        [Test]
+        public void GetFriendlyName_ShouldWorkWithArrays()
+        {
+            CSharpCompilation compilation = CreateCompilation(string.Empty);
+
+            ITypeSymbol ar = compilation.CreateArrayTypeSymbol(compilation.GetSpecialType(SpecialType.System_Int32));
+            
+            Assert.That(ar.GetFriendlyName(), Is.EqualTo("System.Int32[]"));
         }
 
         private class Nested { }

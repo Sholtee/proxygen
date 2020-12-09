@@ -91,12 +91,12 @@ namespace Solti.Utils.Proxy.Internals
 
         public static ITypeSymbol? GetElementType(this ITypeSymbol src) => (src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType;
 
-        public static string? GetAssemblyQualifiedName(this INamedTypeSymbol src) 
+        public static string? GetAssemblyQualifiedName(this ITypeSymbol src) => src switch
         {
-            if (src.ContainingAssembly is null) return null;
-
-            return $"{src.GetQualifiedMetadataName()}, {src.ContainingAssembly.Identity}";
-        }
+            IArrayTypeSymbol => $"{src.GetQualifiedMetadataName()}, {typeof(Array).Assembly}", // tombnek nincs tartalmazo szerelvenye forditaskor
+            _ when src.ContainingAssembly is null => null,
+            _ => $"{src.GetQualifiedMetadataName()}, {src.ContainingAssembly.Identity}"
+        };
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
@@ -104,18 +104,21 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericParameter(this ITypeSymbol src) => src.ContainingType is not null && src.BaseType is null && src.SpecialType is not SpecialType.System_Object;
 
-        private static readonly SymbolDisplayFormat Format = new SymbolDisplayFormat(
-            SymbolDisplayGlobalNamespaceStyle.Omitted,
-            SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-            miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable);
-
-        public static string GetQualifiedMetadataName(this INamedTypeSymbol type)
+        public static string GetQualifiedMetadataName(this ITypeSymbol type)
         {
-            var sb = new StringBuilder(type.ContainingNamespace?.ToString() ??  string.Empty);
+            var sb = new StringBuilder
+            (
+                type switch 
+                {
+                    IArrayTypeSymbol => typeof(Array).Namespace, // tombnek nincs tartalmazo nevtere forditaskor
+                    _ => type.ContainingNamespace?.ToString() ?? string.Empty
+                }
+            );
+
             if (sb.Length > 0)
                 sb.Append(Type.Delimiter);
 
-            foreach (INamedTypeSymbol enclosingType in type.GetEnclosingTypes())
+            foreach (ITypeSymbol enclosingType in type.GetEnclosingTypes())
             {
                 sb.Append($"{GetName(enclosingType)}+");
             }
@@ -124,11 +127,14 @@ namespace Solti.Utils.Proxy.Internals
 
             return sb.ToString();
 
-            static string GetName(INamedTypeSymbol type) 
+            static string GetName(ITypeSymbol type) 
             {
-                string name = type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly));
-                return type.TypeArguments.Any() // ne IsGenericType legyen
-                    ? $"{name}`{type.Arity}"
+                string name = !string.IsNullOrEmpty(type.Name)
+                    ? type.Name // tupple eseten is helyes nevet ad vissza
+                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly));
+
+                return type is INamedTypeSymbol named && named.TypeArguments.Any() // ne IsGenericType legyen
+                    ? $"{name}`{named.Arity}"
                     : name;
             }
         }

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -28,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void AssemblyInfo_Test()
+        public void AssemblyInfo_AbstractionTest()
         {
             Assembly asm = typeof(ISyntaxFactory).Assembly;
 
@@ -45,7 +46,50 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(asm2.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
         }
 
-        private class Generic<T>
+        [Test]
+        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>))] Type type) 
+        {
+            Compilation compilation = CreateCompilation(string.Empty, type.Assembly);
+
+            ITypeInfo
+                type1 = MetadataTypeInfo.CreateFrom(type),
+                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+
+            AssertEquals(type1, type2);
+            AssertEquals(type1.ElementType, type2.ElementType);
+            AssertSequenceEquals(type1.Bases, type2.Bases);
+            AssertSequenceEquals(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
+            AssertSequenceEquals(type1.EnclosingTypes, type2.EnclosingTypes);
+
+            static void AssertEquals(ITypeInfo type1, ITypeInfo type2) 
+            {
+                if (type1 == null || type2 == null) 
+                {
+                    Assert.AreSame(type1, type2);
+                    return;
+                }
+
+                Assert.AreEqual(type1.Name, type2.Name);
+                Assert.AreEqual(type1.FullName, type2.FullName);
+                Assert.AreEqual(type1.AssemblyQualifiedName, type2.AssemblyQualifiedName);
+                Assert.AreEqual(type1.IsNested, type2.IsNested);
+                Assert.AreEqual(type1.IsInterface, type2.IsInterface);
+                Assert.AreEqual(type1.IsGenericParameter, type2.IsGenericParameter);
+                Assert.AreEqual(type1.IsVoid, type2.IsVoid);
+            }
+
+            static void AssertSequenceEquals(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
+            {
+                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEquals(l1[i], l2[i]);
+                }
+            }
+        }
+
+        private class NestedGeneric<T>
         {
             public class Nested<TT> { }
             public class Nested { }
@@ -79,10 +123,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return (typeof(List<>), "System.Collections.Generic.List<T>");
                 yield return (typeof(List<int>), "System.Collections.Generic.List<int>");
                 yield return (typeof(List<List<string>>), "System.Collections.Generic.List<System.Collections.Generic.List<string>>");
-                yield return (typeof(Generic<>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.Generic<T>");
-                yield return (typeof(Generic<List<string>>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.Generic<System.Collections.Generic.List<string>>");
-                yield return (typeof(Generic<int>.Nested), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.Generic<int>.Nested");
-                yield return (typeof(Generic<int>.Nested<string>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.Generic<int>.Nested<string>");
+                yield return (typeof(NestedGeneric<>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.NestedGeneric<T>");
+                yield return (typeof(NestedGeneric<List<string>>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.NestedGeneric<System.Collections.Generic.List<string>>");
+                yield return (typeof(NestedGeneric<int>.Nested), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.NestedGeneric<int>.Nested");
+                yield return (typeof(NestedGeneric<int>.Nested<string>), "Solti.Utils.Proxy.Internals.Tests.ReflectionTests.NestedGeneric<int>.Nested<string>");
             }
         }
 
@@ -91,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             Compilation compilation = CreateCompilation(string.Empty, data.Type.Assembly);
 
-            INamedTypeSymbol resolved = SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type), compilation);
+            ITypeSymbol resolved = SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type), compilation);
 
             Assert.That(resolved.ToString(), Is.EqualTo(data.Name));
         }
@@ -100,7 +144,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void TypeInfoToSymbol_ShouldThrowIfTheTypeNotFound() 
         {
             Compilation compilation = CreateCompilation(string.Empty);
-            Assert.Throws<TypeLoadException>(() => SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(typeof(Generic<>)), compilation));
+            Assert.Throws<TypeLoadException>(() => SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(typeof(NestedGeneric<>)), compilation));
         }
 
         [TestCaseSource(nameof(Types))]
