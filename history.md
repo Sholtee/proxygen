@@ -53,4 +53,7 @@
   - *done:* More efficient generated code
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
+- 4.0.0-preview2
+  - *introduced:* Pointer type support
+  - *done:* More efficient generated code
   
