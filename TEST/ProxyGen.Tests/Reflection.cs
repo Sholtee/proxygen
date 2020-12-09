@@ -74,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
                 Assert.AreEqual(t1.IsNested, t2.IsNested);
                 Assert.AreEqual(t1.IsInterface, t2.IsInterface);
-                Assert.AreEqual(t1.IsByRef, t2.IsByRef);
+                Assert.AreEqual(t1.RefType, t2.RefType);
                 Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
             }

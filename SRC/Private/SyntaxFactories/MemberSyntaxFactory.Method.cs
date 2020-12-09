@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
 
             TypeSyntax returnTypeSytax = CreateType(returnType);
 
-            if (returnType.IsByRef)
+            if (returnType.RefType == RefType.Ref)
                 returnTypeSytax = RefType(returnTypeSytax);
 
             MethodDeclarationSyntax result = MethodDeclaration

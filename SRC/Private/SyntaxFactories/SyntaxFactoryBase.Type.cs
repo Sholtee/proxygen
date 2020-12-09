@@ -140,7 +140,15 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal virtual TypeSyntax CreateType(ITypeInfo type) 
         {
-            if (type.IsByRef) type = type.ElementType!;
+            if (type.RefType != RefType.None)
+            {
+                TypeSyntax result = CreateType(type.ElementType!);
+
+                if (type.RefType == RefType.Pointer) 
+                    result = PointerType(result);
+
+                return result;
+            }
 
             AddType(type);
 

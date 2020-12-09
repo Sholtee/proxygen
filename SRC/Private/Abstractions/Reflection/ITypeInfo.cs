@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         IAssemblyInfo DeclaringAssembly { get; }
         bool IsVoid { get; }
-        bool IsByRef { get; }
+        RefType RefType { get; }
         /// <summary>
         /// Returns true if the type is nested and not a generic parameter.
         /// </summary>

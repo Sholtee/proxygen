@@ -28,6 +28,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCase(typeof(object), "global::System.Object")]
         [TestCase(typeof(int[]), "global::System.Int32[]")]
+        [TestCase(typeof(int*), "global::System.Int32*")]
         [TestCase(typeof(int[,]), "global::System.Int32[, ]")]
         [TestCase(typeof(IEnumerable<>), "global::System.Collections.Generic.IEnumerable<T>")]
         [TestCase(typeof(IEnumerable<int[]>), "global::System.Collections.Generic.IEnumerable<global::System.Int32[]>")]

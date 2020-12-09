@@ -36,7 +36,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsVoid => UnderlyingTypeSymbol.SpecialType == SpecialType.System_Void;
 
-        public bool IsByRef => UnderlyingTypeSymbol is IPointerTypeSymbol;
+        public RefType RefType => UnderlyingTypeSymbol switch
+        {
+            IPointerTypeSymbol => RefType.Pointer,
+            _ => RefType.None
+        };
 
         public bool IsNested => UnderlyingTypeSymbol.IsNested();
 
@@ -149,7 +153,7 @@ namespace Solti.Utils.Proxy.Internals
 
                     return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
 
-                if (type.IsByRef)
+                if (type.RefType == RefType.Pointer)
                     return compilation.CreatePointerTypeSymbol(TypeInfoToSymbol(type.ElementType!, compilation));
 
                 //
