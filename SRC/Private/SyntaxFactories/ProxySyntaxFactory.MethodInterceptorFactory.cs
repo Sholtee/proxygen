@@ -246,7 +246,7 @@ namespace Solti.Utils.Proxy.Internals
                     // "ref" visszateres nem tamogatott.
                     //
 
-                    if (met.ReturnValue.Type.IsByRef)
+                    if (met.ReturnValue.Kind == ParameterKind.InOut)
                         throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
 
                     return DeclareMethod(met).WithBody
