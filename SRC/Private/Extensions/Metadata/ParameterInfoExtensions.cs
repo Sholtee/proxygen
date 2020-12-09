@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         public static ParameterKind GetParameterKind(this ParameterInfo src) 
         {
             if (src.IsRetval)
-                return ParameterKind.Out;
+                return src.ParameterType.IsByRef ? ParameterKind.InOut : ParameterKind.Out;
 
             if (src.ParameterType.IsByRef)
             {
