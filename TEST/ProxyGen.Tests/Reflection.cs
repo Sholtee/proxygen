@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             AssertSequenceEquals(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
             AssertSequenceEquals(type1.EnclosingTypes, type2.EnclosingTypes);
 
-            static void AssertEquals(ITypeInfo type1, ITypeInfo type2) 
+            void AssertEquals(ITypeInfo type1, ITypeInfo type2) 
             {
                 if (type1 == null || type2 == null) 
                 {
@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(type1.IsVoid, type2.IsVoid);
             }
 
-            static void AssertSequenceEquals(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
+            void AssertSequenceEquals(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
                 Assert.That(l1.Count, Is.EqualTo(l2.Count));
 
