@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
-        public bool IsByRef => UnderlyingType.IsByRef;
+        public bool IsByRef => UnderlyingType.IsByRef || UnderlyingType.IsPointer;
 
         private ITypeInfo? FElementType;
         public ITypeInfo? ElementType 

@@ -94,6 +94,7 @@ namespace Solti.Utils.Proxy.Internals
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src) => src switch
         {
             IArrayTypeSymbol => $"{src.GetQualifiedMetadataName()}, {typeof(Array).Assembly}", // tombnek nincs tartalmazo szerelvenye forditaskor
+            IPointerTypeSymbol => $"{src.GetQualifiedMetadataName()}, {typeof(void*).Assembly}",
             _ when src.ContainingAssembly is null => null,
             _ => $"{src.GetQualifiedMetadataName()}, {src.ContainingAssembly.Identity}"
         };
@@ -106,14 +107,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetQualifiedMetadataName(this ITypeSymbol type)
         {
-            var sb = new StringBuilder
-            (
-                type switch 
-                {
-                    IArrayTypeSymbol => typeof(Array).Namespace, // tombnek nincs tartalmazo nevtere forditaskor
-                    _ => type.ContainingNamespace?.ToString() ?? string.Empty
-                }
-            );
+            INamespaceSymbol? ns = type switch
+            {
+                IArrayTypeSymbol ar => ar.GetElementType()?.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
+                IPointerTypeSymbol ptr => ptr.GetElementType()?.ContainingNamespace,
+                _ => type.ContainingNamespace
+            };
+
+            var sb = new StringBuilder(ns?.ToString() ?? string.Empty);
 
             if (sb.Length > 0)
                 sb.Append(Type.Delimiter);

@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsVoid => UnderlyingTypeSymbol.SpecialType == SpecialType.System_Void;
 
-        public bool IsByRef => false; // forras szinten nem jelenik meg
+        public bool IsByRef => UnderlyingTypeSymbol is IPointerTypeSymbol;
 
         public bool IsNested => UnderlyingTypeSymbol.IsNested();
 
@@ -143,13 +143,14 @@ namespace Solti.Utils.Proxy.Internals
             else
             {
                 if (type is IArrayTypeInfo ar) 
-                {
                     //
                     // Tombot nem lehet lekerdezni nev alapjan
                     //
 
                     return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
-                }
+
+                if (type.IsByRef)
+                    return compilation.CreatePointerTypeSymbol(TypeInfoToSymbol(type.ElementType!, compilation));
 
                 //
                 // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond

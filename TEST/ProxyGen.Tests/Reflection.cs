@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>))] Type type) 
+        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>))] Type type) 
         {
             Compilation compilation = CreateCompilation(string.Empty, type.Assembly);
 
@@ -74,6 +74,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(type1.AssemblyQualifiedName, type2.AssemblyQualifiedName);
                 Assert.AreEqual(type1.IsNested, type2.IsNested);
                 Assert.AreEqual(type1.IsInterface, type2.IsInterface);
+                Assert.AreEqual(type1.IsByRef, type2.IsByRef);
                 Assert.AreEqual(type1.IsGenericParameter, type2.IsGenericParameter);
                 Assert.AreEqual(type1.IsVoid, type2.IsVoid);
             }
