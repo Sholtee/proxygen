@@ -61,22 +61,22 @@ namespace Solti.Utils.Proxy.Internals.Tests
             AssertSequenceEquals(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
             AssertSequenceEquals(type1.EnclosingTypes, type2.EnclosingTypes);
 
-            void AssertEquals(ITypeInfo type1, ITypeInfo type2) 
+            void AssertEquals(ITypeInfo t1, ITypeInfo t2) 
             {
-                if (type1 == null || type2 == null) 
+                if (t1 == null || t2 == null) 
                 {
-                    Assert.AreSame(type1, type2);
+                    Assert.AreSame(t1, t2);
                     return;
                 }
 
-                Assert.AreEqual(type1.Name, type2.Name);
-                Assert.AreEqual(type1.FullName, type2.FullName);
-                Assert.AreEqual(type1.AssemblyQualifiedName, type2.AssemblyQualifiedName);
-                Assert.AreEqual(type1.IsNested, type2.IsNested);
-                Assert.AreEqual(type1.IsInterface, type2.IsInterface);
-                Assert.AreEqual(type1.IsByRef, type2.IsByRef);
-                Assert.AreEqual(type1.IsGenericParameter, type2.IsGenericParameter);
-                Assert.AreEqual(type1.IsVoid, type2.IsVoid);
+                Assert.AreEqual(t1.Name, t2.Name);
+                Assert.AreEqual(t1.FullName, t2.FullName);
+                Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
+                Assert.AreEqual(t1.IsNested, t2.IsNested);
+                Assert.AreEqual(t1.IsInterface, t2.IsInterface);
+                Assert.AreEqual(t1.IsByRef, t2.IsByRef);
+                Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
+                Assert.AreEqual(t1.IsVoid, t2.IsVoid);
             }
 
             void AssertSequenceEquals(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
