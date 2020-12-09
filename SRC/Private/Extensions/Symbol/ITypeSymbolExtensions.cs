@@ -91,13 +91,18 @@ namespace Solti.Utils.Proxy.Internals
 
         public static ITypeSymbol? GetElementType(this ITypeSymbol src) => (src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType;
 
-        public static string? GetAssemblyQualifiedName(this ITypeSymbol src) => src switch
+        public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
-            IArrayTypeSymbol => $"{src.GetQualifiedMetadataName()}, {typeof(Array).Assembly}", // tombnek nincs tartalmazo szerelvenye forditaskor
-            IPointerTypeSymbol => $"{src.GetQualifiedMetadataName()}, {typeof(void*).Assembly}",
-            _ when src.ContainingAssembly is null => null,
-            _ => $"{src.GetQualifiedMetadataName()}, {src.ContainingAssembly.Identity}"
-        };
+            IAssemblySymbol? containingAsm = src switch
+            {
+                _ when src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType()!.ContainingAssembly, // tombnek nincs tartalmazo szerelvenye forditaskor
+                _ => src.ContainingAssembly,
+            };
+
+            return containingAsm is null
+                ? null
+                : $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
+        }
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
@@ -109,15 +114,17 @@ namespace Solti.Utils.Proxy.Internals
         {
             INamespaceSymbol? ns = type switch
             {
-                IArrayTypeSymbol ar => ar.GetElementType()?.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
-                IPointerTypeSymbol ptr => ptr.GetElementType()?.ContainingNamespace,
+                _ when  type is IArrayTypeSymbol || type is IPointerTypeSymbol => type.GetElementType()!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
                 _ => type.ContainingNamespace
             };
 
-            var sb = new StringBuilder(ns?.ToString() ?? string.Empty);
+            var sb = new StringBuilder();
 
-            if (sb.Length > 0)
+            if (ns is not null)
+            {
+                sb.Append(ns);
                 sb.Append(Type.Delimiter);
+            }
 
             foreach (ITypeSymbol enclosingType in type.GetEnclosingTypes())
             {
