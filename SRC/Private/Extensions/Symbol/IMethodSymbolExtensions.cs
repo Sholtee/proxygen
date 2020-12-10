@@ -27,9 +27,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public static INamedTypeSymbol GetDeclaringType(this IMethodSymbol src) => (src.GetImplementedInterfacceMethod() ?? src).ContainingType;
 
-        public static IMethodSymbol? GetImplementedInterfacceMethod(this IMethodSymbol method)
+        public static IMethodSymbol? GetImplementedInterfacceMethod(this IMethodSymbol src)
         {
-            INamedTypeSymbol containingType = method.ContainingType;
+            INamedTypeSymbol containingType = src.ContainingType;
 
             return containingType
                 .AllInterfaces
@@ -37,7 +37,21 @@ namespace Solti.Utils.Proxy.Internals
                     .GetMembers()
                     .OfType<IMethodSymbol>())
                 .SingleOrDefault(interfaceMethod => 
-                    SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), method));
+                    SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), src));
+        }
+
+        private static readonly MethodKind[] SpecialMethods = new[]
+        {
+            MethodKind.PropertyGet, MethodKind.PropertySet,
+            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise
+        };
+
+        public static bool IsSpecial(this IMethodSymbol src) // slow
+        {
+            if (src.MethodKind == MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
+                src = (IMethodSymbol) src.GetDeclaringType().GetMembers(src.StrippedName()).Single();
+
+            return SpecialMethods.Contains(src.MethodKind);
         }
     }
 }

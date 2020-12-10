@@ -35,21 +35,8 @@ namespace Solti.Utils.Proxy.Internals
             ? SymbolReturnParameter.CreateFrom(UnderlyingSymbol, Compilation)
             : null!;
 
-        private static readonly MethodKind[] SpecialMethods = new[] 
-        { 
-            MethodKind.PropertyGet, MethodKind.PropertySet, 
-            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise
-        };
-
         private bool? FIsSpecial;
-        public bool IsSpecial => FIsSpecial ??= SpecialMethods.Contains
-        (
-            (
-                UnderlyingSymbol.MethodKind == MethodKind.ExplicitInterfaceImplementation // nem vagom ez mi a faszert nem lehet bitmaszk
-                    ? (IMethodSymbol) UnderlyingSymbol.GetDeclaringType().GetMembers(Name).Single()
-                    : UnderlyingSymbol
-            ).MethodKind
-        );
+        public bool IsSpecial => FIsSpecial ??= UnderlyingSymbol.IsSpecial();
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
