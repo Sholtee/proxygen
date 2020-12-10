@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
             if (src.MethodKind == MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
-                src = (IMethodSymbol) src.GetDeclaringType().GetMembers(src.StrippedName()).Single();
+                src = src.GetImplementedInterfacceMethod()!;
 
             return SpecialMethods.Contains(src.MethodKind);
         }
