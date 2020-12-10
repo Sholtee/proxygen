@@ -48,12 +48,7 @@ namespace Solti.Utils.Proxy.Internals
             var options = new CSharpCompilationOptions
             (
                 outputKind: OutputKind.DynamicallyLinkedLibrary,
-                metadataImportOptions:
-#if IGNORE_VISIBILITY
-                    MetadataImportOptions.All,
-#else
-                    MetadataImportOptions.Public,
-#endif
+                metadataImportOptions: MetadataImportOptions.All,
                 optimizationLevel: OptimizationLevel.Release
             );
 #if IGNORE_VISIBILITY

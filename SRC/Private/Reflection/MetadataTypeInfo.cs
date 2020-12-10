@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType switch 
         {
-            _ when UnderlyingType.IsByRef => RefType.Ref,
+            // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
             _ when UnderlyingType.IsPointer => RefType.Pointer,
             _ => RefType.None
         };
@@ -109,11 +109,15 @@ namespace Solti.Utils.Proxy.Internals
             .Cast<IConstructorInfo>()
             .ToArray();
 
-        public string? AssemblyQualifiedName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
+        public string? AssemblyQualifiedName => FullName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
+            ? $"{FullName}, {UnderlyingType.Assembly}"
+            : null;
 
         public bool IsGenericParameter => UnderlyingType.IsGenericParameter;
 
-        public string? FullName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).FullName;
+        public string? FullName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType)
+            .FullName
+            .TrimEnd('&'); // FIXME: ez nem kene de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
 
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {

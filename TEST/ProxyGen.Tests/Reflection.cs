@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             IAssemblyInfo
                 asm1 = MetadataAssemblyInfo.CreateFrom(asm),
-                asm2 = SymbolAssemblyInfo.CreateFrom((IAssemblySymbol)compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
+                asm2 = SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
 
             Assert.AreEqual(asm1.Name, asm2.Name);
             Assert.AreEqual(asm1.Location, asm2.Location);
@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>))] Type type) 
+        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(DateTime), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>), typeof(InterfaceInterceptor<>), typeof(HasInternal))] Type type) 
         {
             Compilation compilation = CreateCompilation(string.Empty, type.Assembly);
 
@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             AssertSequenceEqualsT(type1.Bases, type2.Bases);
             AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
             AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
-            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ToArray(), type2.Methods.OrderBy(m => m.Name).ToArray());
+            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters.Count).ToArray(), type2.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters.Count).ToArray());
 
             void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
             {
@@ -138,10 +138,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
             }
         }
 
-        private class NestedGeneric<T>
+        public class NestedGeneric<T>
         {
             public class Nested<TT> { }
             public class Nested { }
+        }
+
+        public class HasInternal 
+        {
+            internal void Foo() { }
         }
 
         public static IEnumerable<ITypeInfo> Generics

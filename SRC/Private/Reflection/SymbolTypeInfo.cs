@@ -95,7 +95,8 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
-            MethodKind.PropertyGet, MethodKind.PropertySet
+            MethodKind.PropertyGet, MethodKind.PropertySet,
+            MethodKind.UserDefinedOperator
         };
 
         private IReadOnlyList<IMethodInfo>? FMethods;
