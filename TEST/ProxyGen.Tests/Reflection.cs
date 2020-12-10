@@ -55,13 +55,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
-            AssertEquals(type1, type2);
-            AssertEquals(type1.ElementType, type2.ElementType);
-            AssertSequenceEquals(type1.Bases, type2.Bases);
-            AssertSequenceEquals(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
-            AssertSequenceEquals(type1.EnclosingTypes, type2.EnclosingTypes);
+            AssertEqualsT(type1, type2);
+            AssertEqualsT(type1.ElementType, type2.ElementType);
+            AssertSequenceEqualsT(type1.Bases, type2.Bases);
+            AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
+            AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
+            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ToArray(), type2.Methods.OrderBy(m => m.Name).ToArray());
 
-            void AssertEquals(ITypeInfo t1, ITypeInfo t2) 
+            void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
             {
                 if (t1 == null || t2 == null) 
                 {
@@ -79,13 +80,61 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
             }
 
-            void AssertSequenceEquals(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
+            void AssertEqualsMP(IParameterInfo p1, IParameterInfo p2)
+            {
+                if (p1 == null || p2 == null)
+                {
+                    Assert.AreSame(p1, p2);
+                    return;
+                }
+
+                Assert.AreEqual(p1.Name, p2.Name);
+                Assert.AreEqual(p1.Kind, p2.Kind);
+                AssertEqualsT(p1.Type, p2.Type);
+            }
+
+            void AssertEqualsM(IMethodInfo m1, IMethodInfo m2)
+            {
+                if (m1 == null || m2 == null)
+                {
+                    Assert.AreSame(m1, m2);
+                    return;
+                }
+
+                Assert.AreEqual(m1.Name, m2.Name);
+                Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
+                Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
+                AssertSequenceEqualsP(m1.Parameters, m2.Parameters);
+                AssertEqualsMP(m1.ReturnValue, m2.ReturnValue);
+            }
+
+            void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
                 Assert.That(l1.Count, Is.EqualTo(l2.Count));
 
                 for (int i = 0; i < l1.Count; i++)
                 {
-                    AssertEquals(l1[i], l2[i]);
+                    AssertEqualsT(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsP(IReadOnlyList<IParameterInfo> l1, IReadOnlyList<IParameterInfo> l2)
+            {
+                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEqualsMP(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsM(IReadOnlyList<IMethodInfo> l1, IReadOnlyList<IMethodInfo> l2)
+            {
+                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEqualsM(l1[i], l2[i]);
                 }
             }
         }

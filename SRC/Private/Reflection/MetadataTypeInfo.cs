@@ -98,6 +98,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && m.Name != nameof(Finalize))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 

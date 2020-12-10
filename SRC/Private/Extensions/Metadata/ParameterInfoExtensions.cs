@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static ParameterKind GetParameterKind(this ParameterInfo src) 
         {
-            if (src.IsRetval)
+            if (src.Position == -1) // ne az IsRetVal-t hasznaljuk mert az mindig false (netcore3.0)
                 return src.ParameterType.IsByRef ? ParameterKind.InOut : ParameterKind.Out;
 
             if (src.ParameterType.IsByRef)

@@ -90,7 +90,20 @@ namespace Solti.Utils.Proxy.Internals
 
         public IReadOnlyList<IEventInfo> Events => throw new System.NotImplementedException();
 
-        public IReadOnlyList<IMethodInfo> Methods => throw new System.NotImplementedException();
+        private static readonly MethodKind[] RegularMethods = new[] 
+        {
+            MethodKind.Ordinary,
+            MethodKind.ExplicitInterfaceImplementation,
+            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
+            MethodKind.PropertyGet, MethodKind.PropertySet
+        };
+
+        private IReadOnlyList<IMethodInfo>? FMethods;
+        public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingTypeSymbol
+            .ListMembers<IMethodSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Where(m => RegularMethods.Contains(m.MethodKind) && m.GetAccessModifiers() != AccessModifiers.Private)
+            .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
+            .ToArray();
 
         public IReadOnlyList<IConstructorInfo> Constructors => throw new System.NotImplementedException();
 

@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ParameterKind Kind => UnderLyingParameter.GetParameterKind();
 
-        public string Name => UnderLyingParameter.Name;
+        public string Name => UnderLyingParameter.Name ?? string.Empty;
 
         public override bool Equals(object obj) => obj is MetadataParameterInfo that && UnderLyingParameter.Equals(that.UnderLyingParameter);
 
