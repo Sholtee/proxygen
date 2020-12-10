@@ -93,6 +93,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
+            if (src.IsGenericParameter() || src.GetElementType()?.IsGenericParameter() == true) return null;
+
             IAssemblySymbol? containingAsm = src switch
             {
                 _ when src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType()!.ContainingAssembly, // tombnek nincs tartalmazo szerelvenye forditaskor
@@ -110,12 +112,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericParameter(this ITypeSymbol src) => src.ContainingType is not null && src.BaseType is null && src.SpecialType is not SpecialType.System_Object;
 
-        public static string GetQualifiedMetadataName(this ITypeSymbol type)
+        public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
-            INamespaceSymbol? ns = type switch
+            if (src.IsGenericParameter() || src.GetElementType()?.IsGenericParameter() == true) return null;
+
+            INamespaceSymbol? ns = src switch
             {
-                _ when  type is IArrayTypeSymbol || type is IPointerTypeSymbol => type.GetElementType()!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
-                _ => type.ContainingNamespace
+                _ when  src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType()!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
+                _ => src.ContainingNamespace
             };
 
             var sb = new StringBuilder();
@@ -126,12 +130,12 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(Type.Delimiter);
             }
 
-            foreach (ITypeSymbol enclosingType in type.GetEnclosingTypes())
+            foreach (ITypeSymbol enclosingType in src.GetEnclosingTypes())
             {
                 sb.Append($"{GetName(enclosingType)}+");
             }
 
-            sb.Append($"{GetName(type)}");
+            sb.Append($"{GetName(src)}");
 
             return sb.ToString();
 
