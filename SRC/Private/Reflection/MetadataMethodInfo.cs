@@ -70,14 +70,18 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(MetadataTypeInfo.CreateFrom)
                 .ToArray();
 
-            public IGeneric GenericDefinition => new MetadataGenericMethodInfo(UnderLyingMethod.GetGenericMethodDefinition());
+            private IGeneric? FGenericDefinition;
+            public IGeneric GenericDefinition => FGenericDefinition ??= new MetadataGenericMethodInfo
+            (
+                UnderLyingMethod.GetGenericMethodDefinition()
+            );
 
             public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericMethodInfo
             (
                 UnderLyingMethod.MakeGenericMethod
                 (
                     genericArgs
-                        .Select(arg => Type.GetType(arg.AssemblyQualifiedName, throwOnError: true))
+                        .Select(MetadataTypeInfo.TypeInfoToMetadata)
                         .ToArray()
                 )
             );
