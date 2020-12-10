@@ -120,6 +120,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase
         (@"
             using System.Collections.Generic;
+            public class MyClass<T>: List<T[]>
+            {
+            }
+        ", true)]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
             public class MyClass: List<object>
             {
             }
