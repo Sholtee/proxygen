@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
-            if (src.IsGenericParameter()) return null;
+            if (src.HasGenericParameterElement()) return null;
 
             IAssemblySymbol? containingAsm = src switch
             {
@@ -106,16 +106,25 @@ namespace Solti.Utils.Proxy.Internals
                 : $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
+        private static bool HasGenericParameterElement(this ITypeSymbol src)
+        {
+            for (ITypeSymbol? actual = src; actual is not null; actual = actual.GetElementType())
+            {
+                if (actual.IsGenericParameter()) return true;
+            }
+
+            return false;
+        }
+
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
         public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericArgument();
 
-        public static bool IsGenericParameter(this ITypeSymbol src) => src.GetElementType()?.IsGenericParameter() ??
-            src.ContainingType is not null && src.BaseType is null && src.SpecialType is not SpecialType.System_Object;
+        public static bool IsGenericParameter(this ITypeSymbol src) => src.ContainingType is not null && src.BaseType is null && src.SpecialType is not SpecialType.System_Object;
 
         public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
-            if (src.IsGenericParameter()) return null;
+            if (src.HasGenericParameterElement()) return null;
 
             INamespaceSymbol? ns = src switch
             {
