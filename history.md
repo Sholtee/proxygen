@@ -54,7 +54,9 @@
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
 - 4.0.0-preview2
+  - *breaking:* Removed `TypeGenerator.GeneratedType[Async]` property. It is substituted by the `GetGeneratedType[Async]()` method
   - *breaking:* Assembly cache directory can be set from `appname.runtimeconfig.json`
+  - *introduced:* Cancellable `TypeGenerator`s
   - *introduced:* Pointer type support
   - *done:* More efficient generated code
   
