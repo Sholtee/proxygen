@@ -39,15 +39,11 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal virtual MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
         {
-            ITypeInfo
-                declaringType = method.DeclaringType,
-                returnType    = method.ReturnValue.Type;
+            Debug.Assert(method.DeclaringType.IsInterface);
 
-            Debug.Assert(declaringType.IsInterface);
+            TypeSyntax returnTypeSytax = CreateType(method.ReturnValue.Type);
 
-            TypeSyntax returnTypeSytax = CreateType(returnType);
-
-            if (returnType.RefType == RefType.Ref)
+            if (method.ReturnValue.Kind == ParameterKind.InOut)
                 returnTypeSytax = RefType(returnTypeSytax);
 
             MethodDeclarationSyntax result = MethodDeclaration
@@ -57,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(declaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(method.DeclaringType))
             )
             .WithParameterList
             (

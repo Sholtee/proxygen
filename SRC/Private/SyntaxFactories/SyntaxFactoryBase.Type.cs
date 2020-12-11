@@ -140,7 +140,13 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal virtual TypeSyntax CreateType(ITypeInfo type) 
         {
-            if (type.RefType != RefType.None)
+            //
+            // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
+            //
+            // TODO: FIXME: itt "type.RefType > RefType.None"-ra kene vizsgalni
+            //
+
+            if (type.ElementType is not null && type is not IArrayTypeInfo)
             {
                 TypeSyntax result = CreateType(type.ElementType!);
 
