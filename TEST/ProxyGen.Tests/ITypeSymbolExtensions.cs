@@ -229,5 +229,28 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(ga.GetElementType()?.GetFriendlyName(), Is.EqualTo(element));
         }
+
+        [Test]
+        public void PassingByReference_ShouldNotAffectTheParameterType() // TODO: Ne ide
+        {
+            CSharpCompilation compilation = CreateCompilation
+            (@"
+                public class MyClass 
+                {
+                    void Foo(int a, ref int b) {}
+                }
+            ");
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            IMethodSymbol foo = (IMethodSymbol) visitor.AllTypeSymbols.Single(t => t.Name == "MyClass").GetMembers("Foo").Single();
+
+            ITypeSymbol
+                a = foo.Parameters[0].Type,
+                b = foo.Parameters[0].Type;
+
+            Assert.That(SymbolEqualityComparer.Default.Equals(a, b));
+        }
     }
 }

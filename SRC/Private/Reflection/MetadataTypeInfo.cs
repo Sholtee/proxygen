@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType switch 
         {
-            // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
+            // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
             _ when UnderlyingType.IsPointer => RefType.Pointer,
             _ => RefType.None
         };

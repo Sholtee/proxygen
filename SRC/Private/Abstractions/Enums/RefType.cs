@@ -10,7 +10,7 @@ namespace Solti.Utils.Proxy.Internals
     public enum RefType 
     {
         None = 0,
-        Ref,
+        //Ref,  // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
         Pointer
     }
 }
