@@ -46,9 +46,17 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(DateTime), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>), typeof(InterfaceInterceptor<>), typeof(HasInternal))] Type type) 
+        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(DateTime), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>), typeof(InterfaceInterceptor<>), typeof(Generators.ProxyGenerator<,>), typeof(DuckBase<>), typeof(HasInternal))] Type type) 
         {
-            Compilation compilation = CreateCompilation(string.Empty, type.Assembly);
+            Assembly[] refs = type
+                .Assembly
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .Append(type.Assembly)
+                .Distinct()
+                .ToArray();
+
+            Compilation compilation = CreateCompilation(string.Empty, refs);
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
