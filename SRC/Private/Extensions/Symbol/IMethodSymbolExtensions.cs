@@ -43,7 +43,8 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly MethodKind[] SpecialMethods = new[]
         {
             MethodKind.PropertyGet, MethodKind.PropertySet,
-            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise
+            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
+            MethodKind.UserDefinedOperator
         };
 
         public static bool IsSpecial(this IMethodSymbol src) // slow
