@@ -75,9 +75,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
-            var s = type1.Methods.Select(m => m.Name).Except(type2.Methods.Select(m => m.Name)).ToArray();
-            var ss = SymbolTypeInfo.TypeInfoToSymbol(type1, compilation).GetMembers().Where(m => m.Name.Contains("Get", StringComparison.OrdinalIgnoreCase)).ToArray();
-
             var processed = new HashSet<string>();
 
             AssertEqualsT(type1, type2);

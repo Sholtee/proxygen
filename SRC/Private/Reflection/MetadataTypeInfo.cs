@@ -95,10 +95,22 @@ namespace Solti.Utils.Proxy.Internals
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
+        //
+        // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
+        //
+
+        private static readonly string[] MethodsToSkip = new[] 
+        {
+            "Finalize", // destructor
+            "Get", // = array[i]
+            "Set", // array[i] =
+            "Address" // = ref array[i]
+        };
+
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && m.Name != nameof(Finalize))
+            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Contains(m.Name))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 
