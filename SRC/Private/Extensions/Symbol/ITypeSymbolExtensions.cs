@@ -121,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
-        public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericArgument();
+        public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericParameter();
 
         public static bool IsGenericParameter(this ITypeSymbol src) => 
             src.ContainingType is not null && 
