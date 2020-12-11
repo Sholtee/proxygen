@@ -67,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             AssertSequenceEqualsT(type1.Bases, type2.Bases);
             AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
             AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
-            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters.Count).ToArray(), type2.Methods.OrderBy(m => m.Name).ThenBy(m => m.Parameters.Count).ToArray());
+            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ThenBy(m => string.Join("", m.Parameters.Select(p => p.Type.Name))).ToArray(), type2.Methods.OrderBy(m => m.Name).ThenBy(m => string.Join("", m.Parameters.Select(p => p.Type.Name))).ToArray());
 
             void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
             {
