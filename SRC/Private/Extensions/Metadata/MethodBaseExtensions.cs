@@ -28,9 +28,16 @@ namespace Solti.Utils.Proxy.Internals
         {
             Type reflectedType = src.ReflectedType;
 
-            if (!reflectedType.IsInterface && !reflectedType.IsArray)
+            if (!reflectedType.IsInterface)
                 foreach (Type iface in reflectedType.GetInterfaces())
                 {
+                    //
+                    // https://docs.microsoft.com/en-us/dotnet/api/system.type.getinterfacemap?view=netcore-3.1#exceptions
+                    //
+
+                    if (iface.IsGenericType && reflectedType.IsArray)
+                        continue;
+
                     InterfaceMapping mapping = reflectedType.GetInterfaceMap(iface);
 
                     //
