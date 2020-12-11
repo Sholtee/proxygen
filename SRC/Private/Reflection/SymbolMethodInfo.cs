@@ -40,7 +40,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
-        public ITypeInfo DeclaringType => throw new System.NotImplementedException();
+        private ITypeInfo? FDeclaringType;
+        public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 

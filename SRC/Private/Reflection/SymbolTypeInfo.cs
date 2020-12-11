@@ -98,7 +98,11 @@ namespace Solti.Utils.Proxy.Internals
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 
-        public IReadOnlyList<IPropertyInfo> Properties => throw new System.NotImplementedException();
+        private IReadOnlyList<IPropertyInfo>? FProperties;
+        public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingTypeSymbol
+            .ListMembers<IPropertySymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
+            .ToArray();
 
         public IReadOnlyList<IEventInfo> Events => throw new System.NotImplementedException();
 

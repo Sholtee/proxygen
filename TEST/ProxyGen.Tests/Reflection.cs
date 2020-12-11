@@ -104,6 +104,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
                 AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
                 AssertSequenceEqualsM(OrderMethods(type1.Methods).ToArray(), OrderMethods(type2.Methods).ToArray());
+                AssertSequenceEqualsPr(type1.Properties.OrderBy(i => i.Name).ToArray(), type2.Properties.OrderBy(i => i.Name).ToArray());
 
                 IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
                     .OrderBy(m => m.Name)
@@ -141,8 +142,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(m1.Name, m2.Name);
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
+                AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
                 AssertSequenceEqualsP(m1.Parameters, m2.Parameters);
                 AssertEqualsMP(m1.ReturnValue, m2.ReturnValue);
+            }
+
+            void AssertEqualsPr(IPropertyInfo p1, IPropertyInfo p2) 
+            {
+                if (p1 == null || p2 == null)
+                {
+                    Assert.AreSame(p1, p2);
+                    return;
+                }
+
+                Assert.AreEqual(p1.Name, p2.Name);
+                Assert.AreEqual(p1.IsStatic, p2.IsStatic);
+
+                AssertEqualsT(p1.Type, p2.Type);
+                AssertEqualsT(p1.DeclaringType, p2.DeclaringType);
+                AssertSequenceEqualsP(p1.Indices, p2.Indices);
+                AssertEqualsM(p1.GetMethod, p2.GetMethod);
+                AssertEqualsM(p1.SetMethod, p2.SetMethod);
             }
 
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
@@ -172,6 +192,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 for (int i = 0; i < l1.Count; i++)
                 {
                     AssertEqualsM(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsPr(IReadOnlyList<IPropertyInfo> l1, IReadOnlyList<IPropertyInfo> l2)
+            {
+                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEqualsPr(l1[i], l2[i]);
                 }
             }
         }
