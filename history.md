@@ -54,6 +54,7 @@
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
 - 4.0.0-preview2
+  - *breaking:* Assembly cache directory can be set from `appname.runtimeconfig.json`
   - *introduced:* Pointer type support
   - *done:* More efficient generated code
   
