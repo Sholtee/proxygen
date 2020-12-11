@@ -120,7 +120,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericArgument();
 
-        public static bool IsGenericParameter(this ITypeSymbol src) => src.ContainingType is not null && src.BaseType is null && src.SpecialType is not SpecialType.System_Object;
+        public static bool IsGenericParameter(this ITypeSymbol src) => 
+            src.ContainingType is not null && 
+            src.BaseType is null && 
+            src.SpecialType is not SpecialType.System_Object &&
+            !src.IsInterface();
 
         public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
