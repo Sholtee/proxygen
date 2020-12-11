@@ -24,15 +24,27 @@ namespace Solti.Utils.Proxy.Internals
             UnderlyingTypeSymbol = typeSymbol;
             Compilation = compilation;
         }
-        public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation) => typeSymbol switch 
+        public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation) => typeSymbol switch
         {
             IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
             INamedTypeSymbol named when named.TypeArguments.Any() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
             _ => new SymbolTypeInfo(typeSymbol, compilation)
         };
 
-        private IAssemblyInfo? FAssemblyInfo;
-        public IAssemblyInfo DeclaringAssembly => FAssemblyInfo ??= SymbolAssemblyInfo.CreateFrom(UnderlyingTypeSymbol.ContainingAssembly, Compilation);
+        private IAssemblyInfo? FDeclaringAssembly;
+        public IAssemblyInfo? DeclaringAssembly
+        {
+            get
+            {
+                if (FDeclaringAssembly is null)
+                {
+                    IAssemblySymbol? asm = UnderlyingTypeSymbol.GetElementType(recurse: true)?.ContainingAssembly ?? UnderlyingTypeSymbol.ContainingAssembly;
+                    if (asm != null) 
+                        FDeclaringAssembly = SymbolAssemblyInfo.CreateFrom(asm, Compilation);
+                }
+                return FDeclaringAssembly;
+            }
+        }
 
         public bool IsVoid => UnderlyingTypeSymbol.SpecialType == SpecialType.System_Void;
 

@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
                 bool grantedByAttr = method
                     .DeclaringType
                     .DeclaringAssembly
-                    .IsFriend(assemblyName);
+                    ?.IsFriend(assemblyName) == true;
 
                 if (grantedByAttr) return;
 

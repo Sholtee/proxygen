@@ -216,6 +216,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase
         (@"
             using System.Collections.Generic;
+            class MyList: List<int*[]>{}
+        ", "System.Int32")]
+        [TestCase
+        (@"
+            using System.Collections.Generic;
             class MyList: List<int> {}
         ", null)]
         public void GetElementType_ShouldReturnTheProperElementType(string src, string element) 
@@ -227,7 +232,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             ITypeSymbol ga = visitor.AllTypeSymbols.Single(t => t.Name == "MyList").BaseType.TypeArguments.Single();
 
-            Assert.That(ga.GetElementType()?.GetFriendlyName(), Is.EqualTo(element));
+            Assert.That(ga.GetElementType(recurse: true)?.GetFriendlyName(), Is.EqualTo(element));
         }
 
         [Test]

@@ -10,7 +10,7 @@ namespace Solti.Utils.Proxy.Internals
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public interface ITypeInfo: IHasName
     {
-        IAssemblyInfo DeclaringAssembly { get; }
+        IAssemblyInfo? DeclaringAssembly { get; }
         bool IsVoid { get; }
         RefType RefType { get; }
         /// <summary>

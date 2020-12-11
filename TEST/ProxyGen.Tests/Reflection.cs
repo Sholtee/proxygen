@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void AssemblyInfo_AbstractionTest()
+        public void AssemblyInfo_FriendshipTest()
         {
             Assembly asm = typeof(ISyntaxFactory).Assembly;
 
@@ -38,15 +38,28 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 asm1 = MetadataAssemblyInfo.CreateFrom(asm),
                 asm2 = SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
 
-            Assert.AreEqual(asm1.Name, asm2.Name);
-            Assert.AreEqual(asm1.Location, asm2.Location);
-            Assert.AreEqual(asm1.IsDynamic, asm2.IsDynamic);
             Assert.That(asm1.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
             Assert.That(asm2.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
         }
 
         [Test]
-        public void TypeInfo_AbstractionTest([Values(typeof(void), typeof(int), typeof(int[]), typeof(int[,]), typeof((int Int, string String)), typeof(int*), typeof(DateTime), typeof(List<>), typeof(List<object>), typeof(NestedGeneric<>), typeof(NestedGeneric<List<string>>), typeof(InterfaceInterceptor<>), typeof(Generators.ProxyGenerator<,>), typeof(DuckBase<>), typeof(HasInternal))] Type type) 
+        public void TypeInfo_AbstractionTest([Values(
+            typeof(void), 
+            typeof(object), 
+            typeof(int), 
+            typeof(int[]), 
+            typeof(int[,]), 
+            typeof((int Int, string String)), 
+            typeof(int*), 
+            typeof(DateTime), 
+            typeof(List<>), 
+            typeof(List<object>), 
+            typeof(NestedGeneric<>), 
+            typeof(NestedGeneric<List<string>>), 
+            typeof(InterfaceInterceptor<>), 
+            typeof(Generators.ProxyGenerator<,>), 
+            typeof(DuckBase<>), 
+            typeof(HasInternal))] Type type) 
         {
             Assembly[] refs = type
                 .Assembly
@@ -62,12 +75,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
+            var s = type1.Methods.Select(m => m.Name).Except(type2.Methods.Select(m => m.Name)).ToArray();
+            var ss = SymbolTypeInfo.TypeInfoToSymbol(type1, compilation).GetMembers().Where(m => m.Name.Contains("Get", StringComparison.OrdinalIgnoreCase)).ToArray();
+
+            var processed = new HashSet<string>();
+
             AssertEqualsT(type1, type2);
-            AssertEqualsT(type1.ElementType, type2.ElementType);
-            AssertSequenceEqualsT(type1.Bases, type2.Bases);
-            AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
-            AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
-            AssertSequenceEqualsM(type1.Methods.OrderBy(m => m.Name).ThenBy(m => string.Join("", m.Parameters.Select(p => p.Type.Name))).ToArray(), type2.Methods.OrderBy(m => m.Name).ThenBy(m => string.Join("", m.Parameters.Select(p => p.Type.Name))).ToArray());
 
             void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
             {
@@ -77,6 +90,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     return;
                 }
 
+                if (!processed.Add(t1.Name)) return;
+
                 Assert.AreEqual(t1.Name, t2.Name);
                 Assert.AreEqual(t1.FullName, t2.FullName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
@@ -85,6 +100,24 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.RefType, t2.RefType);
                 Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
+
+                AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
+                AssertEqualsT(type1.ElementType, type2.ElementType);
+                AssertSequenceEqualsT(type1.Bases, type2.Bases);
+                AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
+                AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
+                AssertSequenceEqualsM(OrderMethods(type1.Methods).ToArray(), OrderMethods(type2.Methods).ToArray());
+
+                IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
+                    .OrderBy(m => m.Name)
+                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
+            }
+
+            void AssertEqualsA(IAssemblyInfo a1, IAssemblyInfo a2) 
+            {
+                Assert.AreEqual(a1.Name, a2.Name);
+                Assert.AreEqual(a1.Location, a2.Location);
+                Assert.AreEqual(a1.IsDynamic, a2.IsDynamic);
             }
 
             void AssertEqualsMP(IParameterInfo p1, IParameterInfo p2)

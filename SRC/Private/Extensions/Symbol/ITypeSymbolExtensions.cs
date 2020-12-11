@@ -89,7 +89,18 @@ namespace Solti.Utils.Proxy.Internals
             return constructors;
         }
 
-        public static ITypeSymbol? GetElementType(this ITypeSymbol src) => (src as IArrayTypeSymbol)?.ElementType ?? (src as IPointerTypeSymbol)?.PointedAtType;
+        public static ITypeSymbol? GetElementType(this ITypeSymbol src, bool recurse = false)
+        {
+            ITypeSymbol? prev = null;
+
+            for (ITypeSymbol? current = src; (current = (current as IArrayTypeSymbol)?.ElementType ?? (current as IPointerTypeSymbol)?.PointedAtType) != null;)
+            {
+                if (!recurse) return current;
+                prev = current;
+            }
+
+            return prev;
+        }
 
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
@@ -97,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
 
             IAssemblySymbol? containingAsm = src switch
             {
-                _ when src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType()!.ContainingAssembly, // tombnek nincs tartalmazo szerelvenye forditaskor
+                _ when src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType(recurse: true)!.ContainingAssembly, // tombnek nincs tartalmazo szerelvenye forditaskor
                 _ => src.ContainingAssembly,
             };
 
@@ -106,15 +117,7 @@ namespace Solti.Utils.Proxy.Internals
                 : $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
-        private static bool HasGenericParameterElement(this ITypeSymbol src)
-        {
-            for (ITypeSymbol? actual = src; actual is not null; actual = actual.GetElementType())
-            {
-                if (actual.IsGenericParameter()) return true;
-            }
-
-            return false;
-        }
+        private static bool HasGenericParameterElement(this ITypeSymbol src) => src.GetElementType(recurse: true)?.IsGenericParameter() == true;
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
@@ -132,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
 
             INamespaceSymbol? ns = src switch
             {
-                _ when  src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType()!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
+                _ when  src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType(recurse: true)!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
                 _ => src.ContainingNamespace
             };
 

@@ -46,18 +46,21 @@ namespace Solti.Utils.Proxy.Internals
             if (!FTypes.Add(type)) // korkoros referencia fix
                 return;
 
-            IAssemblyInfo asm = type.DeclaringAssembly;
+            IAssemblyInfo? asm = type.DeclaringAssembly;
 
-            if (asm.IsDynamic)
-                throw new NotSupportedException(Resources.DYNAMIC_ASM);
+            if (asm is not null)
+            {
+                if (asm.IsDynamic)
+                    throw new NotSupportedException(Resources.DYNAMIC_ASM);
 
-            FReferences.Add(asm);
+                FReferences.Add(asm);
+            }
 
             //
             // Generikus parameterek szerepelhetnek masik szerelvenyben.
             //
 
-            if (genericType != null)
+            if (genericType is not null)
                 foreach (ITypeInfo genericArg in genericType.GenericArguments)
                     AddType(genericArg);
   
