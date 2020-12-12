@@ -63,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
             /// </summary>
             internal IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.Kind))
+                .Where(p => new[] { ParameterKind.Ref, ParameterKind.Out }.Contains(p.Parameter.Kind))
                 .Select
                 (
                     p => ExpressionStatement
@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
             /// </summary>
             internal IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.Kind))
+                .Where(p => new[] { ParameterKind.Ref, ParameterKind.Out }.Contains(p.Parameter.Kind))
                 .Select
                 (
                     p => ExpressionStatement
@@ -246,7 +246,7 @@ namespace Solti.Utils.Proxy.Internals
                     // "ref" visszateres nem tamogatott.
                     //
 
-                    if (met.ReturnValue.Kind == ParameterKind.InOut)
+                    if (met.ReturnValue.Kind >= ParameterKind.Ref)
                         throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
 
                     return DeclareMethod(met).WithBody

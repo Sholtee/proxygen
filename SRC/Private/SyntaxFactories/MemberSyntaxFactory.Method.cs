@@ -43,8 +43,18 @@ namespace Solti.Utils.Proxy.Internals
 
             TypeSyntax returnTypeSytax = CreateType(method.ReturnValue.Type);
 
-            if (method.ReturnValue.Kind == ParameterKind.InOut)
-                returnTypeSytax = RefType(returnTypeSytax);
+            if (method.ReturnValue.Kind >= ParameterKind.Ref)
+            {
+                RefTypeSyntax refReturnTypeSyntax = RefType(returnTypeSytax);
+
+                if (method.ReturnValue.Kind == ParameterKind.RefReadonly)
+                    refReturnTypeSyntax = refReturnTypeSyntax.WithReadOnlyKeyword
+                    (
+                        Token(SyntaxKind.ReadOnlyKeyword)
+                    );
+
+                returnTypeSytax = refReturnTypeSyntax;
+            }
 
             MethodDeclarationSyntax result = MethodDeclaration
             (
@@ -76,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
                             case ParameterKind.Out:
                                 modifiers.Add(SyntaxKind.OutKeyword);
                                 break;
-                            case ParameterKind.InOut:
+                            case ParameterKind.Ref:
                                 modifiers.Add(SyntaxKind.RefKeyword);
                                 break;
                             case ParameterKind.Params:
@@ -147,7 +157,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 refKindKeyword: Token(SyntaxKind.OutKeyword)
                             ),
-                            ParameterKind.InOut => arg.WithRefKindKeyword
+                            ParameterKind.Ref => arg.WithRefKindKeyword
                             (
                                 refKindKeyword: Token(SyntaxKind.RefKeyword)
                             ),

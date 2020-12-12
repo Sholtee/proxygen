@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsParams => ParameterKind.Params,
             _ when src.RefKind == RefKind.RefReadOnly => ParameterKind.In,
             _ when src.RefKind == RefKind.Out => ParameterKind.Out,
-            _ when src.RefKind == RefKind.Ref => ParameterKind.InOut,
+            _ when src.RefKind == RefKind.Ref => ParameterKind.Ref,
             _ => ParameterKind.None
         };
     }

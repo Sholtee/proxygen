@@ -58,5 +58,6 @@
   - *breaking:* Assembly cache directory can be set from `appname.runtimeconfig.json`
   - *introduced:* Cancellable `TypeGenerator`s
   - *introduced:* Pointer type support
+  - *introduced:* `ref readonly` support
   - *done:* More efficient generated code
   

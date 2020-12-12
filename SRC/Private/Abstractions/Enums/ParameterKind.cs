@@ -9,9 +9,10 @@ namespace Solti.Utils.Proxy.Internals
     public enum ParameterKind
     {
         None,
+        Params,
         In,
         Out,
-        InOut,
-        Params
+        Ref,
+        RefReadonly
     }
 }

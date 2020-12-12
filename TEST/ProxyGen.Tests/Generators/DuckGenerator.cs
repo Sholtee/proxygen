@@ -51,6 +51,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public interface IRef
         {
             ref object Foo(out string para);
+
+            ref readonly object Bar();
         }
 
         public class Ref
@@ -63,6 +65,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
                 return ref FObject;
             }
+
+            public ref readonly object Bar() => ref FObject;
         }
 
         [Test]

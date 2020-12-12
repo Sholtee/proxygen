@@ -11,10 +11,23 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class ParameterInfoExtensions
     {
-        public static ParameterKind GetParameterKind(this ParameterInfo src) 
+        public static ParameterKind GetParameterKind(this ParameterInfo src)
         {
-            if (src.Position == -1) // ne az IsRetVal-t hasznaljuk mert az mindig false (netcore3.0)
-                return src.ParameterType.IsByRef ? ParameterKind.InOut : ParameterKind.Out;
+            //
+            // Visszateresunk van? Vizsgalathoz ne az IsRetVal-t hasznaljuk mert az 
+            // mindig false (netcore3.0)
+            //
+
+            if (src.Position == -1) return src switch
+            {
+                _ when src.ParameterType.IsByRef && IsReadOnly() => ParameterKind.RefReadonly,
+                _ when src.ParameterType.IsByRef => ParameterKind.Ref,
+                _ => ParameterKind.Out
+            };
+
+            //
+            // "Normal" parameterunk van
+            //
 
             if (src.ParameterType.IsByRef)
             {
@@ -22,25 +35,13 @@ namespace Solti.Utils.Proxy.Internals
                 // Innentol "native by ref" (pl. IntPtr) nem jatszik.
                 //
 
-#if NETSTANDARD2_0
-                //
-                // "IsReadOnlyAttribute" csak netstandard2.1-tol kezdve publikus.
-                //
-
-                if (src.IsIn && src.GetCustomAttributes().Any(attr => attr.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute"))
-#else
-                //
-                // "src.IsIn" nem eleg
-                //
-
-                if (src.IsIn && src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() != null)
-#endif
+                if (src.IsIn && IsReadOnly()) // siman src.IsIn nem eleg
                     return ParameterKind.In;
 
                 if (src.IsOut)
                     return ParameterKind.Out;
 
-                return ParameterKind.InOut;
+                return ParameterKind.Ref;
             }
 
             //
@@ -51,6 +52,17 @@ namespace Solti.Utils.Proxy.Internals
                 return ParameterKind.Params;
 
             return ParameterKind.None;
+
+            bool IsReadOnly() =>
+#if NETSTANDARD2_0
+                //
+                // "IsReadOnlyAttribute" csak netstandard2.1-tol kezdve publikus.
+                //
+                src.GetCustomAttributes().Any(attr => attr.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute")
+#else
+                src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() != null
+#endif          
+                ;
         }
     }
 }

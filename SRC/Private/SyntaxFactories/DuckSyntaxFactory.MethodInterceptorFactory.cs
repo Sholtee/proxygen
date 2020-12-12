@@ -106,7 +106,7 @@ namespace Solti.Utils.Proxy.Internals
                             .ToArray()
                     );
 
-                    if (ifaceMethod.ReturnValue.Kind == ParameterKind.InOut) 
+                    if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref) 
                         invocation = RefExpression(invocation);
 
                     yield return DeclareMethod(ifaceMethod, forceInlining: true)

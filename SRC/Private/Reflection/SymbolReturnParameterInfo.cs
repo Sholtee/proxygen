@@ -15,16 +15,19 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo Type { get; }
 
-        private SymbolReturnParameterInfo(ITypeSymbol type, bool refRetVal, Compilation compilation)
+        private SymbolReturnParameterInfo(IMethodSymbol method, Compilation compilation)
         {
-            Kind = refRetVal
-                ? ParameterKind.InOut
-                : ParameterKind.Out;            
+            Kind = method switch 
+            {
+                _ when method.ReturnsByRefReadonly => ParameterKind.RefReadonly,
+                _ when method.ReturnsByRef => ParameterKind.Ref,
+                _ => ParameterKind.Out
+            };
 
-            Type = SymbolTypeInfo.CreateFrom(type, compilation);
+            Type = SymbolTypeInfo.CreateFrom(method.ReturnType, compilation);
         }
 
-        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameterInfo(method.ReturnType, method.ReturnsByRef || method.ReturnsByRefReadonly, compilation);
+        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameterInfo(method, compilation);
 
         public override bool Equals(object obj) => obj is SymbolReturnParameterInfo that && that.Type.Equals(Type);
 
