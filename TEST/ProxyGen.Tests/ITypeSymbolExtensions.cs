@@ -66,6 +66,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(ar.GetFriendlyName(), Is.EqualTo("System.Int32[]"));
         }
 
+        [Test]
+        public void GetFriendlyName_ShouldWorkWithNullables()
+        {
+            CSharpCompilation compilation = CreateCompilation(string.Empty);
+
+            INamedTypeSymbol nullable = compilation.GetSpecialType(SpecialType.System_Nullable_T).Construct(compilation.GetSpecialType(SpecialType.System_Int32));
+
+            Assert.That(nullable.GetFriendlyName(), Is.EqualTo("System.Nullable"));
+        }
+
         private class Nested { }
 
         private class NestedGeneric<T> 

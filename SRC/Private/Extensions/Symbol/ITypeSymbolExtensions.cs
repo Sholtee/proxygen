@@ -21,6 +21,7 @@ namespace Solti.Utils.Proxy.Internals
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
             _ when src.IsTupleType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen
+            _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
             _ when src.IsNested() => src.ToDisplayString
             (
                 new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)
@@ -30,6 +31,8 @@ namespace Solti.Utils.Proxy.Internals
                 new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
             )
         };
+
+        public static bool IsBoundNullable(this INamedTypeSymbol src) => src.ConstructedFrom?.SpecialType == SpecialType.System_Nullable_T && !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
 
         public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.IsUnboundGenericType;
 /*
@@ -164,8 +167,8 @@ namespace Solti.Utils.Proxy.Internals
             static string GetName(ITypeSymbol type) 
             {
                 string name = !string.IsNullOrEmpty(type.Name)
-                    ? type.Name // tupple eseten is helyes nevet ad vissza
-                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly));
+                    ? type.Name // tupple es nullable eseten is helyes nevet ad vissza
+                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)); // "atlagos" tipusoknal a nev ures
 
                 return type is INamedTypeSymbol named && named.TypeArguments.Any() // ne IsGenericType legyen
                     ? $"{name}`{named.Arity}"
