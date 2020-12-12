@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<IConstructorInfo> ctors = src.Constructors.Where(ctor => ctor.AccessModifiers == AccessModifiers.Public);
 
             if (!ctors.Any())
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src));
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.FullName));
 
             return ctors;
         }
