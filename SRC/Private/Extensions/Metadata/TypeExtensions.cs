@@ -25,9 +25,27 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this Type src)
         {
+            if (src.IsByRef)
+                src = src.GetElementType(recurse: true)!;
+
             Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition || !src.GetOwnGenericArguments().Any());
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
         }
+
+        public static Type? GetElementType(this Type src, bool recurse) 
+        {
+            Type? prev = null;
+
+            for (Type? current = src; (current = current.GetElementType()) != null;)
+            {
+                if (!recurse) return current;
+                prev = current;
+            }
+
+            return prev;
+        }
+
+        public static bool IsGenericParameter(this Type src) => (src.GetElementType(recurse: true) ?? src).IsGenericParameter;
 
         public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false, bool includeStatic = false) where TMember : MemberInfo
         {

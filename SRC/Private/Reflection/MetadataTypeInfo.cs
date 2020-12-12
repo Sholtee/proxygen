@@ -88,12 +88,14 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
             .Select(MetadataPropertyInfo.CreateFrom)
             .ToArray();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
@@ -101,18 +103,19 @@ namespace Solti.Utils.Proxy.Internals
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
         //
 
-        private static readonly IReadOnlyList<string> MethodsToSkip = new[] 
+        private static readonly IReadOnlyList<Func<MethodInfo, bool>> MethodsToSkip = new Func<MethodInfo, bool>[] 
         {
-            "Finalize", // destructor
-            "Get", // = array[i]
-            "Set", // array[i] =
-            "Address" // = ref array[i]
+            m => m.Name == "Finalize", // destructor
+            m => m.DeclaringType.IsArray && m.Name == "Get", // = array[i]
+            m => m.DeclaringType.IsArray && m.Name == "Set", // array[i] =
+            m => m.DeclaringType.IsArray && m.Name == "Address", // = ref array[i]
+            m => typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke" // delegate.Invoke(...)
         };
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Contains(m.Name))
+            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Any(skip => skip(m)))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 
@@ -131,7 +134,7 @@ namespace Solti.Utils.Proxy.Internals
             ? $"{FullName}, {UnderlyingType.Assembly}"
             : null;
 
-        public bool IsGenericParameter => UnderlyingType.IsGenericParameter;
+        public bool IsGenericParameter => UnderlyingType.IsGenericParameter();
 
         public string? FullName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType)
             .FullName

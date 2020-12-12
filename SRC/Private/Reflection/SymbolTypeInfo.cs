@@ -106,12 +106,24 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             .ListMembers<IPropertySymbol>(includeNonPublic: UnderlyingSymbol is not IArrayTypeSymbol /*explicit*/, includeStatic: true)
+
+            //
+            // Teljesen privat property-ke nem jatszanak.
+            //
+
+            .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private /*NULL-t is kizarja*/ || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListMembers<IEventSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
+
+            //
+            // Teljesen privat esemenyek nem jatszanak.
+            //
+
+            .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
             .ToArray();
 
