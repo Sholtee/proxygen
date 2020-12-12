@@ -13,11 +13,17 @@ namespace Solti.Utils.Proxy.Internals
     {
         private PropertyInfo UnderLyingProperty { get; }
 
+        //
+        // Privat property metodusok leszarmazott tipusban nem lathatok
+        //
+
+        private PropertyInfo Declaration => UnderLyingProperty.DeclaringType.GetProperty(UnderLyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderLyingProperty.CanRead ? MetadataMethodInfo.CreateFrom(UnderLyingProperty.GetMethod) : null;
+        public IMethodInfo? GetMethod => FGetMethod ??= Declaration.GetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.GetMethod) : null;
 
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderLyingProperty.CanWrite ? MetadataMethodInfo.CreateFrom(UnderLyingProperty.SetMethod) : null;
+        public IMethodInfo? SetMethod => FSetMethod ??= Declaration.SetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.SetMethod) : null;
 
         public string Name => UnderLyingProperty.StrippedName();
 
