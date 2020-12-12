@@ -136,8 +136,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsGenericParameter => UnderlyingType.IsGenericParameter();
 
-        public string? FullName => (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType)
-            .FullName
+        public string? FullName => UnderlyingType
+            .GetFullName()
             ?.TrimEnd('&'); // FIXME: ez nem kene de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
 
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo

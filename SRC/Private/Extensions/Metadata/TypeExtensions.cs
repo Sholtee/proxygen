@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -28,8 +27,21 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsByRef)
                 src = src.GetElementType(recurse: true)!;
 
-            Debug.Assert(!src.IsGenericType || src.IsGenericTypeDefinition || !src.GetOwnGenericArguments().Any());
+            if (src.IsGenericType)
+                src = src.GetGenericTypeDefinition();
+
             return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
+        }
+
+        public static string? GetFullName(this Type src) 
+        {
+            if (src.IsByRef)
+                src = src.GetElementType(recurse: true)!;
+
+            if (src.IsGenericType)
+                src = src.GetGenericTypeDefinition();
+
+            return src.FullName;
         }
 
         public static Type? GetElementType(this Type src, bool recurse) 
