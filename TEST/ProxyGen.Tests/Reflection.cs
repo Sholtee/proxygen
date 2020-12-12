@@ -112,7 +112,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
                     .OrderBy(m => m.Name)
                     .ThenBy(m => m.AccessModifiers)
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
+                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)))
+                    .ThenBy(m => m.ReturnValue?.Type.Name);
             }
 
             void AssertEqualsA(IAssemblyInfo a1, IAssemblyInfo a2) 
@@ -243,7 +244,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [TestCaseSource(nameof(SystemTypes))]
-        public void TypeInfo_AbstractionTestAgainstSystemTypes(Type t) => TypeInfo_AbstractionTest(t);
+        public void TypeInfo_AbstractionTestAgainstSystemType(Type t) => TypeInfo_AbstractionTest(t);
 
         public class NestedGeneric<T>
         {

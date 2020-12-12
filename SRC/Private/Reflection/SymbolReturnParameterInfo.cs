@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             Type = SymbolTypeInfo.CreateFrom(type, compilation);
         }
 
-        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameterInfo(method.ReturnType, method.ReturnsByRef, compilation);
+        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameterInfo(method.ReturnType, method.ReturnsByRef || method.ReturnsByRefReadonly, compilation);
 
         public override bool Equals(object obj) => obj is SymbolReturnParameterInfo that && that.Type.Equals(Type);
 
