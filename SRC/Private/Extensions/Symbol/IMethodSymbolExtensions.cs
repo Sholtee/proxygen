@@ -46,7 +46,8 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Constructor, MethodKind.StaticConstructor,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
-            MethodKind.UserDefinedOperator
+            MethodKind.UserDefinedOperator,
+            MethodKind.Conversion // explicit, implicit
         };
 
         public static bool IsSpecial(this IMethodSymbol src) // slow
@@ -56,5 +57,17 @@ namespace Solti.Utils.Proxy.Internals
 
             return SpecialMethods.Contains(src.MethodKind);
         }
+
+        private static readonly IReadOnlyList<MethodKind> ClassMethods = new[]
+        {
+            MethodKind.Ordinary,
+            MethodKind.ExplicitInterfaceImplementation,
+            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
+            MethodKind.PropertyGet, MethodKind.PropertySet,
+            MethodKind.UserDefinedOperator,
+            MethodKind.Conversion // explicit, implicit
+        };
+
+        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
     }
 }

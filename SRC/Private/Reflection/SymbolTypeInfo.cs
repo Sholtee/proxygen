@@ -127,19 +127,10 @@ namespace Solti.Utils.Proxy.Internals
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
             .ToArray();
 
-        private static readonly IReadOnlyList<MethodKind> RegularMethods = new[] 
-        {
-            MethodKind.Ordinary,
-            MethodKind.ExplicitInterfaceImplementation,
-            MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
-            MethodKind.PropertyGet, MethodKind.PropertySet,
-            MethodKind.UserDefinedOperator
-        };
-
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMembers<IMethodSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(m => RegularMethods.Contains(m.MethodKind) && m.GetAccessModifiers() != AccessModifiers.Private)
+            .Where(m => m.IsClassMethod() && m.GetAccessModifiers() != AccessModifiers.Private)
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 
