@@ -58,6 +58,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(NestedGeneric<List<string>>), 
             typeof(InterfaceInterceptor<>), 
             typeof(Generators.ProxyGenerator<,>), 
+            typeof(System.ComponentModel.Component), // van esemenye
             typeof(DuckBase<>), 
             typeof(HasInternal))] Type type) 
         {
@@ -105,7 +106,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
                 AssertSequenceEqualsM(OrderMethods(type1.Constructors).ToArray(), OrderMethods(type2.Constructors).ToArray());
                 AssertSequenceEqualsM(OrderMethods(type1.Methods).ToArray(), OrderMethods(type2.Methods).ToArray());
-                AssertSequenceEqualsPr(type1.Properties.OrderBy(i => i.Name).ToArray(), type2.Properties.OrderBy(i => i.Name).ToArray());
+                AssertSequenceEqualsPr(type1.Properties.OrderBy(p => p.Name).ToArray(), type2.Properties.OrderBy(p => p.Name).ToArray());
+                AssertSequenceEqualsE(type1.Events.OrderBy(e => e.Name).ToArray(), type2.Events.OrderBy(e => e.Name).ToArray());
 
                 IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
                     .OrderBy(m => m.Name)
@@ -167,6 +169,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertEqualsM(p1.SetMethod, p2.SetMethod);
             }
 
+            void AssertEqualsE(IEventInfo e1, IEventInfo e2)
+            {
+                if (e1 == null || e2 == null)
+                {
+                    Assert.AreSame(e1, e2);
+                    return;
+                }
+
+                Assert.AreEqual(e1.Name, e2.Name);
+                Assert.AreEqual(e1.IsStatic, e2.IsStatic);
+
+                AssertEqualsT(e1.Type, e2.Type);
+                AssertEqualsT(e1.DeclaringType, e2.DeclaringType);
+                AssertEqualsM(e1.AddMethod, e2.AddMethod);
+                AssertEqualsM(e1.RemoveMethod, e2.RemoveMethod);
+            }
+
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
                 Assert.That(l1.Count, Is.EqualTo(l2.Count));
@@ -204,6 +223,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 for (int i = 0; i < l1.Count; i++)
                 {
                     AssertEqualsPr(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsE(IReadOnlyList<IEventInfo> l1, IReadOnlyList<IEventInfo> l2)
+            {
+                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEqualsE(l1[i], l2[i]);
                 }
             }
         }

@@ -109,7 +109,11 @@ namespace Solti.Utils.Proxy.Internals
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
-        public IReadOnlyList<IEventInfo> Events => throw new System.NotImplementedException();
+        private IReadOnlyList<IEventInfo>? FEvents;
+        public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
+            .ListMembers<IEventSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
+            .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
+            .ToArray();
 
         private static readonly IReadOnlyList<MethodKind> RegularMethods = new[] 
         {

@@ -22,34 +22,34 @@ namespace Solti.Utils.Proxy.Internals
 
         private abstract class MetadataMethodBase<T>: IMethodInfo where T: MethodBase
         {
-            protected T UnderLyingMethod { get; }
+            protected T UnderlyingMethod { get; }
 
-            protected MetadataMethodBase(T method) => UnderLyingMethod = method;
+            protected MetadataMethodBase(T method) => UnderlyingMethod = method;
 
             private IReadOnlyList<IParameterInfo>? FParameters;
-            public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderLyingMethod
+            public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingMethod
                 .GetParameters()
                 .Select(MetadataParameterInfo.CreateFrom)
                 .ToArray();
 
             public abstract IParameterInfo ReturnValue { get; }
 
-            public string Name => UnderLyingMethod.StrippedName();
+            public string Name => UnderlyingMethod.StrippedName();
 
             private ITypeInfo? FDeclaringType;
-            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderLyingMethod.GetDeclaringType());
+            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderlyingMethod.GetDeclaringType());
 
-            public bool IsStatic => UnderLyingMethod.IsStatic;
+            public bool IsStatic => UnderlyingMethod.IsStatic;
 
-            public bool IsSpecial => UnderLyingMethod.IsSpecialName;
+            public bool IsSpecial => UnderlyingMethod.IsSpecialName;
 
-            public AccessModifiers AccessModifiers => UnderLyingMethod.GetAccessModifiers();
+            public AccessModifiers AccessModifiers => UnderlyingMethod.GetAccessModifiers();
 
-            public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderLyingMethod.Equals(that.UnderLyingMethod);
+            public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderlyingMethod.Equals(that.UnderlyingMethod);
 
-            public override int GetHashCode() => UnderLyingMethod.GetHashCode();
+            public override int GetHashCode() => UnderlyingMethod.GetHashCode();
 
-            public override string ToString() => UnderLyingMethod.ToString();
+            public override string ToString() => UnderlyingMethod.ToString();
         }
 
         private class MetadataMethodInfoImpl : MetadataMethodBase<MethodInfo>
@@ -57,17 +57,17 @@ namespace Solti.Utils.Proxy.Internals
             public MetadataMethodInfoImpl(MethodInfo method) : base(method) { }
 
             private IParameterInfo? FReturnValue;
-            public override IParameterInfo ReturnValue => FReturnValue ??= MetadataParameterInfo.CreateFrom(UnderLyingMethod.ReturnParameter);
+            public override IParameterInfo ReturnValue => FReturnValue ??= MetadataParameterInfo.CreateFrom(UnderlyingMethod.ReturnParameter);
         }
 
         private sealed class MetadataGenericMethodInfo : MetadataMethodInfoImpl, IGenericMethodInfo
         {
             public MetadataGenericMethodInfo(MethodInfo method) : base(method) { }
 
-            public bool IsGenericDefinition => UnderLyingMethod.IsGenericMethodDefinition;
+            public bool IsGenericDefinition => UnderlyingMethod.IsGenericMethodDefinition;
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderLyingMethod
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingMethod
                 .GetGenericArguments()
                 .Select(MetadataTypeInfo.CreateFrom)
                 .ToArray();
@@ -75,12 +75,12 @@ namespace Solti.Utils.Proxy.Internals
             private IGeneric? FGenericDefinition;
             public IGeneric GenericDefinition => FGenericDefinition ??= new MetadataGenericMethodInfo
             (
-                UnderLyingMethod.GetGenericMethodDefinition()
+                UnderlyingMethod.GetGenericMethodDefinition()
             );
 
             public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericMethodInfo
             (
-                UnderLyingMethod.MakeGenericMethod
+                UnderlyingMethod.MakeGenericMethod
                 (
                     genericArgs
                         .Select(MetadataTypeInfo.TypeInfoToMetadata)

@@ -11,26 +11,26 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal class MetadataAssemblyInfo : IAssemblyInfo
     {
-        private Assembly UnderLyingAssembly { get; }
+        private Assembly UnderlyingAssembly { get; }
 
-        private MetadataAssemblyInfo(Assembly assembly) => UnderLyingAssembly = assembly;
+        private MetadataAssemblyInfo(Assembly assembly) => UnderlyingAssembly = assembly;
 
-        public override bool Equals(object obj) => obj is MetadataAssemblyInfo that && UnderLyingAssembly.Equals(that.UnderLyingAssembly);
+        public override bool Equals(object obj) => obj is MetadataAssemblyInfo that && UnderlyingAssembly.Equals(that.UnderlyingAssembly);
 
-        public override int GetHashCode() => UnderLyingAssembly.GetHashCode();
+        public override int GetHashCode() => UnderlyingAssembly.GetHashCode();
 
-        public override string ToString() => UnderLyingAssembly.ToString();
+        public override string ToString() => UnderlyingAssembly.ToString();
 
         public static IAssemblyInfo CreateFrom(Assembly assembly) => new MetadataAssemblyInfo(assembly);
 
-        public bool IsFriend(string asmName) => UnderLyingAssembly
+        public bool IsFriend(string asmName) => UnderlyingAssembly
             .GetCustomAttributes<InternalsVisibleToAttribute>()
             .Any(ivt => ivt.AssemblyName == asmName);
 
-        public string? Location => UnderLyingAssembly.IsDynamic ? null : UnderLyingAssembly.Location;
+        public string? Location => UnderlyingAssembly.IsDynamic ? null : UnderlyingAssembly.Location;
 
-        public bool IsDynamic => UnderLyingAssembly.IsDynamic;
+        public bool IsDynamic => UnderlyingAssembly.IsDynamic;
 
-        public string Name => UnderLyingAssembly.GetName().ToString();
+        public string Name => UnderlyingAssembly.GetName().ToString();
     }
 }

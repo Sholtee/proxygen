@@ -11,13 +11,13 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal class MetadataPropertyInfo : IPropertyInfo
     {
-        private PropertyInfo UnderLyingProperty { get; }
+        private PropertyInfo UnderlyingProperty { get; }
 
         //
         // Privat property metodusok leszarmazott tipusban nem lathatok
         //
 
-        private PropertyInfo Declaration => UnderLyingProperty.DeclaringType.GetProperty(UnderLyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        private PropertyInfo Declaration => UnderlyingProperty.DeclaringType.GetProperty(UnderlyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         private IMethodInfo? FGetMethod;
         public IMethodInfo? GetMethod => FGetMethod ??= Declaration.GetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.GetMethod) : null;
@@ -25,30 +25,30 @@ namespace Solti.Utils.Proxy.Internals
         private IMethodInfo? FSetMethod;
         public IMethodInfo? SetMethod => FSetMethod ??= Declaration.SetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.SetMethod) : null;
 
-        public string Name => UnderLyingProperty.StrippedName();
+        public string Name => UnderlyingProperty.StrippedName();
 
         private ITypeInfo? FType;
-        public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderLyingProperty.PropertyType);
+        public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingProperty.PropertyType);
 
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
         private IReadOnlyList<IParameterInfo>? FIndices;
-        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderLyingProperty
+        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty
             .GetIndexParameters()
             .Select(MetadataParameterInfo.CreateFrom)
             .ToArray();
 
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 
-        private MetadataPropertyInfo(PropertyInfo prop) => UnderLyingProperty = prop;
+        private MetadataPropertyInfo(PropertyInfo prop) => UnderlyingProperty = prop;
 
         public static IPropertyInfo CreateFrom(PropertyInfo prop) => new MetadataPropertyInfo(prop);
 
-        public override bool Equals(object obj) => obj is MetadataPropertyInfo that && UnderLyingProperty.Equals(that.UnderLyingProperty);
+        public override bool Equals(object obj) => obj is MetadataPropertyInfo that && UnderlyingProperty.Equals(that.UnderlyingProperty);
 
-        public override int GetHashCode() => UnderLyingProperty.GetHashCode();
+        public override int GetHashCode() => UnderlyingProperty.GetHashCode();
 
-        public override string ToString() => UnderLyingProperty.ToString();
+        public override string ToString() => UnderlyingProperty.ToString();
     }
 }
