@@ -103,11 +103,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertSequenceEqualsT(type1.Bases, type2.Bases);
                 AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
                 AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
+                AssertSequenceEqualsM(OrderMethods(type1.Constructors).ToArray(), OrderMethods(type2.Constructors).ToArray());
                 AssertSequenceEqualsM(OrderMethods(type1.Methods).ToArray(), OrderMethods(type2.Methods).ToArray());
                 AssertSequenceEqualsPr(type1.Properties.OrderBy(i => i.Name).ToArray(), type2.Properties.OrderBy(i => i.Name).ToArray());
 
                 IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
                     .OrderBy(m => m.Name)
+                    .ThenBy(m => m.AccessModifiers)
                     .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
             }
 

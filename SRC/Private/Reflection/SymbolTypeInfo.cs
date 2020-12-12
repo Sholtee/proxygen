@@ -111,7 +111,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public IReadOnlyList<IEventInfo> Events => throw new System.NotImplementedException();
 
-        private static readonly MethodKind[] RegularMethods = new[] 
+        private static readonly IReadOnlyList<MethodKind> RegularMethods = new[] 
         {
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
@@ -127,7 +127,23 @@ namespace Solti.Utils.Proxy.Internals
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 
-        public IReadOnlyList<IConstructorInfo> Constructors => throw new System.NotImplementedException();
+        private static readonly IReadOnlyList<MethodKind> Ctors = new[] 
+        {
+            MethodKind.Constructor, MethodKind.StaticConstructor
+        };
+
+        private IReadOnlyList<IConstructorInfo>? FConstructors;
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingTypeSymbol
+            //
+            // Ne ListMembers()-t hasznaljunk mert az osok konstruktoraira nincs
+            // szukseg (kiveve parameter nelkuli amennyiben az osben nincs felulirva)
+            //
+
+            .GetMembers()
+            .OfType<IMethodSymbol>()
+            .Where(m => Ctors.Contains(m.MethodKind) && m.GetAccessModifiers() != AccessModifiers.Private && !m.IsImplicitlyDeclared)
+            .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
+            .ToArray();
 
         public string Name => UnderlyingTypeSymbol.GetFriendlyName();
 

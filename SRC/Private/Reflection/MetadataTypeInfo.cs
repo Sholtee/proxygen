@@ -99,7 +99,7 @@ namespace Solti.Utils.Proxy.Internals
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
         //
 
-        private static readonly string[] MethodsToSkip = new[] 
+        private static readonly IReadOnlyList<string> MethodsToSkip = new[] 
         {
             "Finalize", // destructor
             "Get", // = array[i]
@@ -115,11 +115,15 @@ namespace Solti.Utils.Proxy.Internals
             .ToArray();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
-        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
-            .GetPublicConstructors()
-            .Select(MetadataMethodInfo.CreateFrom)
-            .Cast<IConstructorInfo>()
-            .ToArray();
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= 
+            UnderlyingType.IsArray
+                ? Array.Empty<IConstructorInfo>() // tomb egy geci specialis allatfaj: fordito generalja hozza a konstruktorokat -> futas idoben mar leteznek forditaskor meg nem
+                : UnderlyingType
+                    .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                    .Where(ctor => ctor.GetAccessModifiers() != AccessModifiers.Private)
+                    .Select(MetadataMethodInfo.CreateFrom)
+                    .Cast<IConstructorInfo>()
+                    .ToArray();
 
         public string? AssemblyQualifiedName => FullName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{FullName}, {UnderlyingType.Assembly}"

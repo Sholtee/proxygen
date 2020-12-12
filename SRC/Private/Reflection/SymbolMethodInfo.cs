@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolMethodInfo : IMethodInfo
+    internal class SymbolMethodInfo : IMethodInfo, IConstructorInfo
     {
         private IMethodSymbol UnderlyingSymbol { get; }
 

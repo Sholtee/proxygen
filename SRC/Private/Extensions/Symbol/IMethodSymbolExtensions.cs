@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -40,8 +41,9 @@ namespace Solti.Utils.Proxy.Internals
                     SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), src));
         }
 
-        private static readonly MethodKind[] SpecialMethods = new[]
+        private static readonly IReadOnlyList<MethodKind> SpecialMethods = new[]
         {
+            MethodKind.Constructor, MethodKind.StaticConstructor,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
             MethodKind.UserDefinedOperator
