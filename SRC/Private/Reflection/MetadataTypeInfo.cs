@@ -27,6 +27,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public override int GetHashCode() => UnderlyingType.GetHashCode();
 
+        public override string ToString() => UnderlyingType.ToString();
+
         private IAssemblyInfo? FDeclaringAssembly;
         public IAssemblyInfo DeclaringAssembly => FDeclaringAssembly ??= MetadataAssemblyInfo.CreateFrom(UnderlyingType.Assembly);
 

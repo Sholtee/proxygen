@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private IParameterInfo? FReturnValue;
         public IParameterInfo ReturnValue => FReturnValue ??= UnderlyingSymbol.MethodKind != MethodKind.Constructor
-            ? SymbolReturnParameter.CreateFrom(UnderlyingSymbol, Compilation)
+            ? SymbolReturnParameterInfo.CreateFrom(UnderlyingSymbol, Compilation)
             : null!;
 
         private bool? FIsSpecial;
@@ -46,5 +46,11 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
         public string Name => UnderlyingSymbol.StrippedName();
+
+        public override bool Equals(object obj) => obj is SymbolMethodInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
+
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
+
+        public override string ToString() => UnderlyingSymbol.ToString();
     }
 }

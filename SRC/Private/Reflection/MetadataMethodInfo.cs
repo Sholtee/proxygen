@@ -48,6 +48,8 @@ namespace Solti.Utils.Proxy.Internals
             public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderLyingMethod.Equals(that.UnderLyingMethod);
 
             public override int GetHashCode() => UnderLyingMethod.GetHashCode();
+
+            public override string ToString() => UnderLyingMethod.ToString();
         }
 
         private class MetadataMethodInfoImpl : MetadataMethodBase<MethodInfo>

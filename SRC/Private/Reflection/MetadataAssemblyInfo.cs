@@ -19,6 +19,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public override int GetHashCode() => UnderLyingAssembly.GetHashCode();
 
+        public override string ToString() => UnderLyingAssembly.ToString();
+
         public static IAssemblyInfo CreateFrom(Assembly assembly) => new MetadataAssemblyInfo(assembly);
 
         public bool IsFriend(string asmName) => UnderLyingAssembly

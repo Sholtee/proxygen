@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* SymbolReturnParameter.cs                                                      *
+* SymbolReturnParameterInfo.cs.cs                                               *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolReturnParameter : IParameterInfo 
+    internal class SymbolReturnParameterInfo : IParameterInfo 
     {
         public ParameterKind Kind { get; }
 
@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo Type { get; }
 
-        private SymbolReturnParameter(ITypeSymbol type, bool refRetVal, Compilation compilation)
+        private SymbolReturnParameterInfo(ITypeSymbol type, bool refRetVal, Compilation compilation)
         {
             Kind = refRetVal
                 ? ParameterKind.InOut
@@ -24,6 +24,12 @@ namespace Solti.Utils.Proxy.Internals
             Type = SymbolTypeInfo.CreateFrom(type, compilation);
         }
 
-        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameter(method.ReturnType, method.ReturnsByRef, compilation);
+        public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolReturnParameterInfo(method.ReturnType, method.ReturnsByRef, compilation);
+
+        public override bool Equals(object obj) => obj is SymbolReturnParameterInfo that && that.Type.Equals(Type);
+
+        public override int GetHashCode() => new { Type, Kind }.GetHashCode();
+
+        public override string ToString() => $"{Type}&";
     }
 }

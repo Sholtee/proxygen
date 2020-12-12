@@ -15,13 +15,13 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class SymbolTypeInfo : ITypeInfo
     {
-        protected ITypeSymbol UnderlyingTypeSymbol { get; }
+        protected ITypeSymbol UnderlyingSymbol { get; }
 
         protected Compilation Compilation { get; }
 
         private SymbolTypeInfo(ITypeSymbol typeSymbol, Compilation compilation)
         {
-            UnderlyingTypeSymbol = typeSymbol;
+            UnderlyingSymbol = typeSymbol;
             Compilation = compilation;
         }
         public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation) => typeSymbol switch
@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (FDeclaringAssembly is null)
                 {
-                    IAssemblySymbol? asm = UnderlyingTypeSymbol.GetElementType(recurse: true)?.ContainingAssembly ?? UnderlyingTypeSymbol.ContainingAssembly;
+                    IAssemblySymbol? asm = UnderlyingSymbol.GetElementType(recurse: true)?.ContainingAssembly ?? UnderlyingSymbol.ContainingAssembly;
                     if (asm != null) 
                         FDeclaringAssembly = SymbolAssemblyInfo.CreateFrom(asm, Compilation);
                 }
@@ -46,23 +46,23 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public bool IsVoid => UnderlyingTypeSymbol.SpecialType == SpecialType.System_Void;
+        public bool IsVoid => UnderlyingSymbol.SpecialType == SpecialType.System_Void;
 
-        public RefType RefType => UnderlyingTypeSymbol switch
+        public RefType RefType => UnderlyingSymbol switch
         {
             IPointerTypeSymbol => RefType.Pointer,
             _ => RefType.None
         };
 
-        public bool IsNested => UnderlyingTypeSymbol.IsNested();
+        public bool IsNested => UnderlyingSymbol.IsNested();
 
-        public bool IsGenericParameter => UnderlyingTypeSymbol.IsGenericParameter();
+        public bool IsGenericParameter => UnderlyingSymbol.IsGenericParameter();
 
-        public bool IsInterface => UnderlyingTypeSymbol.IsInterface();
+        public bool IsInterface => UnderlyingSymbol.IsInterface();
 
-        public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingTypeSymbol.GetAssemblyQualifiedName() : null;
+        public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetAssemblyQualifiedName() : null;
 
-        public string? FullName => !IsGenericParameter ? UnderlyingTypeSymbol.GetQualifiedMetadataName() : null;
+        public string? FullName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
 
         private ITypeInfo? FElementType;
         public ITypeInfo? ElementType
@@ -71,7 +71,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (FElementType == null)
                 {
-                    ITypeSymbol? realType = UnderlyingTypeSymbol.GetElementType();
+                    ITypeSymbol? realType = UnderlyingSymbol.GetElementType();
 
                     if (realType != null)
                         FElementType = CreateFrom(realType, Compilation);
@@ -81,31 +81,31 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<ITypeInfo>? FEnclosingTypes;
-        public IReadOnlyList<ITypeInfo> EnclosingTypes => FEnclosingTypes ??= UnderlyingTypeSymbol
+        public IReadOnlyList<ITypeInfo> EnclosingTypes => FEnclosingTypes ??= UnderlyingSymbol
             .GetEnclosingTypes()
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
-        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingTypeSymbol
+        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .AllInterfaces
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 
         private IReadOnlyList<ITypeInfo>? FBases;
-        public IReadOnlyList<ITypeInfo> Bases => FBases ??= UnderlyingTypeSymbol
+        public IReadOnlyList<ITypeInfo> Bases => FBases ??= UnderlyingSymbol
             .GetBaseTypes()
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
-        public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingTypeSymbol
+        public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             //
             // Tomboknel az explicit interfacek implementaciok nem jatszanak 
             // (reflexio nem adja oket vissza, GetInterfaceMap() kivetelt dob).
             //
 
-            .ListMembers<IPropertySymbol>(includeNonPublic: UnderlyingTypeSymbol is not IArrayTypeSymbol /*explicit*/, includeStatic: true)
+            .ListMembers<IPropertySymbol>(includeNonPublic: UnderlyingSymbol is not IArrayTypeSymbol /*explicit*/, includeStatic: true)
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
@@ -121,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
         };
 
         private IReadOnlyList<IMethodInfo>? FMethods;
-        public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingTypeSymbol
+        public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMembers<IMethodSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(m => RegularMethods.Contains(m.MethodKind) && m.GetAccessModifiers() != AccessModifiers.Private)
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
@@ -133,7 +133,7 @@ namespace Solti.Utils.Proxy.Internals
         };
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
-        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingTypeSymbol
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             //
             // Ne ListMembers()-t hasznaljunk mert az osok konstruktoraira nincs
             // szukseg (kiveve parameter nelkuli amennyiben az osben nincs felulirva)
@@ -145,36 +145,38 @@ namespace Solti.Utils.Proxy.Internals
             .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 
-        public string Name => UnderlyingTypeSymbol.GetFriendlyName();
+        public string Name => UnderlyingSymbol.GetFriendlyName();
 
-        public override bool Equals(object obj) => obj is SymbolTypeInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingTypeSymbol, that.UnderlyingTypeSymbol);
+        public override bool Equals(object obj) => obj is SymbolTypeInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, that.UnderlyingSymbol);
 
-        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingTypeSymbol);
+        public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
+
+        public override string ToString() => UnderlyingSymbol.ToString();
 
         private sealed class SymbolGenericTypeInfo : SymbolTypeInfo, IGenericTypeInfo
         {
-            private new INamedTypeSymbol UnderlyingTypeSymbol => (INamedTypeSymbol) base.UnderlyingTypeSymbol;
+            private new INamedTypeSymbol UnderlyingSymbol => (INamedTypeSymbol) base.UnderlyingSymbol;
 
             public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
-            public bool IsGenericDefinition => UnderlyingTypeSymbol.IsUnboundGenericType;
+            public bool IsGenericDefinition => UnderlyingSymbol.IsUnboundGenericType;
 
             private IGeneric? FGenericDefinition;
-            public IGeneric GenericDefinition => FGenericDefinition ??= (IGeneric) CreateFrom(UnderlyingTypeSymbol.OriginalDefinition, Compilation);
+            public IGeneric GenericDefinition => FGenericDefinition ??= (IGeneric) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingTypeSymbol
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
                 .Select(ti => CreateFrom(ti, Compilation))
                 .ToArray();
 
             public IGeneric Close(params ITypeInfo[] genericArgs)
             {
-                if (UnderlyingTypeSymbol.ContainingType is not null) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
+                if (UnderlyingSymbol.ContainingType is not null) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
 
                 return (IGeneric) CreateFrom
                 (
-                    UnderlyingTypeSymbol.Construct
+                    UnderlyingSymbol.Construct
                     (
                         genericArgs.Select(ga => TypeInfoToSymbol(ga, Compilation)).ToArray()
                     ),
@@ -233,7 +235,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             public SymbolArrayTypeInfo(IArrayTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
-            public int Rank => ((IArrayTypeSymbol) UnderlyingTypeSymbol).Rank;
+            public int Rank => ((IArrayTypeSymbol) UnderlyingSymbol).Rank;
         }
     }
 }

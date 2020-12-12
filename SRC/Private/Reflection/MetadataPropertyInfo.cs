@@ -48,5 +48,7 @@ namespace Solti.Utils.Proxy.Internals
         public override bool Equals(object obj) => obj is MetadataPropertyInfo that && UnderLyingProperty.Equals(that.UnderLyingProperty);
 
         public override int GetHashCode() => UnderLyingProperty.GetHashCode();
+
+        public override string ToString() => UnderLyingProperty.ToString();
     }
 }

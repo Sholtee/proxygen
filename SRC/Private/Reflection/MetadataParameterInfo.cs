@@ -25,5 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         public override bool Equals(object obj) => obj is MetadataParameterInfo that && UnderLyingParameter.Equals(that.UnderLyingParameter);
 
         public override int GetHashCode() => UnderLyingParameter.GetHashCode();
+
+        public override string ToString() => UnderLyingParameter.ToString();
     }
 }

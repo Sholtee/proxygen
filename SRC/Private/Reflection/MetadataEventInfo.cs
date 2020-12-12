@@ -34,5 +34,7 @@ namespace Solti.Utils.Proxy.Internals
         public override bool Equals(object obj) => obj is MetadataEventInfo that && UnderLyingEvent.Equals(that.UnderLyingEvent);
 
         public override int GetHashCode() => UnderLyingEvent.GetHashCode();
+
+        public override string ToString() => UnderLyingEvent.ToString();
     }
 }

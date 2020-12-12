@@ -31,5 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         public override bool Equals(object obj) => obj is SymbolParameterInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, that.UnderlyingSymbol);
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
+
+        public override string ToString() => UnderlyingSymbol.ToString();
     }
 }
