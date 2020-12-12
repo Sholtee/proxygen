@@ -107,20 +107,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
-            if (src.HasGenericParameterElement()) return null;
+            string? metadataName = src.GetQualifiedMetadataName();
+            if (metadataName is null) return null;
 
-            IAssemblySymbol? containingAsm = src switch
-            {
-                _ when src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType(recurse: true)!.ContainingAssembly, // tombnek nincs tartalmazo szerelvenye forditaskor
-                _ => src.ContainingAssembly,
-            };
+            IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly /* tombnek nincs tartalmazo szerelvenye forditaskor */ ?? src.ContainingAssembly;
+            if (containingAsm is null) return null;
 
-            return containingAsm is null
-                ? null
-                : $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
+            return $"{metadataName}, {containingAsm.Identity}";
         }
-
-        private static bool HasGenericParameterElement(this ITypeSymbol src) => src.GetElementType(recurse: true)?.IsGenericParameter() == true;
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
@@ -139,15 +133,25 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
-            if (src.HasGenericParameterElement()) return null;
+            ITypeSymbol? elementType = src.GetElementType(recurse: true);
 
-            INamespaceSymbol? ns = src switch
-            {
-                _ when  src is IArrayTypeSymbol || src is IPointerTypeSymbol => src.GetElementType(recurse: true)!.ContainingNamespace, // tombnek nincs tartalmazo nevtere forditaskor
-                _ => src.ContainingNamespace
-            };
+            //
+            // Specialis eset h reflexiohoz hasonloan mukodjunk:
+            //
+            // class Generic<T>
+            // {
+            //    void Foo(List<T>[] para) {}
+            // }
+            //
+            // Ez esetben "para" tipus-neve NULL kell legyen
+            //
+
+            if (elementType?.IsGenericParameter() == true || (elementType is INamedTypeSymbol namedElement && namedElement.TypeArguments.Any(IsGenericParameter))) 
+                return null;
 
             var sb = new StringBuilder();
+
+            INamespaceSymbol? ns = elementType?.ContainingNamespace ?? src.ContainingNamespace;  // tombnek, mutatonak nincs tartalmazo nevtere forditaskor
 
             if (ns is not null && !ns.IsGlobalNamespace)
             {
