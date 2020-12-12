@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 Members = Context
                     .BaseType
-                    .Constructors
+                    .GetPublicConstructors()
                     .Select(ctor => DeclareCtor(ctor, Context.ClassName))
                     .ToArray();
 

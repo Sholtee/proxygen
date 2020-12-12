@@ -12,8 +12,6 @@ using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal static partial class TypeExtensions
     {
         //
@@ -115,15 +113,6 @@ namespace Solti.Utils.Proxy.Internals
                     }
                 if (own) yield return closedArgs[i];
             } 
-        }
-
-        public static IEnumerable<ConstructorInfo> GetPublicConstructors(this Type src) 
-        {
-            ConstructorInfo[] constructors = src.GetConstructors();
-            if (!constructors.Any())
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src));
-
-            return constructors;
         }
     }
 }

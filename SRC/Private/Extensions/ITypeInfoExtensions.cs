@@ -4,12 +4,16 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal static class ITypeInfoExtensions
     {
         //
@@ -53,6 +57,16 @@ namespace Solti.Utils.Proxy.Internals
                         Hash(ga, transform);
                     }
             }
+        }
+
+        public static IEnumerable<IConstructorInfo> GetPublicConstructors(this ITypeInfo src)
+        {
+            IEnumerable<IConstructorInfo> ctors = src.Constructors.Where(ctor => ctor.AccessModifiers == AccessModifiers.Public);
+
+            if (!ctors.Any())
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src));
+
+            return ctors;
         }
     }
 }
