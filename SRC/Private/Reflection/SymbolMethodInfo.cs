@@ -43,6 +43,12 @@ namespace Solti.Utils.Proxy.Internals
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
+        private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
+        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol
+            .GetDeclaringInterfaces()
+            .Select(di => SymbolTypeInfo.CreateFrom(di, Compilation))
+            .ToArray();
+
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
         public string Name => UnderlyingSymbol.StrippedName();

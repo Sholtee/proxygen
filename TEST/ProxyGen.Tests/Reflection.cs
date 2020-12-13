@@ -104,16 +104,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertSequenceEqualsT(type1.Bases, type2.Bases);
                 AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
                 AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
-                AssertSequenceEqualsM(OrderMethods(type1.Constructors).ToArray(), OrderMethods(type2.Constructors).ToArray());
-                AssertSequenceEqualsM(OrderMethods(type1.Methods).ToArray(), OrderMethods(type2.Methods).ToArray());
-                AssertSequenceEqualsPr(type1.Properties.OrderBy(p => p.Name).ToArray(), type2.Properties.OrderBy(p => p.Name).ToArray());
+                AssertSequenceEqualsM(OrderCtors(type1).ToArray(), OrderCtors(type2).ToArray());
+                AssertSequenceEqualsM(OrderMethods(type1).ToArray(), OrderMethods(type2).ToArray());
+                AssertSequenceEqualsPr(OrderProperties(type1).ToArray(), OrderProperties(type2).ToArray());
                 AssertSequenceEqualsE(type1.Events.OrderBy(e => e.Name).ToArray(), type2.Events.OrderBy(e => e.Name).ToArray());
 
-                IEnumerable<IMethodInfo> OrderMethods(IEnumerable<IMethodInfo> methods) => methods
+                IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
+                    .Constructors
+                    .OrderBy(m => m.AccessModifiers)
+                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
+
+                IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
+                    .Methods
                     .OrderBy(m => m.Name)
                     .ThenBy(m => m.AccessModifiers)
                     .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)))
                     .ThenBy(m => m.ReturnValue?.Type.Name);
+
+                IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
+                    .Properties
+                    .OrderBy(p => p.Name)
+                    .ThenBy(p => p.DeclaringType.Name);
             }
 
             void AssertEqualsA(IAssemblyInfo a1, IAssemblyInfo a2) 
@@ -148,6 +159,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
+                AssertSequenceEqualsT(m1.DeclaringInterfaces, m2.DeclaringInterfaces);
                 AssertSequenceEqualsP(m1.Parameters, m2.Parameters);
                 AssertEqualsMP(m1.ReturnValue, m2.ReturnValue);
             }

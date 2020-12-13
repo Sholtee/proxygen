@@ -11,6 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     public interface IMethodInfo: IMemberInfo
     {
         IReadOnlyList<IParameterInfo> Parameters { get; }
+        IReadOnlyList<ITypeInfo> DeclaringInterfaces { get; }
         IParameterInfo ReturnValue { get; }
         bool IsSpecial { get; }
         AccessModifiers AccessModifiers { get; }

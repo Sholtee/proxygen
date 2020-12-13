@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
                         ifaceProperty,
                         MemberAccess(null, TARGET),
                         castTargetTo: accessor.AccessModifiers == AccessModifiers.Explicit
-                            ? accessor.DeclaringType
+                            ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
                             : null
                     );
 

@@ -21,14 +21,18 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.Internal => AccessModifiers.Internal,
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
             Accessibility.Public => AccessModifiers.Public,
-            Accessibility.Private when src.GetDeclaringType().IsInterface() => AccessModifiers.Explicit,
+            Accessibility.Private when src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 
-        public static INamedTypeSymbol GetDeclaringType(this IMethodSymbol src) => (src.GetImplementedInterfacceMethod() ?? src).ContainingType;
+        public static IEnumerable<INamedTypeSymbol> GetDeclaringInterfaces(this IMethodSymbol src) => src.ContainingType.IsInterface()
+            ? Array.Empty<INamedTypeSymbol>()
+            : src
+                .GetImplementedInterfaceMethods()
+                .Select(m => m.ContainingType);
 
-        public static IMethodSymbol? GetImplementedInterfacceMethod(this IMethodSymbol src)
+        public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src)
         {
             INamedTypeSymbol containingType = src.ContainingType;
 
@@ -37,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals
                 .SelectMany(@interface => @interface
                     .GetMembers()
                     .OfType<IMethodSymbol>())
-                .SingleOrDefault(interfaceMethod => 
+                .Where(interfaceMethod => 
                     SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), src));
         }
 
@@ -53,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
             if (src.MethodKind == MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
-                src = src.GetImplementedInterfacceMethod()!;
+                src = src.GetImplementedInterfaceMethods().Single();
 
             return SpecialMethods.Contains(src.MethodKind);
         }

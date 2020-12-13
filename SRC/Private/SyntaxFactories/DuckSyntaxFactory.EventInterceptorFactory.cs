@@ -3,9 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
+using System.Linq;
 
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
@@ -37,7 +38,9 @@ namespace Solti.Utils.Proxy.Internals
 
                     IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
 
-                    ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit ? accessor.DeclaringType : null;
+                    ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit 
+                        ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
+                        : null;
 
                     yield return DeclareEvent
                     (

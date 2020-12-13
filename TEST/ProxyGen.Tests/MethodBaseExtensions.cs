@@ -15,16 +15,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
     [TestFixture]
     public class MethodBaseExtensionsTests
     {
-        public static (MethodInfo Method, Type DeclaringType)[] Methods = new []
+        public static (MethodInfo Method, IEnumerable<Type> DeclaringTypes)[] Methods = new []
         {
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.Add(default, default)), typeof(IDictionary<string, object>)),
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<MyDictionary<string, object>>(d => d.Add(default, default)), typeof(IDictionary<string, object>)), // leszarmazott
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.GetHashCode()), typeof(object)),
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.Add(default, default)), (IEnumerable<Type>) new[] {typeof(IDictionary<string, object>) }),
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<MyDictionary<string, object>>(d => d.Add(default, default)), new[] {typeof(IDictionary<string, object>) }), // leszarmazott
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.GetHashCode()), Array.Empty<Type>()),
         };
 
         [TestCaseSource(nameof(Methods))]
-        public void GetDeclaringType_ShouldDoWhatTheItsNameSays((MethodInfo Method, Type DeclaringType) data) =>
-            Assert.That(data.Method.GetDeclaringType(), Is.EqualTo(data.DeclaringType));
+        public void GetDeclaringInterfaces_ShouldDoWhatItsNameSays((MethodInfo Method, IEnumerable<Type> DeclaringTypes) data) =>
+            Assert.That(data.Method.GetDeclaringInterfaces().SequenceEqual(data.DeclaringTypes));
 
         private class MyDictionary<TKey, TValue> : Dictionary<TKey, TValue> { }
 

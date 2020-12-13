@@ -98,7 +98,7 @@ namespace Solti.Utils.Proxy.Internals
                         ifaceMethod,
                         MemberAccess(null, TARGET),
                         castTargetTo: targetMethod.AccessModifiers == AccessModifiers.Explicit
-                            ? targetMethod.DeclaringType
+                            ? targetMethod.DeclaringInterfaces.Single() // explicit metodushoz biztosan csak egy deklaralo interface tartozik
                             : null,
                         arguments: ifaceMethod
                             .Parameters
