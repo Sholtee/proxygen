@@ -19,6 +19,7 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsFamily => AccessModifiers.Protected,
             _ when src.IsAssembly => AccessModifiers.Internal,
             _ when src.IsFamilyOrAssembly => AccessModifiers.Protected | AccessModifiers.Internal,
+            _ when src.IsFamilyAndAssembly => AccessModifiers.Protected | AccessModifiers.Private,
             _ when src.IsPublic => AccessModifiers.Public,
             _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
             _ when src.IsPrivate => AccessModifiers.Private,

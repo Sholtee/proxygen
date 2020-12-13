@@ -20,6 +20,7 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.Protected => AccessModifiers.Protected,
             Accessibility.Internal => AccessModifiers.Internal,
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
+            Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
             Accessibility.Public => AccessModifiers.Public,
             Accessibility.Private when src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
