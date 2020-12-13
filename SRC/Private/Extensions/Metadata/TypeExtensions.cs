@@ -25,18 +25,20 @@ namespace Solti.Utils.Proxy.Internals
         public static string GetFriendlyName(this Type src)
         {
             if (src.IsByRef)
-                src = src.GetElementType(recurse: true)!;
+                return src.GetElementType()!.GetFriendlyName();
 
             if (src.IsGenericType)
                 src = src.GetGenericTypeDefinition();
 
-            return TypeNameReplacer.Replace(src.IsNested ? src.Name : src.ToString(), string.Empty);
+            return TypeNameReplacer.Replace(src.IsNested()
+                ? src.Name 
+                : src.ToString(), string.Empty);
         }
 
         public static string? GetFullName(this Type src) 
         {
             if (src.IsByRef)
-                src = src.GetElementType(recurse: true)!;
+                return src.GetElementType()!.GetFullName();
 
             if (src.IsGenericType)
                 src = src.GetGenericTypeDefinition();
@@ -56,6 +58,16 @@ namespace Solti.Utils.Proxy.Internals
 
             return prev;
         }
+
+        public static bool IsNested(this Type src) =>
+            //
+            // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
+            // mar nem beagyazott tipus.
+            //
+
+            src.GetElementType(recurse: true)?.IsNested ?? src.IsNested;
+
+        public static bool IsPointer(this Type src) => src.IsByRef ? src.GetElementType().IsPointer() : src.IsPointer;
 
         public static bool IsGenericParameter(this Type src) => (src.GetElementType(recurse: true) ?? src).IsGenericParameter;
 

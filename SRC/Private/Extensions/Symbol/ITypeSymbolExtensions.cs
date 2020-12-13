@@ -24,22 +24,32 @@ namespace Solti.Utils.Proxy.Internals
             _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
             _ when src.IsNested() => src.ToDisplayString
             (
-                new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)
+                new SymbolDisplayFormat
+                (
+                    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
+                    miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
+                )
             ),
             _ => src.ToDisplayString
             (
-                new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces)
+                new SymbolDisplayFormat
+                (
+                    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                    miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
+                )
             )
         };
 
         public static bool IsBoundNullable(this INamedTypeSymbol src) => src.ConstructedFrom?.SpecialType == SpecialType.System_Nullable_T && !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
 
-        public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.IsUnboundGenericType;
+        public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.TypeArguments.Any(ta => ta.IsGenericParameter()); //src.IsUnboundGenericType;
 /*
         public static IEnumerable<ITypeSymbol> GetOwnGenericArguments(this INamedTypeSymbol src) => src.TypeArguments;
 */
         public static IEnumerable<ITypeSymbol> GetParents(this ITypeSymbol src) 
         {
+            src = src.GetElementType(recurse: true) ?? src; // tombnek pl nincs tartalmazo tipusa, mig a tomb elemnek van
+
             for (ITypeSymbol parent = src; (parent = parent.ContainingType) != null;)
             {
                 yield return parent;
@@ -118,7 +128,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src.ContainingType?.TypeArguments.Contains(src, SymbolEqualityComparer.Default) == true;
 
-        public static bool IsNested(this ITypeSymbol src) => src.ContainingType is not null && !src.IsGenericParameter();
+        //
+        // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
+        // mar nem beagyazott tipus.
+        //
+
+        public static bool IsNested(this ITypeSymbol src) => 
+            (src.GetElementType(recurse: true)?.ContainingType ?? src.ContainingType) is not null && !src.IsGenericParameter();
 
         public static bool IsGenericParameter(this ITypeSymbol src)
         {
@@ -146,7 +162,7 @@ namespace Solti.Utils.Proxy.Internals
             // Ez esetben "para" tipus-neve NULL kell legyen
             //
 
-            if (elementType?.IsGenericParameter() == true || (elementType is INamedTypeSymbol namedElement && namedElement.TypeArguments.Any(IsGenericParameter))) 
+            if (elementType?.IsGenericParameter() == true || (elementType is INamedTypeSymbol namedElement && namedElement.IsGenericTypeDefinition())) 
                 return null;
 
             var sb = new StringBuilder();

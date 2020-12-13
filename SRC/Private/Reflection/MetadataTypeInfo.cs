@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         public RefType RefType => UnderlyingType switch 
         {
             // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
-            _ when UnderlyingType.IsPointer => RefType.Pointer,
+            _ when UnderlyingType.IsPointer() => RefType.Pointer,
             _ => RefType.None
         };
 
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
         // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
         //
 
-        public bool IsNested => UnderlyingType.IsNested && !IsGenericParameter;
+        public bool IsNested => UnderlyingType.IsNested() && !IsGenericParameter;
 
         public bool IsInterface => UnderlyingType.IsInterface;
 
