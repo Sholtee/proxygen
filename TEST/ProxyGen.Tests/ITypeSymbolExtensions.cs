@@ -267,5 +267,124 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(SymbolEqualityComparer.Default.Equals(a, b));
         }
+
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T>(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(T para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(T para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<TT>(TT para) {}
+                }
+            ",
+            true
+        )]
+        public void EqualsTo_ShouldCompareGenericParamsByTheirArity(string src, bool equals) 
+        {
+            CSharpCompilation compilation = CreateCompilation(src);
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            ITypeSymbol
+                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo").Parameters.Single().Type,
+                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo").Parameters.Single().Type;
+
+            Assert.That(a.EqualsTo(b), Is.EqualTo(equals));
+        }
     }
 }

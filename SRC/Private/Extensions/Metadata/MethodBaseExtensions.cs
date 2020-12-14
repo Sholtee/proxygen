@@ -49,14 +49,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 int? mapIndex = mapping
                     .TargetMethods
-                    .Select((tm, i) => new 
-                    { 
-                        TargetMethod = tm, 
-                        Index = i 
-                    })
-                    .Where(x => x.TargetMethod == src)
-                    .Select(x => (int?) x.Index)
-                    .SingleOrDefault();
+                    .IndexOf(src);
 
                 if (mapIndex >= 0) 
                     yield return mapping.InterfaceMethods[mapIndex.Value];

@@ -42,6 +42,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsBoundNullable(this INamedTypeSymbol src) => src.ConstructedFrom?.SpecialType == SpecialType.System_Nullable_T && !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
 
+        public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Any();
+
         public static bool IsGenericTypeDefinition(this INamedTypeSymbol src) => src.TypeArguments.Any(ta => ta.IsGenericParameter()); //src.IsUnboundGenericType;
 /*
         public static IEnumerable<ITypeSymbol> GetOwnGenericArguments(this INamedTypeSymbol src) => src.TypeArguments;
@@ -190,10 +192,40 @@ namespace Solti.Utils.Proxy.Internals
                     ? type.Name // tupple es nullable eseten is helyes nevet ad vissza
                     : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)); // "atlagos" tipusoknal a nev ures
 
-                return type is INamedTypeSymbol named && named.TypeArguments.Any() // ne IsGenericType legyen
+                return type is INamedTypeSymbol named && named.IsGenericType()
                     ? $"{name}`{named.Arity}"
                     : name;
             }
+        }
+
+        public static bool EqualsTo(this ITypeSymbol src, ITypeSymbol that) 
+        {
+            if (src.IsGenericParameter() != that.IsGenericParameter())
+                return false;
+
+            if (!src.IsGenericParameter())
+                return SymbolEqualityComparer.Default.Equals(src, that);
+
+            IEqualityComparer<ISymbol> comparer = SymbolEqualityComparer.Default;
+
+            return src switch 
+            {
+                //
+                // class ClassA<T>.Foo(T para) == class ClassB<TT>.Foo(TT para)
+                //
+
+                _ when src.ContainingSymbol is INamedTypeSymbol srcContainer && that.ContainingSymbol is INamedTypeSymbol thatContainer =>
+                    srcContainer.TypeArguments.IndexOf(src, comparer) == thatContainer.TypeArguments.IndexOf(that, comparer),
+
+                //
+                // class ClassA.Foo<T>(T para) == class ClassB.Foo<TT>(TT para)
+                //
+
+                _ when src.ContainingSymbol is IMethodSymbol srcMethod && that.ContainingSymbol is IMethodSymbol thatMethod =>
+                    srcMethod.TypeArguments.IndexOf(src, comparer) == thatMethod.TypeArguments.IndexOf(that, comparer),
+
+                _ => false
+            };
         }
     }
 }
