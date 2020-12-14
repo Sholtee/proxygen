@@ -84,5 +84,169 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(methods.Single(m => m.StrippedName() == name).IsSpecial(), Is.EqualTo(isSpecial));
         }
+
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T a, int b) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T>(T para, int b) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    T Foo(int a) => default(T);
+                }
+
+                class ClassB 
+                {
+                    T Foo<T>(int a) => default(T);
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T a, int b) {}
+                }
+
+                class ClassB<TT> 
+                {
+                    void Foo(TT a, int b) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo(string para) {}
+                }
+
+                class ClassB
+                {
+                    void Foo(string para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T a, int b) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<TT>(TT a, int b) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    string Foo(int a) => null;
+                }
+
+                class ClassB 
+                {
+                    string Foo(int a) => null;
+                }
+            ",
+            true
+        )]
+        public void SignatureEquals_ShouldReturnTrueOnEquality(string src, bool equals) 
+        {
+            CSharpCompilation compilation = CreateCompilation(src);
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            IMethodSymbol
+                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo"),
+                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo");
+
+            Assert.That(a.SignatureEquals(b), Is.EqualTo(equals));
+        }
     }
 }

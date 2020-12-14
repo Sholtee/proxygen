@@ -74,5 +74,47 @@ namespace Solti.Utils.Proxy.Internals
         };
 
         public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
+
+        public static bool SignatureEquals(this IMethodSymbol src, IMethodSymbol that, bool ignoreVisibility = false) 
+        {
+            if (src.IsSpecial() || that.IsSpecial())
+                return false;
+
+            //
+            // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
+            //
+
+            if (src.ContainingType?.Arity != that.ContainingType?.Arity)
+                return false;
+
+            if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))
+                return false;
+
+            if (!src.ReturnType.EqualsTo(that.ReturnType))
+                return false;
+
+            if (src.Parameters.Length != that.Parameters.Length)
+                return false;
+
+            for (int i = 0; i < src.Parameters.Length; i++)
+                if (!src.Parameters[i].EqualsTo(that.Parameters[i]))
+                    return false;
+
+            return true;
+
+            object GetMethodBasicAttributes(IMethodSymbol m) => new
+            {
+                m.Name,
+                m.IsStatic,
+                m.MethodKind,
+                m.ReturnsByRef,
+                m.ReturnsByRefReadonly,
+                m.RefKind,
+                m.Arity,
+                Accessibility = !ignoreVisibility 
+                    ? m.DeclaredAccessibility 
+                    : (Accessibility?) null
+            };
+        }
     }
 }
