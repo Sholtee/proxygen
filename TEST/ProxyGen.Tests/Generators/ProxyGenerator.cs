@@ -419,10 +419,29 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IMyInterface, ExternalInterceptor<IMyInterface>>((object) null, (object) null));
 
-        public static IEnumerable<Type> RandomInterfaces => typeof(object)
-            .Assembly
-            .GetExportedTypes()
-            .Where(t => t.IsInterface && !t.ContainsGenericParameters);
+        public static IEnumerable<Type> RandomInterfaces 
+        {
+            get 
+            {
+                foreach (Type iface in typeof(object)
+                    .Assembly
+                    .GetExportedTypes()
+                    .Where(t => t.IsInterface))
+                {
+                    if (iface.ContainsGenericParameters)
+                    {
+                        Type[] gas = iface.GetGenericArguments();
+
+                        if (!gas.Any(ga => ga.GetGenericParameterConstraints().Any()))
+                            yield return iface.MakeGenericType(Enumerable.Repeat(typeof(object), gas.Length).ToArray());
+
+                        continue;
+                    }
+
+                    yield return iface;
+                }
+            }
+        }
 
         [TestCaseSource(nameof(RandomInterfaces))]
         public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
