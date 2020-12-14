@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
@@ -253,5 +254,38 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
+
+        public static IEnumerable<Type> RandomInterfaces
+        {
+            get
+            {
+                foreach (Type iface in typeof(object)
+                    .Assembly
+                    .GetExportedTypes()
+                    .Where(t => t.IsInterface))
+                {
+                    if (iface == typeof(ITypeLib2) || iface == typeof(ITypeInfo2))
+                        continue;
+
+                    if (iface.ContainsGenericParameters)
+                    {
+                        Type[] gas = iface.GetGenericArguments();
+
+                        if (!gas.Any(ga => ga.GetGenericParameterConstraints().Any()))
+                            yield return iface.MakeGenericType(Enumerable.Repeat(typeof(string), gas.Length).ToArray());
+
+                        continue;
+                    }
+
+                    yield return iface;
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(RandomInterfaces))]
+        public void DuckGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
+            typeof(DuckGenerator<,>)
+                .MakeGenericType(iface, iface)
+                .InvokeMember(nameof(DuckGenerator<object, object>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
     }
 }
