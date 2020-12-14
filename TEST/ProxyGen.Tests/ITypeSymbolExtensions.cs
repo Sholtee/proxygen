@@ -133,7 +133,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public class MyClass<T>: List<T[]>
             {
             }
-        ", false)]
+        ", true)]
         [TestCase
         (@"
             using System.Collections.Generic;
