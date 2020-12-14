@@ -10,6 +10,9 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
@@ -150,6 +153,166 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public class GenericChild<TT>
             {
             }
+        }
+
+        private static Assembly Compile(string src, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
+        (
+            CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
+            Guid.NewGuid().ToString(),
+            null,
+            Runtime
+                .Assemblies
+                .Concat(additionalReferences)
+                .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
+                .ToArray()
+        );
+
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T>(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(T para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(T para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<TT>(TT para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                using System.Collections.Generic;
+                class ClassA
+                {
+                    void Foo(List<int> para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(List<string> para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                using System.Collections.Generic;
+                class ClassA
+                {
+                    void Foo(List<string> para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(List<string> para) {}
+                }
+            ",
+            true
+        )]
+        public void EqualsTo_ShouldCompareGenericParamsByTheirArity(string src, bool equals)
+        {
+            Assembly asm = Compile(src);
+
+            Type
+                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo").GetParameters().Single().ParameterType,
+                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo").GetParameters().Single().ParameterType;
+
+            Assert.That(a.EqualsTo(b), Is.EqualTo(equals));
         }
     }
 }

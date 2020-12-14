@@ -156,5 +156,23 @@ namespace Solti.Utils.Proxy.Internals
                 if (own) yield return closedArgs[i];
             } 
         }
+
+        public static bool EqualsTo(this Type src, Type that) 
+        {
+            if (src.IsGenericParameter != that.IsGenericParameter)
+                return false;
+
+            if (!src.IsGenericParameter)
+                return src.Equals(that);
+
+            return src switch 
+            {
+                _ when src.DeclaringMethod is not null && that.DeclaringMethod is not null =>
+                    src.DeclaringMethod.GetGenericArguments().IndexOf(src) == that.DeclaringMethod.GetGenericArguments().IndexOf(that),
+                _ when src.DeclaringType is not null && that.DeclaringType is not null =>
+                    src.DeclaringType.GetGenericArguments().IndexOf(src) == that.DeclaringType.GetGenericArguments().IndexOf(that),
+                _ => false
+            };
+        }
     }
 }
