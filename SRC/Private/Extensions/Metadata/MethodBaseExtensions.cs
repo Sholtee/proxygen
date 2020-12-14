@@ -55,5 +55,45 @@ namespace Solti.Utils.Proxy.Internals
                     yield return mapping.InterfaceMethods[mapIndex.Value];
             }
         }
+
+        public static bool SignatureEquals(this MethodInfo src, MethodInfo that, bool ignoreVisibility = false)
+        {
+            //
+            // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
+            //
+
+            if (src.DeclaringType.GetGenericArguments().Length != that.DeclaringType.GetGenericArguments().Length)
+                return false;
+
+            if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))
+                return false;
+
+            if (!src.ReturnType.EqualsTo(that.ReturnType))
+                return false;
+
+            IReadOnlyList<ParameterInfo>
+                paramsA = src.GetParameters(),
+                paramsB = that.GetParameters();
+
+            if (paramsA.Count != paramsB.Count)
+                return false;
+
+            for (int i = 0; i < paramsA.Count; i++)
+                if (!paramsA[i].EqualsTo(paramsB[i]))
+                    return false;
+
+            return true;
+
+            object GetMethodBasicAttributes(MethodInfo m) => new
+            {
+                m.Name,
+                m.IsStatic,
+                m.IsSpecialName,
+                Arity = m.GetGenericArguments().Length,
+                Accessibility = !ignoreVisibility
+                    ? m.GetAccessModifiers()
+                    : (AccessModifiers?) null
+            };
+        }
     }
 }

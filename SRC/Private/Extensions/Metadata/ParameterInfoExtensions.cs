@@ -64,5 +64,20 @@ namespace Solti.Utils.Proxy.Internals
 #endif          
                 ;
         }
+
+        public static bool EqualsTo(this ParameterInfo src, ParameterInfo that) 
+        {
+            if (!GetParameterBasicAttributes(src).Equals(GetParameterBasicAttributes(that)))
+                return false;
+
+            return src.ParameterType.EqualsTo(that.ParameterType);
+
+            static object GetParameterBasicAttributes(ParameterInfo p) => new
+            {
+                //p.Name,
+                p.Attributes, // in, out, stb
+                p.Position
+            };
+        }
     }
 }

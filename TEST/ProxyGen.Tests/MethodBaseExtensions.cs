@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
@@ -50,6 +53,179 @@ namespace Solti.Utils.Proxy.Internals.Tests
             internal void Internal() { }
             void IInterface.Explicit() { }
             private void Private() { }
+        }
+
+        private static Assembly Compile(string src, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
+        (
+            CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
+            Guid.NewGuid().ToString(),
+            null,
+            Runtime
+                .Assemblies
+                .Concat(additionalReferences)
+                .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
+                .ToArray()
+        );
+
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T a, int b) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T>(T para, int b) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    T Foo(int a) => default(T);
+                }
+
+                class ClassB 
+                {
+                    T Foo<T>(int a) => default(T);
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T para) {}
+                }
+
+                class ClassB<T, TT> 
+                {
+                    void Foo(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA<T> 
+                {
+                    void Foo(T a, int b) {}
+                }
+
+                class ClassB<TT> 
+                {
+                    void Foo(TT a, int b) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo(string para) {}
+                }
+
+                class ClassB
+                {
+                    void Foo(string para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(TT para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<T, TT>(T para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    void Foo<T>(T a, int b) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<TT>(TT a, int b) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    string Foo(int a) => null;
+                }
+
+                class ClassB 
+                {
+                    string Foo(int a) => null;
+                }
+            ",
+            true
+        )]
+        public void SignatureEquals_ShouldReturnTrueOnEquality(string src, bool equals)
+        {
+            Assembly asm = Compile(src);
+
+            MethodInfo
+                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo"),
+                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo");
+
+            Assert.That(a.SignatureEquals(b), Is.EqualTo(equals));
         }
     }
 }
