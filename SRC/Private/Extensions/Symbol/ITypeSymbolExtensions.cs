@@ -203,6 +203,13 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter() != that.IsGenericParameter())
                 return false;
 
+            ITypeSymbol?
+                elA = src.GetElementType(),
+                elB = src.GetElementType();
+
+            if (elA is not null) 
+                return elB is not null && elA.EqualsTo(elB);
+
             if (!src.IsGenericParameter())
                 return SymbolEqualityComparer.Default.Equals(src, that);
 

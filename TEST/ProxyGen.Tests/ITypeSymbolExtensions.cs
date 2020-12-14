@@ -376,6 +376,21 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase
         (
             @"
+                class ClassA
+                {
+                    void Foo<T>(T[] para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo<TT>(TT[] para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
                 using System.Collections.Generic;
                 class ClassA
                 {

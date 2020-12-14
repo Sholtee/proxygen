@@ -162,6 +162,12 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter != that.IsGenericParameter)
                 return false;
 
+            if (src.HasElementType != that.HasElementType)
+                return false;
+
+            if (src.HasElementType)
+                return src.GetElementType().EqualsTo(that.GetElementType());
+
             if (!src.IsGenericParameter)
                 return src.Equals(that);
 
