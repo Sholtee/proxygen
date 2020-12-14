@@ -77,9 +77,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool SignatureEquals(this IMethodSymbol src, IMethodSymbol that, bool ignoreVisibility = false) 
         {
-            if (src.IsSpecial() || that.IsSpecial())
-                return false;
-
             //
             // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
             //

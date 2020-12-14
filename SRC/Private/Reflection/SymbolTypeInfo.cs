@@ -112,6 +112,12 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private /*NULL-t is kizarja*/ || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
+
+            //
+            // "new" kulcsszoval rendelkezo propert-k sem
+            //
+
+            .Distinct((a, b) => a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
@@ -124,6 +130,12 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
+
+            //
+            // "new" kulcsszoval rendelkezo esemenyek sem
+            //
+
+            .Distinct((a, b) => a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
             .ToArray();
 
@@ -131,6 +143,12 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMembers<IMethodSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(m => m.IsClassMethod() && m.GetAccessModifiers() != AccessModifiers.Private)
+
+            //
+            // "new" kulcsszoval rendelkezo metodusok sem
+            //
+
+          //  .Distinct((a,b) => a.SignatureEquals(b))
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 
