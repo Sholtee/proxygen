@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -95,33 +94,27 @@ namespace Solti.Utils.Proxy.Internals
 
             protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
-                IPropertyInfo
-                    targetProp = (IPropertyInfo) targetMember,
-                    ifaceProp  = (IPropertyInfo) ifaceMember;
+                if (targetMember is not IPropertyInfo targetProp || ifaceMember is not IPropertyInfo ifaceProp)
+                    return false;
 
-                return
-                    targetProp.Type.Equals(ifaceProp.Type) &&
+                //
+                // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
+                // az olvasast is.
+                //
 
-                    !targetProp.IsStatic &&
+                if (ifaceProp.GetMethod is not null) 
+                {
+                    if (targetProp.GetMethod is null || !targetProp.GetMethod.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true))
+                        return false;
+                }
 
-                    //
-                    // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
-                    // az olvasast is.
-                    //
+                if (ifaceProp.SetMethod is not null) 
+                {
+                    if (targetProp.SetMethod is null || !targetProp.SetMethod.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true))
+                        return false;
+                }
 
-                    (ifaceProp.SetMethod == null || targetProp.SetMethod != null) &&
-                    (ifaceProp.GetMethod == null || targetProp.GetMethod != null) &&
-
-                    //
-                    // Indexer property-knel meg kell egyezniuk az index parameterek
-                    // sorrendjenek es tipusanak.
-                    //
-
-                    targetProp.Indices.Select(p => p.Type)
-                        .SequenceEqual
-                        (
-                            ifaceProp.Indices.Select(p => p.Type)
-                        );
+                return true;
             }
 
             public PropertyInterceptorFactory(IDuckContext context) : base(context) { }

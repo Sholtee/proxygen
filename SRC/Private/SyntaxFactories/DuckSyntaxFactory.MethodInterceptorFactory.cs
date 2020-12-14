@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,59 +21,10 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class MethodInterceptorFactory : DuckMemberSyntaxFactory
         {
-            //
-            // - int A.Foo([in|ref|out] int p) == int B.Foo([in|ref|out] int cica)
-            // - TCica A.Bar<TCica>() == TKutya B.Bar<TKutya>()
-            // - object A.Baz<TCica>(TCica cica, int x) == object B.Baz<TKutya>(TKutya kutya, int y)
-            // - void A.FooBar<TCica, TMica>(TCica a, TCica b) != B.FooBar<TKutya, TMutya>(TKutya a, TMutya b)
-            // - TCica A.BarBaz<TCica, TMica>() != TMutya B.BarBaz<TKutya, TMutya>()
-            //
-
-            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) 
-            {
-                return
-                    targetMember.Name == ifaceMember.Name &&
-                    !targetMember.IsStatic &&
-                    ExtractParameters((IMethodInfo) targetMember).SequenceEqual(ExtractParameters((IMethodInfo) ifaceMember));
-
-                static IEnumerable<object> ExtractParameters(IMethodInfo method) 
-                {
-                    IReadOnlyDictionary<ITypeInfo, string> unifiedGenerics;
-
-                    if (method is IGenericMethodInfo genericMethod) 
-                        unifiedGenerics = genericMethod
-                            .GenericArguments
-                            .Select((type, i) => new
-                            {
-                                Type = type,
-                                Name = $"T{i}"
-                            })
-                            .ToDictionary(x => x.Type, x => x.Name);
-                    else
-                        unifiedGenerics = new Dictionary<ITypeInfo, string>();
-
-                    return new[] { method.ReturnValue }.Concat(method.Parameters).Select(param => new 
-                    {
-                        //
-                        // List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
-                        //
-                        // "FullName" lehet NULL ha a parameter tipusa nyilt generikus. Ne a "Name" tulajdonsagot
-                        // hasznaljuk h eltero nevu nyilt generikusokat is tudjunk vizsgalni.
-                        //
-
-                        Name = unifiedGenerics.TryGetValue(param.Type, out string name) 
-                            ? name 
-                            : param.Type.Name,
-
-                        param.Kind
-
-                        //
-                        // Parameter neve nem erdekel bennunket (azonos tipussal es attributumokkal ket parametert
-                        // azonosnak veszunk).
-                        //
-                    });
-                }
-            }
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
+                targetMember is IMethodInfo targetMethod && 
+                ifaceMember is IMethodInfo ifaceMethod && 
+                targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true);
 
             protected override IEnumerable<MemberDeclarationSyntax> Build()
             {

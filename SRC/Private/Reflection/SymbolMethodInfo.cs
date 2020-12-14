@@ -58,5 +58,8 @@ namespace Solti.Utils.Proxy.Internals
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
 
         public override string ToString() => UnderlyingSymbol.ToString();
+
+        public bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) =>
+            that is SymbolMethodInfo thatMethod && UnderlyingSymbol.SignatureEquals(thatMethod.UnderlyingSymbol, ignoreVisibility);
     }
 }

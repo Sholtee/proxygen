@@ -58,14 +58,11 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
-            {
-                IEventInfo
-                    targetEvt = (IEventInfo) targetMember,
-                    ifaceEvt  = (IEventInfo) ifaceMember;
-
-                return targetEvt.Type.Equals(ifaceEvt.Type) && !targetEvt.IsStatic;
-            }
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
+                targetMember is IEventInfo targetEvent &&
+                ifaceMember is IEventInfo ifaceEvent &&
+                ifaceEvent.AddMethod.SignatureEquals(targetEvent.AddMethod, ignoreVisibility: true) &&
+                ifaceEvent.RemoveMethod.SignatureEquals(targetEvent.RemoveMethod, ignoreVisibility: true);
 
             public EventInterceptorFactory(IDuckContext context) : base(context) { }
         }

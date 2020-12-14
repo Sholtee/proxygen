@@ -59,11 +59,16 @@ namespace Solti.Utils.Proxy.Internals
         public static bool SignatureEquals(this MethodInfo src, MethodInfo that, bool ignoreVisibility = false)
         {
             //
+            // Nyitott generikus eseten az aritasnak meg kell egyeznie mivel:
+            //
             // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
             //
 
-            if (src.DeclaringType.GetGenericArguments().Length != that.DeclaringType.GetGenericArguments().Length)
-                return false;
+            if (src.DeclaringType.IsGenericTypeDefinition)
+            {
+                if (!that.DeclaringType.IsGenericTypeDefinition || src.DeclaringType.GetGenericArguments().Length != that.DeclaringType.GetGenericArguments().Length)
+                    return false;
+            }
 
             if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))
                 return false;
@@ -86,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
 
             object GetMethodBasicAttributes(MethodInfo m) => new
             {
-                m.Name,
+                Name = m.StrippedName(),
                 m.IsStatic,
                 m.IsSpecialName,
                 Arity = m.GetGenericArguments().Length,
