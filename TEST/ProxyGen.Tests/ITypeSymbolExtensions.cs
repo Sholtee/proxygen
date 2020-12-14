@@ -373,6 +373,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
             ",
             true
         )]
+        [TestCase
+        (
+            @"
+                using System.Collections.Generic;
+                class ClassA
+                {
+                    void Foo(List<int> para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(List<string> para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                using System.Collections.Generic;
+                class ClassA
+                {
+                    void Foo(List<string> para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(List<string> para) {}
+                }
+            ",
+            true
+        )]
         public void EqualsTo_ShouldCompareGenericParamsByTheirArity(string src, bool equals) 
         {
             CSharpCompilation compilation = CreateCompilation(src);
