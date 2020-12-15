@@ -443,7 +443,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
-        [TestCaseSource(nameof(RandomInterfaces))]
+        [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
             typeof(ProxyGenerator<,>)
                 .MakeGenericType

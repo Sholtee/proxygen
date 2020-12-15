@@ -282,7 +282,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
-        [TestCaseSource(nameof(RandomInterfaces))]
+        [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void DuckGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
             typeof(DuckGenerator<,>)
                 .MakeGenericType(iface, iface)

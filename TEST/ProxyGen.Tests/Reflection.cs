@@ -256,7 +256,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get => typeof(object).Assembly.GetTypes().Where(t => t.IsPublic);
         }
 
-        [TestCaseSource(nameof(SystemTypes))]
+        [TestCaseSource(nameof(SystemTypes)), Parallelizable]
         public void TypeInfo_AbstractionTestAgainstSystemType(Type t) => TypeInfo_AbstractionTest(t);
 
         public class NestedGeneric<T>
