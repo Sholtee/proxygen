@@ -26,17 +26,7 @@ namespace Solti.Utils.Proxy.Internals
             ? SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
             : null;
 
-        public string Name 
-        {
-            get 
-            {
-                string strippedName = UnderlyingSymbol.StrippedName();
-
-                return string.IsNullOrEmpty(strippedName)
-                    ? "Item" // "this[]" eseten
-                    : strippedName;
-            }
-        }
+        public string Name => UnderlyingSymbol.StrippedName();
 
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.Type, Compilation);

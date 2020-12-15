@@ -17,6 +17,6 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly Regex FStripper = new Regex("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
-        public static string StrippedName(this ISymbol self) => FStripper.Match(self.Name).Value;
+        public static string StrippedName(this ISymbol self) => FStripper.Match(self.MetadataName).Value;
     }
 }

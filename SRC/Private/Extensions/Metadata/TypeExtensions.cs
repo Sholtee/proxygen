@@ -69,6 +69,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsPointer(this Type src) => src.IsByRef ? src.GetElementType().IsPointer() : src.IsPointer;
 
+        public static bool IsInterface(this Type src) => src.IsByRef ? src.GetElementType().IsInterface() : src.IsInterface;
+
         public static bool IsGenericParameter(this Type src) => (src.GetElementType(recurse: true) ?? src).IsGenericParameter;
 
         public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false, bool includeStatic = false) where TMember : MemberInfo

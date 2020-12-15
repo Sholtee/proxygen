@@ -83,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsNested => UnderlyingType.IsNested() && !IsGenericParameter;
 
-        public bool IsInterface => UnderlyingType.IsInterface;
+        public bool IsInterface => UnderlyingType.IsInterface();
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
