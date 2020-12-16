@@ -119,6 +119,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
                     .Methods
                     .OrderBy(m => m.AccessModifiers)
+                    .ThenBy(m => m.IsStatic)
                     .ThenBy(m => m.Name)
                     .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.FullName ?? p.Type.Name)))
                     .ThenBy(m => m.ReturnValue.Type.FullName ?? m.ReturnValue.Type.Name);

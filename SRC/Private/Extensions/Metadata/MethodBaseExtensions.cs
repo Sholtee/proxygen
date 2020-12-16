@@ -34,6 +34,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
         {
+            if (src is not MethodInfo method)
+                yield break; // ctor
+
             Type reflectedType = src.ReflectedType;
 
             foreach (Type iface in reflectedType.GetInterfaces())
@@ -49,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 int? mapIndex = mapping
                     .TargetMethods
-                    .IndexOf(src);
+                    .IndexOf(method);
 
                 if (mapIndex >= 0) 
                     yield return mapping.InterfaceMethods[mapIndex.Value];
