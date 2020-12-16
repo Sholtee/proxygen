@@ -100,12 +100,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
-            //
-            // Tomboknel az explicit interfacek implementaciok nem jatszanak 
-            // (reflexio nem adja oket vissza, GetInterfaceMap() kivetelt dob).
-            //
-
-            .ListMembers<IPropertySymbol>(includeNonPublic: UnderlyingSymbol is not IArrayTypeSymbol /*explicit*/, includeStatic: true)
+            .ListMembers<IPropertySymbol>(includeNonPublic: true, includeStatic: true)
 
             //
             // Teljesen privat property-ke nem jatszanak.
