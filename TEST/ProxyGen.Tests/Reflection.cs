@@ -56,7 +56,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(List<object>), 
             typeof(NestedGeneric<>), 
             typeof(NestedGeneric<List<string>>), 
-            typeof(InterfaceInterceptor<>), 
+#if !NETCOREAPP2_2
+            typeof(InterfaceInterceptor<>),
+#endif
             typeof(Generators.ProxyGenerator<,>), 
             typeof(System.ComponentModel.Component), // van esemenye
             typeof(DuckBase<>), 
@@ -116,11 +118,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
                     .Methods
-                    .OrderBy(m => m.Name)
-                    .ThenBy(m => m.AccessModifiers)                 
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)))
-                    .ThenBy(m => m is IGenericMethodInfo generic ? string.Join(string.Empty, generic.GenericArguments.Select(ga => ga.Name)) : null)
-                    .ThenBy(m => m.ReturnValue?.Type.Name);
+                    .OrderBy(m => m.AccessModifiers)
+                    .ThenBy(m => m.Name)
+                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.FullName ?? p.Type.Name)))
+                    .ThenBy(m => m.ReturnValue.Type.FullName ?? m.ReturnValue.Type.Name);
 
                 IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
                     .Properties
