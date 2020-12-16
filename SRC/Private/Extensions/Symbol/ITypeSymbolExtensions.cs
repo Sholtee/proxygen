@@ -203,12 +203,20 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter() != that.IsGenericParameter())
                 return false;
 
-            ITypeSymbol?
-                elA = src.GetElementType(),
-                elB = src.GetElementType();
+            if (!GetByRefAttributes(src).Equals(GetByRefAttributes(that)))
+                return false;
 
-            if (elA is not null) 
-                return elB is not null && elA.EqualsTo(elB);
+            //
+            // Itt mar mindkettonek v van v nincs elem tipusa
+            //
+
+            ITypeSymbol? elA = src.GetElementType();
+
+            if (elA is not null)
+            {
+                ITypeSymbol elB = that.GetElementType()!;
+                return elA.EqualsTo(elB);
+            }
 
             if (!src.IsGenericParameter())
                 return SymbolEqualityComparer.Default.Equals(src, that);
@@ -232,6 +240,12 @@ namespace Solti.Utils.Proxy.Internals
                     srcMethod.TypeArguments.IndexOf(src, comparer) == thatMethod.TypeArguments.IndexOf(that, comparer),
 
                 _ => false
+            };
+
+            static object GetByRefAttributes(ITypeSymbol t) => new
+            {
+                IsPointer = t is IPointerTypeSymbol,
+                IsArray = t is IArrayTypeSymbol
             };
         }
     }

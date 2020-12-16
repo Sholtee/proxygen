@@ -420,6 +420,21 @@ namespace Solti.Utils.Proxy.Internals.Tests
             ",
             true
         )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    unsafe void Foo(byte* para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(byte[] para) {}
+                }
+            ",
+            false
+        )]
         public void EqualsTo_ShouldCompareGenericParamsByTheirArity(string src, bool equals) 
         {
             CSharpCompilation compilation = CreateCompilation(src);

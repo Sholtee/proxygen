@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
-        public RefType RefType => UnderlyingType switch 
+        public RefType RefType => UnderlyingType switch
         {
             // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
             _ when UnderlyingType.IsPointer() => RefType.Pointer,
@@ -62,9 +62,9 @@ namespace Solti.Utils.Proxy.Internals
         };
 
         private ITypeInfo? FElementType;
-        public ITypeInfo? ElementType 
+        public ITypeInfo? ElementType
         {
-            get 
+            get
             {
                 if (FElementType == null)
                 {
@@ -89,6 +89,7 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
+            .Distinct((a, b) => a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
             .Select(MetadataPropertyInfo.CreateFrom)
             .ToArray();
 
@@ -96,6 +97,7 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
+            .Distinct((a, b) => a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
@@ -116,6 +118,13 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Any(skip => skip(m)))
+
+            //
+            // Ez nem lehet a ListMEmbers()-ben elintezni (class A : B {} ahol class B {void Foo();}, ListMembers() Foo()-t
+            // "A" es "B"-ben is megtalalja kulonbozo ReflectedType-al).
+            //
+
+            .Distinct((a, b) => a.SignatureEquals(b))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 

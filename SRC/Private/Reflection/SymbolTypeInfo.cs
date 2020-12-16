@@ -148,7 +148,7 @@ namespace Solti.Utils.Proxy.Internals
             // "new" kulcsszoval rendelkezo metodusok sem
             //
 
-          //  .Distinct((a,b) => a.SignatureEquals(b))
+            .Distinct((a,b) => a.SignatureEquals(b))
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 

@@ -83,16 +83,21 @@ namespace Solti.Utils.Proxy.Internals
                 // implementaciokra).
                 //
 
-                return GetMembers(src).Concat
-                (
-                    src.GetInterfaces().SelectMany(GetMembers)
-                );
-          
-            flags |= BindingFlags.FlattenHierarchy;
+                return src.GetInterfaces().Append(src).SelectMany(GetMembers);
+
+            //
+            // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza
+            // az os osztalyokbol, privatot nem, viszont az explicit implementaciok privat
+            // tagok... 
+            //
+
+            //flags |= BindingFlags.FlattenHierarchy;
             if (includeNonPublic) flags |= BindingFlags.NonPublic;
             if (includeStatic) flags |= BindingFlags.Static;
 
-            return GetMembers(src);
+            //return GetMembers(src);
+
+            return src.GetBaseTypes().Append(src).SelectMany(GetMembers);
 
             IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
         }
@@ -164,7 +169,12 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter != that.IsGenericParameter)
                 return false;
 
-            if (src.HasElementType != that.HasElementType)
+            //
+            // Ha a tipus rendelkezik elemmel akkor mindkettonek tombnek, mutatonak v referencia
+            // szerint atadott tipusnak kell lennie
+            //
+
+            if (!GetByRefAttributes(src).Equals(GetByRefAttributes(that)) /*src.HasElementType != that.HasElementType*/)
                 return false;
 
             if (src.HasElementType)
@@ -181,6 +191,13 @@ namespace Solti.Utils.Proxy.Internals
                     src.DeclaringType.GetGenericArguments().IndexOf(src) == that.DeclaringType.GetGenericArguments().IndexOf(that),
                 _ => false
             };
+
+            static object GetByRefAttributes(Type t) => new 
+            {
+                t.IsArray,
+                t.IsPointer,
+                t.IsByRef
+            }; 
         }
     }
 }

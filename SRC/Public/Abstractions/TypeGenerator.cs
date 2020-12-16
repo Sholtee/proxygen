@@ -98,6 +98,7 @@ namespace Solti.Utils.Proxy.Abstractions
                         .References
                         .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
                         .ToArray(),
+                     allowUnsafe: false,
                      cancellation
                  )
             );

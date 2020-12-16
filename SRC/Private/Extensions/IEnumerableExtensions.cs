@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
 
-        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> src, Func<T, T, bool> equals) 
+        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> src, Func<T, T, bool> equals) // baszottul nem optimalis
         {
             var result = new List<T>();
 

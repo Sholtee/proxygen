@@ -164,7 +164,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .Assemblies
                 .Concat(additionalReferences)
                 .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
-                .ToArray()
+                .ToArray(),
+            allowUnsafe: true
         );
 
         [TestCase
@@ -315,6 +316,36 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 class ClassB 
                 {
                     void Foo(List<string> para) {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    unsafe void Foo(byte* para) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(byte[] para) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    unsafe void Foo(ref byte cica) {}
+                }
+
+                class ClassB 
+                {
+                    void Foo(ref byte kutya) {}
                 }
             ",
             true

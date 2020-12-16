@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     CSharpSyntaxTree.ParseText(src)
                 },
                 Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location)),
-                CompilationOptionsFactory.Create()
+                CompilationOptionsFactory.Create(allowUnsafe: true)
             );
 
             Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
