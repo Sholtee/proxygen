@@ -17,6 +17,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Internals;
     using Properties;
 
+    using static Internals.Tests.IXxXSymbolExtensionsTestsBase;
+
     [TestFixture]
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
     {
@@ -131,5 +133,39 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
             Assert.Throws<AmbiguousMatchException>(() => new DuckSyntaxFactory.PropertyInterceptorFactory(CreateGenerator<IList<int>, List<int>>()).Build(default));
+
+
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
+
+        [Test]
+        public void GenerateDuckClass_ShouldReturnTheSameSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType)
+        {
+            Assembly[] refs = type
+                .Assembly
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .Append(type.Assembly)
+                .Distinct()
+                .ToArray();
+
+            Compilation compilation = CreateCompilation(string.Empty, refs);
+
+            ITypeInfo
+                type1 = MetadataTypeInfo.CreateFrom(type),
+                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+
+            IUnitSyntaxFactory
+                fact1 = new DuckSyntaxFactory(type1, type1, "cica", outputType),
+                fact2 = new DuckSyntaxFactory(type2, type2, "cica", outputType);
+
+            Assert.DoesNotThrow(() => fact1.Build());
+            Assert.DoesNotThrow(() => fact2.Build());
+
+            string
+                src1 = fact1.Unit.NormalizeWhitespace().ToFullString(),
+                src2 = fact2.Unit.NormalizeWhitespace().ToFullString();
+
+            Assert.AreEqual(src1, src2);
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class IXxXSymbolExtensionsTestsBase
     {
-        protected static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) 
+        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) 
         {
             var result = CSharpCompilation.Create
             (

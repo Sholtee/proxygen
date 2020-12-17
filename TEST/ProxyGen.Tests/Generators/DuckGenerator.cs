@@ -255,32 +255,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        public static IEnumerable<Type> RandomInterfaces
-        {
-            get
-            {
-                foreach (Type iface in typeof(object)
-                    .Assembly
-                    .GetExportedTypes()
-                    .Where(t => t.IsInterface))
-                {
-                    if (iface == typeof(ITypeLib2) || iface == typeof(ITypeInfo2))
-                        continue;
-
-                    if (iface.ContainsGenericParameters)
-                    {
-                        Type[] gas = iface.GetGenericArguments();
-
-                        if (!gas.Any(ga => ga.GetGenericParameterConstraints().Any()))
-                            yield return iface.MakeGenericType(Enumerable.Repeat(typeof(string), gas.Length).ToArray());
-
-                        continue;
-                    }
-
-                    yield return iface;
-                }
-            }
-        }
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void DuckGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>

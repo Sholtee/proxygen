@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,6 +18,8 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
+
+    using static Internals.Tests.IXxXSymbolExtensionsTestsBase;
     using static Internals.ProxySyntaxFactory;
 
     [TestFixture]
@@ -167,6 +170,42 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Generator.Build(default);
 
             Assert.That(Generator.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
+        }
+
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
+
+        [Test]
+        public void GenerateProxyClass_ShouldReturnTheSameSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType) 
+        {
+            Assembly[] refs = type
+                .Assembly
+                .GetReferencedAssemblies()
+                .Select(Assembly.Load)
+                .Append(type.Assembly)
+                .Distinct()
+                .ToArray();
+
+            Compilation compilation = CreateCompilation(string.Empty, refs);
+
+            ITypeInfo
+                type1 = MetadataTypeInfo.CreateFrom(type),
+                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+
+            IGenericTypeInfo
+                interceptor = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>));
+
+            IUnitSyntaxFactory
+                fact1 = new ProxySyntaxFactory(type1, (ITypeInfo) interceptor.Close(type1), outputType),
+                fact2 = new ProxySyntaxFactory(type2, (ITypeInfo) interceptor.Close(type2), outputType);
+
+            Assert.DoesNotThrow(() => fact1.Build());
+            Assert.DoesNotThrow(() => fact2.Build());
+
+            string
+                src1 = fact1.Unit.NormalizeWhitespace().ToFullString(),
+                src2 = fact2.Unit.NormalizeWhitespace().ToFullString();
+
+            Assert.AreEqual(src1, src2);
         }
     }
 }
