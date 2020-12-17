@@ -20,12 +20,15 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (Members is not null) return false;
 
-                cancellation.ThrowIfCancellationRequested();
-
                 Members = Context
                     .InterceptorType
                     .GetPublicConstructors()
-                    .Select(ctor => DeclareCtor(ctor, Context.ClassName))
+                    .Select(ctor => 
+                    {
+                        cancellation.ThrowIfCancellationRequested();
+
+                        return DeclareCtor(ctor, Context.ClassName);
+                    })
                     .ToArray();
 
                 return true;

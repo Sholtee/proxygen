@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.ComTypes;
+using System.Threading;
 
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
@@ -19,6 +20,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Properties;
 
     using static Internals.Tests.IXxXSymbolExtensionsTestsBase;
+    using static Internals.DuckSyntaxFactory;
 
     [TestFixture]
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
@@ -168,6 +170,32 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
             Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.References.Select(asm => asm.Location)));
             Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
+        }
+
+        public static IEnumerable<ISyntaxFactory> Factories
+        {
+            get
+            {
+                ITypeInfo iface = MetadataTypeInfo.CreateFrom(typeof(IComplex));
+
+                var fact = new DuckSyntaxFactory(iface, iface, "cica", OutputType.Module);
+
+                yield return new ConstructorFactory(fact);
+                yield return new MethodInterceptorFactory(fact);
+                yield return new PropertyInterceptorFactory(fact);
+                yield return new EventInterceptorFactory(fact);
+            }
+        }
+
+        [TestCaseSource(nameof(Factories))]
+        public void Factory_CanBeCancelled(ISyntaxFactory fact)
+        {
+            using (CancellationTokenSource cancellation = new CancellationTokenSource())
+            {
+                cancellation.Cancel();
+
+                Assert.Throws<OperationCanceledException>(() => fact.Build(cancellation.Token));
+            }
         }
     }
 }

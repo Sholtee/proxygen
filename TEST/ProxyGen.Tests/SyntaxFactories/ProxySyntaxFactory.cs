@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -43,9 +44,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [SetUp]
         public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), OutputType.Module);
 
+        private class NonAbstractProxyMemberSyntaxFactory : ProxyMemberSyntaxFactory
+        {
+            public NonAbstractProxyMemberSyntaxFactory(IProxyContext context) : base(context) { }
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => throw new NotImplementedException();
+        }
+
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
-            Assert.That(new ProxyMemberSyntaxFactory(Generator).CreateArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(new NonAbstractProxyMemberSyntaxFactory(Generator).CreateArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
@@ -65,7 +72,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void LocalArgs_ShouldBeDeclaredForEachArgument()
         {
-            var fact = new ProxyMemberSyntaxFactory(Generator);
+            var fact = new NonAbstractProxyMemberSyntaxFactory(Generator);
 
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = fact.DeclareCallbackLocals(fact.DeclareLocal<object[]>("args"), Foo.Parameters).ToArray();
 
@@ -109,7 +116,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(ReturnTypes))]
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para)
         {
-            var fact = new ProxyMemberSyntaxFactory(Generator);
+            var fact = new NonAbstractProxyMemberSyntaxFactory(Generator);
 
             Assert.That(fact.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), fact.DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
@@ -208,6 +215,34 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
             Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.References.Select(asm => asm.Location)));
             Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
+        }
+
+        public static IEnumerable<ISyntaxFactory> Factories 
+        {
+            get 
+            {
+                ITypeInfo
+                    iface = MetadataTypeInfo.CreateFrom(typeof(IComplex)),
+                    interceptor = MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IComplex>));
+
+                var fact = new ProxySyntaxFactory(iface, interceptor, OutputType.Module);
+
+                yield return new ConstructorFactory(fact);
+                yield return new MethodInterceptorFactory(fact);
+                yield return new PropertyInterceptorFactory(fact);
+                yield return new EventInterceptorFactory(fact);
+            }
+        }
+
+        [TestCaseSource(nameof(Factories))]
+        public void Factory_CanBeCancelled(ISyntaxFactory fact)
+        {
+            using (CancellationTokenSource cancellation = new CancellationTokenSource())
+            {
+                cancellation.Cancel();
+
+                Assert.Throws<OperationCanceledException>(() => fact.Build(cancellation.Token));
+            }
         }
     }
 }

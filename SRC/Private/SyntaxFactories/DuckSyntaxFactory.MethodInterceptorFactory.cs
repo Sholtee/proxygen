@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,10 +27,12 @@ namespace Solti.Utils.Proxy.Internals
                 ifaceMember is IMethodInfo ifaceMethod && 
                 targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true);
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build()
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
                 foreach(IMethodInfo ifaceMethod in Context.InterfaceType.Methods.Where(m => !m.IsSpecial))
                 {
+                    cancellation.ThrowIfCancellationRequested();
+
                     IMethodInfo targetMethod = GetTargetMember(ifaceMethod, Context.TargetType.Methods);
 
                     //
@@ -64,7 +67,10 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             expressionBody: ArrowExpressionClause(invocation)
                         )
-                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                        .WithSemicolonToken
+                        (
+                            Token(SyntaxKind.SemicolonToken)
+                        );
                 }
             }
 

@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
                 return possibleTargets[0];
             }
 
-            protected abstract IEnumerable<MemberDeclarationSyntax> Build();
+            protected abstract IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation);
 
             public IDuckContext Context { get; }
 
@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (Members is not null) return false;
 
-                Members = Build().ToArray();
+                Members = BuildMembers(cancellation).ToArray();
 
                 return true;
             }

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,17 +27,25 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class PropertyInterceptorFactory : DuckMemberSyntaxFactory
         {
-            protected override IEnumerable<MemberDeclarationSyntax> Build()
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
                 foreach(IPropertyInfo ifaceProperty in Context.InterfaceType.Properties)
                 {
+                    cancellation.ThrowIfCancellationRequested();
+
                     IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Context.TargetType.Properties);
 
                     //
                     // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetProperty, Context.AssemblyName, checkGet: ifaceProperty.GetMethod != null, checkSet: ifaceProperty.SetMethod != null);
+                    Visibility.Check
+                    (
+                        targetProperty, 
+                        Context.AssemblyName, 
+                        checkGet: ifaceProperty.GetMethod is not null, 
+                        checkSet: ifaceProperty.SetMethod is not null
+                    );
 
                     IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 

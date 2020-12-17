@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
-        internal class ProxyMemberSyntaxFactory: MemberSyntaxFactory
+        internal abstract class ProxyMemberSyntaxFactory: MemberSyntaxFactory
         {
             #region Protected
             protected internal readonly IPropertyInfo
@@ -202,14 +202,14 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
             
-            protected virtual IEnumerable<MemberDeclarationSyntax> Build() => throw new NotImplementedException();
+            protected abstract IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation);
             #endregion
 
             public sealed override bool Build(CancellationToken cancellation)
             {
                 if (Members is not null) return false;
 
-                Members = Build().ToArray();
+                Members = BuildMembers(cancellation).ToArray();
 
                 return true;
             }

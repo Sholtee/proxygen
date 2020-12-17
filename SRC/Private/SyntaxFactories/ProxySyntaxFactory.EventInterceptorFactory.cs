@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -113,26 +114,33 @@ namespace Solti.Utils.Proxy.Internals
 
             public EventInterceptorFactory(IProxyContext context) : base(context)
             {
-                RESOLVE_EVENT = Context.BaseInterceptorType
+                RESOLVE_EVENT = Context
+                    .BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
+                .InterfaceType
                 .Events
                 .Where(evt => !AlreadyImplemented(evt))
-                .Select(evt => DeclareEvent
-                (
-                    @event: evt,
-                    addBody: Block
+                .Select(evt =>
+                {
+                    cancellation.ThrowIfCancellationRequested();
+
+                    return DeclareEvent
                     (
-                        Build(evt, add: true)
-                    ),
-                    removeBody: Block
-                    (
-                        Build(evt, add: false)
-                    )
-                ));
+                        @event: evt,
+                        addBody: Block
+                        (
+                            Build(evt, add: true)
+                        ),
+                        removeBody: Block
+                        (
+                            Build(evt, add: false)
+                        )
+                    );
+                });
         }
     }
 }

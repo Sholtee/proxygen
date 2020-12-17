@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
@@ -17,6 +19,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             void Bar();
             T Prop { get; set; }
             event TestDelegate<T> Event;
+        }
+
+        protected interface IComplex
+        {
+            void Method();
+            int Property { get; }
+            event Action Event;
         }
 
         internal static IEventInfo Event { get; } = MetadataEventInfo.CreateFrom(typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event)));

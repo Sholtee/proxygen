@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -24,17 +25,25 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         internal sealed class EventInterceptorFactory : DuckMemberSyntaxFactory
         {
-            protected override IEnumerable<MemberDeclarationSyntax> Build()
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
                 foreach (IEventInfo ifaceEvt in Context.InterfaceType.Events)
                 {
+                    cancellation.ThrowIfCancellationRequested();
+
                     IEventInfo targetEvt = GetTargetMember(ifaceEvt, Context.TargetType.Events);
 
                     //
                     // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetEvt, Context.AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
+                    Visibility.Check
+                    (
+                        targetEvt, 
+                        Context.AssemblyName, 
+                        checkAdd: ifaceEvt.AddMethod is not null, 
+                        checkRemove: ifaceEvt.RemoveMethod is not null
+                    );
 
                     IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
 
@@ -45,25 +54,44 @@ namespace Solti.Utils.Proxy.Internals
                     yield return DeclareEvent
                     (
                         ifaceEvt,
-                        addBody: ArrowExpressionClause
-                        (
-                            expression: RegisterEvent(targetEvt, MemberAccess(null, TARGET), add: true, IdentifierName(Value), castTargetTo)
-                        ),
-                        removeBody: ArrowExpressionClause
-                        (
-                            expression: RegisterEvent(targetEvt, MemberAccess(null, TARGET), add: false, IdentifierName(Value), castTargetTo)
-                        ),
+                        addBody: CreateBody(register: true),
+                        removeBody: CreateBody(register: false),
                         forceInlining: true
+                    );
+
+                    ArrowExpressionClauseSyntax CreateBody(bool register) => ArrowExpressionClause
+                    (
+                        expression: RegisterEvent
+                        (
+                            targetEvt,
+                            MemberAccess(null, TARGET),
+                            register,
+                            IdentifierName(Value),
+                            castTargetTo
+                        )
                     );
                 }
             }
 
-            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
-                targetMember is IEventInfo targetEvent &&
-                ifaceMember is IEventInfo ifaceEvent &&
-                ifaceEvent.AddMethod.SignatureEquals(targetEvent.AddMethod, ignoreVisibility: true) &&
-                ifaceEvent.RemoveMethod.SignatureEquals(targetEvent.RemoveMethod, ignoreVisibility: true);
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
+            {
+                if (targetMember is not IEventInfo targetEvent || ifaceMember is not IEventInfo ifaceEvent)
+                    return false;
 
+                if (ifaceEvent.AddMethod is not null) 
+                {
+                    if (targetEvent.AddMethod is null || !ifaceEvent.AddMethod.SignatureEquals(targetEvent.AddMethod, ignoreVisibility: true))
+                        return false;              
+                }
+
+                if (ifaceEvent.RemoveMethod is not null)
+                {
+                    if (targetEvent.RemoveMethod is null || !ifaceEvent.RemoveMethod.SignatureEquals(targetEvent.RemoveMethod, ignoreVisibility: true))
+                        return false;
+                }
+
+                return true;
+            }
             public EventInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }

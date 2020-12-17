@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -237,11 +238,14 @@ namespace Solti.Utils.Proxy.Internals
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
             }
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
+                .InterfaceType
                 .Methods
                 .Where(met => !AlreadyImplemented(met) && !met.IsSpecial)
                 .Select(met =>
                 {
+                    cancellation.ThrowIfCancellationRequested();
+
                     //
                     // "ref" visszateres nem tamogatott.
                     //

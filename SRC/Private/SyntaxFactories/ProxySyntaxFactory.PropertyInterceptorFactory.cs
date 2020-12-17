@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -207,16 +208,26 @@ namespace Solti.Utils.Proxy.Internals
                 false
             );
 
-            protected override IEnumerable<MemberDeclarationSyntax> Build() => Context.InterfaceType
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context.InterfaceType
                 .Properties
                 .Where(prop => !AlreadyImplemented(prop))
-                .Select(prop => BuildProperty(prop, prop.Indices.Any() 
-                    ? DeclareIndexer 
-                    : DeclareProperty));
+                .Select(prop => 
+                {
+                    cancellation.ThrowIfCancellationRequested();
+
+                    return BuildProperty
+                    (
+                        prop,
+                        prop.Indices.Any()
+                            ? DeclareIndexer
+                            : DeclareProperty
+                    );
+                });
 
             public PropertyInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_PROPERTY = Context.BaseInterceptorType
+                RESOLVE_PROPERTY = Context
+                    .BaseInterceptorType
                     .Methods
                     .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
             }
