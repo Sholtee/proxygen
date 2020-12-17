@@ -138,7 +138,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
 
         [Test]
-        public void GenerateDuckClass_ShouldReturnTheSameSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType)
+        public void GenerateDuckClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType)
         {
             Assembly[] refs = type
                 .Assembly
@@ -166,6 +166,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 src2 = fact2.Unit.NormalizeWhitespace().ToFullString();
 
             Assert.AreEqual(src1, src2);
+            Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.References.Select(asm => asm.Location)));
+            Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
         }
     }
 }

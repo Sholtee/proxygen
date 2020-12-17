@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -16,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class IXxXSymbolExtensionsTestsBase
     {
-        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) 
+        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences) 
         {
             var result = CSharpCompilation.Create
             (
@@ -25,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                     CSharpSyntaxTree.ParseText(src)
                 },
-                Runtime.Assemblies.Concat(additionalReferences).Distinct().Select(asm => MetadataReference.CreateFromFile(asm.Location)),
+                Runtime.Assemblies.Select(asm => asm.Location).Concat(additionalReferences).Distinct().Select(location => MetadataReference.CreateFromFile(location)),
                 CompilationOptionsFactory.Create(allowUnsafe: true)
             );
 
@@ -34,6 +33,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             return result;
         }
+
+        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
 
         protected class FindAllTypesVisitor : SymbolVisitor
         {
