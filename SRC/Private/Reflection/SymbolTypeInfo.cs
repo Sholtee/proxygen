@@ -109,10 +109,10 @@ namespace Solti.Utils.Proxy.Internals
             .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private /*NULL-t is kizarja*/ || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
 
             //
-            // "new" kulcsszoval rendelkezo propert-k sem
+            // "new" kulcsszoval rendelkezo propert-k sem (nem interface-ek eseteben)
             //
 
-            .Distinct((a, b) => a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
+            .Distinct((a, b) => !UnderlyingSymbol.IsInterface() && a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
@@ -127,10 +127,10 @@ namespace Solti.Utils.Proxy.Internals
             .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
 
             //
-            // "new" kulcsszoval rendelkezo esemenyek sem
+            // "new" kulcsszoval rendelkezo esemenyek sem (nem interface-ek eseteben)
             //
 
-            .Distinct((a, b) => a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
+            .Distinct((a, b) => !UnderlyingSymbol.IsInterface() && a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
             .ToArray();
 
@@ -140,10 +140,10 @@ namespace Solti.Utils.Proxy.Internals
             .Where(m => m.IsClassMethod() && m.GetAccessModifiers() != AccessModifiers.Private)
 
             //
-            // "new" kulcsszoval rendelkezo metodusok sem
+            // "new" kulcsszoval rendelkezo metodusok sem (nem interface-ek eseteben)
             //
 
-            .Distinct((a,b) => a.SignatureEquals(b))
+            .Distinct((a,b) => !UnderlyingSymbol.IsInterface() && a.SignatureEquals(b))
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 

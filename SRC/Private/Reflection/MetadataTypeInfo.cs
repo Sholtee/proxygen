@@ -89,7 +89,12 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
-            .Distinct((a, b) => a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
+
+            //
+            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
+            //
+
+            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
             .Select(MetadataPropertyInfo.CreateFrom)
             .ToArray();
 
@@ -97,7 +102,12 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
             .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
-            .Distinct((a, b) => a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
+
+            //
+            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
+            //
+
+            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
@@ -120,11 +130,10 @@ namespace Solti.Utils.Proxy.Internals
             .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Any(skip => skip(m)))
 
             //
-            // Ez nem lehet a ListMEmbers()-ben elintezni (class A : B {} ahol class B {void Foo();}, ListMembers() Foo()-t
-            // "A" es "B"-ben is megtalalja kulonbozo ReflectedType-al).
+            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
             //
 
-            .Distinct((a, b) => a.SignatureEquals(b))
+            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.SignatureEquals(b))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 
