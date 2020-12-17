@@ -44,7 +44,14 @@ namespace Solti.Utils.Proxy.Internals
 
             protected bool AlreadyImplemented(IMemberInfo member) => Context.InterceptorType
                 .Interfaces
-                .Contains(member.DeclaringType);
+
+                //
+                // TODO: FIXME: 
+                //   Ez "Contains(member.DeclaringType)"-al csak akkor vizsgalhato ha "member"
+                //   es "Context.InterceptorType" is vagy metadata vagy szimbolum
+                //
+
+                .Any(iface => iface.FullName == member.DeclaringType.FullName);
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
