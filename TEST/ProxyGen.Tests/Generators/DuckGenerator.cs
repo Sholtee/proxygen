@@ -255,7 +255,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void DuckGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
