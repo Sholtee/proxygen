@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Threading;
 
 namespace Solti.Utils.Proxy
 {
@@ -13,22 +12,14 @@ namespace Solti.Utils.Proxy
     /// </summary>
     public class ConcurrentInterfaceInterceptor<TInterface>: InterfaceInterceptor<TInterface> where TInterface : class
     {
-        private readonly ThreadLocal<Func<object>?> FInvokeTarget = new ThreadLocal<Func<object>?>();
+        [ThreadStatic]
+        private static Func<object>? FInvokeTarget;
 
         /// <inheritdoc/>
-        protected internal override Func<object>? InvokeTarget 
-        { 
-            get => FInvokeTarget.Value; 
-            set => FInvokeTarget.Value = value;
-        }
-
-        /// <inheritdoc/>
-        protected override void Dispose(bool disposeManaged)
+        protected internal override Func<object>? InvokeTarget
         {
-            if (disposeManaged)
-                FInvokeTarget.Dispose();
-
-            base.Dispose(disposeManaged);
+            get => FInvokeTarget;
+            set => FInvokeTarget = value;
         }
 
         /// <summary>
