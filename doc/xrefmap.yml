@@ -203,23 +203,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor(Of TInterface).ConcurrentInterfaceInterceptor
   nameWithType: ConcurrentInterfaceInterceptor<TInterface>.ConcurrentInterfaceInterceptor
   nameWithType.vb: ConcurrentInterfaceInterceptor(Of TInterface).ConcurrentInterfaceInterceptor
-- uid: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor`1.Dispose(System.Boolean)
-  name: Dispose(Boolean)
-  href: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor-1.html#Solti_Utils_Proxy_ConcurrentInterfaceInterceptor_1_Dispose_System_Boolean_
-  commentId: M:Solti.Utils.Proxy.ConcurrentInterfaceInterceptor`1.Dispose(System.Boolean)
-  fullName: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor<TInterface>.Dispose(System.Boolean)
-  fullName.vb: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor(Of TInterface).Dispose(System.Boolean)
-  nameWithType: ConcurrentInterfaceInterceptor<TInterface>.Dispose(Boolean)
-  nameWithType.vb: ConcurrentInterfaceInterceptor(Of TInterface).Dispose(Boolean)
-- uid: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor`1.Dispose*
-  name: Dispose
-  href: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor-1.html#Solti_Utils_Proxy_ConcurrentInterfaceInterceptor_1_Dispose_
-  commentId: Overload:Solti.Utils.Proxy.ConcurrentInterfaceInterceptor`1.Dispose
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor<TInterface>.Dispose
-  fullName.vb: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor(Of TInterface).Dispose
-  nameWithType: ConcurrentInterfaceInterceptor<TInterface>.Dispose
-  nameWithType.vb: ConcurrentInterfaceInterceptor(Of TInterface).Dispose
 - uid: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor`1.InvokeTarget
   name: InvokeTarget
   href: Solti.Utils.Proxy.ConcurrentInterfaceInterceptor-1.html#Solti_Utils_Proxy_ConcurrentInterfaceInterceptor_1_InvokeTarget
