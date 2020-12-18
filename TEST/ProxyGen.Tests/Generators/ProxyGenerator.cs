@@ -91,6 +91,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
             .Select(_ => CreateProxy<IMyInterface, MyInterfaceProxy>(new MyClass()))));
 
         [Test]
+        public async Task GeneratedProxy_MayBeThreadSafe() 
+        {
+            IMyInterface proxy = await CreateProxy<IMyInterface, ConcurrentInterfaceInterceptor<IMyInterface>>(new MyClass());
+
+            Assert.DoesNotThrow(() => Parallel.For(1, 1000, _ => proxy.Hooked(0)));
+        }
+
+        [Test]
         public async Task GeneratedProxy_ShouldWorkWithComplexInterfaces()
         {
             IList<string> proxy = await CreateProxy<IList<string>, InterfaceInterceptor<IList<string>>>(new List<string>());
