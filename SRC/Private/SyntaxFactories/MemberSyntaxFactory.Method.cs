@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -39,8 +40,6 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected internal virtual MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
         {
-            Debug.Assert(method.DeclaringType.IsInterface);
-
             TypeSyntax returnTypeSytax = CreateType(method.ReturnValue.Type);
 
             if (method.ReturnValue.Kind >= ParameterKind.Ref)
@@ -60,10 +59,6 @@ namespace Solti.Utils.Proxy.Internals
             (
                 returnType: returnTypeSytax,
                 identifier: Identifier(method.Name)
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(method.DeclaringType))
             )
             .WithParameterList
             (
@@ -95,7 +90,10 @@ namespace Solti.Utils.Proxy.Internals
                         }
 
                         if (modifiers.Any())
-                            parameter = parameter.WithModifiers(TokenList(modifiers.Select(Token)));
+                            parameter = parameter.WithModifiers
+                            (
+                                TokenList(modifiers.Select(Token))
+                            );
 
                         return parameter;
                     })
@@ -110,17 +108,66 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
+            //
+            // Interface implementaciokat mindig expliciten deklaraljuk
+            //
+
+            if (method.DeclaringType.IsInterface) result = result.WithExplicitInterfaceSpecifier
+            (
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(method.DeclaringType))
+            );
+
+            //
+            // Kulonben a lathatosagnak meg kell egyeznie
+            //
+
+            else 
+            {
+                var modifiers = new List<SyntaxKind>();
+
+                if (method.AccessModifiers.HasFlag(AccessModifiers.Public))
+                    modifiers.Add(SyntaxKind.PublicKeyword);
+
+                if (method.AccessModifiers.HasFlag(AccessModifiers.Protected))
+                    modifiers.Add(SyntaxKind.ProtectedKeyword);
+
+                if (method.AccessModifiers.HasFlag(AccessModifiers.Internal))
+                    modifiers.Add(SyntaxKind.InternalKeyword);
+
+                if (method.AccessModifiers.HasFlag(AccessModifiers.Private)) // private protected
+                    modifiers.Add(SyntaxKind.PrivateKeyword);
+
+                result = result.WithModifiers
+                (
+                    TokenList(modifiers.Select(Token))
+                );
+            }
+
             if (forceInlining) result = result.WithAttributeLists
             (
                 attributeLists: DeclareMethodImplAttributeToForceInlining()
             );
 
-            //
-            // Interface metodus nem lehet "async" ezert nem kell ellenorizni h rendelkezik
-            // e "AsyncStateMachineAttribute" attributummal.
-            //
-
             return result;
+        }
+
+        /// <summary>
+        /// int IInterface.Foo[T](string a, ref T b)
+        /// </summary>
+        protected internal virtual MethodDeclarationSyntax OverrideMethod(IMethodInfo method, bool forceInlining = false)
+        {
+            MethodDeclarationSyntax result = DeclareMethod(method, forceInlining);
+            
+            return result.WithModifiers
+            (
+                TokenList
+                (
+                    result.Modifiers.Append // WithModifiers() felulcsapja a korabbi ertekeket
+                    (
+                        Token(SyntaxKind.OverrideKeyword)
+                    )
+                )
+            );
         }
 
         /// <summary>

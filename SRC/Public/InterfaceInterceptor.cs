@@ -74,14 +74,7 @@ namespace Solti.Utils.Proxy
             if (Target == null) throw new InvalidOperationException(Resources.NULL_TARGET);
             if (InvokeTarget == null) throw new InvalidOperationException(); // TODO
 
-            try
-            {
-                return InvokeTarget();
-            }
-            finally 
-            {
-                InvokeTarget = null;
-            }
+            return InvokeTarget();
         }
     }
 }

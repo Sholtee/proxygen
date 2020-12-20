@@ -119,13 +119,13 @@ namespace Solti.Utils.Proxy.Internals
             /// <summary>
             /// InvokeTarget = ...;
             /// </summary>
-            protected internal StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
+            protected internal StatementSyntax AssignCallback(ExpressionSyntax expr) => ExpressionStatement
             (
                 expression: AssignmentExpression
                 (
                     kind: SyntaxKind.SimpleAssignmentExpression,
                     left: PropertyAccess(INVOKE_TARGET, null, null),
-                    right: lambda
+                    right: expr
                 )
             );
 

@@ -38,6 +38,8 @@ namespace Solti.Utils.Proxy.Internals
                 yield break; // ctor
 
             Type reflectedType = src.ReflectedType;
+            if (reflectedType.IsInterface)
+                yield break;
 
             foreach (Type iface in reflectedType.GetInterfaces())
             {
@@ -103,5 +105,7 @@ namespace Solti.Utils.Proxy.Internals
                     : (AccessModifiers?) null
             };
         }
+
+        //public static bool IsFinal(this MethodBase src) => src.IsFinal || src.GetImplementedInterfaceMethods().Any();
     }
 }

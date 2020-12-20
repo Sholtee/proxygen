@@ -5,6 +5,18 @@ internal sealed class GeneratedClass_10FC5DBDBA8C97EBE529724F5CB55A8A : global::
     {
     }
 
+    public override global::System.Object Invoke(global::System.Reflection.MethodInfo method, global::System.Object[] args, global::System.Reflection.MemberInfo extra)
+    {
+        try
+        {
+            return base.Invoke(method, args, extra);
+        }
+        finally
+        {
+            this.InvokeTarget = null;
+        }
+    }
+
     global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c)
     {
         global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};

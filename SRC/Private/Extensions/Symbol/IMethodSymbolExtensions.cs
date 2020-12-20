@@ -118,5 +118,7 @@ namespace Solti.Utils.Proxy.Internals
                     : (Accessibility?) null
             };
         }
+
+        //public static bool IsFinal(this IMethodSymbol src) => src.IsSealed || src.GetImplementedInterfaceMethods().Any();
     }
 }
