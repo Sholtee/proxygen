@@ -59,6 +59,7 @@
   - *introduced:* Cancellable `TypeGenerator`s
   - *introduced:* Pointer type support
   - *introduced:* `ref readonly` support
-  - *improved::* Generated code
+  - *improved:* Generated code
   - *improved:* Visibility check
+  - *fixed:* `InterfaceInterceptor.InvokeTarget` cleanup after invocation
   
