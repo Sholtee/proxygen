@@ -23,9 +23,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IAssemblyInfo CreateFrom(Assembly assembly) => new MetadataAssemblyInfo(assembly);
 
-        public bool IsFriend(string asmName) => UnderlyingAssembly
-            .GetCustomAttributes<InternalsVisibleToAttribute>()
-            .Any(ivt => ivt.AssemblyName == asmName);
+        public bool IsFriend(string asmName) => 
+            asmName == UnderlyingAssembly.GetName().Name || 
+            UnderlyingAssembly
+                .GetCustomAttributes<InternalsVisibleToAttribute>()
+                .Any(ivt => ivt.AssemblyName == asmName);
 
         public string? Location => UnderlyingAssembly.IsDynamic ? null : UnderlyingAssembly.Location;
 

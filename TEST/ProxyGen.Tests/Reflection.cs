@@ -27,20 +27,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.False(set.Add(MetadataTypeInfo.CreateFrom(typeof(object))));
         }
 
-        [Test]
-        public void AssemblyInfo_FriendshipTest()
+        public static IEnumerable<IAssemblyInfo> FirendAsms 
         {
-            Assembly asm = typeof(ISyntaxFactory).Assembly;
+            get 
+            {
+                Assembly asm = typeof(ISyntaxFactory).Assembly;
 
-            Compilation compilation = CreateCompilation(string.Empty, asm);
+                Compilation compilation = CreateCompilation(string.Empty, asm);
 
-            IAssemblyInfo
-                asm1 = MetadataAssemblyInfo.CreateFrom(asm),
-                asm2 = SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
-
-            Assert.That(asm1.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
-            Assert.That(asm2.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
+                yield return MetadataAssemblyInfo.CreateFrom(asm);
+                yield return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
+                yield return MetadataAssemblyInfo.CreateFrom(typeof(ReflectionTests).Assembly);
+            }
         }
+
+        [TestCaseSource(nameof(FirendAsms))]
+        public void AssemblyInfo_FriendshipTest(IAssemblyInfo asm) =>
+            Assert.That(asm.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
         [Test]
         public void TypeInfo_AbstractionTest([Values(
