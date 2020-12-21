@@ -4,9 +4,9 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -33,12 +33,10 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.Identity.ToString();
 
-        public bool IsFriend(string asmName) => 
-            asmName == UnderlyingSymbol.Name ||
-            UnderlyingSymbol
-                .GetAttributes()
-                .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, Compilation.GetTypeByMetadataName(typeof(InternalsVisibleToAttribute).FullName)))
-                .Any(ivt => ivt.ConstructorArguments.Single().Value is string str && str == asmName);
+        public bool IsFriend(string asmName) => UnderlyingSymbol.Name == asmName || UnderlyingSymbol.GivesAccessTo // TODO: strong name support
+        (
+            CSharpCompilation.Create(asmName).Assembly
+        );
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
 

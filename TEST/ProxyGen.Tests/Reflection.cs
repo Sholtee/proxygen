@@ -31,13 +31,17 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             get 
             {
-                Assembly asm = typeof(ISyntaxFactory).Assembly;
-
-                Compilation compilation = CreateCompilation(string.Empty, asm);
-
-                yield return MetadataAssemblyInfo.CreateFrom(asm);
-                yield return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
+                yield return MetadataAssemblyInfo.CreateFrom(typeof(ISyntaxFactory).Assembly);
+                yield return CreateTI(typeof(ISyntaxFactory).Assembly);
                 yield return MetadataAssemblyInfo.CreateFrom(typeof(ReflectionTests).Assembly);
+                yield return CreateTI(typeof(ReflectionTests).Assembly);
+
+                static IAssemblyInfo CreateTI(Assembly asm) 
+                {
+                    Compilation compilation = CreateCompilation(string.Empty, asm);
+
+                    return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
+                }
             }
         }
 

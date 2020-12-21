@@ -136,7 +136,7 @@
     <value>Target interface can not be generic</value>
   </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
-    <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
+    <value>The member ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>
   <data name="METHOD_NOT_VISIBLE" xml:space="preserve">
     <value>The method ("{0}") is not visible.</value>
@@ -172,7 +172,7 @@
     <value>The type "{0}" can not be found.</value>
   </data>
   <data name="TYPE_NOT_VISIBLE" xml:space="preserve">
-    <value>{0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
+    <value>{0} (or its enclosing type) is not visible.</value>
   </data>
   <data name="UNDETERMINED_ACCESS_MODIFIER" xml:space="preserve">
     <value>Access modifier could not be determined.</value>

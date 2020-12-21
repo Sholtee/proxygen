@@ -26,9 +26,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void Check_ShouldThrowIfTheTypeNotVisible()
         {
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
             Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), AnnotatedAssembly));
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
             Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), AnnotatedAssembly));
             Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
             Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);

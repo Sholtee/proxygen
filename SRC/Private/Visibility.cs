@@ -13,6 +13,7 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
+    using static SymbolTypeInfo;
 
     internal static class Visibility
     {
@@ -91,57 +92,45 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static void Check(ITypeInfo type, string assemblyName) // FIXME: nyilt generikusokra nem mukodik (igaz egyelore nem is kell)
+        public static void Check(ITypeInfo type, string assemblyName)
         {
-            //
-            // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
-            // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditora bizzuk
-            // a dontest:
-            //
-            // using t = Namespace.Type;
-            //
-
-            IUnitSyntaxFactory fact = new VisibilityCheckSyntaxFactory(type);
-            fact.Build();
-
-            Debug.WriteLine(fact.Unit!.NormalizeWhitespace().ToFullString());
-
-            CSharpCompilation compilation = CSharpCompilation.Create
-            (
-                assemblyName: assemblyName,
-                syntaxTrees: new[]
-                {
-                    CSharpSyntaxTree.Create
-                    (
-                        root: fact.Unit!
-                    )
-                },
-                references: fact.References!.Select(asm => MetadataReference.CreateFromFile(asm.Location!)),
-                options: CompilationOptionsFactory.Create()
-            );
-
-            Diagnostic[] diagnostics = compilation
-                .GetDeclarationDiagnostics()
-                .Where(diag => diag.Severity == DiagnosticSeverity.Error)
-                .ToArray();
-
-            if (diagnostics.Length == 0) return;
+            if (type.DeclaringAssembly is null)
+                throw new NotSupportedException();
 
             //
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0122
+            // Tomb es mutato tipusnal az elem tipusat kell vizsgaljuk
             //
 
-            if (diagnostics.Length > 1 || !diagnostics.Single().Id.Equals("CS0122", StringComparison.OrdinalIgnoreCase))
+            if (type.ElementType is not null)
             {
-                throw new Exception(string.Join(Environment.NewLine, diagnostics.Select(diagnostic => diagnostic.GetMessage())));
+                Check(type.ElementType, assemblyName);
+                return;
             }
 
+            var fact = new SyntaxFactoryBase(); // TODO: referenciakat vhogy szebben is ossze lehetne gyujteni
+            fact.AddType(type);
+
             //
-            // A fordito nem fogja megmondani h mi a tipus lathatosaga csak azt h lathato e v sem,
-            // ezert vmi altalanosabb hibauzenet kell.
+            // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
+            // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditotol kerjuk
+            // el.
             //
 
-            throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type, assemblyName));
+            CSharpCompilation comp = CSharpCompilation.Create
+            (
+                null,
+                references: fact
+                    .References
+                    .Select(@ref => MetadataReference.CreateFromFile(@ref.Location!))
+            );
+
+            switch (TypeInfoToSymbol(type, comp).DeclaredAccessibility) 
+            {
+                case Accessibility.Private:
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
+                case Accessibility.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
+            }
         }
     }
 }

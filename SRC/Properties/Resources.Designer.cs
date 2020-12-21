@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
+        ///   Looks up a localized string similar to The member (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
         /// </summary>
         internal static string IVT_REQUIRED {
             get {
@@ -223,7 +223,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
+        ///   Looks up a localized string similar to {0} (or its enclosing type) is not visible..
         /// </summary>
         internal static string TYPE_NOT_VISIBLE {
             get {
