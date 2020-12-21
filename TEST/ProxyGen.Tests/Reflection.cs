@@ -36,13 +36,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return MetadataAssemblyInfo.CreateFrom(typeof(ReflectionTests).Assembly);
                 yield return CreateTI(typeof(ReflectionTests).Assembly);
 
-                static IAssemblyInfo CreateTI(Assembly asm) 
-                {
-                    Compilation compilation = CreateCompilation(string.Empty, asm);
-
-                    return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
-                }
             }
+        }
+
+        private static IAssemblyInfo CreateTI(Assembly asm)
+        {
+            Compilation compilation = CreateCompilation(string.Empty, asm);
+
+            return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol)compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
         }
 
         [TestCaseSource(nameof(FriendAsms))]
