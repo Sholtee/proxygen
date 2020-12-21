@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.False(set.Add(MetadataTypeInfo.CreateFrom(typeof(object))));
         }
 
-        public static IEnumerable<IAssemblyInfo> FirendAsms 
+        public static IEnumerable<IAssemblyInfo> FriendAsms 
         {
             get 
             {
@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             }
         }
 
-        [TestCaseSource(nameof(FirendAsms))]
+        [TestCaseSource(nameof(FriendAsms))]
         public void AssemblyInfo_FriendshipTest(IAssemblyInfo asm) =>
             Assert.That(asm.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
