@@ -50,7 +50,7 @@
   - *breaking:* New `ISyntaxFactory` layout
   - *introduced:* `IProxySyntaxFactory` interface
   - *introduced:* `ConcurrentInterfaceinterceptor` class
-  - *done:* More efficient generated code
+  - *improved:* Generated code
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
 - 4.0.0-preview2
@@ -59,5 +59,6 @@
   - *introduced:* Cancellable `TypeGenerator`s
   - *introduced:* Pointer type support
   - *introduced:* `ref readonly` support
-  - *done:* More efficient generated code
+  - *improved::* Generated code
+  - *improved:* Visibility check
   
