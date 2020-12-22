@@ -15,7 +15,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     [TestFixture]
-    public class ReflectionTests : IXxXSymbolExtensionsTestsBase
+    public class ReflectionTests : CodeAnalysisTestsBase
     {
         [Test]
         public void EqualityComparison_ShouldWork()

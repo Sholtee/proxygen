@@ -5,47 +5,81 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Text.Json;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Abstractions;
     using Attributes;
 
-    internal class ProxyEmbedder
+    [Generator]
+    internal class ProxyEmbedder: ISourceGenerator
     {
-        public CSharpCompilation Compilation { get; }
-
-        public CancellationToken Cancellation { get; }
-
-        public ProxyEmbedder(CSharpCompilation compilation, in CancellationToken cancellation) 
-        {
-            Compilation = compilation;
-            Cancellation = cancellation;
-        }
-
-        private bool Is(ISymbol? s, Type t) => SymbolEqualityComparer.Default.Equals(s, Compilation.GetTypeByMetadataName(t.FullName));
-
-        private static IReadOnlyList<Type> Generators { get; } = typeof(ProxyEmbedder)
+        private static IReadOnlyList<Type> TypeGenerators { get; } = typeof(ProxyEmbedder)
             .Assembly
             .GetTypes()
             .Where(t => t.BaseType?.IsGenericType == true && t.BaseType.GetGenericTypeDefinition() == typeof(TypeGenerator<>))
             .ToArray();
 
-        internal IEnumerable<INamedTypeSymbol> GetAOTGenerators() 
+        internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) 
         {
-            foreach(AttributeData attr in Compilation.Assembly.GetAttributes().Where(attr => Is(attr.AttributeClass, typeof(EmbedGeneratedTypeAttribute))))
+            foreach(AttributeData attr in compilation.Assembly.GetAttributes().Where(attr => Is(attr.AttributeClass, typeof(EmbedGeneratedTypeAttribute))))
             {
                 if (attr.ConstructorArguments.Single().Value is INamedTypeSymbol arg) 
                 {   
                     INamedTypeSymbol genericTypeDefinition = arg.OriginalDefinition;
 
-                    if (Generators.Any(generator => Is(genericTypeDefinition, generator)))
+                    if (TypeGenerators.Any(generator => Is(genericTypeDefinition, generator)))
                         yield return arg;
+                }
+            }
+
+            bool Is(ISymbol? s, Type t) => SymbolEqualityComparer.Default.Equals(s, compilation.GetTypeByMetadataName(t.FullName));
+        }
+
+        internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location) 
+        {
+            string logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen-{Guid.NewGuid()}.log");
+
+            using var writer = new Utf8JsonWriter(File.OpenWrite(logFile));
+
+            JsonSerializer.Serialize(writer, ex, new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IgnoreReadOnlyProperties = false
+            });
+
+            writer.Flush();
+
+            return Diagnostic.Create
+            (
+                new DiagnosticDescriptor("PG00", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile}", "Type Embedding", DiagnosticSeverity.Warning, true),
+                location
+            );
+        }
+
+        public void Initialize(GeneratorInitializationContext context)
+        {
+        }
+
+        public void Execute(GeneratorExecutionContext context)
+        {
+            foreach (INamedTypeSymbol generator in GetAOTGenerators(context.Compilation))
+            {
+                try
+                {
+                    // TODO
+                }
+                catch (Exception e) 
+                {
+                    context.ReportDiagnostic
+                    (
+                        CreateDiagnosticAndLog(e, generator.Locations.Single())
+                    );
                 }
             }
         }

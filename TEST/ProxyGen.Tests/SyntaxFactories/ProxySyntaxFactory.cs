@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
 
-    using static Internals.Tests.IXxXSymbolExtensionsTestsBase;
+    using static Internals.Tests.CodeAnalysisTestsBase;
     using static Internals.ProxySyntaxFactory;
 
     [TestFixture]

@@ -17,7 +17,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     [TestFixture]
-    public class ITypeSymbolExtensionsTests : IXxXSymbolExtensionsTestsBase
+    public class ITypeSymbolExtensionsTests : CodeAnalysisTestsBase
     {
         [Test]
         public void GetFriendlyName_ShouldNotReturnNamespaceForNestedTypes()

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* IXxXSymbolExtensionsTestsBase.cs                                              *
+* CodeAnalysisTestsBase.cs                                                      *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    public abstract class IXxXSymbolExtensionsTestsBase
+    public abstract class CodeAnalysisTestsBase
     {
         public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences) 
         {

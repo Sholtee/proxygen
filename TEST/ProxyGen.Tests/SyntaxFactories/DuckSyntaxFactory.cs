@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Internals;
     using Properties;
 
-    using static Internals.Tests.IXxXSymbolExtensionsTestsBase;
+    using static Internals.Tests.CodeAnalysisTestsBase;
     using static Internals.DuckSyntaxFactory;
 
     [TestFixture]

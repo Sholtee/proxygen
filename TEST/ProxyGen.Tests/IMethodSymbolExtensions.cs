@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     [TestFixture]
-    public class IMethodSymbolExtensionsTests: IXxXSymbolExtensionsTestsBase
+    public class IMethodSymbolExtensionsTests: CodeAnalysisTestsBase
     {
         [TestCase("Foo", AccessModifiers.Public)]
         [TestCase("Bar", AccessModifiers.Explicit)]
