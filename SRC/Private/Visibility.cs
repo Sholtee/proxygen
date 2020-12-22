@@ -107,7 +107,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            var collector = new ReferenceCollector(); // TODO: referenciakat vhogy szebben is ossze lehetne gyujteni
+            var collector = new ReferenceCollector();
             collector.AddType(type);
 
             //
