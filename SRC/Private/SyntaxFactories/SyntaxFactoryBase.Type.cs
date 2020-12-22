@@ -15,70 +15,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class SyntaxFactoryBase
     {
-        private readonly HashSet<IAssemblyInfo> FReferences = new HashSet<IAssemblyInfo>
-        (
-            Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom),
-            IAssemblyInfoComparer.Instance
-        );
-
-        private readonly HashSet<ITypeInfo> FTypes = new HashSet<ITypeInfo>(ITypeInfoComparer.Instance);
-
-        protected internal void AddTypesFrom(ISyntaxFactory syntax) 
-        {
-            foreach (ITypeInfo type in syntax.Types)
-                FTypes.Add(type);
-
-            foreach (IAssemblyInfo asm in syntax.References)
-                FReferences.Add(asm);
-        }
-
-        protected internal void AddType(ITypeInfo type) 
-        {
-            IGenericTypeInfo? genericType = type as IGenericTypeInfo;
-
-            if (genericType?.IsGenericDefinition == true)
-                return;
-
-            if (!FTypes.Add(type)) // korkoros referencia fix
-                return;
-
-            IAssemblyInfo? asm = type.DeclaringAssembly;
-
-            if (asm is not null)
-            {
-                if (asm.IsDynamic)
-                    throw new NotSupportedException(Resources.DYNAMIC_ASM);
-
-                FReferences.Add(asm);
-            }
-
-            //
-            // Generikus parameterek szerepelhetnek masik szerelvenyben.
-            //
-
-            if (genericType is not null)
-                foreach (ITypeInfo genericArg in genericType.GenericArguments)
-                    AddType(genericArg);
-  
-            //
-            // Az os (osztaly) szerepelhet masik szerelvenyben.
-            //
-
-            foreach (ITypeInfo @base in type.Bases)
-                AddType(@base);
-
-            //
-            // "os" interface-ek szarmazhatnak masik szerelvenybol.
-            //
-
-            foreach (ITypeInfo iface in type.Interfaces)
-                AddType(iface);
-        }
-
         /// <summary>
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]

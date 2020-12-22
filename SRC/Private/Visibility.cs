@@ -107,8 +107,8 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            var fact = new SyntaxFactoryBase(); // TODO: referenciakat vhogy szebben is ossze lehetne gyujteni
-            fact.AddType(type);
+            var collector = new ReferenceCollector(); // TODO: referenciakat vhogy szebben is ossze lehetne gyujteni
+            collector.AddType(type);
 
             //
             // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
@@ -119,7 +119,7 @@ namespace Solti.Utils.Proxy.Internals
             CSharpCompilation comp = CSharpCompilation.Create
             (
                 null,
-                references: fact
+                references: collector
                     .References
                     .Select(@ref => MetadataReference.CreateFromFile(@ref.Location!))
             );
