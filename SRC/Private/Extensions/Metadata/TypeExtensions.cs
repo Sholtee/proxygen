@@ -102,6 +102,105 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
         }
 
+        public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic) => src.ListMembersInternal
+        (
+            (t, f) => t.GetMethods(f),
+            m => m.GetAccessModifiers(),
+
+            //
+            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa kell
+            //
+
+            m =>
+            {
+                var hk = new HashCode();
+
+                foreach (var descr in m.GetParameters().Select(p => new { p.ParameterType, ParameterKind = p.GetParameterKind() }))
+                {
+                    hk.Add(descr);
+                }
+
+                return new
+                {
+                    m.Name,
+                    ParamzHash = hk.ToHashCode()
+                };
+            },
+            includeStatic
+        );
+
+        public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic) => src.ListMembersInternal
+        (
+            (t, f) => t.GetProperties(f),
+
+            //
+            // A nagyobb lathatosagut tekintjuk mervadonak
+            //
+
+            p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
+            p => p.Name, // tipus lenyegtelen, tulajdonsagbol adott nevvel csak egy db lehet adott tipusban
+            includeStatic
+        );
+
+        public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic) => src.ListMembersInternal
+        (
+            (t, f) => t.GetEvents(f),
+            e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
+            e => e.Name, // tipus lenyegtelen, esemeny adott nevvel csak egy db lehet adott tipusban
+            includeStatic
+        );
+
+        private static IEnumerable<TMember> ListMembersInternal<TMember>(
+            this Type src, 
+            Func<Type, BindingFlags, TMember[]> getter, 
+            Func<TMember, AccessModifiers> getVisibility, 
+            Func<TMember, object> getDescriptor, 
+            bool includeStatic)
+        {
+            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+
+            if (src.IsInterface)
+                //
+                // - A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem
+                //   ertelmezett interface-ekre.
+                // - Ez a megoldas a "new" kulcsszo altal elrejtett tagokat is visszaadja 
+                //   (ami szukseges interface-ek eseteben).
+                //
+
+                return src.GetInterfaces().Append(src).SelectMany(GetMembers);
+
+            //
+            // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza
+            // az os osztalyokbol, privatot nem, viszont az explicit implementaciok privat
+            // tagok... 
+            //
+
+            //flags |= BindingFlags.FlattenHierarchy;
+            flags |= BindingFlags.NonPublic;
+            if (includeStatic) flags |= BindingFlags.Static;
+
+            var returnedMembers = new HashSet<object>();
+
+            //
+            // Sorrend fontos, a leszarmazottol haladunk az os fele
+            //
+
+            return new[] { src }.Concat(src.GetBaseTypes()).SelectMany(GetMembers).Where
+            (
+                //
+                // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
+                // jok vagyunk.
+                //
+
+                m => getVisibility(m) is not AccessModifiers.Private && returnedMembers.Add
+                (
+                    getDescriptor(m)
+                )
+            );
+
+            IEnumerable<TMember> GetMembers(Type t) => getter(t, flags);
+        }
+
         public static IEnumerable<Type> GetParents(this Type type)
         {
             //

@@ -42,8 +42,16 @@ namespace Solti.Utils.Proxy.Internals
                 .SelectMany(@interface => @interface
                     .GetMembers()
                     .OfType<IMethodSymbol>())
-                .Where(interfaceMethod => 
-                    SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), src));
+                .Where(interfaceMethod =>
+                {
+                    for (IMethodSymbol? met = src; met is not null; met = met.OverriddenMethod)
+                    {
+                        if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), met))
+                            return true;
+                    }
+
+                    return false;
+                });
         }
 
         private static readonly IReadOnlyList<MethodKind> SpecialMethods = new[]

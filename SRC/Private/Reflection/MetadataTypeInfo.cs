@@ -87,27 +87,13 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
-            .ListMembers<PropertyInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
-
-            //
-            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
-            //
-
-            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
+            .ListProperties(includeStatic: true)
             .Select(MetadataPropertyInfo.CreateFrom)
             .ToArray();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
-            .ListMembers<EventInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
-
-            //
-            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
-            //
-
-            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
+            .ListEvents(includeStatic: true)
             .Select(MetadataEventInfo.CreateFrom)
             .ToArray();
 
@@ -126,14 +112,8 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
-            .ListMembers<MethodInfo>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(m => m.GetAccessModifiers() != AccessModifiers.Private && !MethodsToSkip.Any(skip => skip(m)))
-
-            //
-            // "new" kulcsszoval rendelkezo propert-k nem jatszanak (nem interface-ek eseteben)
-            //
-
-            .Distinct((a, b) => !UnderlyingType.IsInterface() && a.SignatureEquals(b))
+            .ListMethods(includeStatic: true)
+            .Where(m => !MethodsToSkip.Any(skip => skip(m)))
             .Select(MetadataMethodInfo.CreateFrom)
             .ToArray();
 

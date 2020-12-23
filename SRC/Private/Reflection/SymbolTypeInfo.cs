@@ -100,50 +100,20 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
-            .ListMembers<IPropertySymbol>(includeNonPublic: true, includeStatic: true)
-
-            //
-            // Teljesen privat property-ke nem jatszanak.
-            //
-
-            .Where(p => p.GetMethod?.GetAccessModifiers() > AccessModifiers.Private /*NULL-t is kizarja*/ || p.SetMethod?.GetAccessModifiers() > AccessModifiers.Private)
-
-            //
-            // "new" kulcsszoval rendelkezo propert-k sem (nem interface-ek eseteben)
-            //
-
-            .Distinct((a, b) => !UnderlyingSymbol.IsInterface() && a.Name == b.Name && (a.GetMethod?.SignatureEquals(b.GetMethod!) == true || a.SetMethod?.SignatureEquals(b.SetMethod!) == true))
+            .ListProperties(includeStatic: true)
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
             .ToArray();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
-            .ListMembers<IEventSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
-
-            //
-            // Teljesen privat esemenyek nem jatszanak.
-            //
-
-            .Where(e => e.AddMethod?.GetAccessModifiers() > AccessModifiers.Private || e.RemoveMethod?.GetAccessModifiers() > AccessModifiers.Private)
-
-            //
-            // "new" kulcsszoval rendelkezo esemenyek sem (nem interface-ek eseteben)
-            //
-
-            .Distinct((a, b) => !UnderlyingSymbol.IsInterface() && a.Name == b.Name && (a.AddMethod?.SignatureEquals(b.AddMethod!) == true || a.RemoveMethod?.SignatureEquals(b.RemoveMethod!) == true))
+            .ListEvents(includeStatic: true)
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
             .ToArray();
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
-            .ListMembers<IMethodSymbol>(includeNonPublic: true /*explicit*/, includeStatic: true)
-            .Where(m => m.IsClassMethod() && m.GetAccessModifiers() != AccessModifiers.Private)
-
-            //
-            // "new" kulcsszoval rendelkezo metodusok sem (nem interface-ek eseteben)
-            //
-
-            .Distinct((a,b) => !UnderlyingSymbol.IsInterface() && a.SignatureEquals(b))
+            .ListMethods(includeStatic: true)
+            .Where(m => m.IsClassMethod())
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
             .ToArray();
 

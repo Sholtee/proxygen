@@ -92,17 +92,80 @@ namespace Solti.Utils.Proxy.Internals
                 .OfType<TMember>();
         }
 
-        public static IEnumerable<IMethodSymbol> GetPublicConstructors(this INamedTypeSymbol src)
+        public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IMethodSymbol>
+        (
+            m => m.GetAccessModifiers(),
+
+            //
+            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa kell
+            //
+
+            m =>
+            {
+                var hk = new HashCode();
+
+                foreach (var descr in m.Parameters.Select(p => new { p.Type, ParameterKind = p.GetParameterKind() }))
+                {
+                    hk.Add(descr);
+                }
+
+                return new
+                {
+                    m.Name,
+                    ParamzHash = hk.ToHashCode()
+                };
+            },
+            includeStatic
+        );
+
+        public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IPropertySymbol>
+        (
+            //
+            // A nagyobb lathatosagut tekintjuk mervadonak
+            //
+
+            p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
+            p => p.Name, // nem kell StrippedName()
+            includeStatic
+        );
+
+        public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IEventSymbol>
+        (
+            e => (e.AddMethod ?? e.RemoveMethod)?.GetAccessModifiers() ?? AccessModifiers.Unknown,
+            e => e.Name, // nem kell StrippedName()
+            includeStatic
+        );
+
+        private static IEnumerable<TMember> ListMembersInternal<TMember>(
+            this ITypeSymbol src, 
+            Func<TMember, AccessModifiers> getVisibility,
+            Func<TMember, object> getDescriptor,
+            bool includeStatic) where TMember : ISymbol
         {
-            IEnumerable<IMethodSymbol> constructors = src
-                .InstanceConstructors
-                .Where(ctor => ctor.DeclaredAccessibility == Accessibility.Public);
+            if (src.IsInterface())
+                return src.AllInterfaces.Append(src).SelectMany(GetMembers);
 
-            if (!constructors.Any())
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.Name));
+            var returnedMembers = new HashSet<object>();
 
-            return constructors;
+            Func<TMember, bool> filter = m => getVisibility(m) > AccessModifiers.Private && returnedMembers.Add
+            (
+                getDescriptor(m)
+            );
+
+            if (!includeStatic)
+                filter = filter.And(m => !m.IsStatic);
+
+            //
+            // Sorrend szamit: a leszarmazottaktol haladunk az os fele
+            //
+           
+            return new[] { src }.Concat(src.GetBaseTypes()).SelectMany(GetMembers).Where(filter);
+
+            static IEnumerable<TMember> GetMembers(ITypeSymbol t) => t
+                .GetMembers()
+                .OfType<TMember>();
         }
+
 
         public static ITypeSymbol? GetElementType(this ITypeSymbol src, bool recurse = false)
         {

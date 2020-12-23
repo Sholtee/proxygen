@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,18 +21,5 @@ namespace Solti.Utils.Proxy.Internals
             .SingleOrDefault();
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
-
-        public static IEnumerable<T> Distinct<T>(this IEnumerable<T> src, Func<T, T, bool> equals) // baszottul nem optimalis
-        {
-            var result = new List<T>();
-
-            foreach (T item in src)
-            {
-                if (!result.Any(stored => equals(stored, item)))
-                    result.Add(item);
-            }
-
-            return result;
-        }
     }
 }
