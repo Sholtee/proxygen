@@ -80,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 var hk = new HashCode();
 
-                foreach (var descr in m.Parameters.Select(p => new { p.Type, ParameterKind = p.GetParameterKind() }))
+                foreach (var descr in m.Parameters.Select(p => new { TypeHash = p.Type.GetUniqueHashCode(), ParameterKind = p.GetParameterKind() }))
                 {
                     hk.Add(descr);
                 }
@@ -93,6 +93,26 @@ namespace Solti.Utils.Proxy.Internals
             },
             includeStatic
         );
+
+        //
+        // symbolof(int32*) == symbolof(int[]). Ebbol fakadoan pl symbolof(List<int*>) == symbolof(List<int[]>) 
+        // Lasd: PointersAndArrays_ShouldBeConsideredEqual teszt
+        //
+
+        public static int GetUniqueHashCode(this ITypeSymbol src) => src switch 
+        {
+            IArrayTypeSymbol array => new 
+            { 
+                Extra = typeof(IArrayTypeSymbol), 
+                TypeHash = array.ElementType.GetUniqueHashCode() 
+            }.GetHashCode(),
+            IPointerTypeSymbol pointer => new 
+            { 
+                Extra = typeof(IPointerTypeSymbol), 
+                TypeHash = pointer.PointedAtType.GetUniqueHashCode() 
+            }.GetHashCode(),
+            _ => src.GetHashCode()
+        };
 
         public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IPropertySymbol>
         (
@@ -258,6 +278,10 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             if (!src.IsGenericParameter())
+                //
+                // Ez helyesen hasonlit ossze mutatot tombbel: "symbolof(int[]) != symbolfo(int*)" (ami valojaban gepikod szinten persze ugyanaz)
+                //
+
                 return SymbolEqualityComparer.Default.Equals(src, that);
 
             IEqualityComparer<ISymbol> comparer = SymbolEqualityComparer.Default;

@@ -448,5 +448,33 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(a.EqualsTo(b), Is.EqualTo(equals));
         }
+
+        [Test]
+        public void PointersAndArrays_ShouldBeConsideredEqual() 
+        {
+            Compilation compilation = CreateCompilation(string.Empty);
+
+            ITypeSymbol 
+                int32 = compilation.GetSpecialType(SpecialType.System_Int32),
+                intAr = compilation.CreateArrayTypeSymbol(int32),
+                intPtr = compilation.CreatePointerTypeSymbol(int32);
+
+            Assert.AreEqual(intAr.GetHashCode(), intPtr.GetHashCode());
+            Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(intAr), SymbolEqualityComparer.Default.GetHashCode(intPtr));
+            Assert.False(SymbolEqualityComparer.Default.Equals(intAr, intPtr));
+        }
+
+        [Test]
+        public void GetUniqueHashCode_ShouldDistinguishBetweenArraysAndPointers() 
+        {
+            Compilation compilation = CreateCompilation(string.Empty);
+
+            ITypeSymbol
+                int32 = compilation.GetSpecialType(SpecialType.System_Int32),
+                intAr = compilation.CreateArrayTypeSymbol(int32),
+                intPtr = compilation.CreatePointerTypeSymbol(int32);
+
+            Assert.AreNotEqual(intAr.GetUniqueHashCode(), intPtr.GetUniqueHashCode());
+        }
     }
 }
