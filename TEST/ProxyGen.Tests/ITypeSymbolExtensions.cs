@@ -476,5 +476,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.AreNotEqual(intAr.GetUniqueHashCode(), intPtr.GetUniqueHashCode());
         }
+
+        [Test]
+        public void GenericParameterAndItsDeclaringGeneric_ShouldBeConsideredEqual() 
+        {
+            Compilation compilation = CreateCompilation // mondjuk ez kibaszott perverz :D
+            (@"
+                interface IGeneric<T> 
+                {
+                    void Foo(IGeneric<T> a, T b);
+                }
+            ");
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            ITypeSymbol
+                a = visitor.AllTypeSymbols.Single(t => t.Name == "IGeneric").ListMethods().Single(m => m.Name == "Foo").Parameters[0].Type,
+                b = visitor.AllTypeSymbols.Single(t => t.Name == "IGeneric").ListMethods().Single(m => m.Name == "Foo").Parameters[1].Type;
+
+            Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
+            Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(a), SymbolEqualityComparer.Default.GetHashCode(b));
+        }
     }
 }

@@ -94,13 +94,13 @@ namespace Solti.Utils.Proxy.Internals
             includeStatic
         );
 
-        //
-        // symbolof(int32*) == symbolof(int[]). Ebbol fakadoan pl symbolof(List<int*>) == symbolof(List<int[]>) 
-        // Lasd: PointersAndArrays_ShouldBeConsideredEqual teszt
-        //
-
         public static int GetUniqueHashCode(this ITypeSymbol src) => src switch 
         {
+            //
+            // symbolof(int32*) == symbolof(int[]). Ebbol fakadoan pl symbolof(List<int*>) == symbolof(List<int[]>) 
+            // Lasd: PointersAndArrays_ShouldBeConsideredEqual teszt
+            //
+
             IArrayTypeSymbol array => new 
             { 
                 Extra = typeof(IArrayTypeSymbol), 
@@ -111,6 +111,14 @@ namespace Solti.Utils.Proxy.Internals
                 Extra = typeof(IPointerTypeSymbol), 
                 TypeHash = pointer.PointedAtType.GetUniqueHashCode() 
             }.GetHashCode(),
+
+            //
+            // symbolof(List<T>) == symbolof(T), lehet en vagyok a fasz de ennek tenyleg igy kene lennie
+            // Lasd: GenericParameterAndItsDeclaringGeneric_ShouldBeConsideredEqual teszt
+            //
+
+            _ when src.IsGenericParameter() => src.GetGenericParameterIndex()!.Value,
+
             _ => src.GetHashCode()
         };
 
@@ -257,6 +265,33 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        public static int? GetGenericParameterIndex(this ITypeSymbol src) 
+        {
+            if (!src.IsGenericParameter())
+                return null;
+
+            IEqualityComparer<ISymbol> comparer = SymbolEqualityComparer.Default;
+
+            return src switch
+            {
+                //
+                // class ClassA<T>.Foo(T para) == class ClassB<TT>.Foo(TT para)
+                //
+
+                _ when src.ContainingSymbol is INamedTypeSymbol srcContainer =>
+                    srcContainer.TypeArguments.IndexOf(src, comparer),
+
+                //
+                // class ClassA.Foo<T>(T para) == class ClassB.Foo<TT>(TT para)
+                //
+
+                _ when src.ContainingSymbol is IMethodSymbol srcMethod =>
+                    srcMethod.TypeArguments.IndexOf(src, comparer) * -1, // ha a parameter metoduson van definialva akkor negativ szam
+
+                _ => null
+            };
+        }
+
         public static bool EqualsTo(this ITypeSymbol src, ITypeSymbol that) 
         {
             if (src.IsGenericParameter() != that.IsGenericParameter())
@@ -277,33 +312,14 @@ namespace Solti.Utils.Proxy.Internals
                 return elA.EqualsTo(elB);
             }
 
-            if (!src.IsGenericParameter())
+            return !src.IsGenericParameter()
                 //
                 // Ez helyesen hasonlit ossze mutatot tombbel: "symbolof(int[]) != symbolfo(int*)" (ami valojaban gepikod szinten persze ugyanaz)
                 //
 
-                return SymbolEqualityComparer.Default.Equals(src, that);
+                ? SymbolEqualityComparer.Default.Equals(src, that)
 
-            IEqualityComparer<ISymbol> comparer = SymbolEqualityComparer.Default;
-
-            return src switch 
-            {
-                //
-                // class ClassA<T>.Foo(T para) == class ClassB<TT>.Foo(TT para)
-                //
-
-                _ when src.ContainingSymbol is INamedTypeSymbol srcContainer && that.ContainingSymbol is INamedTypeSymbol thatContainer =>
-                    srcContainer.TypeArguments.IndexOf(src, comparer) == thatContainer.TypeArguments.IndexOf(that, comparer),
-
-                //
-                // class ClassA.Foo<T>(T para) == class ClassB.Foo<TT>(TT para)
-                //
-
-                _ when src.ContainingSymbol is IMethodSymbol srcMethod && that.ContainingSymbol is IMethodSymbol thatMethod =>
-                    srcMethod.TypeArguments.IndexOf(src, comparer) == thatMethod.TypeArguments.IndexOf(that, comparer),
-
-                _ => false
-            };
+                : src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
 
             static object GetByRefAttributes(ITypeSymbol t) => new
             {
