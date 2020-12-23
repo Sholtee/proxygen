@@ -275,14 +275,14 @@ namespace Solti.Utils.Proxy.Internals
             return src switch
             {
                 //
-                // class ClassA<T>.Foo(T para) == class ClassB<TT>.Foo(TT para)
+                // class ClassA<T>.Foo(T para)
                 //
 
                 _ when src.ContainingSymbol is INamedTypeSymbol srcContainer =>
                     srcContainer.TypeArguments.IndexOf(src, comparer),
 
                 //
-                // class ClassA.Foo<T>(T para) == class ClassB.Foo<TT>(TT para)
+                // class ClassA.Foo<T>(T para)
                 //
 
                 _ when src.ContainingSymbol is IMethodSymbol srcMethod =>
