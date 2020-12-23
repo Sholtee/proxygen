@@ -90,12 +90,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T a, int b) {}
+                    public void Foo(T a, int b) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T>(T para, int b) {}
+                    public void Foo<T>(T para, int b) {}
                 }
             ",
             false
@@ -105,12 +105,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    T Foo(int a) => default(T);
+                    public T Foo(int a) => default(T);
                 }
 
                 class ClassB 
                 {
-                    T Foo<T>(int a) => default(T);
+                    public T Foo<T>(int a) => default(T);
                 }
             ",
             false
@@ -120,12 +120,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             false
@@ -135,12 +135,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
             ",
             false
@@ -150,12 +150,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T a, int b) {}
+                    public void Foo(T a, int b) {}
                 }
 
                 class ClassB<TT> 
                 {
-                    void Foo(TT a, int b) {}
+                    public void Foo(TT a, int b) {}
                 }
             ",
             true
@@ -165,12 +165,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo(string para) {}
+                    public void Foo(string para) {}
                 }
 
                 class ClassB
                 {
-                    void Foo(string para) {}
+                    public void Foo(string para) {}
                 }
             ",
             true
@@ -180,12 +180,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(TT para) {}
+                    public void Foo<T, TT>(TT para) {}
                 }
             ",
             false
@@ -195,12 +195,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(T para) {}
+                    public void Foo<T, TT>(T para) {}
                 }
             ",
             false
@@ -210,12 +210,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T a, int b) {}
+                    public void Foo<T>(T a, int b) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT a, int b) {}
+                    public void Foo<TT>(TT a, int b) {}
                 }
             ",
             true
@@ -225,12 +225,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    string Foo(int a) => null;
+                    public string Foo(int a) => null;
                 }
 
                 class ClassB 
                 {
-                    string Foo(int a) => null;
+                    public string Foo(int a) => null;
                 }
             ",
             true
@@ -243,8 +243,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             visitor.VisitNamespace(compilation.GlobalNamespace);
 
             IMethodSymbol
-                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo"),
-                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo");
+                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMethods().Single(m => m.Name == "Foo"),
+                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMethods().Single(m => m.Name == "Foo");
 
             Assert.That(a.SignatureEquals(b), Is.EqualTo(equals));
         }

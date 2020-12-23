@@ -68,30 +68,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<TMember> ListMembers<TMember>(this ITypeSymbol src, bool includeNonPublic = false, bool includeStatic = false) where TMember : ISymbol
-        {
-            if (src.IsInterface())
-                return src.AllInterfaces.Append(src).SelectMany(GetMembers);
-
-            //
-            // Nem publikus es statikus tagok nem tartozhatnak interface-ekhez
-            //
-
-            Func<TMember, bool> filter = m => !m.IsOverride;
-
-            if (!includeNonPublic)
-                filter = filter.And(m => m.DeclaredAccessibility == Accessibility.Public);
-
-            if (!includeStatic)
-                filter = filter.And(m => !m.IsStatic);
-
-            return src.GetBaseTypes().Append(src).SelectMany(GetMembers).Where(filter);
-
-            static IEnumerable<TMember> GetMembers(ITypeSymbol t) => t
-                .GetMembers()
-                .OfType<TMember>();
-        }
-
         public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IMethodSymbol>
         (
             m => m.GetAccessModifiers(),

@@ -203,7 +203,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 public void Bar() {}
             }
         ", "BarCls")]
-        public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy(string src, string cls)
+        public void ListMethods_ShouldReturnMethodsFromTheWholeHierarchy(string src, string cls)
         {
             CSharpCompilation compilation = CreateCompilation(src);
 
@@ -212,7 +212,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             INamedTypeSymbol bar = visitor.AllTypeSymbols.Single(t => t.Name == cls);
 
-            IMethodSymbol[] methods = bar.ListMembers<IMethodSymbol>().ToArray();
+            IMethodSymbol[] methods = bar.ListMethods().ToArray();
 
             Assert.That(methods.Count(m => m.Name == "Foo"), Is.EqualTo(1));
             Assert.That(methods.Count(m => m.Name == "Bar"), Is.EqualTo(1));
@@ -273,12 +273,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
             ",
             false
@@ -288,12 +288,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             false
@@ -303,12 +303,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
             ",
             true
@@ -318,12 +318,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             true
@@ -333,12 +333,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(TT para) {}
+                    public void Foo<T, TT>(TT para) {}
                 }
             ",
             false
@@ -348,12 +348,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(T para) {}
+                    public void Foo<T, TT>(T para) {}
                 }
             ",
             true
@@ -363,12 +363,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT para) {}
+                    public void Foo<TT>(TT para) {}
                 }
             ",
             true
@@ -378,12 +378,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T[] para) {}
+                    public void Foo<T>(T[] para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT[] para) {}
+                    public void Foo<TT>(TT[] para) {}
                 }
             ",
             true
@@ -394,12 +394,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 using System.Collections.Generic;
                 class ClassA
                 {
-                    void Foo(List<int> para) {}
+                    public void Foo(List<int> para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
             ",
             false
@@ -410,12 +410,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 using System.Collections.Generic;
                 class ClassA
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
             ",
             true
@@ -425,12 +425,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    unsafe void Foo(byte* para) {}
+                    public unsafe void Foo(byte* para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(byte[] para) {}
+                    public void Foo(byte[] para) {}
                 }
             ",
             false
@@ -443,8 +443,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             visitor.VisitNamespace(compilation.GlobalNamespace);
 
             ITypeSymbol
-                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo").Parameters.Single().Type,
-                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMembers<IMethodSymbol>(includeNonPublic: true).Single(m => m.Name == "Foo").Parameters.Single().Type;
+                a = visitor.AllTypeSymbols.Single(t => t.Name == "ClassA").ListMethods().Single(m => m.Name == "Foo").Parameters.Single().Type,
+                b = visitor.AllTypeSymbols.Single(t => t.Name == "ClassB").ListMethods().Single(m => m.Name == "Foo").Parameters.Single().Type;
 
             Assert.That(a.EqualsTo(b), Is.EqualTo(equals));
         }

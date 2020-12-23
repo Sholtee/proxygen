@@ -21,30 +21,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
     public sealed class TypeExtensionsTests
     {
         [Test]
-        public void ListMembers_ShouldReturnOverLoadedInterfaceMembers() 
+        public void ListMethods_ShouldReturnOverLoadedInterfaceMethods() 
         {
-            MethodInfo[] methods = typeof(IEnumerable<string>).ListMembers<MethodInfo>().ToArray();
+            MethodInfo[] methods = typeof(IEnumerable<string>).ListMethods().ToArray();
             Assert.That(methods.Length, Is.EqualTo(2));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable<string>>(i => i.GetEnumerator())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable>(i => i.GetEnumerator())));
-
-            PropertyInfo[] properties = typeof(IEnumerator<string>).ListMembers<PropertyInfo>().ToArray();
-            Assert.That(properties.Length, Is.EqualTo(2));
-            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
-            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
         }
 
         [Test]
-        public void ListMembers_ShouldReturnExplicitImplementations() 
+        public void ListProperties_ShouldReturnOverLoadedInterfaceProperties()
         {
-            MethodInfo[] methods = typeof(List<int>).ListMembers<MethodInfo>(includeNonPublic: true).ToArray();
+            PropertyInfo[] properties = typeof(IEnumerator<string>).ListProperties().ToArray();
+            Assert.That(properties.Length, Is.EqualTo(2));
+            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
+            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
+        }
+
+        [Test]
+        public void ListMethods_ShouldReturnExplicitImplementations() 
+        {
+            MethodInfo[] methods = typeof(List<int>).ListMethods().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(methods.Distinct().Count()));
 
             // Enumerator, IEnumerator, IEnumerator<int>
             Assert.That(methods.Where(m => m.Name.Contains(nameof(IEnumerable.GetEnumerator))).Count(), Is.EqualTo(3));
+        }
 
-            PropertyInfo[] properties = typeof(List<int>).ListMembers<PropertyInfo>(includeNonPublic: true).ToArray();
+        [Test]
+        public void ListProperties_ShouldReturnExplicitImplementations()
+        {
+            PropertyInfo[] properties = typeof(List<int>).ListProperties().ToArray();
 
             Assert.That(properties.Length, Is.EqualTo(properties.Distinct().Count()));
 
@@ -64,10 +72,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void ListMembers_ShouldReturnExplicitImplementations2() 
+        public void ListMethods_ShouldReturnExplicitImplementations2() 
         {
             MethodInfo[] methods = typeof(NoughtyClass)
-                .ListMembers<MethodInfo>(includeNonPublic: true)
+                .ListMethods()
                 .Where(m => m.Name.Contains(nameof(IInterface.Bar)))
                 .ToArray();
 
@@ -75,23 +83,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy()
+        public void ListMethods_ShouldReturnMethodsFromTheWholeHierarchy()
         {
-            MethodInfo[] methods = typeof(IGrandChild).ListMembers<MethodInfo>().ToArray();
+            MethodInfo[] methods = typeof(IGrandChild).ListMethods().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(3));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IParent>(i => i.Foo())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IChild>(i => i.Bar())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IGrandChild>(i => i.Baz())));
-        }
-
-        [TestCase(true, 3)]
-        [TestCase(false, 1)]
-        public void ListMembers_ShouldReturnNonPublicMembersIfNecessary(bool includeNonPublic, int expectedLength) 
-        {
-            PropertyInfo[] properties = typeof(Class).ListMembers<PropertyInfo>(includeNonPublic).ToArray();
-
-            Assert.That(properties.Length, Is.EqualTo(expectedLength));
         }
 
         private class Class 
@@ -173,12 +172,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
             ",
             false
@@ -188,12 +187,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             false
@@ -203,12 +202,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
             ",
             true
@@ -218,12 +217,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             true
@@ -233,12 +232,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(TT para) {}
+                    public void Foo<T, TT>(TT para) {}
                 }
             ",
             false
@@ -248,12 +247,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(T para) {}
+                    public void Foo<T, TT>(T para) {}
                 }
             ",
             true
@@ -263,12 +262,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT para) {}
+                    public void Foo<TT>(TT para) {}
                 }
             ",
             true
@@ -278,12 +277,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T[] para) {}
+                    public void Foo<T>(T[] para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT[] para) {}
+                    public void Foo<TT>(TT[] para) {}
                 }
             ",
             true
@@ -294,12 +293,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 using System.Collections.Generic;
                 class ClassA
                 {
-                    void Foo(List<int> para) {}
+                    public void Foo(List<int> para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
             ",
             false
@@ -310,12 +309,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 using System.Collections.Generic;
                 class ClassA
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(List<string> para) {}
+                    public void Foo(List<string> para) {}
                 }
             ",
             true
@@ -325,12 +324,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    unsafe void Foo(byte* para) {}
+                    public unsafe void Foo(byte* para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(byte[] para) {}
+                    public void Foo(byte[] para) {}
                 }
             ",
             false
@@ -340,12 +339,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    unsafe void Foo(ref byte cica) {}
+                    public unsafe void Foo(ref byte cica) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo(ref byte kutya) {}
+                    public void Foo(ref byte kutya) {}
                 }
             ",
             true
@@ -355,8 +354,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assembly asm = Compile(src);
 
             Type
-                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo").GetParameters().Single().ParameterType,
-                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo").GetParameters().Single().ParameterType;
+                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMethods().Single(m => m.Name == "Foo").GetParameters().Single().ParameterType,
+                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMethods().Single(m => m.Name == "Foo").GetParameters().Single().ParameterType;
 
             Assert.That(a.EqualsTo(b), Is.EqualTo(equals));
         }

@@ -36,9 +36,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase(nameof(MyClass.ProtectedInternal), AccessModifiers.Protected | AccessModifiers.Internal)]
         [TestCase(nameof(MyClass.Internal), AccessModifiers.Internal)]
         [TestCase("Solti.Utils.Proxy.Internals.Tests.MethodBaseExtensionsTests.IInterface.Explicit", AccessModifiers.Explicit)]
-        [TestCase("Private", AccessModifiers.Private)]
         public void GetAccessModifiers_ShouldDoWhatTheItsNameSays(string name, int am) =>
-            Assert.That(typeof(MyClass).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == name).GetAccessModifiers(), Is.EqualTo((AccessModifiers) am));
+            Assert.That(typeof(MyClass).ListMethods().Single(m => m.Name == name).GetAccessModifiers(), Is.EqualTo((AccessModifiers) am));
 
         private interface IInterface 
         {
@@ -52,7 +51,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             protected internal void ProtectedInternal() { }
             internal void Internal() { }
             void IInterface.Explicit() { }
-            private void Private() { }
         }
 
         private static Assembly Compile(string src, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
@@ -72,12 +70,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T a, int b) {}
+                    public void Foo(T a, int b) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T>(T para, int b) {}
+                    public void Foo<T>(T para, int b) {}
                 }
             ",
             false
@@ -87,12 +85,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    T Foo(int a) => default(T);
+                    public T Foo(int a) => default(T);
                 }
 
                 class ClassB 
                 {
-                    T Foo<T>(int a) => default(T);
+                    public T Foo<T>(int a) => default(T);
                 }
             ",
             false
@@ -102,12 +100,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(TT para) {}
+                    public void Foo(TT para) {}
                 }
             ",
             false
@@ -117,12 +115,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
 
                 class ClassB<T, TT> 
                 {
-                    void Foo(T para) {}
+                    public void Foo(T para) {}
                 }
             ",
             false
@@ -132,12 +130,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA<T> 
                 {
-                    void Foo(T a, int b) {}
+                    public void Foo(T a, int b) {}
                 }
 
                 class ClassB<TT> 
                 {
-                    void Foo(TT a, int b) {}
+                    public void Foo(TT a, int b) {}
                 }
             ",
             true
@@ -147,12 +145,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo(string para) {}
+                    public void Foo(string para) {}
                 }
 
                 class ClassB
                 {
-                    void Foo(string para) {}
+                    public void Foo(string para) {}
                 }
             ",
             true
@@ -162,12 +160,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(TT para) {}
+                    public void Foo<T, TT>(TT para) {}
                 }
             ",
             false
@@ -177,12 +175,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T para) {}
+                    public void Foo<T>(T para) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<T, TT>(T para) {}
+                    public void Foo<T, TT>(T para) {}
                 }
             ",
             false
@@ -192,12 +190,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    void Foo<T>(T a, int b) {}
+                    public void Foo<T>(T a, int b) {}
                 }
 
                 class ClassB 
                 {
-                    void Foo<TT>(TT a, int b) {}
+                    public void Foo<TT>(TT a, int b) {}
                 }
             ",
             true
@@ -207,12 +205,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
                 class ClassA
                 {
-                    string Foo(int a) => null;
+                    public string Foo(int a) => null;
                 }
 
                 class ClassB 
                 {
-                    string Foo(int a) => null;
+                    public string Foo(int a) => null;
                 }
             ",
             true
@@ -222,8 +220,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assembly asm = Compile(src);
 
             MethodInfo
-                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo"),
-                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMembers<MethodInfo>(includeNonPublic: true).Single(m => m.Name == "Foo");
+                a = asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMethods().Single(m => m.Name == "Foo"),
+                b = asm.GetTypes().Single(t => t.Name.Contains("ClassB")).ListMethods().Single(m => m.Name == "Foo");
 
             Assert.That(a.SignatureEquals(b), Is.EqualTo(equals));
         }

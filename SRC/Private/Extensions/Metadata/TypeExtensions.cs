@@ -73,36 +73,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericParameter(this Type src) => (src.GetElementType(recurse: true) ?? src).IsGenericParameter;
 
-        public static IEnumerable<TMember> ListMembers<TMember>(this Type src, bool includeNonPublic = false, bool includeStatic = false) where TMember : MemberInfo
-        {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-
-            if (src.IsInterface)
-                //
-                // A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem ertelmezett interface-ekre (es explicit 
-                // implementaciokra).
-                //
-
-                return src.GetInterfaces().Append(src).SelectMany(GetMembers);
-
-            //
-            // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza
-            // az os osztalyokbol, privatot nem, viszont az explicit implementaciok privat
-            // tagok... 
-            //
-
-            //flags |= BindingFlags.FlattenHierarchy;
-            if (includeNonPublic) flags |= BindingFlags.NonPublic;
-            if (includeStatic) flags |= BindingFlags.Static;
-
-            //return GetMembers(src);
-
-            return src.GetBaseTypes().Append(src).SelectMany(GetMembers);
-
-            IEnumerable<TMember> GetMembers(Type t) => t.GetMembers(flags).OfType<TMember>();
-        }
-
-        public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic) => src.ListMembersInternal
+        public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
             (t, f) => t.GetMethods(f),
             m => m.GetAccessModifiers(),
@@ -129,7 +100,7 @@ namespace Solti.Utils.Proxy.Internals
             includeStatic
         );
 
-        public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic) => src.ListMembersInternal
+        public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
             (t, f) => t.GetProperties(f),
 
@@ -142,7 +113,7 @@ namespace Solti.Utils.Proxy.Internals
             includeStatic
         );
 
-        public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic) => src.ListMembersInternal
+        public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
             (t, f) => t.GetEvents(f),
             e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
