@@ -11,8 +11,6 @@ namespace Solti.Utils.Proxy.Internals
 
         ITypeInfo InterceptorType { get; }
 
-        ITypeInfo BaseInterceptorType { get; }
-
         string ClassName { get; }
     }
 }

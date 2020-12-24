@@ -233,9 +233,16 @@ namespace Solti.Utils.Proxy.Internals
 
             public MethodInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_METHOD = Context.BaseInterceptorType
-                    .Methods
-                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveMethod));
+                RESOLVE_METHOD = Context.InterceptorType.Methods.Single
+                (
+                    met => met.SignatureEquals
+                    (
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveMethod(default!))
+                        )
+                    )
+                );
             }
 
             protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context

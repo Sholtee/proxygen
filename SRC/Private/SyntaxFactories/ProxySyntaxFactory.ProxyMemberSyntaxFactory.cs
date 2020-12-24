@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -220,17 +221,26 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Context = context;
 
-                TARGET = Context.BaseInterceptorType
-                    .Properties
-                    .Single(prop => prop.Name == nameof(InterfaceInterceptor<object>.Target));
+                TARGET = Context.InterceptorType.Properties.Single
+                (
+                    prop => prop.Name == nameof(InterfaceInterceptor<object>.Target)
+                );
 
-                INVOKE_TARGET = Context.BaseInterceptorType
-                    .Properties
-                    .Single(prop => prop.Name == nameof(InterfaceInterceptor<object>.InvokeTarget));
+                INVOKE_TARGET = Context.InterceptorType.Properties.Single
+                (
+                    prop => prop.Name == nameof(InterfaceInterceptor<object>.InvokeTarget)
+                );
 
-                INVOKE = Context.BaseInterceptorType
-                    .Methods
-                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.Invoke));
+                INVOKE = Context.InterceptorType.Methods.Single
+                (
+                    met => met.SignatureEquals
+                    (
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!, default!, default!))
+                        )
+                    )
+                );
             }
         }
     }

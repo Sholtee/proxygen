@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -13,7 +15,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using System.Collections.Generic;
+    using Properties;
 
     internal partial class ProxySyntaxFactory
     {
@@ -35,19 +37,10 @@ namespace Solti.Utils.Proxy.Internals
             protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
                 cancellation.ThrowIfCancellationRequested();
-/*
-                //
-                // TODO: IMethodInfo.IsFinal implementalasa.
-                //
 
-                IMethodInfo invoke = Context // ne az INVOKE konstanst hasznaljuk (az az os metodusra mutat)
-                    .InterceptorType
-                    .Methods
-                    .Single(m => m.SignatureEquals(INVOKE));
-
-                if (invoke.IsFinal)
+                if (INVOKE.IsFinal)
                     throw new InvalidOperationException(Resources.SEALED_INVOKE);
-*/
+
                 yield return OverrideMethod(INVOKE).WithBody
                 (
                     SimpleBlock

@@ -22,8 +22,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
-        public ITypeInfo BaseInterceptorType { get; }  // ebbol kerdezzuk le az Invoke() stb tagokat, igy biztosan nem lesz utkozes
-
         public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
         public override string ClassName { get; }
@@ -40,9 +38,9 @@ namespace Solti.Utils.Proxy.Internals
             // Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
             //
 
-            BaseInterceptorType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))).Close(interfaceType);
+            var  baseInterceptorType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))).Close(interfaceType);
 
-            if (!interceptorType.Bases.Append(interceptorType).Any(BaseInterceptorType.Equals))
+            if (!interceptorType.Bases.Append(interceptorType).Any(baseInterceptorType.Equals))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)

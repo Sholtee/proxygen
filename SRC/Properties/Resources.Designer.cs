@@ -214,6 +214,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invoke() method can not be sealed..
+        /// </summary>
+        internal static string SEALED_INVOKE {
+            get {
+                return ResourceManager.GetString("SEALED_INVOKE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &quot;{0}&quot; can not be found..
         /// </summary>
         internal static string TYPE_NOT_FOUND {

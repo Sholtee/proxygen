@@ -226,10 +226,16 @@ namespace Solti.Utils.Proxy.Internals
 
             public PropertyInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_PROPERTY = Context
-                    .BaseInterceptorType
-                    .Methods
-                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveProperty));
+                RESOLVE_PROPERTY = Context.InterceptorType.Methods.Single
+                (
+                    met => met.SignatureEquals
+                    (
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveProperty(default!))
+                        )
+                    )
+                );
             }
         }
     }

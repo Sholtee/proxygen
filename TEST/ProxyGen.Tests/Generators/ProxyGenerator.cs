@@ -355,6 +355,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
+        public class InterceptorWithSealedInvoke : InterfaceInterceptor<IMyInterface> 
+        {
+            public InterceptorWithSealedInvoke() : base(null) { }
+
+            public sealed override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => base.Invoke(method, args, extra);
+        }
+
         [Test]
         public void ProxyGenerator_ShouldValidate() 
         {
@@ -362,6 +369,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.ThrowsAsync<NotSupportedException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
+            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithSealedInvoke>());
             Assert.ThrowsAsync<MemberAccessException>(() => CreateProxy<IMyInterface, PrivateInterceptor>());
         }
 

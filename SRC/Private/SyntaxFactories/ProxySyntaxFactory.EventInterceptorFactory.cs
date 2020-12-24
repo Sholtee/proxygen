@@ -114,10 +114,16 @@ namespace Solti.Utils.Proxy.Internals
 
             public EventInterceptorFactory(IProxyContext context) : base(context)
             {
-                RESOLVE_EVENT = Context
-                    .BaseInterceptorType
-                    .Methods
-                    .Single(met => met.Name == nameof(InterfaceInterceptor<object>.ResolveEvent));
+                RESOLVE_EVENT = Context.InterceptorType.Methods.Single
+                (
+                    met => met.SignatureEquals
+                    (
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveEvent(default!))
+                        )
+                    )
+                );
             }
 
             protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
