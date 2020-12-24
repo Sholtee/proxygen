@@ -18,6 +18,23 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static bool IsInterface(this ITypeSymbol src) => src.TypeKind == TypeKind.Interface;
 
+        private static readonly IReadOnlyList<TypeKind> ClassTypes = new[] 
+        {
+            TypeKind.Class,
+            TypeKind.Array,
+            TypeKind.Delegate,
+            TypeKind.Pointer
+        };
+
+        public static bool IsClass(this ITypeSymbol src) => ClassTypes.Contains(src.TypeKind);
+
+        private static readonly IReadOnlyList<TypeKind> SealedTypes = new[]
+        {
+            TypeKind.Array
+        };
+
+        public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.Contains(src.TypeKind);
+
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
             _ when src.IsTupleType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen

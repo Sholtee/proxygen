@@ -138,6 +138,12 @@ namespace Solti.Utils.Proxy.Internals
             .GetFullName()
             ?.TrimEnd('&'); // FIXME: ez nem kene de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
 
+        public bool IsClass => UnderlyingType.IsClass();
+
+        public bool IsFinal => UnderlyingType.IsFinal();
+
+        public bool IsAbstract => UnderlyingType.IsAbstract();
+
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }

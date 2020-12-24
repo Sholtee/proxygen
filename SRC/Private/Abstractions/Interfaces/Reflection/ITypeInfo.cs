@@ -22,6 +22,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         bool IsGenericParameter { get; }
         bool IsInterface { get; }
+        bool IsClass { get; }
+        bool IsFinal { get; }
+        bool IsAbstract { get; }
         /// <summary>
         /// The <see cref="FullName"/> of the type followed by the identity of the containing assembly. The result should not reflect the type arguments.
         /// </summary>

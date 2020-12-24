@@ -137,6 +137,12 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
+        public bool IsClass => UnderlyingSymbol.IsClass();
+
+        public bool IsFinal => UnderlyingSymbol.IsFinal();
+
+        public bool IsAbstract => UnderlyingSymbol.IsAbstract;
+
         public override bool Equals(object obj) => obj is SymbolTypeInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, that.UnderlyingSymbol);
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);

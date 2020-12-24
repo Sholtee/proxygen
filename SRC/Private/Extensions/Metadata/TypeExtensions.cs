@@ -71,6 +71,12 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsInterface(this Type src) => src.IsByRef ? src.GetElementType().IsInterface() : src.IsInterface;
 
+        public static bool IsClass(this Type src) => src.IsByRef ? src.GetElementType().IsClass() : !src.IsGenericParameter && src.IsClass;
+
+        public static bool IsFinal(this Type src) => src.IsByRef ? src.GetElementType().IsFinal() : src.IsSealed;
+
+        public static bool IsAbstract(this Type src) => src.IsByRef ? src.GetElementType().IsAbstract() : src.IsAbstract && !src.IsSealed; // statikus osztalyok IL szinten "sealed abstract"-k
+
         public static bool IsGenericParameter(this Type src) => (src.GetElementType(recurse: true) ?? src).IsGenericParameter;
 
         public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
