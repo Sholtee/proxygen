@@ -105,7 +105,5 @@ namespace Solti.Utils.Proxy.Internals
                     : (AccessModifiers?) null
             };
         }
-
-        //public static bool IsFinal(this MethodBase src) => src.IsFinal || src.GetImplementedInterfaceMethods().Any();
     }
 }

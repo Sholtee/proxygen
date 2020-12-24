@@ -14,6 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         IReadOnlyList<ITypeInfo> DeclaringInterfaces { get; }
         IParameterInfo ReturnValue { get; }
         bool IsSpecial { get; }
+        bool IsFinal { get; }
         AccessModifiers AccessModifiers { get; }
         bool SignatureEquals(IMethodInfo that, bool ignoreVisibility = false);
     }

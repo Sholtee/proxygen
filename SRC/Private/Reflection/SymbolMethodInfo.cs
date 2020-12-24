@@ -53,6 +53,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.StrippedName();
 
+        public bool IsFinal => UnderlyingSymbol.IsFinal();
+
         public override bool Equals(object obj) => obj is SymbolMethodInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);

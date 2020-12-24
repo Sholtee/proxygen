@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
                 .GetImplementedInterfaceMethods()
                 .Select(m => m.ContainingType);
 
-        public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src)
+        public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
             INamedTypeSymbol containingType = src.ContainingType;
 
@@ -48,6 +48,9 @@ namespace Solti.Utils.Proxy.Internals
                     {
                         if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), met))
                             return true;
+
+                        if (!inspectOverrides)
+                            break;
                     }
 
                     return false;
@@ -65,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
-            if (src.MethodKind == MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
+            if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
                 src = src.GetImplementedInterfaceMethods().Single();
 
             return SpecialMethods.Contains(src.MethodKind);
@@ -127,6 +130,8 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        //public static bool IsFinal(this IMethodSymbol src) => src.IsSealed || src.GetImplementedInterfaceMethods().Any();
+        public static bool IsFinal(this IMethodSymbol src) => 
+            src.IsSealed || 
+            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Any()); // a fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol
     }
 }

@@ -168,6 +168,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(m1.Name, m2.Name);
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
+                Assert.AreEqual(m1.IsFinal, m2.IsFinal);
                 Assert.AreEqual(m1.IsStatic, m2.IsStatic);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
