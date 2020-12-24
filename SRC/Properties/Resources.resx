@@ -129,11 +129,11 @@
   <data name="DYNAMIC_ASM" xml:space="preserve">
     <value>Dynamic assemblies are not supported.</value>
   </data>
-  <data name="GENERIC_GENERATOR" xml:space="preserve">
-    <value>A generator can not be generic.</value>
-  </data>
   <data name="GENERIC_IFACE" xml:space="preserve">
     <value>Target interface can not be generic</value>
+  </data>
+  <data name="GENERIC_INTERCEPTOR" xml:space="preserve">
+    <value>The interceptor can not be generic.</value>
   </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The member ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>

@@ -26,6 +26,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ClassName { get; }
 
+        private static readonly string BaseInterceptorName = typeof(InterfaceInterceptor<>).FullName;
+
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
@@ -35,16 +37,15 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
             //
-            // Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
+            // - Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
+            // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
             //
 
-            var  baseInterceptorType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>))).Close(interfaceType);
-
-            if (!interceptorType.Bases.Append(interceptorType).Any(baseInterceptorType.Equals))
+            if (!interceptorType.Bases.Append(interceptorType).Any(ic => ic.FullName == BaseInterceptorName))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
-                throw new ArgumentException(Resources.GENERIC_GENERATOR, nameof(interceptorType));
+                throw new ArgumentException(Resources.GENERIC_INTERCEPTOR, nameof(interceptorType));
 
             InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
@@ -62,6 +63,12 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
+            if (InterceptorType.IsFinal)
+                throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
+
+            if (InterceptorType.IsAbstract)
+                throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
+
             ClassDeclarationSyntax cls = ClassDeclaration
             (
                 identifier: ClassName

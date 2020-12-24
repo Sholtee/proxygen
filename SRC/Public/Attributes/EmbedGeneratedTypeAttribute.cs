@@ -28,9 +28,6 @@ namespace Solti.Utils.Proxy.Attributes
             if (!typeof(TypeGenerator<>).IsAssignableFrom(generator.GetGenericTypeDefinition()))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(generator));
 
-            if (generator.IsGenericTypeDefinition)
-                throw new NotSupportedException(Resources.GENERIC_GENERATOR);
-
             Generator = generator;
         }
     }

@@ -97,20 +97,20 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to A generator can not be generic..
-        /// </summary>
-        internal static string GENERIC_GENERATOR {
-            get {
-                return ResourceManager.GetString("GENERIC_GENERATOR", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Target interface can not be generic.
         /// </summary>
         internal static string GENERIC_IFACE {
             get {
                 return ResourceManager.GetString("GENERIC_IFACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The interceptor can not be generic..
+        /// </summary>
+        internal static string GENERIC_INTERCEPTOR {
+            get {
+                return ResourceManager.GetString("GENERIC_INTERCEPTOR", resourceCulture);
             }
         }
         
