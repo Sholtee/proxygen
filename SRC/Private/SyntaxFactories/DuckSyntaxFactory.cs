@@ -51,8 +51,6 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
-            ITypeInfo @base = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(TargetType);
-
             ClassDeclarationSyntax cls = ClassDeclaration
             (
                 identifier: ClassName
@@ -73,7 +71,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    new[] { @base, InterfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
+                    new[] { BaseType, InterfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
                     (
                         CreateType(t)
                     ))
