@@ -26,8 +26,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ClassName { get; }
 
-        private static readonly string BaseInterceptorName = typeof(InterfaceInterceptor<>).FullName;
-
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
@@ -41,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
             // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
             //
 
-            if (!interceptorType.Bases.Append(interceptorType).Any(ic => ic.FullName == BaseInterceptorName))
+            if (!interceptorType.Bases.Append(interceptorType).Any(ic => ic.FullName == typeof(InterfaceInterceptor<>).FullName))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
