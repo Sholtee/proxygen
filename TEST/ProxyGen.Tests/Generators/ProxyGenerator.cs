@@ -186,7 +186,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
             IInternalInterface proxy = await CreateProxy<IInternalInterface, InternalInterfaceProxy>();
             Assert.That(proxy.Foo(), Is.EqualTo(1));
         }
+#if !NETCOREAPP2_2
+        public interface IInterfaceContainingMembersHavingAccessibility
+        {
+            public void Foo();
+            protected void Bar() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
+            internal void Baz() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
+            private void FooBar() { } // muszaj legyen torzse
+        }
 
+        [Test]
+        public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
+            Assert.DoesNotThrowAsync(() => CreateProxy<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>((object) null));
+#endif
         public class CallContext
         {
             public MethodInfo Method;
