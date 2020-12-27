@@ -43,21 +43,27 @@ namespace Solti.Utils.Proxy.Internals
 
         internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location) 
         {
-            string logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen-{Guid.NewGuid()}.log");
+            string? logFile = null;
 
-            using var writer = new Utf8JsonWriter(File.OpenWrite(logFile));
-
-            JsonSerializer.Serialize(writer, ex, new JsonSerializerOptions
+            try
             {
-                WriteIndented = true,
-                IgnoreReadOnlyProperties = false
-            });
+                logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen-{Guid.NewGuid()}.log");
 
-            writer.Flush();
+                using var writer = new Utf8JsonWriter(File.OpenWrite(logFile));
+
+                JsonSerializer.Serialize(writer, ex, new JsonSerializerOptions
+                {
+                    WriteIndented = true,
+                    IgnoreReadOnlyProperties = false
+                });
+
+                writer.Flush();
+            }
+            catch { }
 
             return Diagnostic.Create
             (
-                new DiagnosticDescriptor("PG00", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile}", "Type Embedding", DiagnosticSeverity.Warning, true),
+                new DiagnosticDescriptor("PG00", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile ?? "NULL"}", "Type Embedding", DiagnosticSeverity.Warning, true),
                 location
             );
         }
