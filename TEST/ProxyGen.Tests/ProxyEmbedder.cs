@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 using Solti.Utils.Proxy.Attributes;
                 using Solti.Utils.Proxy.Generators;
 
-                [assembly: EmbedGeneratedType(typeof(IList<>)), EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+                [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
                 ",
                 typeof(EmbedGeneratedTypeAttribute).Assembly
             );

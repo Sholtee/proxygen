@@ -344,5 +344,16 @@ namespace Solti.Utils.Proxy.Internals
                 IsArray = t is IArrayTypeSymbol
             };
         }
+
+        public static bool InheritsFrom(this INamedTypeSymbol src, ITypeSymbol type)
+        {
+            for (INamedTypeSymbol? baseType = src; baseType is not null; baseType = baseType.BaseType) 
+            {
+                if (baseType.EqualsTo(type))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

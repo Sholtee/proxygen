@@ -19,27 +19,12 @@ namespace Solti.Utils.Proxy.Internals
     [Generator]
     internal class ProxyEmbedder: ISourceGenerator
     {
-        private static IReadOnlyList<Type> TypeGenerators { get; } = typeof(ProxyEmbedder)
+        internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) => compilation
             .Assembly
-            .GetTypes()
-            .Where(t => t.BaseType?.IsGenericType == true && t.BaseType.GetGenericTypeDefinition() == typeof(TypeGenerator<>))
-            .ToArray();
-
-        internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) 
-        {
-            foreach(AttributeData attr in compilation.Assembly.GetAttributes().Where(attr => Is(attr.AttributeClass, typeof(EmbedGeneratedTypeAttribute))))
-            {
-                if (attr.ConstructorArguments.Single().Value is INamedTypeSymbol arg) 
-                {   
-                    INamedTypeSymbol genericTypeDefinition = arg.OriginalDefinition;
-
-                    if (TypeGenerators.Any(generator => Is(genericTypeDefinition, generator)))
-                        yield return arg;
-                }
-            }
-
-            bool Is(ISymbol? s, Type t) => SymbolEqualityComparer.Default.Equals(s, compilation.GetTypeByMetadataName(t.FullName));
-        }
+            .GetAttributes()
+            .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
+            .Select(attr => attr.ConstructorArguments.Single().Value)
+            .Cast<INamedTypeSymbol>();
 
         internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location) 
         {
@@ -61,12 +46,14 @@ namespace Solti.Utils.Proxy.Internals
             }
             catch { }
 
-            return Diagnostic.Create
-            (
-                new DiagnosticDescriptor("PG00", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile ?? "NULL"}", "Type Embedding", DiagnosticSeverity.Warning, true),
-                location
-            );
+            return CreateDiagnostic ("PG01", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile ?? "NULL"}", location);
         }
+
+        internal static Diagnostic CreateDiagnostic(string id, string msg, string fullMsg, Location location) => Diagnostic.Create
+        (
+            new DiagnosticDescriptor(id, msg, fullMsg, "Type Embedding", DiagnosticSeverity.Warning, true),
+            location
+        );
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -76,6 +63,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (INamedTypeSymbol generator in GetAOTGenerators(context.Compilation))
             {
+                if (generator.OriginalDefinition.InheritsFrom(context.Compilation.GetTypeByMetadataName(typeof(TypeGenerator<>).FullName)!))
+                {
+                    context.ReportDiagnostic
+                    (
+                        CreateDiagnostic("PG00", "Not a generator", $"{generator} is not a generator", generator.Locations.Single())
+                    );
+                    continue;
+                }
+
                 try
                 {
                     // TODO
