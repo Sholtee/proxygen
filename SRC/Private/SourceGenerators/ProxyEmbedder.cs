@@ -15,6 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Abstractions;
     using Attributes;
+    using Properties;
 
     [Generator]
     internal class ProxyEmbedder: ISourceGenerator
@@ -32,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen-{Guid.NewGuid()}.log");
+                logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using var writer = new Utf8JsonWriter(File.OpenWrite(logFile));
 
@@ -46,12 +47,12 @@ namespace Solti.Utils.Proxy.Internals
             }
             catch { }
 
-            return CreateDiagnostic ("PG01", "Type embedding failed", $"Reason: {ex.Message} - Details stored in: {logFile ?? "NULL"}", location);
+            return CreateDiagnostic ("PG01", SGResources.TE_FAILED, string.Format(SGResources.Culture, SGResources.TE_FAILED_FULL, ex.Message, logFile ?? "NULL"), location);
         }
 
         internal static Diagnostic CreateDiagnostic(string id, string msg, string fullMsg, Location location) => Diagnostic.Create
         (
-            new DiagnosticDescriptor(id, msg, fullMsg, "Type Embedding", DiagnosticSeverity.Warning, true),
+            new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, DiagnosticSeverity.Warning, true),
             location
         );
 
@@ -63,11 +64,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (INamedTypeSymbol generator in GetAOTGenerators(context.Compilation))
             {
-                if (generator.OriginalDefinition.InheritsFrom(context.Compilation.GetTypeByMetadataName(typeof(TypeGenerator<>).FullName)!))
+                if (!generator.OriginalDefinition.GetBaseTypes().Any(bt => bt.GetQualifiedMetadataName() == typeof(TypeGenerator<>).FullName))
                 {
                     context.ReportDiagnostic
                     (
-                        CreateDiagnostic("PG00", "Not a generator", $"{generator} is not a generator", generator.Locations.Single())
+                        CreateDiagnostic("PG00", SGResources.NOT_A_GENERATOR, string.Format(SGResources.Culture, SGResources.NOT_A_GENERATOR_FULL, generator), generator.Locations.Single())
                     );
                     continue;
                 }

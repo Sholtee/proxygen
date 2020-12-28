@@ -274,7 +274,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 string name = !string.IsNullOrEmpty(type.Name)
                     ? type.Name // tupple es nullable eseten is helyes nevet ad vissza
-                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)); // "atlagos" tipusoknal a nev ures
+                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)); // "atlagos" tipusoknal a Name ures
 
                 return type is INamedTypeSymbol named && named.IsGenericType()
                     ? $"{name}`{named.Arity}"
@@ -343,17 +343,6 @@ namespace Solti.Utils.Proxy.Internals
                 IsPointer = t is IPointerTypeSymbol,
                 IsArray = t is IArrayTypeSymbol
             };
-        }
-
-        public static bool InheritsFrom(this INamedTypeSymbol src, ITypeSymbol type)
-        {
-            for (INamedTypeSymbol? baseType = src; baseType is not null; baseType = baseType.BaseType) 
-            {
-                if (baseType.EqualsTo(type))
-                    return true;
-            }
-
-            return false;
         }
     }
 }
