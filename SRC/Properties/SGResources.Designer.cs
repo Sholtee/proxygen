@@ -106,7 +106,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Reason: {0} - Details stored in: {1}.
+        ///   Looks up a localized string similar to Type embedding failed: {0} - Details stored in: {1}.
         /// </summary>
         internal static string TE_FAILED_FULL {
             get {

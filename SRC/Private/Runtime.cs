@@ -25,7 +25,10 @@ namespace Solti.Utils.Proxy.Internals
                 "netstandard"
             };
 
-            foreach (string assemblyPath in ((string) AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES")).Split(Path.PathSeparator))
+            if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is not string asms)
+                yield break;
+
+            foreach (string assemblyPath in asms.Split(Path.PathSeparator))
             {
                 string fileName = Path.GetFileNameWithoutExtension(assemblyPath);
                 if (mandatoryAssemblies.Contains(fileName))

@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
+using System.Text;
 
 using Microsoft.CodeAnalysis;
 
@@ -35,15 +35,20 @@ namespace Solti.Utils.Proxy.Internals
             {
                 logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen_{Guid.NewGuid()}.log");
 
-                using var writer = new Utf8JsonWriter(File.OpenWrite(logFile));
+                using var log = new StreamWriter(File.OpenWrite(logFile));
 
-                JsonSerializer.Serialize(writer, ex, new JsonSerializerOptions
+                //
+                // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
+                // a Roslyn szamara is), ezert a primitiv naplozas.
+                //
+
+                for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
-                    WriteIndented = true,
-                    IgnoreReadOnlyProperties = false
-                });
+                    if (current != ex) log.Write($"{Environment.NewLine}->{Environment.NewLine}");
+                    log.Write(current.ToString());
+                }
 
-                writer.Flush();
+                log.Flush();
             }
             catch { }
 
