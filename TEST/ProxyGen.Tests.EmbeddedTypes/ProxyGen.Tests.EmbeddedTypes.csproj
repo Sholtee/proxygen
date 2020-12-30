@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <IsPackable>false</IsPackable>
+    <OutputPath>..\..\BIN\</OutputPath>
+    <AssemblyName>Solti.Utils.Proxy.Tests.EmbeddedTypes</AssemblyName>
+    <RootNamespace>Solti.Utils.Proxy.Tests.EmbeddedTypes</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SRC\ProxyGen.csproj" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
+  </ItemGroup>
+  
+</Project>

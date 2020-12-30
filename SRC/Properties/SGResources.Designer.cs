@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Not a generator.
+        ///   Looks up a localized string similar to {0} is not a generator.
         /// </summary>
         internal static string NOT_A_GENERATOR {
             get {
@@ -70,11 +70,20 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} is not a generator.
+        ///   Looks up a localized string similar to Source extended successfully.
         /// </summary>
-        internal static string NOT_A_GENERATOR_FULL {
+        internal static string SRC_EXTENDED {
             get {
-                return ResourceManager.GetString("NOT_A_GENERATOR_FULL", resourceCulture);
+                return ResourceManager.GetString("SRC_EXTENDED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source extended with type: {0}.
+        /// </summary>
+        internal static string SRC_EXTENDED_FULL {
+            get {
+                return ResourceManager.GetString("SRC_EXTENDED_FULL", resourceCulture);
             }
         }
         

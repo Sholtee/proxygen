@@ -13,8 +13,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
     using Attributes;
+    using Generators;
     using Properties;
 
     [Generator]
@@ -47,12 +47,25 @@ namespace Solti.Utils.Proxy.Internals
             }
             catch { }
 
-            return CreateDiagnostic ("PG01", SGResources.TE_FAILED, string.Format(SGResources.Culture, SGResources.TE_FAILED_FULL, ex.Message, logFile ?? "NULL"), location);
+            return CreateDiagnostic
+            (
+                "PGE00", 
+                SGResources.TE_FAILED, 
+                string.Format
+                (
+                    SGResources.Culture, 
+                    SGResources.TE_FAILED_FULL, 
+                    ex.Message, 
+                    logFile ?? "NULL"
+                ), 
+                location, 
+                DiagnosticSeverity.Warning
+            );
         }
 
-        internal static Diagnostic CreateDiagnostic(string id, string msg, string fullMsg, Location location) => Diagnostic.Create
+        internal static Diagnostic CreateDiagnostic(string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => Diagnostic.Create
         (
-            new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, DiagnosticSeverity.Warning, true),
+            new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, severity, true),
             location
         );
 
@@ -62,20 +75,64 @@ namespace Solti.Utils.Proxy.Internals
 
         public void Execute(GeneratorExecutionContext context)
         {
-            foreach (INamedTypeSymbol generator in GetAOTGenerators(context.Compilation))
-            {
-                if (!generator.OriginalDefinition.GetBaseTypes().Any(bt => bt.GetQualifiedMetadataName() == typeof(TypeGenerator<>).FullName))
-                {
-                    context.ReportDiagnostic
-                    (
-                        CreateDiagnostic("PG00", SGResources.NOT_A_GENERATOR, string.Format(SGResources.Culture, SGResources.NOT_A_GENERATOR_FULL, generator), generator.Locations.Single())
-                    );
-                    continue;
-                }
+            Compilation compilation = context.Compilation;
 
+            foreach (INamedTypeSymbol generator in GetAOTGenerators(compilation))
+            {
                 try
                 {
-                    // TODO
+                    string? generatorFullName = generator.GetQualifiedMetadataName();
+
+                    IUnitSyntaxFactory unitSyntaxFactory = generatorFullName switch 
+                    {
+                        _ when generatorFullName == typeof(ProxyGenerator<,>).FullName => new ProxySyntaxFactory
+                        (
+                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
+                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
+                            OutputType.Unit
+                        ),
+                        _ when generatorFullName == typeof(DuckGenerator<,>).FullName => new DuckSyntaxFactory
+                        (
+                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
+                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
+                            compilation.AssemblyName!,
+                            OutputType.Unit
+                        ),
+                        _ => throw new InvalidOperationException
+                        (
+                            string.Format
+                            (
+                                SGResources.Culture, 
+                                SGResources.NOT_A_GENERATOR, 
+                                generator
+                            )
+                        )
+                    };
+
+                    unitSyntaxFactory.Build(context.CancellationToken);
+
+                    context.AddSource
+                    (
+                        $"{unitSyntaxFactory.DefinedClasses.Single()}.cs", 
+                        unitSyntaxFactory.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString()
+                    );
+
+                    context.ReportDiagnostic
+                    (
+                        CreateDiagnostic
+                        (
+                            "PGI00",
+                            SGResources.SRC_EXTENDED,
+                            string.Format
+                            (
+                                SGResources.Culture, 
+                                SGResources.NOT_A_GENERATOR, 
+                                unitSyntaxFactory.DefinedClasses.Single()
+                            ),
+                            generator.Locations.Single(),
+                            DiagnosticSeverity.Info
+                        )
+                    );
                 }
                 catch (Exception e) 
                 {
