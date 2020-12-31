@@ -12,9 +12,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" />
   </ItemGroup>
-  
-  <ItemGroup>
-    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" />
-  </ItemGroup>
 
 </Project>

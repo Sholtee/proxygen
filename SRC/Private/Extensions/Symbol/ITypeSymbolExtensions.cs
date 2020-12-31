@@ -344,5 +344,35 @@ namespace Solti.Utils.Proxy.Internals
                 IsArray = t is IArrayTypeSymbol
             };
         }
+
+        public static string GetDebugString(this ITypeSymbol src) 
+        {
+            var fmt = new SymbolDisplayFormat
+            (
+                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
+                memberOptions: SymbolDisplayMemberOptions.IncludeAccessibility | SymbolDisplayMemberOptions.IncludeExplicitInterface | SymbolDisplayMemberOptions.IncludeParameters | SymbolDisplayMemberOptions.IncludeModifiers | SymbolDisplayMemberOptions.IncludeRef,
+                parameterOptions: SymbolDisplayParameterOptions.IncludeName | SymbolDisplayParameterOptions.IncludeParamsRefOut | SymbolDisplayParameterOptions.IncludeType,
+                propertyStyle: SymbolDisplayPropertyStyle.ShowReadWriteDescriptor,
+                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes
+            );
+
+            var sb = new StringBuilder()
+            .AppendLine(src.ToDisplayString(fmt))
+            .AppendLine("{");
+
+            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Where(m => !m.IsSpecial()))
+                sb.AppendLine($"  {method.ToDisplayString(fmt)};");
+
+            foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))
+                sb.AppendLine($"  {property.ToDisplayString(fmt)};");
+
+            foreach (IEventSymbol evt in src.ListEvents(includeStatic: true))
+                sb.AppendLine($"  {evt.ToDisplayString(fmt)};");
+
+            sb.Append("}");
+
+            return sb.ToString();
+        }
     }
 }

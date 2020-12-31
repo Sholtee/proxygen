@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -497,6 +498,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
             Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(a), SymbolEqualityComparer.Default.GetHashCode(b));
+        }
+
+        [Test]
+        public void GetDebugString_ShouldReturnThePrettifiedDebugStringOfTheType() 
+        {
+            ITypeSymbol type = CreateCompilation(string.Empty).GetTypeByMetadataName(typeof(List<>).FullName);
+
+            Assert.That(type.GetDebugString(), Is.EqualTo(File.ReadAllText("ListDbg.txt")));
         }
     }
 }
