@@ -9,15 +9,16 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Attributes;
-    using Generators;
     using Properties;
 
+    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Generator]
-    internal class ProxyEmbedder: ISourceGenerator
+    public class ProxyEmbedder: ISourceGenerator
     {
         internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) => compilation
             .Assembly
@@ -45,6 +46,11 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     if (current != ex) log.Write($"{Environment.NewLine}->{Environment.NewLine}");
                     log.Write(current.ToString());
+
+                    foreach (object? key in current.Data.Keys) 
+                    {
+                        log.Write($"{Environment.NewLine}{key}:{Environment.NewLine}{current.Data[key]}");
+                    }
                 }
 
                 log.Flush();
@@ -77,8 +83,21 @@ namespace Solti.Utils.Proxy.Internals
         {
         }
 
+        public static IList<ICodeFactory> CodeFactories { get; } = new List<ICodeFactory>
+        {
+            new ProxyCodeFactory(),
+            new DuckCodeFactory()
+        };
+
         public void Execute(GeneratorExecutionContext context)
         {
+            //
+            // Csak C#-t tamogatjuk
+            //
+
+            if (context.ParseOptions.Language != CSharpParseOptions.Default.Language)
+                return;
+
             Compilation compilation = context.Compilation;
 
             foreach (INamedTypeSymbol generator in GetAOTGenerators(compilation))
@@ -87,56 +106,41 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     string? generatorFullName = generator.GetQualifiedMetadataName();
 
-                    IUnitSyntaxFactory unitSyntaxFactory = generatorFullName switch 
+                    ICodeFactory codeFactory = CodeFactories.SingleOrDefault(cf => cf.GeneratorFullName == generatorFullName) ?? throw new InvalidOperationException
+                    (
+                        string.Format
+                        (
+                            SGResources.Culture, 
+                            SGResources.NOT_A_GENERATOR, 
+                            generator
+                        )
+                    );
+
+                    foreach ((string Hint, string Value) in codeFactory.GetSourceCodes(generator, context))
                     {
-                        _ when generatorFullName == typeof(ProxyGenerator<,>).FullName => new ProxySyntaxFactory
+                        context.AddSource
                         (
-                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
-                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-                            OutputType.Unit
-                        ),
-                        _ when generatorFullName == typeof(DuckGenerator<,>).FullName => new DuckSyntaxFactory
+                            Hint,
+                            Value
+                        );
+
+                        context.ReportDiagnostic
                         (
-                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
-                            SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-                            compilation.AssemblyName!,
-                            OutputType.Unit
-                        ),
-                        _ => throw new InvalidOperationException
-                        (
-                            string.Format
+                            CreateDiagnostic
                             (
-                                SGResources.Culture, 
-                                SGResources.NOT_A_GENERATOR, 
-                                generator
+                                "PGI00",
+                                SGResources.SRC_EXTENDED,
+                                string.Format
+                                (
+                                    SGResources.Culture,
+                                    SGResources.SRC_EXTENDED_FULL,
+                                    Hint
+                                ),
+                                generator.Locations.Single(),
+                                DiagnosticSeverity.Info
                             )
-                        )
-                    };
-
-                    unitSyntaxFactory.Build(context.CancellationToken);
-
-                    context.AddSource
-                    (
-                        $"{unitSyntaxFactory.DefinedClasses.Single()}.cs", 
-                        unitSyntaxFactory.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString()
-                    );
-
-                    context.ReportDiagnostic
-                    (
-                        CreateDiagnostic
-                        (
-                            "PGI00",
-                            SGResources.SRC_EXTENDED,
-                            string.Format
-                            (
-                                SGResources.Culture, 
-                                SGResources.NOT_A_GENERATOR, 
-                                unitSyntaxFactory.DefinedClasses.Single()
-                            ),
-                            generator.Locations.Single(),
-                            DiagnosticSeverity.Info
-                        )
-                    );
+                        );
+                    }
                 }
                 catch (Exception e) 
                 {
