@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals
             private IParameterInfo? FReturnValue;
             public override IParameterInfo ReturnValue => FReturnValue ??= MetadataParameterInfo.CreateFrom(UnderlyingMethod.ReturnParameter);
 
-            public override bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => 
+            public override bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => // TODO: FIXME: IMethodInfo ne csak MetadataMethodInfo lehessen
                 that is MetadataMethodInfoImpl thatMethod && UnderlyingMethod.SignatureEquals(thatMethod.UnderlyingMethod, ignoreVisibility);
         }
 
@@ -91,15 +91,7 @@ namespace Solti.Utils.Proxy.Internals
                 UnderlyingMethod.GetGenericMethodDefinition()
             );
 
-            public IGeneric Close(params ITypeInfo[] genericArgs) => new MetadataGenericMethodInfo
-            (
-                UnderlyingMethod.MakeGenericMethod
-                (
-                    genericArgs
-                        .Select(MetadataTypeInfo.TypeInfoToMetadata)
-                        .ToArray()
-                )
-            );
+            public IGeneric Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException();
         }
 
         private sealed class MetadataConstructorInfo : MetadataMethodBase<ConstructorInfo>, IConstructorInfo 

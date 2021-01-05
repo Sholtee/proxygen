@@ -51,6 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         public RefType RefType => UnderlyingSymbol switch
         {
             IPointerTypeSymbol => RefType.Pointer,
+            IArrayTypeSymbol => RefType.Array,
             _ => RefType.None
         };
 
@@ -142,6 +143,14 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsFinal => UnderlyingSymbol.IsFinal();
 
         public bool IsAbstract => UnderlyingSymbol.IsAbstract;
+
+        private IHasName? FContainingMember;
+        public IHasName? ContainingMember => FContainingMember ??= UnderlyingSymbol.ContainingSymbol switch 
+        {
+            IMethodSymbol method => SymbolMethodInfo.CreateFrom(method, Compilation),
+            ITypeSymbol type => SymbolTypeInfo.CreateFrom(type, Compilation),
+            _ => null
+        };
 
         public override bool Equals(object obj) => obj is SymbolTypeInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, that.UnderlyingSymbol);
 

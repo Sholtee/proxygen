@@ -37,6 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         /// Returns the underlying element type (for e.g.: <see cref="int"/> for <i>int*</i>). Yields non null for pointers, ref types and arrays.
         /// </summary>
         ITypeInfo? ElementType { get; }
+        IHasName? ContainingMember { get; }
         /// <summary>
         /// Returns the declaring types starting with the closest one. In case of non nested types this property returns an empty list.
         /// </summary>

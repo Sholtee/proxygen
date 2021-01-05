@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,13 +17,17 @@ namespace Solti.Utils.Proxy.Internals
 
         private Compilation Compilation { get; }
 
-        private SymbolMethodInfo(IMethodSymbol method, Compilation compilation) 
+        protected SymbolMethodInfo(IMethodSymbol method, Compilation compilation) 
         {
             UnderlyingSymbol = method;
             Compilation = compilation;
         }
 
-        public static IMethodInfo CreateFrom(IMethodSymbol method, Compilation compilation) => new SymbolMethodInfo(method, compilation);
+        public static IMethodInfo CreateFrom(IMethodSymbol method, Compilation compilation) => method switch 
+        {
+            _ when method.TypeArguments.Any() => new SymbolGenericMethodInfo(method, compilation),
+            _ => new SymbolMethodInfo(method, compilation)
+        };
 
         private IReadOnlyList<IParameterInfo>? FParameters;
         public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol
@@ -61,7 +66,25 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingSymbol.ToString();
 
-        public bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) =>
+        public bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => // TODO: FIXME: IMethodInfo ne csak SymbolMethodInfo lehessen
             that is SymbolMethodInfo thatMethod && UnderlyingSymbol.SignatureEquals(thatMethod.UnderlyingSymbol, ignoreVisibility);
+
+        private sealed class SymbolGenericMethodInfo : SymbolMethodInfo, IGenericMethodInfo 
+        {
+            public SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : base(method, compilation) { }
+
+            public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericArgument());
+
+            private IGeneric? FGenericDefinition;
+            public IGeneric GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
+
+            private IReadOnlyList<ITypeInfo>? FGenericArguments;
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
+                .TypeArguments
+                .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
+                .ToArray();
+
+            public IGeneric Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException();
+        }
     }
 }

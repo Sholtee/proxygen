@@ -43,16 +43,10 @@ namespace Solti.Utils.Proxy.Internals
             // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
             //
 
-            protected bool AlreadyImplemented(IMemberInfo member) => Context.InterceptorType
+            protected bool AlreadyImplemented(IMemberInfo member) => Context
+                .InterceptorType
                 .Interfaces
-
-                //
-                // TODO: FIXME: 
-                //   Ez "Contains(member.DeclaringType)"-al csak akkor vizsgalhato ha "member"
-                //   es "Context.InterceptorType" is vagy metadata vagy szimbolum
-                //
-
-                .Any(iface => iface.FullName == member.DeclaringType.FullName);
+                .Any(iface => iface.EqualsTo(member.DeclaringType));
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>

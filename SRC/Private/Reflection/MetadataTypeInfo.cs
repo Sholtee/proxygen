@@ -16,12 +16,20 @@ namespace Solti.Utils.Proxy.Internals
 
         protected MetadataTypeInfo(Type underlyingType) => UnderlyingType = underlyingType;
 
-        public static ITypeInfo CreateFrom(Type underlyingType) => underlyingType switch
+        public static ITypeInfo CreateFrom(Type underlyingType)
         {
-            _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
-            _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
-            _ => new MetadataTypeInfo(underlyingType)
-        };
+            while (underlyingType.IsByRef)
+            {
+                underlyingType = underlyingType.GetElementType();
+            }
+
+            return underlyingType switch
+            {
+                _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
+                _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
+                _ => new MetadataTypeInfo(underlyingType)
+            };
+        }
 
         public override bool Equals(object obj) => obj is MetadataTypeInfo that && UnderlyingType.Equals(that.UnderlyingType);
 
@@ -57,7 +65,8 @@ namespace Solti.Utils.Proxy.Internals
         public RefType RefType => UnderlyingType switch
         {
             // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
-            _ when UnderlyingType.IsPointer() => RefType.Pointer,
+            _ when UnderlyingType.IsPointer => RefType.Pointer,
+            _ when UnderlyingType.IsArray => RefType.Array,
             _ => RefType.None
         };
 
@@ -83,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsNested => UnderlyingType.IsNested() && !IsGenericParameter;
 
-        public bool IsInterface => UnderlyingType.IsInterface();
+        public bool IsInterface => UnderlyingType.IsInterface;
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
@@ -101,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
         //
 
-        private static readonly IReadOnlyList<Func<MethodInfo, bool>> MethodsToSkip = new Func<MethodInfo, bool>[] 
+        private static readonly IReadOnlyList<Func<MethodInfo, bool>> MethodsToSkip = new Func<MethodInfo, bool>[]
         {
             m => m.Name == "Finalize", // destructor
             m => m.DeclaringType.IsArray && m.Name == "Get", // = array[i]
@@ -118,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals
             .ToArray();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
-        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= 
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??=
             UnderlyingType.IsArray
                 ? Array.Empty<IConstructorInfo>() // tomb egy geci specialis allatfaj: fordito generalja hozza a konstruktorokat -> futas idoben mar leteznek forditaskor meg nem
                 : UnderlyingType
@@ -132,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
             ? $"{FullName}, {UnderlyingType.Assembly}"
             : null;
 
-        public bool IsGenericParameter => UnderlyingType.IsGenericParameter();
+        public bool IsGenericParameter => (UnderlyingType.GetElementType(recurse: true) ?? UnderlyingType).IsGenericParameter;
 
         public string? FullName => UnderlyingType
             .GetFullName()
@@ -140,9 +149,29 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsClass => UnderlyingType.IsClass();
 
-        public bool IsFinal => UnderlyingType.IsFinal();
+        public bool IsFinal => UnderlyingType.IsSealed;
 
         public bool IsAbstract => UnderlyingType.IsAbstract();
+
+        private IHasName? FContainingMember;
+        public IHasName? ContainingMember
+        {
+            get
+            {
+                if (FContainingMember is null)
+                {
+                    Type concreteType = UnderlyingType.GetElementType(recurse: true) ?? UnderlyingType;
+
+                    FContainingMember = concreteType switch
+                    {
+                        _ when concreteType.IsGenericParameter /*kulonben a DeclaringMethod megbaszodik*/ && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
+                        _ when /*Ez lehet T es nested is*/ concreteType.DeclaringType is not null => MetadataTypeInfo.CreateFrom(concreteType.DeclaringType),
+                        _ => null
+                    };
+                }
+                return FContainingMember;
+            }
+        }
 
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {

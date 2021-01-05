@@ -124,7 +124,7 @@
     <value>Source extended successfully</value>
   </data>
   <data name="SRC_EXTENDED_FULL" xml:space="preserve">
-    <value>Source extended with type: {0}</value>
+    <value>Source extended with {0}</value>
   </data>
   <data name="TE" xml:space="preserve">
     <value>Type embedding</value>

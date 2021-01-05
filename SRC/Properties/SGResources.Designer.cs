@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Source extended with type: {0}.
+        ///   Looks up a localized string similar to Source extended with {0}.
         /// </summary>
         internal static string SRC_EXTENDED_FULL {
             get {

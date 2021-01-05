@@ -114,6 +114,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
                 AssertEqualsT(type1.ElementType, type2.ElementType);
+                AssertEqualsN(type1.ContainingMember, type2.ContainingMember);
                 AssertSequenceEqualsT(type1.Bases, type2.Bases);
                 AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
                 AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
@@ -121,6 +122,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertSequenceEqualsM(OrderMethods(type1).ToArray(), OrderMethods(type2).ToArray());
                 AssertSequenceEqualsPr(OrderProperties(type1).ToArray(), OrderProperties(type2).ToArray());
                 AssertSequenceEqualsE(type1.Events.OrderBy(e => e.Name).ToArray(), type2.Events.OrderBy(e => e.Name).ToArray());
+
+                IGenericTypeInfo
+                    gt1 = t1 as IGenericTypeInfo,
+                    gt2 = t2 as IGenericTypeInfo;
+
+                Assert.AreEqual(gt1 != null, gt2 != null);
+                if (gt1 != null)
+                    AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
 
                 IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
                     .Constructors
@@ -132,6 +141,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .OrderBy(m => m.AccessModifiers)
                     .ThenBy(m => m.IsStatic)
                     .ThenBy(m => m.Name)
+                    .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
                     .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.FullName ?? p.Type.Name)))
                     .ThenBy(m => m.ReturnValue.Type.FullName ?? m.ReturnValue.Type.Name);
 
@@ -146,6 +156,30 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(a1.Name, a2.Name);
                 Assert.AreEqual(a1.Location, a2.Location);
                 Assert.AreEqual(a1.IsDynamic, a2.IsDynamic);
+            }
+
+            void AssertEqualsN(IHasName hn1, IHasName hn2)
+            {
+                if (hn1 is null)
+                    Assert.IsNull(hn2);
+
+                else if (hn1 is ITypeInfo t1)
+                {
+                    var t2 = hn2 as ITypeInfo;
+
+                    Assert.NotNull(t2);
+                    AssertEqualsT(t1, t2);
+                }
+
+                else if (hn1 is IMethodInfo m1)
+                {
+                    var m2 = hn2 as IMethodInfo;
+
+                    Assert.NotNull(m2);
+                    AssertEqualsM(m1, m2);
+                }
+
+                else Assert.Fail();
             }
 
             void AssertEqualsMP(IParameterInfo p1, IParameterInfo p2)
@@ -174,10 +208,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(m1.IsFinal, m2.IsFinal);
                 Assert.AreEqual(m1.IsStatic, m2.IsStatic);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
+
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
                 AssertSequenceEqualsT(m1.DeclaringInterfaces, m2.DeclaringInterfaces);
                 AssertSequenceEqualsP(m1.Parameters, m2.Parameters);
                 AssertEqualsMP(m1.ReturnValue, m2.ReturnValue);
+
+                IGenericMethodInfo
+                    gm1 = m1 as IGenericMethodInfo,
+                    gm2 = m2 as IGenericMethodInfo;
+
+                Assert.AreEqual(gm1 != null, gm2 != null);
+                if (gm1 != null)
+                    AssertSequenceEqualsT(gm1.GenericArguments, gm2.GenericArguments);
             }
 
             void AssertEqualsPr(IPropertyInfo p1, IPropertyInfo p2) 
