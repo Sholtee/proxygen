@@ -129,7 +129,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(gt1 != null, gt2 != null);
                 if (gt1 != null)
+                {
+                    Assert.AreEqual(gt1.IsGenericDefinition, gt2.IsGenericDefinition);
+                    Assert.AreEqual(gt1.IsGenericParameter, gt2.IsGenericParameter);
+
                     AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
+                }
 
                 IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
                     .Constructors

@@ -58,8 +58,6 @@ namespace Solti.Utils.Proxy.Internals
             public override int GetHashCode() => UnderlyingMethod.GetHashCode();
 
             public override string ToString() => UnderlyingMethod.ToString();
-
-            public abstract bool SignatureEquals(IMethodInfo that, bool ignoreVisibility);
         }
 
         private class MetadataMethodInfoImpl : MetadataMethodBase<MethodInfo>
@@ -68,9 +66,6 @@ namespace Solti.Utils.Proxy.Internals
 
             private IParameterInfo? FReturnValue;
             public override IParameterInfo ReturnValue => FReturnValue ??= MetadataParameterInfo.CreateFrom(UnderlyingMethod.ReturnParameter);
-
-            public override bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => // TODO: FIXME: IMethodInfo ne csak MetadataMethodInfo lehessen
-                that is MetadataMethodInfoImpl thatMethod && UnderlyingMethod.SignatureEquals(thatMethod.UnderlyingMethod, ignoreVisibility);
         }
 
         private sealed class MetadataGenericMethodInfo : MetadataMethodInfoImpl, IGenericMethodInfo
@@ -99,8 +94,6 @@ namespace Solti.Utils.Proxy.Internals
             public MetadataConstructorInfo(ConstructorInfo method) : base(method) { }
 
             public override IParameterInfo ReturnValue { get; } = null!;
-
-            public override bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => ReferenceEquals(this, that);
         }
     }
 }

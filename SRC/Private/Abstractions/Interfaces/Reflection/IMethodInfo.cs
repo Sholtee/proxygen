@@ -16,7 +16,6 @@ namespace Solti.Utils.Proxy.Internals
         bool IsSpecial { get; }
         bool IsFinal { get; }
         AccessModifiers AccessModifiers { get; }
-        bool SignatureEquals(IMethodInfo that, bool ignoreVisibility = false);
     }
 
     public interface IConstructorInfo : IMethodInfo { }

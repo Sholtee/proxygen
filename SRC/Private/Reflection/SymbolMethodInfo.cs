@@ -66,9 +66,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingSymbol.ToString();
 
-        public bool SignatureEquals(IMethodInfo that, bool ignoreVisibility) => // TODO: FIXME: IMethodInfo ne csak SymbolMethodInfo lehessen
-            that is SymbolMethodInfo thatMethod && UnderlyingSymbol.SignatureEquals(thatMethod.UnderlyingSymbol, ignoreVisibility);
-
         private sealed class SymbolGenericMethodInfo : SymbolMethodInfo, IGenericMethodInfo 
         {
             public SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : base(method, compilation) { }

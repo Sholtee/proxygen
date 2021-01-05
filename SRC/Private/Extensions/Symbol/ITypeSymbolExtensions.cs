@@ -12,8 +12,6 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal static class ITypeSymbolExtensions
     {
         public static bool IsInterface(this ITypeSymbol src) => src.TypeKind == TypeKind.Interface;
@@ -187,7 +185,6 @@ namespace Solti.Utils.Proxy.Internals
                 .OfType<TMember>();
         }
 
-
         public static ITypeSymbol? GetElementType(this ITypeSymbol src, bool recurse = false)
         {
             ITypeSymbol? prev = null;
@@ -306,42 +303,6 @@ namespace Solti.Utils.Proxy.Internals
                     srcMethod.TypeArguments.IndexOf(src, comparer) * -1, // ha a parameter metoduson van definialva akkor negativ szam
 
                 _ => null
-            };
-        }
-
-        public static bool EqualsTo(this ITypeSymbol src, ITypeSymbol that) 
-        {
-            if (src.IsGenericParameter() != that.IsGenericParameter())
-                return false;
-
-            if (!GetByRefAttributes(src).Equals(GetByRefAttributes(that)))
-                return false;
-
-            //
-            // Itt mar mindkettonek v van v nincs elem tipusa
-            //
-
-            ITypeSymbol? elA = src.GetElementType();
-
-            if (elA is not null)
-            {
-                ITypeSymbol elB = that.GetElementType()!;
-                return elA.EqualsTo(elB);
-            }
-
-            return !src.IsGenericParameter()
-                //
-                // Ez helyesen hasonlit ossze mutatot tombbel: "symbolof(int[]) != symbolfo(int*)" (ami valojaban gepikod szinten persze ugyanaz)
-                //
-
-                ? SymbolEqualityComparer.Default.Equals(src, that)
-
-                : src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
-
-            static object GetByRefAttributes(ITypeSymbol t) => new
-            {
-                IsPointer = t is IPointerTypeSymbol,
-                IsArray = t is IArrayTypeSymbol
             };
         }
 

@@ -86,50 +86,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
 
-        public static bool SignatureEquals(this IMethodSymbol src, IMethodSymbol that, bool ignoreVisibility = false) 
-        {
-            //
-            // Nyitott generikus eseten az aritasnak meg kell egyeznie mivel:
-            //
-            // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
-            //
-
-            if (src.ContainingType?.IsGenericTypeDefinition() == true)
-            {
-                if (that.ContainingType?.IsGenericTypeDefinition() != true || src.ContainingType.Arity != that.ContainingType.Arity)
-                    return false;
-            }
-
-            if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))
-                return false;
-
-            if (!src.ReturnType.EqualsTo(that.ReturnType))
-                return false;
-
-            if (src.Parameters.Length != that.Parameters.Length)
-                return false;
-
-            for (int i = 0; i < src.Parameters.Length; i++)
-                if (!src.Parameters[i].EqualsTo(that.Parameters[i]))
-                    return false;
-
-            return true;
-
-            object GetMethodBasicAttributes(IMethodSymbol m) => new
-            {
-                Name = m.StrippedName(),
-                m.IsStatic,
-                m.MethodKind,
-                m.ReturnsByRef,
-                m.ReturnsByRefReadonly,
-                m.RefKind,
-                m.Arity,
-                Accessibility = !ignoreVisibility 
-                    ? m.DeclaredAccessibility 
-                    : (Accessibility?) null
-            };
-        }
-
         public static bool IsFinal(this IMethodSymbol src) => 
             src.IsSealed || 
             (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Any()); // a fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol

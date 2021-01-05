@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Internals
 
             public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
-            public bool IsGenericDefinition => UnderlyingSymbol.IsUnboundGenericType;
+            public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericParameter()); // "UnderlyingSymbol.IsUnboundGenericType" baszik mukodni
 
             private IGeneric? FGenericDefinition;
             public IGeneric GenericDefinition => FGenericDefinition ??= (IGeneric) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);

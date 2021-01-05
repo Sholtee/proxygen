@@ -177,7 +177,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
 
-            public bool IsGenericDefinition => UnderlyingType.IsGenericTypeDefinition;
+            public bool IsGenericDefinition => UnderlyingType.GetGenericArguments().All(ga => ga.IsGenericParameter);
 
             public IReadOnlyList<ITypeInfo> GenericArguments => UnderlyingType
                 .GetOwnGenericArguments()

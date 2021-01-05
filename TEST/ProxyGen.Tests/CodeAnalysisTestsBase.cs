@@ -34,6 +34,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
             return result;
         }
 
+        public static Assembly Compile(string src, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
+        (
+            CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
+            Guid.NewGuid().ToString(),
+            null,
+            Runtime
+                .Assemblies
+                .Concat(additionalReferences)
+                .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
+                .ToArray(),
+            allowUnsafe: true
+        );
+
         public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
 
         protected class FindAllTypesVisitor : SymbolVisitor
