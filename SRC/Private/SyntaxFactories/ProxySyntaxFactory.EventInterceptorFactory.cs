@@ -26,6 +26,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         {                                                                   <br/>
         ///             EventType cb_value = (EventType) args[a];                       <br/>
         ///             Target.Event += cb_value;                                       <br/>
+        ///             return null;                                                    <br/>
         ///         };                                                                  <br/>
         ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
         ///         Invoke(evt.AddMethod, args, evt);                                   <br/>
@@ -37,6 +38,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         {                                                                   <br/>
         ///             EventType cb_value = (EventType) args[a];                       <br/>
         ///             Target.Event -= cb_value;                                       <br/>
+        ///             return null;                                                    <br/>
         ///         };                                                                  <br/>
         ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
         ///         Invoke(evt.RemoveMethod, args, evt);                                <br/>

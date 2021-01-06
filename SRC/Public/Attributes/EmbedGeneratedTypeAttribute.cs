@@ -1,4 +1,9 @@
-﻿using System;
+﻿/********************************************************************************
+* EmbedGeneratedTypeAttribute.cs                                                *
+*                                                                               *
+* Author: Denes Solti                                                           *
+********************************************************************************/
+using System;
 
 namespace Solti.Utils.Proxy.Attributes
 {
@@ -25,7 +30,7 @@ namespace Solti.Utils.Proxy.Attributes
             if (generator is null)
                 throw new ArgumentNullException(nameof(generator));
 
-            if (!typeof(TypeGenerator<>).IsAssignableFrom(generator.GetGenericTypeDefinition()))
+            if (!typeof(TypeGenerator<>).MakeGenericType(generator).IsAssignableFrom(generator))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(generator));
 
             Generator = generator;

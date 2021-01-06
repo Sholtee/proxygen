@@ -169,16 +169,8 @@ namespace Solti.Utils.Proxy.Internals
             ///     System.Int32 cb_a = (System.Int32)args[0]; <br/>
             ///     System.String cb_b;                        <br/>
             ///     TT cb_c = (TT)args[2];                     <br/>
-            ///                                                <br/>
-            ///     System.Object result;                      <br/>
-            ///     result = ...;                              <br/>
-            ///     return result;                             <br/>
-            ///                                                <br/>
-            ///     OR                                         <br/>
-            ///                                                <br/>
-            ///     ...;                                       <br/>
-            ///     return null;                               <br/>
-            /// };   
+            ///     ...                                        <br/>
+            /// };
             /// </summary>
             protected internal LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IMethodInfo method, Action<IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
             {

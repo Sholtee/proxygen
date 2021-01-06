@@ -144,20 +144,20 @@ namespace Solti.Utils.Proxy.Internals
                 }
                 else
                 {
-                    LocalDeclarationStatementSyntax result = DeclareLocal<object>
+                    LocalDeclarationStatementSyntax cb_result = DeclareLocal<object> // ne siman "result" legyen a neve mert a callback-en kivul is lehet ilyen nevu valtozo
                     (
-                        EnsureUnused(nameof(result), method),
+                        EnsureUnused(nameof(cb_result), method),
                         CastExpression
                         (
                             CreateType<object>(),
                             invocation
                         )
                     );
-                    body.Add(result);
+                    body.Add(cb_result);
                     body.AddRange(argsArrayReassignment);
                     body.Add
                     (
-                        ReturnResult(null, result)
+                        ReturnResult(null, cb_result)
                     );
                 }
             });

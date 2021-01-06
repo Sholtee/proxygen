@@ -4,8 +4,10 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 using Microsoft.CodeAnalysis;
@@ -15,6 +17,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
+    using Abstractions;
     using Proxy.Attributes;
 
     public interface IMyService { }
@@ -53,6 +56,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
             string path = Regex.Match(diag.ToString(), "Details stored in: ([\\w\\\\\\/ -:]+)$").Groups[1].Value;
 
             Assert.That(File.Exists(path));
+        }
+
+        private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");
+
+        public static IEnumerable<Type> EmbeddedGenerators 
+        {
+            get 
+            {
+                foreach (var egta in EmbeddedGeneratorHolder.GetCustomAttributes<EmbedGeneratedTypeAttribute>())
+                {
+                    yield return egta.Generator;
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(EmbeddedGenerators))]
+        public void Execute_ShouldExtendTheSource(Type generator) 
+        {
+            var generatedType = (Type) generator.InvokeMember
+            (
+                "GetGeneratedType", 
+                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, 
+                null, 
+                null, 
+                new object[0]
+            );
+
+            //
+            // A nem beagyazott "generatedType" nincs nevterben
+            //
+
+            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType($"Proxies.{generatedType.Name}", throwOnError: false));
         }
     }
 }
