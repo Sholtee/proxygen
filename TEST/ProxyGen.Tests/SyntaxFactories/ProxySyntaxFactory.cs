@@ -176,8 +176,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             Generator.Build(default);
 
-            var s = Generator.Unit.NormalizeWhitespace(eol: "\n").ToFullString();
-
             Assert.That(Generator.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ClsSrc.txt")));
         }
 
