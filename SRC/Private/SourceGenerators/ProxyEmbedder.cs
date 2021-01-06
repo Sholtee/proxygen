@@ -11,6 +11,8 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
+using static System.Environment;
+
 namespace Solti.Utils.Proxy.Internals
 {
     using Attributes;
@@ -35,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen_{Guid.NewGuid()}.log");
 
-                using var log = new StreamWriter(File.OpenWrite(logFile));
+                using StreamWriter log = File.CreateText(logFile);
 
                 //
                 // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
@@ -44,12 +46,12 @@ namespace Solti.Utils.Proxy.Internals
 
                 for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
-                    if (current != ex) log.Write($"{Environment.NewLine}->{Environment.NewLine}");
+                    if (current != ex) log.Write($"{NewLine}->{NewLine}");
                     log.Write(current.ToString());
 
                     foreach (object? key in current.Data.Keys) 
                     {
-                        log.Write($"{Environment.NewLine}{key}:{Environment.NewLine}{current.Data[key]}");
+                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}");
                     }
                 }
 
@@ -116,12 +118,14 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     );
 
-                    foreach ((string Hint, string Value) in codeFactory.GetSourceCodes(generator, context))
+                    foreach (SourceCode source in codeFactory.GetSourceCodes(generator, context))
                     {
+                        source.Dump();
+
                         context.AddSource
                         (
-                            Hint,
-                            Value
+                            source.Hint,
+                            source.Value
                         );
 
                         context.ReportDiagnostic
@@ -134,7 +138,7 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     SGResources.Culture,
                                     SGResources.SRC_EXTENDED_FULL,
-                                    Hint
+                                    source.Hint
                                 ),
                                 generator.Locations.Single(),
                                 DiagnosticSeverity.Info

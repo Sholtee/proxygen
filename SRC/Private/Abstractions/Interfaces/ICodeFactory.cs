@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
     public interface ICodeFactory
     {
         string GeneratorFullName { get; }
-        IEnumerable<(string Hint, string SourceCode)> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);
+        IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);
 
         //
         // Forrasgenerator nem bovitheti a mar meglevo referencia listat, szoval elvileg

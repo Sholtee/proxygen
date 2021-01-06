@@ -12,11 +12,11 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class IUnitSyntaxFactoryExtensions
     {
-        public static string GetSourceCode(this IUnitSyntaxFactory src, CancellationToken cancellation) 
+        public static SourceCode GetSourceCode(this IUnitSyntaxFactory src, string hint, CancellationToken cancellation) 
         {
             src.Build(cancellation);
 
-            return src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString();
+            return new SourceCode(hint, src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString());
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public string GeneratorFullName { get; } = typeof(ProxyGenerator<,>).FullName;
 
-        public IEnumerable<(string Hint, string SourceCode)> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
+        public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
         {
             ITypeSymbol
                 iface = generator.TypeArguments[0],
@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 return new[] 
                 {
-                    ($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", unitSyntaxFactory.GetSourceCode(context.CancellationToken))
+                    unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken)
                 };
             }
             catch (Exception e) 
