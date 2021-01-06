@@ -6,10 +6,10 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
         global::System.Int32 cb_a = (global::System.Int32)args[0];
         global::System.String cb_b;
         TT cb_c = (TT)args[2];
-        global::System.Object result = (global::System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
+        global::System.Object cb_result = (global::System.Object)this.Target.Foo<TT>(cb_a, out cb_b, ref cb_c);
         args[1] = (global::System.Object)cb_b;
         args[2] = (global::System.Object)cb_c;
-        return result;
+        return cb_result;
     };
     global::System.Reflection.MethodInfo method = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveMethod(this.InvokeTarget);
     global::System.Object result = this.Invoke(method, args, method);
