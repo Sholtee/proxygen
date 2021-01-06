@@ -194,7 +194,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     arguments.ToSyntaxList
                     (
-                        (arg, i) => (paramz[i].Kind) switch
+                        (arg, i) => paramz[i].Kind switch
                         {
                             ParameterKind.In => arg.WithRefKindKeyword
                             (
