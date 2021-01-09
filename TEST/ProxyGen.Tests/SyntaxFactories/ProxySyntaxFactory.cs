@@ -192,7 +192,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .Distinct()
                 .ToArray();
 
-            Compilation compilation = CreateCompilation(string.Empty, validate: true, refs);
+            Compilation compilation = CreateCompilation(string.Empty, refs);
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
@@ -213,8 +213,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 src2 = fact2.Unit.NormalizeWhitespace().ToFullString();
 
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
-            Assert.DoesNotThrow(() => CreateCompilation(src1, validate: true, fact1.References.Select(asm => asm.Location)));
-            Assert.DoesNotThrow(() => CreateCompilation(src2, validate: true, fact2.References.Select(asm => asm.Location)));
+            Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.References.Select(asm => asm.Location)));
+            Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
         }
 
         public static IEnumerable<ISyntaxFactory> Factories 

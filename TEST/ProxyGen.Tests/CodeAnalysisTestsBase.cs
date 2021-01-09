@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class CodeAnalysisTestsBase
     {
-        public static CSharpCompilation CreateCompilation(string src, bool validate, IEnumerable<string> additionalReferences) 
+        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences) 
         {
             var result = CSharpCompilation.Create
             (
@@ -28,11 +28,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 CompilationOptionsFactory.Create(allowUnsafe: true)
             );
 
-            if (validate)
-            {
-                Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-                if (errors.Any()) throw new Exception("Bad source");
-            }
+            Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
+            if (errors.Any()) throw new Exception("Bad source");
 
             return result;
         }
@@ -50,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             allowUnsafe: true
         );
 
-        public static CSharpCompilation CreateCompilation(string src, bool validate = true, params Assembly[] additionalReferences) => CreateCompilation(src, validate, additionalReferences.Select(asm => asm.Location));
+        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
 
         protected class FindAllTypesVisitor : SymbolVisitor
         {
