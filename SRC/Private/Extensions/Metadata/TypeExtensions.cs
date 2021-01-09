@@ -14,13 +14,16 @@ namespace Solti.Utils.Proxy.Internals
     internal static partial class TypeExtensions
     {
         //
-        // "&":  referencia szerinti parameter
+        // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/specifying-fully-qualified-type-names
+        //
+        // "&": referencia szerinti parameter
+        // "*": mutato parameter
         // "`d": generikus tipus ahol "d" egesz szam
         // "[T, TT]": generikus parameterek
         // "[<PropName_1>xXx, <PropName_2>xXx]": anonim oljektum property-k
         //
 
-        private static readonly Regex TypeNameReplacer = new Regex(@"\&|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
+        private static readonly Regex TypeNameReplacer = new Regex(@"\&|\*|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
 
         public static string GetFriendlyName(this Type src)
         {
@@ -30,9 +33,13 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericType)
                 src = src.GetGenericTypeDefinition();
 
-            return TypeNameReplacer.Replace(src.IsNested()
-                ? src.Name 
-                : src.ToString(), string.Empty);
+            return TypeNameReplacer.Replace
+            (
+                src.IsNested()
+                    ? src.Name 
+                    : src.ToString(), 
+                string.Empty
+            );
         }
 
         public static string? GetFullName(this Type src) 
