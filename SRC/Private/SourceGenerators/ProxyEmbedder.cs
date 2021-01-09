@@ -106,14 +106,16 @@ namespace Solti.Utils.Proxy.Internals
             {
                 try
                 {
+                    generator.EnsureNotError();
+
                     string? generatorFullName = generator.GetQualifiedMetadataName();
 
                     ICodeFactory codeFactory = CodeFactories.SingleOrDefault(cf => cf.GeneratorFullName == generatorFullName) ?? throw new InvalidOperationException
                     (
                         string.Format
                         (
-                            SGResources.Culture, 
-                            SGResources.NOT_A_GENERATOR, 
+                            SGResources.Culture,
+                            SGResources.NOT_A_GENERATOR,
                             generator
                         )
                     );
@@ -146,7 +148,11 @@ namespace Solti.Utils.Proxy.Internals
                         );
                     }
                 }
-                catch (Exception e) 
+                catch (InvalidSymbolException)
+                {
+                    continue;
+                }
+                catch (Exception e)
                 {
                     context.ReportDiagnostic
                     (

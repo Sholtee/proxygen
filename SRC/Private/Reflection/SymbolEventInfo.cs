@@ -35,7 +35,12 @@ namespace Solti.Utils.Proxy.Internals
             Compilation = compilation;
         }
 
-        public static IEventInfo CreateFrom(IEventSymbol evt, Compilation compilation) => new SymbolEventInfo(evt, compilation);
+        public static IEventInfo CreateFrom(IEventSymbol evt, Compilation compilation)
+        {
+            evt.EnsureNotError();
+
+            return new SymbolEventInfo(evt, compilation);
+        }
 
         public override bool Equals(object obj) => obj is SymbolEventInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
 

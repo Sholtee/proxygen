@@ -22,7 +22,12 @@ namespace Solti.Utils.Proxy.Internals
             Compilation = compilation;
         }
 
-        public static IAssemblyInfo CreateFrom(IAssemblySymbol underlyingSymbol, Compilation compilation) => new SymbolAssemblyInfo(underlyingSymbol, compilation);
+        public static IAssemblyInfo CreateFrom(IAssemblySymbol asm, Compilation compilation)
+        {
+            asm.EnsureNotError();
+
+            return new SymbolAssemblyInfo(asm, compilation);
+        }
 
         public string? Location => Compilation
             .References

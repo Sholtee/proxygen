@@ -19,7 +19,12 @@ namespace Solti.Utils.Proxy.Internals
             Compilation = compilation;
         }
 
-        public static IParameterInfo CreateFrom(IParameterSymbol para, Compilation compilation) => new SymbolParameterInfo(para, compilation);
+        public static IParameterInfo CreateFrom(IParameterSymbol para, Compilation compilation)
+        {
+            para.EnsureNotError();
+
+            return new SymbolParameterInfo(para, compilation);
+        }
 
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.Type, Compilation);

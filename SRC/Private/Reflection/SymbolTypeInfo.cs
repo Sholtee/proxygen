@@ -24,12 +24,17 @@ namespace Solti.Utils.Proxy.Internals
             UnderlyingSymbol = typeSymbol;
             Compilation = compilation;
         }
-        public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation) => typeSymbol switch
+        public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation)
         {
-            IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-            INamedTypeSymbol named when named.TypeArguments.Any() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
-            _ => new SymbolTypeInfo(typeSymbol, compilation)
-        };
+            typeSymbol.EnsureNotError();
+
+            return typeSymbol switch
+            {
+                IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
+                INamedTypeSymbol named when named.TypeArguments.Any() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
+                _ => new SymbolTypeInfo(typeSymbol, compilation)
+            };
+        }
 
         private IAssemblyInfo? FDeclaringAssembly;
         public IAssemblyInfo? DeclaringAssembly
@@ -198,7 +203,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 int arity = (type as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
 
-                symbol = TypeInfoToSymbol(type.EnclosingTypes.Last(), compilation)
+                symbol = TypeInfoToSymbol(type.EnclosingTypes[type.EnclosingTypes.Count - 1], compilation)
                     .GetTypeMembers(type.Name, arity)
                     .Single();
             }

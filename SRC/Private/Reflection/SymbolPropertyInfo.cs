@@ -48,7 +48,12 @@ namespace Solti.Utils.Proxy.Internals
             Compilation = compilation;
         }
 
-        public static IPropertyInfo CreateFrom(IPropertySymbol prop, Compilation compilation) => new SymbolPropertyInfo(prop, compilation);
+        public static IPropertyInfo CreateFrom(IPropertySymbol prop, Compilation compilation)
+        {
+            prop.EnsureNotError();
+
+            return new SymbolPropertyInfo(prop, compilation);
+        }
 
         public override bool Equals(object obj) => obj is SymbolPropertyInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
 

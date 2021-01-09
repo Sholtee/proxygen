@@ -23,11 +23,16 @@ namespace Solti.Utils.Proxy.Internals
             Compilation = compilation;
         }
 
-        public static IMethodInfo CreateFrom(IMethodSymbol method, Compilation compilation) => method switch 
+        public static IMethodInfo CreateFrom(IMethodSymbol method, Compilation compilation)
         {
-            _ when method.TypeArguments.Any() => new SymbolGenericMethodInfo(method, compilation),
-            _ => new SymbolMethodInfo(method, compilation)
-        };
+            method.EnsureNotError();
+
+            return method switch
+            {
+                _ when method.TypeArguments.Any() => new SymbolGenericMethodInfo(method, compilation),
+                _ => new SymbolMethodInfo(method, compilation)
+            };
+        }
 
         private IReadOnlyList<IParameterInfo>? FParameters;
         public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol
