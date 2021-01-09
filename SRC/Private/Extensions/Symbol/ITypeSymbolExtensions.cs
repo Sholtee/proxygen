@@ -37,6 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             _ when src.IsTupleType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen
             _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
+            _ when src is IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
             _ when src.IsNested() => src.ToDisplayString
             (
                 new SymbolDisplayFormat
