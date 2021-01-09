@@ -27,7 +27,8 @@ namespace Solti.Utils.Proxy.Internals
             .GetAttributes()
             .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
             .Select(attr => attr.ConstructorArguments.Single().Value)
-            .Cast<INamedTypeSymbol>();
+            .Cast<INamedTypeSymbol>()
+            .Where(generator => generator.IsValidNamedType());
 
         internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location) 
         {

@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         private static IAssemblyInfo CreateTI(Assembly asm)
         {
-            Compilation compilation = CreateCompilation(string.Empty, asm);
+            Compilation compilation = CreateCompilation(string.Empty, validate: true, asm);
 
             return SymbolAssemblyInfo.CreateFrom((IAssemblySymbol)compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location)), compilation);
         }
@@ -80,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .Distinct()
                 .ToArray();
 
-            Compilation compilation = CreateCompilation(string.Empty, refs);
+            Compilation compilation = CreateCompilation(string.Empty, validate: true, refs);
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
@@ -339,7 +339,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
                 yield return MetadataTypeInfo.CreateFrom(typeof(List<>));
 
-                Compilation compilation = CreateCompilation(string.Empty, typeof(List<>).Assembly);
+                Compilation compilation = CreateCompilation(string.Empty, validate: true, typeof(List<>).Assembly);
                 yield return SymbolTypeInfo.CreateFrom(compilation.GetTypeByMetadataName(typeof(List<>).FullName), compilation);
                 
             }
@@ -371,7 +371,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(Types))]
         public void TypeInfoToSymbol_ShouldReturnTheDesiredSymbol((Type Type, string Name) data) 
         {
-            Compilation compilation = CreateCompilation(string.Empty, data.Type.Assembly);
+            Compilation compilation = CreateCompilation(string.Empty, validate: true, data.Type.Assembly);
 
             ITypeSymbol resolved = SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type), compilation);
 

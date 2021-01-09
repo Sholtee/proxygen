@@ -331,9 +331,42 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IEventSymbol evt in src.ListEvents(includeStatic: true))
                 sb.AppendLine($"  {evt.ToDisplayString(fmt)};");
 
-            sb.Append("}");
+            sb.Append('}');
 
             return sb.ToString();
+        }
+
+        public static bool IsValidNamedType(this ITypeSymbol src)
+        {
+            var visitedTypes = new HashSet<ITypeSymbol>(SymbolEqualityComparer.Default);
+
+            return IsValid(src);
+
+            bool IsValid(ITypeSymbol type)
+            {
+                if (!visitedTypes.Contains(type))
+                {
+                    visitedTypes.Add(type);
+
+                    //
+                    // SymbolKind.ErrorType hibas tipus eseten
+                    //
+
+                    if (type.Kind != SymbolKind.NamedType || string.IsNullOrEmpty(type.Name))
+                        return false;
+
+                    if (type is not INamedTypeSymbol named || !named.TypeArguments.All(IsValid))
+                        return false;
+
+                    if (!type.GetBaseTypes().All(IsValid))
+                        return false;
+
+                    if (!type.AllInterfaces.All(IsValid))
+                        return false;
+                }
+
+                return true;
+            }
         }
     }
 }

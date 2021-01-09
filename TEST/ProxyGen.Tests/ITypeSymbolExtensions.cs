@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             Assembly asm = type.Assembly;
 
-            CSharpCompilation compilation = CreateCompilation(string.Empty, asm);
+            CSharpCompilation compilation = CreateCompilation(string.Empty, validate: true, asm);
 
             IAssemblySymbol asmSymbol = (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == asm.Location));
             INamedTypeSymbol typeSymbol = asmSymbol.GetTypeByMetadataName(type.FullName);
@@ -325,6 +325,71 @@ namespace Solti.Utils.Proxy.Internals.Tests
             ITypeSymbol type = CreateCompilation(string.Empty).GetTypeByMetadataName(typeof(List<>).FullName);
 
             Assert.That(type.GetDebugString(), Is.EqualTo(File.ReadAllText("ListDbg.txt")));
+        }
+
+        public static IEnumerable<(string Src, bool IsValid)> TypesToValidate 
+        {
+            get 
+            {
+                yield return 
+                (
+                    @"
+                        using System.Collections.Generic;
+                        interface IMyInterface: IDictionary<int,>{}
+                    ",
+                    false
+                );
+                yield return
+                (
+                    @"
+                        using System.Collections.Generic;
+                        interface IMyInterface: IList<invalid>{}
+                    ",
+                    false
+                );
+                yield return
+                (
+                    @"
+                        interface IMyInterface: IInvalid{}
+                    ",
+                    false
+                );
+                yield return
+                (
+                    @"
+                        using System.Collections.Generic;
+                        interface IMyInterface: IList<object>{}
+                    ",
+                    true
+                );
+                yield return
+                (
+                    @"
+                        using System.Collections;
+                        interface IMyInterface: IList{}
+                    ",
+                    true
+                );
+                yield return
+                (
+                    @"
+                        interface IMyInterface{}
+                    ",
+                    true
+                );
+            }
+        }
+
+        [TestCaseSource(nameof(TypesToValidate))]
+        public void IsValidNamedType_ShouldReturnFalseOnInvalidType((string Src, bool IsValid) data)
+        {
+            Compilation compilation = CreateCompilation(data.Src, validate: false);
+
+            var visitor = new FindAllTypesVisitor();
+            visitor.VisitNamespace(compilation.GlobalNamespace);
+
+            INamedTypeSymbol type = visitor.AllTypeSymbols.Single(t => t.Name == "IMyInterface");
+            Assert.That(type.IsValidNamedType(), Is.EqualTo(data.IsValid));
         }
     }
 }
