@@ -21,6 +21,17 @@ namespace Solti.Utils.Proxy.Internals
             FValue = value;
         }
 
-        public void Dump() => File.WriteAllText(Path.Combine(Path.GetTempPath(), Hint), FValue);
+        public bool Dump()
+        {
+            try
+            {
+                File.WriteAllText(Path.Combine(Path.GetTempPath(), Hint), FValue);
+                return true;
+            }
+            catch 
+            {
+                return false;
+            }
+        }
     }
 }
