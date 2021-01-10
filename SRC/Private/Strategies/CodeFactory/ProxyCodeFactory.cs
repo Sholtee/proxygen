@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class ProxyCodeFactory : ICodeFactory
     {
-        public string GeneratorFullName { get; } = typeof(ProxyGenerator<,>).FullName;
+        public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(ProxyGenerator<,>).FullName;
 
         public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
         {

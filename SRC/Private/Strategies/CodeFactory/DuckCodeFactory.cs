@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class DuckCodeFactory : ICodeFactory
     {
-        public string GeneratorFullName { get; } = typeof(DuckGenerator<,>).FullName;
+        public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(DuckGenerator<,>).FullName;
 
         public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
         {

@@ -108,9 +108,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     generator.EnsureNotError();
 
-                    string? generatorFullName = generator.GetQualifiedMetadataName();
-
-                    ICodeFactory codeFactory = CodeFactories.SingleOrDefault(cf => cf.GeneratorFullName == generatorFullName) ?? throw new InvalidOperationException
+                    ICodeFactory codeFactory = CodeFactories.SingleOrDefault(cf => cf.ShouldUse(generator)) ?? throw new InvalidOperationException
                     (
                         string.Format
                         (

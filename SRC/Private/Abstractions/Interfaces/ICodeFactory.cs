@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public interface ICodeFactory
     {
-        string GeneratorFullName { get; }
+        bool ShouldUse(INamedTypeSymbol generator);
         IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);
 
         //
