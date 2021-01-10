@@ -18,11 +18,21 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class ClassSyntaxFactory: SyntaxFactoryBase, IUnitSyntaxFactory
     {
+        private const string CONTAINING_NS = "Proxies";
+
         public CompilationUnitSyntax? Unit { get; private set; }
 
         public OutputType OutputType { get; }
 
-        IReadOnlyCollection<string>? IUnitSyntaxFactory.DefinedClasses => new[] { ClassName };
+        IReadOnlyCollection<string>? IUnitSyntaxFactory.DefinedClasses => new[]
+        {
+            OutputType switch 
+            {
+                OutputType.Unit => CONTAINING_NS + Type.Delimiter + ClassName,
+                OutputType.Module => ClassName,
+                _ => throw new NotSupportedException()
+            }
+        };
 
         public abstract IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
@@ -52,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         NamespaceDeclaration
                         (
-                            IdentifierName("Proxies")
+                            IdentifierName(CONTAINING_NS)
                         )
                         .WithMembers
                         (

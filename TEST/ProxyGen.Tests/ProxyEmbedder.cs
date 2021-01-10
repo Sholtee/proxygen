@@ -17,8 +17,8 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    using Abstractions;
-    using Proxy.Attributes;
+    using Attributes;
+    using Primitives;
 
     public interface IMyService { }
 
@@ -72,22 +72,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [TestCaseSource(nameof(EmbeddedGenerators))]
-        public void Execute_ShouldExtendTheSource(Type generator) 
+        public void Execute_ShouldExtendTheOriginalSource(Type generator) 
         {
-            var generatedType = (Type) generator.InvokeMember
-            (
-                "GetGeneratedType", 
-                BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, 
-                null, 
-                null, 
-                new object[0]
-            );
+            object generatorInst = generator
+                .GetConstructor(Type.EmptyTypes)
+                .ToStaticDelegate()
+                .Invoke(new object[0]);
 
-            //
-            // A nem beagyazott "generatedType" nincs nevterben
-            //
+            IUnitSyntaxFactory syntaxFactory = (IUnitSyntaxFactory) generator
+                .GetProperty("SyntaxFactory")
+                .ToGetter()
+                .Invoke(generatorInst);
 
-            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType($"Proxies.{generatedType.Name}", throwOnError: false));
+            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType(syntaxFactory.DefinedClasses.Single(), throwOnError: false));
         }
     }
 }

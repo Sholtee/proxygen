@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public override void VisitNamedType(INamedTypeSymbol symbol)
             {
                 AllTypeSymbols.Add(symbol);
-                foreach (var childSymbol in symbol.GetTypeMembers())
+                foreach (INamedTypeSymbol childSymbol in symbol.GetTypeMembers())
                 {
                     base.Visit(childSymbol);
                 }

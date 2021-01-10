@@ -19,14 +19,19 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
+        /// Creates a new <see cref="ProxyGenerator{TInterface, TInterceptor}"/> instance.
         /// </summary>
-        public override IUnitSyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory
+        public ProxyGenerator() => SyntaxFactory = new ProxySyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)),
             MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
-            OutputType.Module
+            TypeResolutionStrategy.Type
         );
+
+        /// <summary>
+        /// See <see cref="ITypeGenerator"/>.
+        /// </summary>
+        public override IUnitSyntaxFactory SyntaxFactory { get; }
 
         /// <summary>
         /// See <see cref="TypeGenerator{T}"/>.

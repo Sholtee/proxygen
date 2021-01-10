@@ -19,6 +19,9 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
+    using Abstractions;
+    using Internals;
+
     [TestFixture]
     public sealed class DuckGeneratorTests
     {
@@ -224,33 +227,37 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
+        public void DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
+            ITypeGenerator generator = new DuckGenerator<IGeneric<Guid>, Generic<Guid>>();
+
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, new DuckGenerator<IGeneric<Guid>, Generic<Guid>>().CacheFileName);
+            string cacheFile = Path.Combine(tmpDir, generator.TypeResolutionStrategy.AssemblyName);
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            DuckGenerator<IGeneric<Guid>, Generic<Guid>>.CacheDir = tmpDir;
-            await DuckGenerator<IGeneric<Guid>, Generic<Guid>>.GetGeneratedTypeAsync();
+            ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = tmpDir;
+
+            generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(File.Exists(cacheFile));
         }
 
         [Test]
-        public async Task DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
+            ITypeGenerator generator = new DuckGenerator<IGeneric<object>, Generic<object>>();
+
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                cacheFile = Path.Combine(
-                    cacheDir, 
-                    new DuckGenerator<IGeneric<object>, Generic<object>>().CacheFileName);
+                cacheFile = Path.Combine(cacheDir, generator.TypeResolutionStrategy.AssemblyName);
+         
+            ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = cacheDir;
 
-            DuckGenerator<IGeneric<object>, Generic<object>>.CacheDir = cacheDir;
-            Type gt = await DuckGenerator<IGeneric<object>, Generic<object>>.GetGeneratedTypeAsync();
+            Type gt = generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

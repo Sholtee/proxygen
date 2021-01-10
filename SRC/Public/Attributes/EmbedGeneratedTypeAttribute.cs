@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Attributes
     public sealed class EmbedGeneratedTypeAttribute: Attribute
     {
         /// <summary>
-        /// The related generator.
+        /// The related <see cref="TypeGenerator{TDescendant}"/>.
         /// </summary>
         public Type Generator { get; }
 
