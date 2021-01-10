@@ -20,13 +20,21 @@ namespace Solti.Utils.Proxy.Internals
     {
         private const string CONTAINING_NS = "Proxies";
 
-        private readonly IReadOnlyCollection<string> FDefinedClasses;
-
         public CompilationUnitSyntax? Unit { get; private set; }
 
         public OutputType OutputType { get; }
 
-        IReadOnlyCollection<string> IUnitSyntaxFactory.DefinedClasses => FDefinedClasses;
+        private IReadOnlyCollection<string>? FDefinedClasses;
+
+        IReadOnlyCollection<string> IUnitSyntaxFactory.DefinedClasses => FDefinedClasses ??= new[]
+        {
+            OutputType switch
+            {
+                OutputType.Unit => CONTAINING_NS + Type.Delimiter + ClassName,
+                OutputType.Module => ClassName,
+                _ => throw new NotSupportedException()
+            }
+        };
 
         public abstract IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
@@ -34,20 +42,7 @@ namespace Solti.Utils.Proxy.Internals
 
         protected abstract MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members);
 
-        protected ClassSyntaxFactory(OutputType outputType)
-        {
-            OutputType = outputType;
-
-            FDefinedClasses = new[]
-            {
-                OutputType switch
-                {
-                    OutputType.Unit => CONTAINING_NS + Type.Delimiter + ClassName,
-                    OutputType.Module => ClassName,
-                    _ => throw new NotSupportedException()
-                }
-            };
-        }
+        protected ClassSyntaxFactory(OutputType outputType) => OutputType = outputType;
 
         public override bool Build(CancellationToken cancellation)
         {
