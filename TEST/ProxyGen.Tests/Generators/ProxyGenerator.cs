@@ -460,7 +460,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, generator.TypeResolutionStrategy.AssemblyName);
+            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
@@ -480,7 +480,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(
                     cacheDir,
-                    generator.TypeResolutionStrategy.AssemblyName);
+                    $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
 
             ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = cacheDir;
             Type gt = generator.TypeResolutionStrategy.Resolve();
