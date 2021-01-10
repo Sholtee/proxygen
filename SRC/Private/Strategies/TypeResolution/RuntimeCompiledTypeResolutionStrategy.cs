@@ -29,13 +29,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             IUnitSyntaxFactory syntaxFactory = Generator.SyntaxFactory;
 
-            string?
-                assemblyName = $"{AssemblyName}.dll",
-                cacheFile = null;
+            string? cacheFile = null;
 
             if (!string.IsNullOrEmpty(CacheDir))
             {
-                cacheFile = Path.Combine(CacheDir, assemblyName);
+                cacheFile = Path.Combine(CacheDir, $"{AssemblyName}.dll");
 
                 if (File.Exists(cacheFile)) return ExtractType
                 (
@@ -53,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
                  Compile.ToAssembly
                  (
                      syntaxFactory.Unit!,
-                     assemblyName,
+                     AssemblyName,
                      cacheFile,
                      syntaxFactory
                         .References
