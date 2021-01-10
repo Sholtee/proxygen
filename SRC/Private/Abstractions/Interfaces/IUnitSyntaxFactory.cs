@@ -16,6 +16,6 @@ namespace Solti.Utils.Proxy.Internals
         
         OutputType OutputType { get; }
 
-        IReadOnlyCollection<string>? DefinedClasses { get; }
+        IReadOnlyCollection<string> DefinedClasses { get; }
     }
 }
