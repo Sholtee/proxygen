@@ -209,15 +209,18 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                if (type is IArrayTypeInfo ar) 
-                    //
-                    // Tombot nem lehet lekerdezni nev alapjan
-                    //
+                //
+                // Tombot es mutatot nem lehet lekerdezni nev alapjan
+                //
 
-                    return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
-
-                if (type.RefType == RefType.Pointer)
-                    return compilation.CreatePointerTypeSymbol(TypeInfoToSymbol(type.ElementType!, compilation));
+                switch (type.RefType)
+                {
+                    case RefType.Array:
+                        IArrayTypeInfo ar = (IArrayTypeInfo) type;
+                        return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
+                    case RefType.Pointer:
+                        return compilation.CreatePointerTypeSymbol(TypeInfoToSymbol(type.ElementType!, compilation));
+                }
 
                 //
                 // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
