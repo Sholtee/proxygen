@@ -327,10 +327,10 @@ namespace Solti.Utils.Proxy.Internals
                 sb.AppendLine($"  {method.ToDisplayString(fmt)};");
 
             foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))
-                sb.AppendLine($"  {property.ToDisplayString(fmt)};");
+                sb.AppendLine($"  {property.ToDisplayString(fmt)}");
 
             foreach (IEventSymbol evt in src.ListEvents(includeStatic: true))
-                sb.AppendLine($"  {evt.ToDisplayString(fmt)};");
+                sb.AppendLine($"  {evt.ToDisplayString(fmt)}");
 
             sb.Append("}");
 
