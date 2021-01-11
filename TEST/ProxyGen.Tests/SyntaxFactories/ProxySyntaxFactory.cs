@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private ProxySyntaxFactory Generator { get; set; }
 
         [SetUp]
-        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), "cica", OutputType.Module);
+        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), typeof(ProxySyntaxFactoryTests).Assembly.GetName().Name, OutputType.Module);
 
         private class NonAbstractProxyMemberSyntaxFactory : ProxyMemberSyntaxFactory
         {

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -51,6 +52,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void Check_ShouldThrowIfTheMemberNotVisible()
         {
+            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList)), "cica"));
+
             Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
             Assert.DoesNotThrow(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly));
 
