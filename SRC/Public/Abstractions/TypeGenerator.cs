@@ -47,23 +47,6 @@ namespace Solti.Utils.Proxy.Abstractions
         }
         #endregion
 
-        #region Protected
-        /// <summary>
-        /// Override to invoke your own checks.
-        /// </summary>
-        protected virtual void DoCheck() { }
-
-        /// <summary>
-        /// Throws if the <paramref name="type"/> is not visible for the assembly being created.
-        /// </summary>
-        protected void CheckVisibility(Type type)
-        {
-#if !IGNORE_VISIBILITY
-            Visibility.Check(MetadataTypeInfo.CreateFrom(type), TypeResolutionStrategy.AssemblyName);
-#endif
-        }
-        #endregion
-
         #region Public
         /// <summary>
         /// Creates a new <see cref="TypeGenerator{TDescendant}"/> instance.

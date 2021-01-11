@@ -18,12 +18,8 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class ClassSyntaxFactory: SyntaxFactoryBase, IUnitSyntaxFactory
     {
+        #region Private
         private const string CONTAINING_NS = "Proxies";
-
-        public CompilationUnitSyntax? Unit { get; private set; }
-
-        public OutputType OutputType { get; }
-
         private IReadOnlyCollection<string>? FDefinedClasses;
 
         IReadOnlyCollection<string> IUnitSyntaxFactory.DefinedClasses => FDefinedClasses ??= new[]
@@ -35,14 +31,39 @@ namespace Solti.Utils.Proxy.Internals
                 _ => throw new NotSupportedException()
             }
         };
+        #endregion
+
+        #region Protected
+        protected abstract MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members);
+
+        protected virtual IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
+        {
+            foreach (IMemberSyntaxFactory syntaxFactory in MemberSyntaxFactories)
+            {
+                syntaxFactory.Build(cancellation);
+
+                foreach (MemberDeclarationSyntax memberDeclaration in syntaxFactory.Members!)
+                {
+                    yield return memberDeclaration;
+                }
+
+                AddTypesFrom(syntaxFactory);
+            }
+        }
+
+        protected ClassSyntaxFactory(OutputType outputType) => OutputType = outputType;
+        #endregion
+
+        #region Public
+        public CompilationUnitSyntax? Unit { get; private set; }
+
+        public OutputType OutputType { get; }
 
         public abstract IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
         public abstract string ClassName { get; }
 
-        protected abstract MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members);
-
-        protected ClassSyntaxFactory(OutputType outputType) => OutputType = outputType;
+        public abstract string AssemblyName { get; }
 
         public override bool Build(CancellationToken cancellation)
         {
@@ -52,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 GenerateClass
                 (
-                    BuildMembers()
+                    BuildMembers(cancellation)
                 )
             );
 
@@ -108,21 +129,7 @@ namespace Solti.Utils.Proxy.Internals
             return true;
 
             static LiteralExpressionSyntax AsLiteral(string param) => LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(param));
-
-            IEnumerable<MemberDeclarationSyntax> BuildMembers() 
-            {
-                foreach (IMemberSyntaxFactory syntaxFactory in MemberSyntaxFactories) 
-                {
-                    syntaxFactory.Build(cancellation);
-
-                    foreach (MemberDeclarationSyntax memberDeclaration in syntaxFactory.Members!)
-                    {
-                        yield return memberDeclaration;
-                    }
-
-                    AddTypesFrom(syntaxFactory);
-                }
-            }
         }
+        #endregion
     }
 }

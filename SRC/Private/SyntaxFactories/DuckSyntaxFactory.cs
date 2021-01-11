@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseType { get; }
 
-        public string AssemblyName { get; }
+        public override string AssemblyName { get; }
 
         public override string ClassName { get; }
 
@@ -47,6 +48,14 @@ namespace Solti.Utils.Proxy.Internals
                 new PropertyInterceptorFactory(this),
                 new EventInterceptorFactory(this)
             };
+        }
+
+        protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
+        {
+            Visibility.Check(InterfaceType, AssemblyName);
+            Visibility.Check(TargetType, AssemblyName);
+
+            return base.BuildMembers(cancellation);
         }
 
         protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)

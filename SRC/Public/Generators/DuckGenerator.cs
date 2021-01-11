@@ -3,13 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-
 namespace Solti.Utils.Proxy.Generators
 {
     using Abstractions;
     using Internals;
-    using Properties;
 
     /// <summary>
     /// Type generator for creating proxies that let <typeparamref name="TTarget"/> behaves like a <typeparamref name="TInterface"/>.
@@ -33,31 +30,5 @@ namespace Solti.Utils.Proxy.Generators
         /// See <see cref="ITypeGenerator"/>.
         /// </summary>
         public override IUnitSyntaxFactory SyntaxFactory { get; }
-
-        /// <summary>
-        /// See <see cref="TypeGenerator{T}"/>.
-        /// </summary>
-        protected override void DoCheck()
-        {
-            CheckInterface();
-            CheckTarget();
-        }
-
-        private void CheckInterface()
-        {
-            Type type = typeof(TInterface);
-
-            CheckVisibility(type);
-
-            if (!type.IsInterface) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters) throw new InvalidOperationException();
-        }
-
-        private void CheckTarget() =>
-            //
-            // Konstruktor parameterben atadasra kerul -> lathatonak kell lennie.
-            //
-
-            CheckVisibility(typeof(TTarget));
     }
 }

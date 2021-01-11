@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private ProxySyntaxFactory Generator { get; set; }
 
         [SetUp]
-        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), OutputType.Module);
+        public void Setup() => Generator = new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)), MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), "cica", OutputType.Module);
 
         private class NonAbstractProxyMemberSyntaxFactory : ProxyMemberSyntaxFactory
         {
@@ -152,7 +152,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyIndexer_Test()
         {
-            var fact = new PropertyInterceptorFactory(new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IList<int>)), MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), OutputType.Module));
+            var fact = new PropertyInterceptorFactory(new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IList<int>)), MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), "cica", OutputType.Module));
             fact.Build(default);
 
             Assert.That(fact.Members, Is.Not.Null);
@@ -202,8 +202,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 interceptor = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>));
 
             IUnitSyntaxFactory
-                fact1 = new ProxySyntaxFactory(type1, (ITypeInfo) interceptor.Close(type1), outputType),
-                fact2 = new ProxySyntaxFactory(type2, (ITypeInfo) interceptor.Close(type2), outputType);
+                fact1 = new ProxySyntaxFactory(type1, (ITypeInfo) interceptor.Close(type1), "cica", outputType),
+                fact2 = new ProxySyntaxFactory(type2, (ITypeInfo) interceptor.Close(type2), "cica", outputType);
 
             Assert.DoesNotThrow(() => fact1.Build());
             Assert.DoesNotThrow(() => fact2.Build());
@@ -225,7 +225,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     iface = MetadataTypeInfo.CreateFrom(typeof(IComplex)),
                     interceptor = MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IComplex>));
 
-                var fact = new ProxySyntaxFactory(iface, interceptor, OutputType.Module);
+                var fact = new ProxySyntaxFactory(iface, interceptor, "cica", OutputType.Module);
 
                 yield return new ConstructorFactory(fact);
                 yield return new InvokeFactory(fact);

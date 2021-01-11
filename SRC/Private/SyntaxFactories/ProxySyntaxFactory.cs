@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,7 +27,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ClassName { get; }
 
-        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, OutputType outputType): base(outputType) 
+        public override string AssemblyName { get; }
+
+        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string assemblyName, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -47,6 +50,7 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
+            AssemblyName = assemblyName;
             ClassName = $"GeneratedClass_{InterceptorType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[] 
@@ -59,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
         {
             if (InterceptorType.IsFinal)
                 throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
@@ -67,6 +71,14 @@ namespace Solti.Utils.Proxy.Internals
             if (InterceptorType.IsAbstract)
                 throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
 
+            Visibility.Check(InterfaceType, AssemblyName);
+            Visibility.Check(InterceptorType, AssemblyName);
+
+            return base.BuildMembers(cancellation);
+        }
+
+        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        {
             ClassDeclarationSyntax cls = ClassDeclaration
             (
                 identifier: ClassName
