@@ -3,17 +3,16 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-using System.Diagnostics;
-using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget>
+    internal partial class DuckSyntaxFactory
     {
         /// <summary>
         /// event TDelegate IFoo[System.Int32].Event     <br/>
@@ -24,52 +23,76 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove => Target.Event -= value;           <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : InterceptorFactoryBase
+        internal sealed class EventInterceptorFactory : DuckMemberSyntaxFactory
         {
-            public EventInterceptorFactory(DuckSyntaxFactory<TInterface, TTarget> owner) : base(owner) { }
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
-                EventInfo
-                    ifaceEvt = (EventInfo) member,
-                    targetEvt = GetTargetMember(ifaceEvt);
+                foreach (IEventInfo ifaceEvt in Context.InterfaceType.Events)
+                {
+                    cancellation.ThrowIfCancellationRequested();
 
-                //
-                // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
-                //
+                    IEventInfo targetEvt = GetTargetMember(ifaceEvt, Context.TargetType.Events);
 
-                Visibility.Check(targetEvt, Owner.AssemblyName, checkAdd: ifaceEvt.AddMethod != null, checkRemove: ifaceEvt.RemoveMethod != null);
+                    //
+                    // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
+                    //
 
-                MethodInfo accessor = (ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod)!;
-                Debug.Assert(accessor != null);
-
-                Type? castTargetTo = accessor!.GetAccessModifiers() == AccessModifiers.Explicit ? accessor!.GetDeclaringType() : null;
-
-                return Owner.DeclareEvent
-                (
-                    ifaceEvt,
-                    addBody: ArrowExpressionClause
+                    Visibility.Check
                     (
-                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: true, IdentifierName(Value), castTargetTo)
-                    ),
-                    removeBody: ArrowExpressionClause
+                        targetEvt, 
+                        Context.AssemblyName, 
+                        checkAdd: ifaceEvt.AddMethod is not null, 
+                        checkRemove: ifaceEvt.RemoveMethod is not null
+                    );
+
+                    IMethodInfo accessor = ifaceEvt.AddMethod ?? ifaceEvt.RemoveMethod!;
+
+                    ITypeInfo? castTargetTo = accessor.AccessModifiers == AccessModifiers.Explicit 
+                        ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
+                        : null;
+
+                    yield return DeclareEvent
                     (
-                        expression: Owner.RegisterEvent(targetEvt, Owner.TARGET, add: false, IdentifierName(Value), castTargetTo)
-                    ),
-                    forceInlining: true
-                );
+                        ifaceEvt,
+                        addBody: CreateBody(register: true),
+                        removeBody: CreateBody(register: false),
+                        forceInlining: true
+                    );
+
+                    ArrowExpressionClauseSyntax CreateBody(bool register) => ArrowExpressionClause
+                    (
+                        expression: RegisterEvent
+                        (
+                            targetEvt,
+                            MemberAccess(null, TARGET),
+                            register,
+                            IdentifierName(Value),
+                            castTargetTo
+                        )
+                    );
+                }
             }
 
-            public override bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface;
-
-            protected override bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember)
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
-                EventInfo
-                    targetEvt = (EventInfo) targetMember,
-                    ifaceEvt = (EventInfo) ifaceMember;
+                if (targetMember is not IEventInfo targetEvent || ifaceMember is not IEventInfo ifaceEvent)
+                    return false;
 
-                return targetEvt.EventHandlerType == ifaceEvt.EventHandlerType;
+                if (ifaceEvent.AddMethod is not null) 
+                {
+                    if (targetEvent.AddMethod is null || !ifaceEvent.AddMethod.SignatureEquals(targetEvent.AddMethod, ignoreVisibility: true))
+                        return false;              
+                }
+
+                if (ifaceEvent.RemoveMethod is not null)
+                {
+                    if (targetEvent.RemoveMethod is null || !ifaceEvent.RemoveMethod.SignatureEquals(targetEvent.RemoveMethod, ignoreVisibility: true))
+                        return false;
+                }
+
+                return true;
             }
+            public EventInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }
 }

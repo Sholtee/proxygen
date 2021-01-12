@@ -4,46 +4,42 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
+    using static SymbolTypeInfo;
 
     internal static class Visibility
     {
-        public static void Check(MethodBase method, string assemblyName, bool allowProtected = false) 
+        public static void Check(IMethodInfo method, string assemblyName, bool allowProtected = false) 
         {
-            AccessModifiers am = method.GetAccessModifiers();
+            AccessModifiers am = method.AccessModifiers;
 
             if (am.HasFlag(AccessModifiers.Internal))
             {
                 bool grantedByAttr = method
                     .DeclaringType
-                    .Assembly
-                    .GetCustomAttributes<InternalsVisibleToAttribute>()
-                    .FirstOrDefault(ivt => ivt.AssemblyName == assemblyName) != null;
+                    .DeclaringAssembly
+                    ?.IsFriend(assemblyName) == true;
 
                 if (grantedByAttr) return;
 
                 if (!am.HasFlag(AccessModifiers.Protected) /*protected-internal*/)
                 {
-                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.GetFullName(), assemblyName));
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
                 }
             }
 
             if (am.HasFlag(AccessModifiers.Protected)) 
             {
                 if (allowProtected) return;
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.GetFullName()));
+                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
             }
 
             //
@@ -53,16 +49,16 @@ namespace Solti.Utils.Proxy.Internals
             if (am == AccessModifiers.Explicit) return; // meg ha cast-olni is kell hozza de lathato
 
             if (am == AccessModifiers.Private)
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.GetFullName()));
+                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
 
             Debug.Assert(am == AccessModifiers.Public, $"Unknown AccessModifier: {am}");
         }
 
-        public static void Check(PropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
+        public static void Check(IPropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
         {
             if (checkGet) 
             {
-                MethodInfo get = property.GetMethod;
+                IMethodInfo? get = property.GetMethod;
                 Debug.Assert(get != null, "property.GetMethod == NULL");
 
                 Check(get!, assemblyName, allowProtected);
@@ -70,18 +66,18 @@ namespace Solti.Utils.Proxy.Internals
 
             if (checkSet)
             {
-                MethodInfo set = property.SetMethod;
+                IMethodInfo? set = property.SetMethod;
                 Debug.Assert(set != null, "property.SetMethod == NULL");
 
                 Check(set!, assemblyName, allowProtected);
             }
         }
 
-        public static void Check(EventInfo @event, string assemblyName, bool checkAdd = true, bool checkRemove = true, bool allowProtected = false) 
+        public static void Check(IEventInfo @event, string assemblyName, bool checkAdd = true, bool checkRemove = true, bool allowProtected = false) 
         {
             if (checkAdd)
             {
-                MethodInfo add = @event.AddMethod;
+                IMethodInfo? add = @event.AddMethod;
                 Debug.Assert(add != null, "event.AddMethod == NULL");
 
                 Check(add!, assemblyName, allowProtected);
@@ -89,63 +85,62 @@ namespace Solti.Utils.Proxy.Internals
 
             if (checkRemove)
             {
-                MethodInfo remove = @event.RemoveMethod;
+                IMethodInfo? remove = @event.RemoveMethod;
                 Debug.Assert(remove != null, "event.RemoveMethod == NULL");
 
                 Check(remove!, assemblyName, allowProtected);
             }
         }
 
-        public static void Check(Type type, string assemblyName) // FIXME: nyilt generikusokra nem mukodik (igaz egyelore nem is kell)
+        public static void Check(ITypeInfo type, string assemblyName)
         {
-            //
-            // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
-            // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditora bizzuk
-            // a dontest:
-            //
-            // using t = Namespace.Type;
-            //
-
-            (CompilationUnitSyntax Unit, IReadOnlyCollection<MetadataReference> References, _) = new VisibilityCheckSyntaxFactory(type).GetContext();
-
-            Debug.WriteLine(Unit.NormalizeWhitespace().ToFullString());
-
-            CSharpCompilation compilation = CSharpCompilation.Create
-            (
-                assemblyName: assemblyName,
-                syntaxTrees: new[]
-                {
-                    CSharpSyntaxTree.Create
-                    (
-                        root: Unit
-                    )
-                },
-                references: References,
-                options: CompilationOptionsFactory.Create()
-            );
-
-            Diagnostic[] diagnostics = compilation
-                .GetDeclarationDiagnostics()
-                .Where(diag => diag.Severity == DiagnosticSeverity.Error)
-                .ToArray();
-
-            if (diagnostics.Length == 0) return;
+            if (type.DeclaringAssembly is null)
+                throw new NotSupportedException();
 
             //
-            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/compiler-messages/cs0122
+            // Tomb es mutato tipusnal az elem tipusat kell vizsgaljuk
             //
 
-            if (diagnostics.Length > 1 || !diagnostics.Single().Id.Equals("CS0122", StringComparison.OrdinalIgnoreCase))
+            if (type.ElementType is not null)
             {
-                throw new Exception(string.Join(Environment.NewLine, diagnostics.Select(diagnostic => diagnostic.GetMessage())));
+                Check(type.ElementType, assemblyName);
+                return;
             }
 
+            var collector = new ReferenceCollector(includeRuntimeReferences: false);
+            collector.AddType(type);
+
             //
-            // A fordito nem fogja megmondani h mi a tipus lathatosaga csak azt h lathato e v sem,
-            // ezert vmi altalanosabb hibauzenet kell.
+            // Korbedolgozas arra az esetre ha a "type" GeneratorExecutionContext-bol jon es nem
+            // teljes ujraforditas van
             //
 
-            throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type, assemblyName));
+            if (collector.References.Any(@ref => @ref.Location is null))
+                return;
+
+            //
+            // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
+            // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditotol kerjuk
+            // el.
+            //
+
+            CSharpCompilation comp = CSharpCompilation.Create
+            (
+                null,
+                references: collector
+                    .References
+                    .Select(@ref => MetadataReference.CreateFromFile(@ref.Location!))
+            );
+
+            switch (TypeInfoToSymbol(type, comp).DeclaredAccessibility) 
+            {
+                case Accessibility.Private:
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
+                case Accessibility.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
+                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
+                case Accessibility.NotApplicable:
+                    throw new InvalidOperationException();
+            }
         }
     }
 }

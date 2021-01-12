@@ -50,7 +50,16 @@
   - *breaking:* New `ISyntaxFactory` layout
   - *introduced:* `IProxySyntaxFactory` interface
   - *introduced:* `ConcurrentInterfaceinterceptor` class
-  - *done:* More efficient generated code
+  - *improved:* Generated code
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
+- 4.0.0-preview2
+  - *breaking:* Removed `TypeGenerator.GeneratedType[Async]` property. It is substituted by the `GetGeneratedType[Async]()` method
+  - *breaking:* Assembly cache directory can be set from `appname.runtimeconfig.json`
+  - *introduced:* Cancellable `TypeGenerator`s
+  - *introduced:* Pointer type support
+  - *introduced:* `ref readonly` support
+  - *improved:* Generated code
+  - *improved:* Visibility check
+  - *fixed:* `InterfaceInterceptor.InvokeTarget` cleanup after invocation
   

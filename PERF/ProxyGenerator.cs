@@ -20,9 +20,10 @@ namespace Solti.Utils.Proxy.Perf
             {
             }
         }
-
+        /*
         [Benchmark]
         public void AssemblingProxyType() =>
-            new ProxyGenerator<IInterface, InterfaceProxy>().GenerateTypeCore(null, Guid.NewGuid().ToString());
+            new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(null, Guid.NewGuid().ToString());
+        */
     }
 }

@@ -3,9 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget>
+    internal partial class DuckSyntaxFactory
     {
         /// <summary>
         /// System.Int32 IFoo[System.Int32].Prop         <br/>
@@ -25,107 +25,108 @@ namespace Solti.Utils.Proxy.Internals
         ///   set => Target.Prop = value;                <br/>
         /// }
         /// </summary>
-        internal sealed class PropertyInterceptorFactory : InterceptorFactoryBase
+        internal sealed class PropertyInterceptorFactory : DuckMemberSyntaxFactory
         {
-            public PropertyInterceptorFactory(DuckSyntaxFactory<TInterface, TTarget> owner) : base(owner) { }
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
             {
-                PropertyInfo
-                    ifaceProperty = (PropertyInfo) member,
-                    targetProperty = GetTargetMember(ifaceProperty);
+                foreach(IPropertyInfo ifaceProperty in Context.InterfaceType.Properties)
+                {
+                    cancellation.ThrowIfCancellationRequested();
 
-                //
-                // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
-                //
+                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Context.TargetType.Properties);
 
-                Visibility.Check(targetProperty, Owner.AssemblyName, checkGet: ifaceProperty.CanRead, checkSet: ifaceProperty.CanWrite);
+                    //
+                    // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
+                    //
 
-                MethodInfo accessor = targetProperty.GetAccessors(nonPublic: true).First();
-
-                //
-                // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
-                // maskepp vannak elnvezve a parameterei.
-                //
-
-                ExpressionSyntax propertyAccess = Owner.PropertyAccess
-                (
-                    ifaceProperty,
-                    Owner.TARGET,
-                    castTargetTo: accessor.GetAccessModifiers() == AccessModifiers.Explicit
-                        ? accessor.GetDeclaringType()
-                        : null
-                );
-
-                //
-                // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-                // figyelmen kivul lesz hagyva.
-                //
-
-                ArrowExpressionClauseSyntax
-                    getBody = ArrowExpressionClause
+                    Visibility.Check
                     (
-                        expression: propertyAccess
-                    ),
-                    setBody = ArrowExpressionClause
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: propertyAccess,
-                            right: IdentifierName(Value)
-                        )
+                        targetProperty, 
+                        Context.AssemblyName, 
+                        checkGet: ifaceProperty.GetMethod is not null, 
+                        checkSet: ifaceProperty.SetMethod is not null
                     );
 
-                return ifaceProperty.IsIndexer()
-                    ? Owner.DeclareIndexer
+                    IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
+
+                    //
+                    // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
+                    // maskepp vannak elnvezve a parameterei.
+                    //
+
+                    ExpressionSyntax propertyAccess = PropertyAccess
                     (
-                        property: ifaceProperty,
-                        getBody: getBody,
-                        setBody: setBody,
-                        forceInlining: true
-                    )
-                    : (MemberDeclarationSyntax) Owner.DeclareProperty
-                    (
-                        property: ifaceProperty,
-                        getBody: getBody,
-                        setBody: setBody,
-                        forceInlining: true
+                        ifaceProperty,
+                        MemberAccess(null, TARGET),
+                        castTargetTo: accessor.AccessModifiers == AccessModifiers.Explicit
+                            ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
+                            : null
                     );
-            }
-
-            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface;
-
-            protected override bool SignatureEquals(MemberInfo targetMember, MemberInfo ifaceMember)
-            {
-                PropertyInfo
-                    targetProp = (PropertyInfo) targetMember,
-                    ifaceProp = (PropertyInfo) ifaceMember;
-
-                return
-                    targetProp.PropertyType == ifaceProp.PropertyType &&
 
                     //
-                    // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
-                    // az olvasast is.
+                    // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
+                    // figyelmen kivul lesz hagyva.
                     //
 
-                    (!ifaceProp.CanWrite || targetProp.CanWrite) &&
-                    (!ifaceProp.CanRead || targetProp.CanRead) &&
-
-                    //
-                    // Indexer property-knel meg kell egyezniuk az index parameterek
-                    // sorrendjenek es tipusanak.
-                    //
-
-                    targetProp
-                        .GetIndexParameters()
-                        .Select(p => p.ParameterType)
-                        .SequenceEqual
+                    ArrowExpressionClauseSyntax
+                        getBody = ArrowExpressionClause
                         (
-                            ifaceProp.GetIndexParameters().Select(p => p.ParameterType)
+                            expression: propertyAccess
+                        ),
+                        setBody = ArrowExpressionClause
+                        (
+                            expression: AssignmentExpression
+                            (
+                                kind: SyntaxKind.SimpleAssignmentExpression,
+                                left: propertyAccess,
+                                right: IdentifierName(Value)
+                            )
                         );
+
+                    yield return ifaceProperty.Indices.Any()
+                        ? DeclareIndexer
+                        (
+                            property: ifaceProperty,
+                            getBody: getBody,
+                            setBody: setBody,
+                            forceInlining: true
+                        )
+                        : (MemberDeclarationSyntax) DeclareProperty
+                        (
+                            property: ifaceProperty,
+                            getBody: getBody,
+                            setBody: setBody,
+                            forceInlining: true
+                        );
+                }
             }
+
+            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
+            {
+                if (targetMember is not IPropertyInfo targetProp || ifaceMember is not IPropertyInfo ifaceProp)
+                    return false;
+
+                //
+                // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
+                // az olvasast is.
+                //
+
+                if (ifaceProp.GetMethod is not null) 
+                {
+                    if (targetProp.GetMethod is null || !targetProp.GetMethod.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true))
+                        return false;
+                }
+
+                if (ifaceProp.SetMethod is not null) 
+                {
+                    if (targetProp.SetMethod is null || !targetProp.SetMethod.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true))
+                        return false;
+                }
+
+                return true;
+            }
+
+            public PropertyInterceptorFactory(IDuckContext context) : base(context) { }
         }
     }
 }

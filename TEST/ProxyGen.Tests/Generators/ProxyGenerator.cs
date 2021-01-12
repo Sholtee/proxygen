@@ -9,20 +9,20 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Moq;
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.InternalInterfaceProxy_Solti.Utils.Proxy.Generators.Tests.ProxyGeneratorTests.IInternalInterface_Proxy")]
+[assembly: InternalsVisibleTo("Generated_3414F45DAAE29C6B1A60FC2BB1653B46")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
-    using Proxy.Tests.External;
-    using Internals;
+    using Abstractions;
     using Generators;
+    using Internals;
     using Primitives;
+    using Proxy.Tests.External;
 
     [TestFixture]
     public class ProxyGeneratorTests
@@ -203,7 +203,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
             IInternalInterface proxy = await CreateProxy<IInternalInterface, InternalInterfaceProxy>();
             Assert.That(proxy.Foo(), Is.EqualTo(1));
         }
+#if !NETCOREAPP2_2
+        public interface IInterfaceContainingMembersHavingAccessibility
+        {
+            public void Foo();
+            protected void Bar() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
+            internal void Baz() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
+            private void FooBar() { } // muszaj legyen torzse
+        }
 
+        [Test]
+        public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
+            Assert.DoesNotThrowAsync(() => CreateProxy<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>((object) null));
+#endif
         public class CallContext
         {
             public MethodInfo Method;
@@ -372,13 +384,21 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
+        public class InterceptorWithSealedInvoke : InterfaceInterceptor<IMyInterface> 
+        {
+            public InterceptorWithSealedInvoke() : base(null) { }
+
+            public sealed override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => base.Invoke(method, args, extra);
+        }
+
         [Test]
         public void ProxyGenerator_ShouldValidate() 
         {
-            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<object, InterfaceInterceptor<object>>());
-            Assert.ThrowsAsync<NotSupportedException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
+            Assert.ThrowsAsync<ArgumentException>(() => CreateProxy<object, InterfaceInterceptor<object>>());
+            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
+            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithSealedInvoke>());
             Assert.ThrowsAsync<MemberAccessException>(() => CreateProxy<IMyInterface, PrivateInterceptor>());
         }
 
@@ -436,12 +456,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IMyInterface, ExternalInterceptor<IMyInterface>>((object) null, (object) null));
 
-        public static IEnumerable<Type> RandomInterfaces => typeof(object)
-            .Assembly
-            .GetExportedTypes()
-            .Where(t => t.IsInterface && !t.ContainsGenericParameters);
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>.Values;
 
-        [TestCaseSource(nameof(RandomInterfaces))]
+        [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
             typeof(ProxyGenerator<,>)
                 .MakeGenericType
@@ -449,36 +466,51 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     iface,
                     typeof(InterfaceInterceptor<>).MakeGenericType(iface)
                 )
-                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[] { null }));
+                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
 
         [Test]
-        public async Task ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 
+        public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet() 
         {
+            ITypeGenerator generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
+
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>().CacheFileName);
+            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
-           
-            await ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.GetGeneratedTypeAsync(tmpDir);
+
+            ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = tmpDir;
+            generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(File.Exists(cacheFile));               
         }
 
         [Test]
-        public async Task ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet() 
+        public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet() 
         {
+            ITypeGenerator generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+
             string 
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(
                     cacheDir,
-                    new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>().CacheFileName);
+                    $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
 
-            Type gt = await ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.GetGeneratedTypeAsync(cacheDir);
+            ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = cacheDir;
+            Type gt = generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
+        }
+
+        private const string WIRED_NAME = "Generated_D21B2B2F800C1FCEA906362887907084"; // amig a tipus nem valtozik addig ez sem valtozhat
+
+        [Test]
+        public void ProxyGenerator_ShouldGenerateUniqueAssemblyName() 
+        {
+            Assert.AreEqual(WIRED_NAME, new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>().TypeResolutionStrategy.AssemblyName);
+            Assert.AreNotEqual(WIRED_NAME, new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>().TypeResolutionStrategy.AssemblyName);
         }
     }
 }

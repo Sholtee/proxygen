@@ -34,11 +34,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" />
+    <ProjectReference Include="..\ProxyGen.Tests.EmbeddedTypes\ProxyGen.Tests.EmbeddedTypes.csproj" />
     <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="1b3f2fb7485186dad83c16b086f575d1.dll">
+    <None Update="Generated_58FE2F468ED7922B66B7373FBC0D23A1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BarSrc.txt">
@@ -56,13 +57,16 @@
     <None Update="EventSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="fa5d9f467363f2c469e3a897ea8ef088.dll">
+    <None Update="Generated_C338C18DE50CD6EC9CD281D1C349E681.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="FooSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="IndexerSrc.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ListDbg.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PropSrc.txt">

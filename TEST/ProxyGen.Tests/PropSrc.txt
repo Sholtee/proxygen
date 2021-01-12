@@ -1,28 +1,26 @@
-System.Int32 Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>.Prop
+global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop
 {
     get
     {
-        System.Object[] args = new System.Object[0];
+        global::System.Object[] args = new global::System.Object[0];
         this.InvokeTarget = () =>
         {
-            System.Object result;
-            result = (System.Object)this.Target.Prop;
-            return result;
+            return (global::System.Object)this.Target.Prop;
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
-        return (System.Int32)this.Invoke(prop.GetMethod, args, prop);
+        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
+        return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);
     }
 
     set
     {
-        System.Object[] args = new System.Object[]{value};
+        global::System.Object[] args = new global::System.Object[]{value};
         this.InvokeTarget = () =>
         {
-            System.Int32 cb_value = (System.Int32)args[0];
+            global::System.Int32 cb_value = (global::System.Int32)args[0];
             this.Target.Prop = cb_value;
             return null;
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
+        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
         this.Invoke(prop.SetMethod, args, prop);
     }
 }

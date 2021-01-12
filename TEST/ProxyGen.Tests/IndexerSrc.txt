@@ -1,30 +1,28 @@
-System.Int32 System.Collections.Generic.IList<System.Int32>.this[System.Int32 index]
+global::System.Int32 global::System.Collections.Generic.IList<global::System.Int32>.this[global::System.Int32 index]
 {
     get
     {
-        System.Object[] args = new System.Object[]{index};
+        global::System.Object[] args = new global::System.Object[]{index};
         this.InvokeTarget = () =>
         {
-            System.Int32 cb_index = (System.Int32)args[0];
-            System.Object result;
-            result = (System.Object)this.Target[cb_index];
-            return result;
+            global::System.Int32 cb_index = (global::System.Int32)args[0];
+            return (global::System.Object)this.Target[cb_index];
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
-        return (System.Int32)this.Invoke(prop.GetMethod, args, prop);
+        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.Generic.IList<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
+        return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);
     }
 
     set
     {
-        System.Object[] args = new System.Object[]{index, value};
+        global::System.Object[] args = new global::System.Object[]{index, value};
         this.InvokeTarget = () =>
         {
-            System.Int32 cb_index = (System.Int32)args[0];
-            System.Int32 cb_value = (System.Int32)args[1];
+            global::System.Int32 cb_index = (global::System.Int32)args[0];
+            global::System.Int32 cb_value = (global::System.Int32)args[1];
             this.Target[cb_index] = cb_value;
             return null;
         };
-        System.Reflection.PropertyInfo prop = Solti.Utils.Proxy.InterfaceInterceptor<Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTestsBase.IFoo<System.Int32>>.ResolveProperty(this.InvokeTarget);
+        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.Generic.IList<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
         this.Invoke(prop.SetMethod, args, prop);
     }
 }

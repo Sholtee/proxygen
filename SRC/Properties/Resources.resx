@@ -129,8 +129,14 @@
   <data name="DYNAMIC_ASM" xml:space="preserve">
     <value>Dynamic assemblies are not supported.</value>
   </data>
+  <data name="GENERIC_IFACE" xml:space="preserve">
+    <value>Target interface can not be generic</value>
+  </data>
+  <data name="GENERIC_INTERCEPTOR" xml:space="preserve">
+    <value>The interceptor can not be generic.</value>
+  </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
-    <value>The method ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
+    <value>The member ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
   </data>
   <data name="METHOD_NOT_VISIBLE" xml:space="preserve">
     <value>The method ("{0}") is not visible.</value>
@@ -138,11 +144,17 @@
   <data name="MISSING_IMPLEMENTATION" xml:space="preserve">
     <value>The target does not implement the member: {0}</value>
   </data>
+  <data name="NOT_AN_INTERCEPTOR" xml:space="preserve">
+    <value>The type must be a InterfaceInterceptor descendant.</value>
+  </data>
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>
   </data>
   <data name="NOT_A_CLASS" xml:space="preserve">
     <value>The type must be a class.</value>
+  </data>
+  <data name="NOT_A_GENERATOR" xml:space="preserve">
+    <value>The parameter must be a TypeGenerator descendant.</value>
   </data>
   <data name="NO_PUBLIC_CTOR" xml:space="preserve">
     <value>At least one public constructor should be declared on {0}.</value>
@@ -156,8 +168,14 @@
   <data name="SEALED_INTERCEPTOR" xml:space="preserve">
     <value>The interceptor can not be sealed.</value>
   </data>
+  <data name="SEALED_INVOKE" xml:space="preserve">
+    <value>Invoke() method can not be sealed.</value>
+  </data>
+  <data name="TYPE_NOT_FOUND" xml:space="preserve">
+    <value>The type "{0}" can not be found.</value>
+  </data>
   <data name="TYPE_NOT_VISIBLE" xml:space="preserve">
-    <value>{0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
+    <value>{0} (or its enclosing type) is not visible.</value>
   </data>
   <data name="UNDETERMINED_ACCESS_MODIFIER" xml:space="preserve">
     <value>Access modifier could not be determined.</value>

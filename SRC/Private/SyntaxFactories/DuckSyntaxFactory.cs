@@ -5,9 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,41 +14,55 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory<TInterface, TTarget> : ProxySyntaxFactoryBase
+    using Properties;
+
+    internal partial class DuckSyntaxFactory : ClassSyntaxFactory, IDuckContext
     {
-        //
-        // this.Target
-        //
+        public ITypeInfo InterfaceType { get; }
 
-        private readonly MemberAccessExpressionSyntax TARGET;
+        public ITypeInfo TargetType { get; }
 
-        public DuckSyntaxFactory() 
+        public ITypeInfo BaseType { get; }
+
+        public override string AssemblyName { get; }
+
+        public override string ClassName { get; }
+
+        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
+
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName, OutputType outputType): base(outputType) 
         {
-            InterceptorFactories = new List<IInterceptorFactory>
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
+
+            InterfaceType = interfaceType;
+            TargetType = targetType;
+            BaseType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
+            AssemblyName = assemblyName;
+            ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
+
+            MemberSyntaxFactories = new IMemberSyntaxFactory[]
             {
+                new ConstructorFactory(this),
                 new MethodInterceptorFactory(this),
                 new PropertyInterceptorFactory(this),
                 new EventInterceptorFactory(this)
             };
-
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<DuckBase<TTarget>>(ii => ii.Target!));
         }
 
-        private IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; }
-
-        protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
+        protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
         {
-            Type 
-                interfaceType = typeof(TInterface),
-                @base = typeof(DuckBase<TTarget>);
+            Visibility.Check(InterfaceType, AssemblyName);
+            Visibility.Check(TargetType, AssemblyName);
 
-            Debug.Assert(interfaceType.IsInterface);
-            Debug.Assert(!interfaceType.IsGenericTypeDefinition);
-            Debug.Assert(!@base.IsGenericTypeDefinition);
+            return base.BuildMembers(cancellation);
+        }
 
+        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        {
             ClassDeclarationSyntax cls = ClassDeclaration
             (
-                identifier: ProxyClassName
+                identifier: ClassName
             )
             .WithModifiers
             (
@@ -69,30 +80,11 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    new[] { @base, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
+                    new[] { BaseType, InterfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
                     (
                         CreateType(t)
                     ))
                 )
-            );
-
-            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
-            (
-                @base.GetPublicConstructors().Select(DeclareCtor)
-            );
-
-            members.AddRange
-            (
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                interfaceType
-                    .ListMembers<MemberInfo>()
-                    .Select(m => 
-                    {
-                        cancellation.ThrowIfCancellationRequested();
-                        return InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m);
-                    })
-                    .Where(m => m != null)
-#pragma warning restore CS8620
             );
 
             return cls.WithMembers
@@ -100,7 +92,5 @@ namespace Solti.Utils.Proxy.Internals
                 List(members)
             );
         }
-
-        public override string AssemblyName => $"{GetSafeTypeName<TTarget>()}_{GetSafeTypeName<TInterface>()}_Duck";
     }
 }

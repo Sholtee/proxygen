@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// event EventType IInterface.Event                                            <br/>
@@ -25,6 +26,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         {                                                                   <br/>
         ///             EventType cb_value = (EventType) args[a];                       <br/>
         ///             Target.Event += cb_value;                                       <br/>
+        ///             return null;                                                    <br/>
         ///         };                                                                  <br/>
         ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
         ///         Invoke(evt.AddMethod, args, evt);                                   <br/>
@@ -36,48 +38,56 @@ namespace Solti.Utils.Proxy.Internals
         ///         {                                                                   <br/>
         ///             EventType cb_value = (EventType) args[a];                       <br/>
         ///             Target.Event -= cb_value;                                       <br/>
+        ///             return null;                                                    <br/>
         ///         };                                                                  <br/>
         ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
         ///         Invoke(evt.RemoveMethod, args, evt);                                <br/>
         ///     }                                                                       <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : InterceptorFactoryBase
+        internal sealed class EventInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private static readonly MethodInfo
-                RESOLVE_EVENT = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveEvent(default!));
+            private readonly IMethodInfo
+                RESOLVE_EVENT;
 
-            private IEnumerable<StatementSyntax> Build(EventInfo member, bool add) 
+            private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
             {
-                MethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
+                IMethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(targetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         targetMethod,
-                        (locals, result) => new StatementSyntax[]
+                        (locals, body) =>
                         {
-                            ExpressionStatement
+                            body.Add
                             (
-                                Owner.RegisterEvent(member, Owner.TARGET, add, ToIdentifierName(locals.Single()))
-                            )
+                                ExpressionStatement
+                                (
+                                    RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()))
+                                )
+                            );
+                            body.Add
+                            (
+                                ReturnNull()
+                            );
                         }
                     )
                 );
 
-                LocalDeclarationStatementSyntax evt = Owner.DeclareLocal(typeof(EventInfo), nameof(evt), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax evt = DeclareLocal<EventInfo>(nameof(evt), InvokeMethod
                 (
                     RESOLVE_EVENT,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
@@ -85,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    Owner.InvokeMethod
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -104,27 +114,41 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public EventInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
-
-            public override bool IsCompatible(MemberInfo member) => member is EventInfo evt && evt.DeclaringType.IsInterface && !AlreadyImplemented(evt);
-
-            public override MemberDeclarationSyntax Build(MemberInfo member)
+            public EventInterceptorFactory(IProxyContext context) : base(context)
             {
-                EventInfo evt = (EventInfo) member;
-
-                return Owner.DeclareEvent
+                RESOLVE_EVENT = Context.InterceptorType.Methods.Single
                 (
-                    @event: evt,
-                    addBody: Block
+                    met => met.SignatureEquals
                     (
-                        Build(evt, add: true)
-                    ),
-                    removeBody: Block
-                    (
-                        Build(evt, add: false)
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveEvent(default!))
+                        )
                     )
                 );
             }
+
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
+                .InterfaceType
+                .Events
+                .Where(evt => !AlreadyImplemented(evt))
+                .Select(evt =>
+                {
+                    cancellation.ThrowIfCancellationRequested();
+
+                    return DeclareEvent
+                    (
+                        @event: evt,
+                        addBody: Block
+                        (
+                            Build(evt, add: true)
+                        ),
+                        removeBody: Block
+                        (
+                            Build(evt, add: false)
+                        )
+                    );
+                });
         }
     }
 }

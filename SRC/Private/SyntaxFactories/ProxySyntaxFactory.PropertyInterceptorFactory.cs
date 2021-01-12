@@ -3,9 +3,11 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +16,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// TResult IInterface.Prop                                                          <br/>
@@ -43,60 +45,57 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                            <br/>
         /// }
         /// </summary>
-        internal class PropertyInterceptorFactory : InterceptorFactoryBase
+        internal sealed class PropertyInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private static readonly MethodInfo
-                RESOLVE_PROPERTY = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveProperty(default!));
+            private readonly IMethodInfo
+                RESOLVE_PROPERTY;
 
-            protected IEnumerable<StatementSyntax> BuildGet(PropertyInfo property) 
+            private IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
             {
-                if (!property.CanRead) yield break;
+                if (property.GetMethod == null) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.GetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         property.GetMethod,
-                        (locals, result) => new StatementSyntax[] 
-                        {
-                            ExpressionStatement
+                        (locals, body) => body.Add
+                        (
+                            ReturnResult
                             (
-                                AssignmentExpression
+                                null,
+                                CastExpression
                                 (
-                                    SyntaxKind.SimpleAssignmentExpression,
-                                    ToIdentifierName(result!),
-                                    CastExpression
-                                    (
-                                        Owner.CreateType<object>(),
-                                        Owner.PropertyAccess(property, Owner.TARGET, null, locals.Select(ToArgument))
-                                    )
+                                    CreateType<object>(),
+                                    PropertyAccess(property, MemberAccess(null, TARGET), null, locals.Select(ToArgument))
                                 )
                             )
-                        }
+
+                        )
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.GetMethod), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.GetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
                 yield return prop;
 
-                yield return Owner.ReturnResult
+                yield return ReturnResult
                 (
-                    property.PropertyType,
-                    Owner.InvokeMethod
+                    property.Type,
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -115,48 +114,55 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            protected IEnumerable<StatementSyntax> BuildSet(PropertyInfo property)
+            private IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
             {
-                if (!property.CanWrite) yield break;
+                if (property.SetMethod == null) yield break;
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(property.SetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
 
-                yield return Owner.AssignCallback
+                yield return AssignCallback
                 (
-                    Owner.DeclareCallback
+                    DeclareCallback
                     (
                         argsArray,
                         property.SetMethod,
-                        (locals, result) => new StatementSyntax[]
+                        (locals, body) =>
                         {
-                            ExpressionStatement
+                            body.Add
                             (
-                                expression: AssignmentExpression
+                                ExpressionStatement
                                 (
-                                    kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: Owner.PropertyAccess(property, Owner.TARGET, null, locals
+                                    expression: AssignmentExpression
+                                    (
+                                        kind: SyntaxKind.SimpleAssignmentExpression,
+                                        left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
 #if NETSTANDARD2_0
-                                        .Take(locals.Count - 1)
+                                            .Take(locals.Count - 1)
 #else
-                                        .SkipLast(1)
+                                            .SkipLast(1)
 #endif
-                                        .Select(ToArgument)),
-                                    right: ToIdentifierName(locals[locals.Count - 1])
+                                            .Select(ToArgument)),
+                                        right: ToIdentifierName(locals[locals.Count - 1])
+                                    )
                                 )
-                            )
+                            );
+                            body.Add
+                            (
+                                ReturnNull()
+                            );
                         }
                     )
                 );
 
-                LocalDeclarationStatementSyntax prop = Owner.DeclareLocal(typeof(PropertyInfo), EnsureUnused(nameof(prop), property.SetMethod), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.SetMethod), InvokeMethod
                 (
                     RESOLVE_PROPERTY,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
 
@@ -164,7 +170,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    Owner.InvokeMethod
+                    InvokeMethod
                     (
                         INVOKE,
                         target: null,
@@ -183,29 +189,51 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            public PropertyInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
-
-            public override bool IsCompatible(MemberInfo member) => member is PropertyInfo prop && prop.DeclaringType.IsInterface && !prop.IsIndexer() && !AlreadyImplemented(prop);
-
             //
             // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
             // figyelmen kivul lesz hagyva.
             //
 
-            public override MemberDeclarationSyntax Build(MemberInfo member)
-            {
-                PropertyInfo property = (PropertyInfo) member;
-
-                return Owner.DeclareProperty
+            private MemberDeclarationSyntax BuildProperty(IPropertyInfo property, Func<IPropertyInfo, CSharpSyntaxNode?, CSharpSyntaxNode?, bool, MemberDeclarationSyntax> fact) => fact
+            (
+                property,
+                Block
                 (
-                    property: property,
-                    getBody: Block
+                    BuildGet(property)
+                ),
+                Block
+                (
+                    BuildSet(property)
+                ),
+                false
+            );
+
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context.InterfaceType
+                .Properties
+                .Where(prop => !AlreadyImplemented(prop))
+                .Select(prop => 
+                {
+                    cancellation.ThrowIfCancellationRequested();
+
+                    return BuildProperty
                     (
-                        BuildGet(property)
-                    ),
-                    setBody: Block
+                        prop,
+                        prop.Indices.Any()
+                            ? DeclareIndexer
+                            : DeclareProperty
+                    );
+                });
+
+            public PropertyInterceptorFactory(IProxyContext context) : base(context) 
+            {
+                RESOLVE_PROPERTY = Context.InterceptorType.Methods.Single
+                (
+                    met => met.SignatureEquals
                     (
-                        BuildSet(property)
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveProperty(default!))
+                        )
                     )
                 );
             }

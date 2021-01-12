@@ -5,10 +5,9 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -16,69 +15,28 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class SyntaxFactoryBase
     {
-        private readonly HashSet<Assembly> FReferences = new HashSet<Assembly>(Runtime.Assemblies);
-
-        private readonly HashSet<Type> FTypes = new HashSet<Type>();
-
-        protected internal void AddType(Type type) 
-        {
-            if (type.IsGenericTypeDefinition)
-                return;
-
-            if (!FTypes.Add(type)) return; // korkoros referencia fix
-
-            Assembly asm = type.Assembly;
-
-            if (asm.IsDynamic)
-                throw new NotSupportedException(Resources.DYNAMIC_ASM);
-
-            FReferences.Add(asm);
-
-            //
-            // Generikus parameterek szerepelhetnek masik szerelvenyben.
-            //
-
-            foreach (Type genericArg in type.GetGenericArguments())
-                AddType(genericArg);
-  
-            //
-            // Az os (osztaly) szerepelhet masik szerelvenyben. "BaseType" csak az os osztalyokat adja vissza
-            // megvalositott interfaceket nem.
-            //
-
-            foreach (Type @base in type.GetBaseTypes())
-                AddType(@base);
-
-            //
-            // "os" interface-ek szarmazhatnak masik szerelvenybol. A GetInterfaces() az osszes "os"-t
-            // visszaadja.
-            //
-
-            foreach (Type iface in type.GetInterfaces())
-                AddType(iface);
-        }
-
         /// <summary>
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
-        /// Namespace.ParentType[T] -> Namespace.ParentType[T]
+        /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
-        protected internal virtual NameSyntax GetQualifiedName(Type type)
+        protected internal virtual NameSyntax GetQualifiedName(ITypeInfo type)
         {
-            //
-            // GetFriendlyName() lezart generikusokat nem eszi meg
-            //
+            IReadOnlyList<string> parts = type.Name.Split(Type.Delimiter);
 
-            IReadOnlyList<string> parts = (type.IsGenericType ? type.GetGenericTypeDefinition() : type)
-                .GetFriendlyName()
-                .Split('.');
+            if (type.IsNested) 
+            {
+                Debug.Assert(parts.Count == 1);
 
-            return parts
+                return parts
+                    .Select(CreateTypeName)
+                    .Qualify();
+            }
+
+            NameSyntax[] names = parts
                 //
-                // Nevter, szulo osztaly (beagyazott tipus eseten)
+                // Nevter
                 //
 #if NETSTANDARD2_0
                 .Take(parts.Count - 1)
@@ -93,45 +51,70 @@ namespace Solti.Utils.Proxy.Internals
 
                 .Append
                 (
-                    CreateTypeName(parts[parts.Count - 1], type.GetOwnGenericArguments())
+                    CreateTypeName
+                    (
+                        parts[parts.Count - 1]
+                    )
                 )
-                .Qualify();
+                .ToArray();
 
-            NameSyntax CreateTypeName(string name, IEnumerable<Type> genericArguments) => !genericArguments.Any() ? IdentifierName(name) : GenericName(name).WithTypeArgumentList
+            //
+            // Ez jol kezeli azt az esetet is ha a tipus nincs nevter alatt
+            //
+
+            if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
+            (
+                IdentifierName(Token(SyntaxKind.GlobalKeyword)), 
+                (SimpleNameSyntax) names[0]
+            );
+
+            return names.Qualify();
+
+            NameSyntax CreateTypeName(string name) => type is not IGenericTypeInfo genericType ? IdentifierName(name) : GenericName(name).WithTypeArgumentList
             (
                 typeArgumentList: TypeArgumentList
                 (
-                    arguments: genericArguments.ToSyntaxList(CreateType)
+                    arguments: genericType.GenericArguments.ToSyntaxList(CreateType)
                 )
             );
         }
 
-        protected internal virtual TypeSyntax CreateType(Type type) 
+        protected internal virtual TypeSyntax CreateType(ITypeInfo type) 
         {
-            if (type.IsByRef) type = type.GetElementType();
+            //
+            // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
+            //
+            // TODO: FIXME: itt "type.RefType > RefType.None"-ra kene vizsgalni
+            //
+
+            if (type.ElementType is not null && type is not IArrayTypeInfo)
+            {
+                TypeSyntax result = CreateType(type.ElementType!);
+
+                if (type.RefType == RefType.Pointer) 
+                    result = PointerType(result);
+
+                return result;
+            }
 
             AddType(type);
 
             return type switch
             {
-                _ when type == typeof(void) => PredefinedType
+                _ when type.IsVoid => PredefinedType
                 (
                     Token(SyntaxKind.VoidKeyword)
                 ),
 
-                //
-                // "Cica<T>.Mica<TT>"-nal a "TT" is beagyazott ami nekunk nem jo
-                //
-
-                _ when type.IsNested && !type.IsGenericParameter => type
-                    .GetEnclosingTypes()
+                _ when type.IsNested => type
+                    .EnclosingTypes
                     .Append(type)
                     .Select(GetQualifiedName)
                     .Qualify(),
 
-                _ when type.IsArray => ArrayType
+                _ when type is IArrayTypeInfo array => ArrayType
                 (
-                    elementType: CreateType(type.GetElementType())
+                    elementType: CreateType(array.ElementType!)
                 )
                 .WithRankSpecifiers
                 (
@@ -139,9 +122,10 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         node: ArrayRankSpecifier
                         (
-                            sizes: Enumerable
-                                .Repeat(0, type.GetArrayRank())
-                                .ToSyntaxList(_ => (ExpressionSyntax) OmittedArraySizeExpression())
+                            sizes: array
+                                .Rank
+                                .Times(OmittedArraySizeExpression)
+                                .ToSyntaxList(arSize => (ExpressionSyntax) arSize)
                         )
                     )
                 ),
@@ -150,9 +134,6 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        /// <summary>
-        /// Namespace.Type
-        /// </summary>
-        protected internal TypeSyntax CreateType<T>() => CreateType(typeof(T));
+        protected internal TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
     }
 }

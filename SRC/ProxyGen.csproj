@@ -10,6 +10,8 @@
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
   </PropertyGroup>
 
   <ItemGroup>
@@ -33,12 +35,35 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.*" />
     <PackageReference Include="Mono.Reflection" Version="2.*" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.*" />
     <PackageReference Include="System.Runtime.Loader" Version="4.*" />
-    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" />
+    
+    <!-- Ezek a szerelvenyek kellenek (akkor is) ha a Roslyn betolti a SourceGenerator-unkat -->  
+    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" GeneratePathProperty="true" PrivateAssets="all" />
   </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <!-- Ezek a szerelvenyek kellenek (akkor is) ha a Roslyn betolti a SourceGenerator-unkat -->  
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.*" GeneratePathProperty="true" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.*" GeneratePathProperty="true" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <GetTargetPathDependsOn>$(GetTargetPathDependsOn);GetDependencyTargetPaths</GetTargetPathDependsOn>
+  </PropertyGroup>
+
+  <Target Name="GetDependencyTargetPaths">
+    <ItemGroup>           
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGSolti_Utils_Primitives)\lib\netstandard2.0\Solti.Utils.Primitives.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" />
+      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" />
+    </ItemGroup>  
+  </Target>
 
   <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
@@ -46,12 +71,21 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Update="Properties\SGResources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SGResources.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\SGResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SGResources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

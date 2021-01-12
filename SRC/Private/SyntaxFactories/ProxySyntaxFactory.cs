@@ -5,9 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -17,224 +15,74 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor>: ProxySyntaxFactoryBase where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    using Properties;
+
+    internal partial class ProxySyntaxFactory: ClassSyntaxFactory, IProxyContext
     {
-        #region Private
-        //
-        // this.Target
-        //
+        public ITypeInfo InterfaceType { get; }
 
-        private readonly MemberAccessExpressionSyntax TARGET;
+        public ITypeInfo InterceptorType { get; }
 
-        private static readonly MethodInfo
-            INVOKE = (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Invoke(default!, default!, default!));
+        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
-        private static readonly PropertyInfo
-            INVOKE_TARGET = (PropertyInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.InvokeTarget!);
+        public override string ClassName { get; }
 
-        private static string EnsureUnused(string name, IEnumerable<ParameterInfo> parameters) 
+        public override string AssemblyName { get; }
+
+        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string assemblyName, OutputType outputType): base(outputType) 
         {
-            while (parameters.Any(param => param.Name == name))
-            {
-                name = $"_{name}";
-            }
-            return name;
-        }
+            if (!interfaceType.IsInterface)
+                throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
-        private static string EnsureUnused(string name, MethodBase method) => EnsureUnused(name, method.GetParameters());
-
-        private IReadOnlyList<IInterceptorFactory> InterceptorFactories { get; }
-        #endregion
-
-        #region Internal
-        /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
-        /// {                                                                                       <br/>
-        ///   ...                                                                                   <br/>
-        ///   object[] args = new object[]{para1, para2, default(T3), para4};                       <br/>
-        ///   ...                                                                                   <br/>
-        /// }
-        /// </summary>
-        internal LocalDeclarationStatementSyntax CreateArgumentsArray(MethodInfo method)
-        {
-            ParameterInfo[] paramz = method.GetParameters();
-
-            return DeclareLocal<object[]>(EnsureUnused("args", paramz), CreateArray<object>(paramz
-                .Select(param => param.IsOut
-                    ? DefaultExpression(CreateType(param.ParameterType))
-                    : (ExpressionSyntax) IdentifierName(param.Name))
-                .ToArray()));
-        }
-
-        /// <summary>
-        /// return;          <br/>
-        ///                  <br/>
-        /// OR               <br/>
-        ///                  <br/>
-        /// return (T) ...;
-        /// </summary>
-        internal ReturnStatementSyntax ReturnResult(Type? returnType, ExpressionSyntax result) => ReturnStatement
-        (
-            expression: returnType == typeof(void)
-                ? null
-                : returnType != null
-                    ? CastExpression
-                    (
-                        type: CreateType(returnType),
-                        expression: result
-                    )
-                    : result
-        );
-
-        /// <summary>
-        /// return;             <br/>
-        ///                     <br/>
-        /// OR                  <br/>
-        ///                     <br/>
-        /// return (T) result;
-        /// </summary>
-        internal ReturnStatementSyntax ReturnResult(Type? returnType, LocalDeclarationStatementSyntax result) =>
-            ReturnResult(returnType, ToIdentifierName(result));
-
-
-        /// <summary>
-        /// InvokeTarget = ...;
-        /// </summary>
-        internal StatementSyntax AssignCallback(LambdaExpressionSyntax lambda) => ExpressionStatement
-        (
-            expression: AssignmentExpression
-            (
-                kind: SyntaxKind.SimpleAssignmentExpression,
-                left: PropertyAccess(INVOKE_TARGET, null, null),
-                right: lambda
-            )
-        );
-
-        /// <summary>
-        /// System.String cb_a;    <br/>
-        /// TT cb_b = (TT)args[1];
-        /// </summary>
-        internal LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<ParameterInfo> paramz) => paramz
-            .Select((param, i) => new { Parameter = param, Index = i })
+            if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
             //
-            // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
-            // erteket.
+            // - Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
+            // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
             //
 
-            .Select
-            (
-                p => DeclareLocal
-                (
-                    p.Parameter.ParameterType,
-                    EnsureUnused($"cb_{p.Parameter.Name}", paramz),
-                    p.Parameter.GetParameterKind() == ParameterKind.Out ? null : CastExpression
-                    (
-                        type: CreateType(p.Parameter.ParameterType),
-                        expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
-                        (
-                            argumentList: BracketedArgumentList
-                            (
-                                SingletonSeparatedList
-                                (
-                                    Argument
-                                    (
-                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(p.Index))
-                                    )
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-            .ToArray();
+            if (!interceptorType.Bases.Append(interceptorType).Any(ic => ic.FullName == typeof(InterfaceInterceptor<>).FullName))
+                throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
-        /// <summary>
-        /// () =>                                          <br/>
-        /// {                                              <br/>
-        ///     System.Int32 cb_a = (System.Int32)args[0]; <br/>
-        ///     System.String cb_b;                        <br/>
-        ///     TT cb_c = (TT)args[2];                     <br/>
-        ///                                                <br/>
-        ///     System.Object result;                      <br/>
-        ///     result = ...;                              <br/>
-        ///     return result;                             <br/>
-        ///                                                <br/>
-        ///     OR                                         <br/>
-        ///                                                <br/>
-        ///     ...;                                       <br/>
-        ///     return null;                               <br/>
-        /// };   
-        /// </summary>
-        internal LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, MethodInfo method, Func<IReadOnlyList<LocalDeclarationStatementSyntax>, LocalDeclarationStatementSyntax?, IEnumerable<StatementSyntax>> invocationFactory)
-        {
-            IReadOnlyList<ParameterInfo> paramz = method.GetParameters();
+            if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_INTERCEPTOR, nameof(interceptorType));
 
-            var statements = new List<StatementSyntax>();
+            InterfaceType = interfaceType;        
+            InterceptorType = interceptorType;
+            AssemblyName = assemblyName;
+            ClassName = $"GeneratedClass_{InterceptorType.GetMD5HashCode()}";
 
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, paramz);
-            statements.AddRange(locals);
-
-            if (method.ReturnType != typeof(void))
+            MemberSyntaxFactories = new IMemberSyntaxFactory[] 
             {
-                LocalDeclarationStatementSyntax result = DeclareLocal(typeof(object), EnsureUnused(nameof(result), paramz));
-
-                statements.Add(result);
-                statements.AddRange
-                (
-                    invocationFactory(locals, result)
-                );
-                statements.Add
-                (
-                    ReturnResult(null, result)
-                );
-            }
-            else 
-            {
-                statements.AddRange
-                (
-                    invocationFactory(locals, null)
-                );
-                statements.Add
-                (
-                    ReturnStatement
-                    (
-                        LiteralExpression(SyntaxKind.NullLiteralExpression)
-                    )
-                );
-            }
-
-            return ParenthesizedLambdaExpression
-            (
-                Block(statements)
-            );
-        }
-        #endregion
-
-        public override string AssemblyName => $"{GetSafeTypeName<TInterceptor>()}_{GetSafeTypeName<TInterface>()}_Proxy";
-
-        public ProxySyntaxFactory() 
-        {
-            InterceptorFactories = new List<IInterceptorFactory>
-            {
+                new ConstructorFactory(this),
+                new InvokeFactory(this),
                 new MethodInterceptorFactory(this),
                 new PropertyInterceptorFactory(this),
-                new IndexerInterceptorFactory(this),
                 new EventInterceptorFactory(this)
             };
-
-            TARGET = MemberAccess(null, MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<TInterface>>(ii => ii.Target!));
         }
 
-        protected override MemberDeclarationSyntax GenerateProxyClass(CancellationToken cancellation)
+        protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
         {
-            Type
-                interfaceType   = typeof(TInterface),
-                interceptorType = typeof(TInterceptor);
+            if (InterceptorType.IsFinal)
+                throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
 
-            Debug.Assert(interfaceType.IsInterface);
+            if (InterceptorType.IsAbstract)
+                throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
 
-            ClassDeclarationSyntax cls = ClassDeclaration(ProxyClassName)
+            Visibility.Check(InterfaceType, AssemblyName);
+            Visibility.Check(InterceptorType, AssemblyName);
+
+            return base.BuildMembers(cancellation);
+        }
+
+        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        {
+            ClassDeclarationSyntax cls = ClassDeclaration
+            (
+                identifier: ClassName
+            )
             .WithModifiers
             (
                 modifiers: TokenList
@@ -251,27 +99,14 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    new[] { interceptorType, interfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType(CreateType(t)))
+                    new[] { InterceptorType, InterfaceType }.ToSyntaxList
+                    (
+                        t => (BaseTypeSyntax) SimpleBaseType
+                        (
+                            CreateType(t)
+                        )
+                    )
                 )
-            );
-
-            List<MemberDeclarationSyntax> members = new List<MemberDeclarationSyntax>
-            (
-                interceptorType.GetPublicConstructors().Select(DeclareCtor)
-            );
-
-            members.AddRange
-            (
-#pragma warning disable CS8620 // Argument cannot be used for parameter due to differences in the nullability of reference types.
-                interfaceType
-                    .ListMembers<MemberInfo>()
-                    .Select(m => 
-                    {
-                        cancellation.ThrowIfCancellationRequested();
-                        return InterceptorFactories.SingleOrDefault(fact => fact.IsCompatible(m))?.Build(m);
-                    })
-                    .Where(m => m != null)
-#pragma warning restore CS8620
             );
 
             return cls.WithMembers

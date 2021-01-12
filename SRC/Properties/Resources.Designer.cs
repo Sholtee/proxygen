@@ -97,7 +97,25 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The method (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
+        ///   Looks up a localized string similar to Target interface can not be generic.
+        /// </summary>
+        internal static string GENERIC_IFACE {
+            get {
+                return ResourceManager.GetString("GENERIC_IFACE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The interceptor can not be generic..
+        /// </summary>
+        internal static string GENERIC_INTERCEPTOR {
+            get {
+                return ResourceManager.GetString("GENERIC_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The member (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
         /// </summary>
         internal static string IVT_REQUIRED {
             get {
@@ -142,6 +160,24 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parameter must be a TypeGenerator descendant..
+        /// </summary>
+        internal static string NOT_A_GENERATOR {
+            get {
+                return ResourceManager.GetString("NOT_A_GENERATOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type must be a InterfaceInterceptor descendant..
+        /// </summary>
+        internal static string NOT_AN_INTERCEPTOR {
+            get {
+                return ResourceManager.GetString("NOT_AN_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type must be an interface..
         /// </summary>
         internal static string NOT_AN_INTERFACE {
@@ -178,7 +214,25 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to {0} (or its enclosing type) is not visible. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
+        ///   Looks up a localized string similar to Invoke() method can not be sealed..
+        /// </summary>
+        internal static string SEALED_INVOKE {
+            get {
+                return ResourceManager.GetString("SEALED_INVOKE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &quot;{0}&quot; can not be found..
+        /// </summary>
+        internal static string TYPE_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("TYPE_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} (or its enclosing type) is not visible..
         /// </summary>
         internal static string TYPE_NOT_VISIBLE {
             get {

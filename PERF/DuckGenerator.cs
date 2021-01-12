@@ -18,9 +18,10 @@ namespace Solti.Utils.Proxy.Perf
         {
             public int DoSomething(string param) => param.GetHashCode();
         }
-
+        /*
         [Benchmark]
         public void AssemblingDuckType() =>
-            new DuckGenerator<IInterface, Implementation>().GenerateTypeCore(null, Guid.NewGuid().ToString());
+            new DuckGenerator<IInterface, Implementation>().GenerateType(null, Guid.NewGuid().ToString());
+        */
     }
 }

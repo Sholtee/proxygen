@@ -10,6 +10,8 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.CodeAnalysis;
+
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
@@ -18,30 +20,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
     public sealed class TypeExtensionsTests
     {
         [Test]
-        public void ListMembers_ShouldReturnOverLoadedInterfaceMembers() 
+        public void ListMethods_ShouldReturnOverLoadedInterfaceMethods() 
         {
-            MethodInfo[] methods = typeof(IEnumerable<string>).ListMembers<MethodInfo>().ToArray();
+            MethodInfo[] methods = typeof(IEnumerable<string>).ListMethods().ToArray();
             Assert.That(methods.Length, Is.EqualTo(2));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable<string>>(i => i.GetEnumerator())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable>(i => i.GetEnumerator())));
-
-            PropertyInfo[] properties = typeof(IEnumerator<string>).ListMembers<PropertyInfo>().ToArray();
-            Assert.That(properties.Length, Is.EqualTo(2));
-            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
-            Assert.That(properties.Contains((PropertyInfo) MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
         }
 
         [Test]
-        public void ListMembers_ShouldReturnExplicitImplementations() 
+        public void ListProperties_ShouldReturnOverLoadedInterfaceProperties()
         {
-            MethodInfo[] methods = typeof(List<int>).ListMembers<MethodInfo>(includeNonPublic: true).ToArray();
+            PropertyInfo[] properties = typeof(IEnumerator<string>).ListProperties().ToArray();
+            Assert.That(properties.Length, Is.EqualTo(2));
+            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
+            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
+        }
+
+        [Test]
+        public void ListMethods_ShouldReturnExplicitImplementations() 
+        {
+            MethodInfo[] methods = typeof(List<int>).ListMethods().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(methods.Distinct().Count()));
 
             // Enumerator, IEnumerator, IEnumerator<int>
             Assert.That(methods.Where(m => m.Name.Contains(nameof(IEnumerable.GetEnumerator))).Count(), Is.EqualTo(3));
+        }
 
-            PropertyInfo[] properties = typeof(List<int>).ListMembers<PropertyInfo>(includeNonPublic: true).ToArray();
+        [Test]
+        public void ListProperties_ShouldReturnExplicitImplementations()
+        {
+            PropertyInfo[] properties = typeof(List<int>).ListProperties().ToArray();
 
             Assert.That(properties.Length, Is.EqualTo(properties.Distinct().Count()));
 
@@ -61,10 +71,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void ListMembers_ShouldReturnExplicitImplementations2() 
+        public void ListMethods_ShouldReturnExplicitImplementations2() 
         {
             MethodInfo[] methods = typeof(NoughtyClass)
-                .ListMembers<MethodInfo>(includeNonPublic: true)
+                .ListMethods()
                 .Where(m => m.Name.Contains(nameof(IInterface.Bar)))
                 .ToArray();
 
@@ -72,23 +82,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void ListMembers_ShouldReturnMembersFromTheWholeHierarchy()
+        public void ListMethods_ShouldReturnMethodsFromTheWholeHierarchy()
         {
-            MethodInfo[] methods = typeof(IGrandChild).ListMembers<MethodInfo>().ToArray();
+            MethodInfo[] methods = typeof(IGrandChild).ListMethods().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(3));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IParent>(i => i.Foo())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IChild>(i => i.Bar())));
             Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IGrandChild>(i => i.Baz())));
-        }
-
-        [TestCase(true, 3)]
-        [TestCase(false, 1)]
-        public void ListMembers_ShouldReturnNonPublicMembersIfNecessary(bool includeNonPublic, int expectedLength) 
-        {
-            PropertyInfo[] properties = typeof(Class).ListMembers<PropertyInfo>(includeNonPublic).ToArray();
-
-            Assert.That(properties.Length, Is.EqualTo(expectedLength));
         }
 
         private interface IIFace : IA, IB { }

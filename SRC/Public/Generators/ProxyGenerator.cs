@@ -3,13 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-
 namespace Solti.Utils.Proxy.Generators
 {
     using Abstractions;
     using Internals;
-    using Properties;
 
     /// <summary>
     /// Type generator for creating proxies that intercept interface method calls.
@@ -19,39 +16,19 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
+        /// Creates a new <see cref="ProxyGenerator{TInterface, TInterceptor}"/> instance.
         /// </summary>
-        public override IProxySyntaxFactory SyntaxFactory { get; } = new ProxySyntaxFactory<TInterface, TInterceptor>();
+        public ProxyGenerator() => SyntaxFactory = new ProxySyntaxFactory
+        (
+            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+            MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
+            TypeResolutionStrategy.AssemblyName,
+            TypeResolutionStrategy.Type
+        );
 
         /// <summary>
-        /// See <see cref="TypeGenerator{T}"/>.
+        /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        protected override void DoCheck()
-        {
-            CheckInterface();
-            CheckBase();
-        }
-
-        private void CheckInterface()
-        {
-            Type type = typeof(TInterface);
-
-            CheckVisibility(type);
-
-            if (!type.IsInterface) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters) throw new InvalidOperationException();
-        }
-
-        private void CheckBase()
-        {
-            Type type = typeof(TInterceptor);
-
-            CheckVisibility(type);
-
-            if (!type.IsClass) throw new InvalidOperationException(Resources.NOT_A_CLASS);
-            if (type.IsSealed) throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);          
-            if (type.IsAbstract) throw new NotSupportedException(Resources.ABSTRACT_INTERCEPTOR);
-            if (type.ContainsGenericParameters) throw new InvalidOperationException();
-        }
+        public override IUnitSyntaxFactory SyntaxFactory { get; }
     }
 }

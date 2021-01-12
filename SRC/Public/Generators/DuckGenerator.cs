@@ -3,13 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-
 namespace Solti.Utils.Proxy.Generators
 {
     using Abstractions;
     using Internals;
-    using Properties;
 
     /// <summary>
     /// Type generator for creating proxies that let <typeparamref name="TTarget"/> behaves like a <typeparamref name="TInterface"/>.
@@ -19,36 +16,19 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class DuckGenerator<TInterface, TTarget>: TypeGenerator<DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
         /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
+        /// Creates a new <see cref="DuckGenerator{TInterface, TTarget}"/> instance
         /// </summary>
-        public override IProxySyntaxFactory SyntaxFactory { get; } = new DuckSyntaxFactory<TInterface, TTarget>();
+        public DuckGenerator() => SyntaxFactory = new DuckSyntaxFactory
+        (
+            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+            MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+            TypeResolutionStrategy.AssemblyName,
+            TypeResolutionStrategy.Type
+        );
 
         /// <summary>
-        /// See <see cref="TypeGenerator{T}"/>.
+        /// See <see cref="ITypeGenerator"/>.
         /// </summary>
-        protected override void DoCheck()
-        {
-            CheckInterface();
-            CheckTarget();
-        }
-
-        private void CheckInterface()
-        {
-            Type type = typeof(TInterface);
-
-            CheckVisibility(type);
-
-            if (!type.IsInterface) throw new InvalidOperationException(Resources.NOT_AN_INTERFACE);
-            if (type.ContainsGenericParameters) throw new InvalidOperationException();
-        }
-
-        private void CheckTarget()
-        {
-            //
-            // Konstruktor parameterben atadasra kerul -> lathatonak kell lennie.
-            //
-
-            CheckVisibility(typeof(TTarget));
-        }
+        public override IUnitSyntaxFactory SyntaxFactory { get; }
     }
 }

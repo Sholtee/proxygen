@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory<TInterface, TInterceptor> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
+    internal partial class ProxySyntaxFactory
     {
         /// <summary>
         /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)               <br/>
@@ -46,11 +47,11 @@ namespace Solti.Utils.Proxy.Internals
         ///     return (TResult) result;                                                                         <br/>
         /// }
         /// </summary>
-        internal sealed class MethodInterceptorFactory : InterceptorFactoryBase
+        internal sealed class MethodInterceptorFactory : ProxyMemberSyntaxFactory
         {
             #region Internals
-            private static readonly MethodInfo
-                RESOLVE_METHOD = (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<TInterface>.ResolveMethod(default!));
+            private readonly IMethodInfo
+                RESOLVE_METHOD;
 
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
@@ -61,9 +62,9 @@ namespace Solti.Utils.Proxy.Internals
             ///   ...                                                                                    <br/>
             /// }
             /// </summary>
-            internal IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IReadOnlyList<ParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray) => paramz
+            internal IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
+                .Where(p => new[] { ParameterKind.Ref, ParameterKind.Out }.Contains(p.Parameter.Kind))
                 .Select
                 (
                     p => ExpressionStatement
@@ -74,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
                             left: IdentifierName(p.Parameter.Name),
                             right: CastExpression
                             (
-                                type: Owner.CreateType(p.Parameter.ParameterType),
+                                type: CreateType(p.Parameter.Type),
                                 expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
                                 (
                                     argumentList: BracketedArgumentList
@@ -91,9 +92,9 @@ namespace Solti.Utils.Proxy.Internals
             /// args[0] = (System.Object)cb_a // ref <br/>
             /// args[2] = (TT)cb_c // out
             /// </summary>
-            internal IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<ParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals) => paramz
+            internal IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals) => paramz
                 .Select((param, i) => new { Parameter = param, Index = i })
-                .Where(p => new[] { ParameterKind.InOut, ParameterKind.Out }.Contains(p.Parameter.GetParameterKind()))
+                .Where(p => new[] { ParameterKind.Ref, ParameterKind.Out }.Contains(p.Parameter.Kind))
                 .Select
                 (
                     p => ExpressionStatement
@@ -110,78 +111,85 @@ namespace Solti.Utils.Proxy.Internals
                             ),
                             right: CastExpression
                             (
-                                type: Owner.CreateType(typeof(object)),
+                                type: CreateType<object>(),
                                 ToIdentifierName(locals[p.Index])
                             )
                         )
                     )
                 );
 
-            internal LambdaExpressionSyntax BuildCallback(MethodInfo method, LocalDeclarationStatementSyntax argsArray) => Owner.DeclareCallback(argsArray, method, (locals, result) =>
+            internal LambdaExpressionSyntax BuildCallback(IMethodInfo method, LocalDeclarationStatementSyntax argsArray) => DeclareCallback(argsArray, method, (locals, body) =>
             {
-                InvocationExpressionSyntax invocation = Owner.InvokeMethod
+                InvocationExpressionSyntax invocation = InvokeMethod
                 (
                     method,
-                    Owner.TARGET,
+                    MemberAccess(null, TARGET),
                     castTargetTo: null,
                     arguments: locals.Select(ToArgument).ToArray()
                 );
 
-                var body = new List<StatementSyntax>();
-                body.Add
-                (
-                    ExpressionStatement
-                    (
-                        method.ReturnType != typeof(void)
-                            ? AssignmentExpression
-                            (
-                                SyntaxKind.SimpleAssignmentExpression,
-                                ToIdentifierName(result!),
-                                CastExpression
-                                (
-                                    Owner.CreateType<object>(),
-                                    invocation
-                                )
-                            )
-                            : (ExpressionSyntax) invocation
-                    )
-                );
-                body.AddRange
-                (
-                    ReassignArgsArray(method.GetParameters(), argsArray, locals)
-                );
+                IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method.Parameters, argsArray, locals);
 
-                return body;
+                if (method.ReturnValue.Type.IsVoid)
+                {
+                    body.Add
+                    (
+                        ExpressionStatement(invocation)
+                    );
+                    body.AddRange(argsArrayReassignment);
+                    body.Add
+                    (
+                        ReturnNull()
+                    );
+                }
+                else
+                {
+                    LocalDeclarationStatementSyntax cb_result = DeclareLocal<object> // ne siman "result" legyen a neve mert a callback-en kivul is lehet ilyen nevu valtozo
+                    (
+                        EnsureUnused(nameof(cb_result), method),
+                        CastExpression
+                        (
+                            CreateType<object>(),
+                            invocation
+                        )
+                    );
+                    body.Add(cb_result);
+                    body.AddRange(argsArrayReassignment);
+                    body.Add
+                    (
+                        ReturnResult(null, cb_result)
+                    );
+                }
             });
 
-            internal IEnumerable<StatementSyntax> BuildBody(MethodInfo methodInfo) 
+            internal IEnumerable<StatementSyntax> BuildBody(IMethodInfo methodInfo) 
             {
                 var statements = new List<StatementSyntax>();
 
-                LocalDeclarationStatementSyntax argsArray = Owner.CreateArgumentsArray(methodInfo);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(methodInfo);
 
                 statements.Add(argsArray);
                 statements.Add
                 (
-                    Owner.AssignCallback
+                    AssignCallback
                     (
                         BuildCallback(methodInfo, argsArray)
                     )
                 );
 
-                LocalDeclarationStatementSyntax method = Owner.DeclareLocal<MethodInfo>(EnsureUnused(nameof(method), methodInfo), Owner.InvokeMethod
+                LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(EnsureUnused(nameof(method), methodInfo), InvokeMethod
                 (
                     RESOLVE_METHOD,
                     target: null,
                     castTargetTo: null,
                     Argument
                     (
-                        expression: Owner.PropertyAccess(INVOKE_TARGET, null, null)
+                        expression: PropertyAccess(INVOKE_TARGET, null, null)
                     )
                 ));
                 statements.Add(method);
 
-                InvocationExpressionSyntax invocation = Owner.InvokeMethod
+                InvocationExpressionSyntax invocation = InvokeMethod
                 (
                     INVOKE,
                     target: null,
@@ -189,19 +197,22 @@ namespace Solti.Utils.Proxy.Internals
                     ToArgument(method), ToArgument(argsArray), ToArgument(method)
                 );
 
-                if (methodInfo.ReturnType != typeof(void))
+                if (!methodInfo.ReturnValue.Type.IsVoid)
                 {
-                    LocalDeclarationStatementSyntax result = Owner.DeclareLocal<object>
+                    LocalDeclarationStatementSyntax result = DeclareLocal<object>
                     (
                         EnsureUnused(nameof(result), methodInfo),
                         invocation
                     );
 
                     statements.Add(result);
-                    statements.AddRange(AssignByRefParameters(methodInfo.GetParameters(), argsArray));
+                    statements.AddRange
+                    (
+                        AssignByRefParameters(methodInfo.Parameters, argsArray)
+                    );
                     statements.Add
                     (
-                        Owner.ReturnResult(methodInfo.ReturnType, result)
+                        ReturnResult(methodInfo.ReturnValue.Type, result)
                     );
                 }
                 else
@@ -210,36 +221,53 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         ExpressionStatement(invocation)
                     );
-                    statements.AddRange(AssignByRefParameters(methodInfo.GetParameters(), argsArray));
+                    statements.AddRange
+                    (
+                        AssignByRefParameters(methodInfo.Parameters, argsArray)
+                    );
                 }
 
                 return statements;
             }
             #endregion
 
-            public MethodInterceptorFactory(ProxySyntaxFactory<TInterface, TInterceptor> owner) : base(owner) { }
-
-            public override bool IsCompatible(MemberInfo member) => member is MethodInfo method && method.DeclaringType.IsInterface && !method.IsSpecialName && !AlreadyImplemented(method);
-
-            public override MemberDeclarationSyntax Build(MemberInfo member) 
+            public MethodInterceptorFactory(IProxyContext context) : base(context) 
             {
-                MethodInfo method = (MethodInfo) member;
-
-                //
-                // "ref" visszateres nem tamogatott.
-                //
-
-                if (method.ReturnType.IsByRef)
-                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
-             
-                return Owner.DeclareMethod(method).WithBody
+                RESOLVE_METHOD = Context.InterceptorType.Methods.Single
                 (
-                    body: Block
+                    met => met.SignatureEquals
                     (
-                        BuildBody(method)
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveMethod(default!))
+                        )
                     )
                 );
             }
+
+            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
+                .InterfaceType
+                .Methods
+                .Where(met => !AlreadyImplemented(met) && !met.IsSpecial)
+                .Select(met =>
+                {
+                    cancellation.ThrowIfCancellationRequested();
+
+                    //
+                    // "ref" visszateres nem tamogatott.
+                    //
+
+                    if (met.ReturnValue.Kind >= ParameterKind.Ref)
+                        throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
+
+                    return DeclareMethod(met).WithBody
+                    (
+                        body: Block
+                        (
+                            BuildBody(met)
+                        )
+                    );
+                });
         }
     }
 }
