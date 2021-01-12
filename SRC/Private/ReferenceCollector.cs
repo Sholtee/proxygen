@@ -13,11 +13,15 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class ReferenceCollector
     {
-        private readonly HashSet<IAssemblyInfo> FReferences = new HashSet<IAssemblyInfo>
+        public ReferenceCollector(bool includeRuntimeReferences = true) => FReferences = new HashSet<IAssemblyInfo>
         (
-            Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom),
+            includeRuntimeReferences
+                ? Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom)
+                : Array.Empty<IAssemblyInfo>(),
             IAssemblyInfoComparer.Instance
         );
+
+        private readonly HashSet<IAssemblyInfo> FReferences;
 
         public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
 
