@@ -110,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void ListMembers_ShouldDistinct() => Assert.That(typeof(IIFace).ListMembers<MethodInfo>().Count(), Is.EqualTo(3));
+        public void ListMethods_ShouldDistinct() => Assert.That(typeof(IIFace).ListMethods().Count(), Is.EqualTo(3));
 
         private class Class 
         {
