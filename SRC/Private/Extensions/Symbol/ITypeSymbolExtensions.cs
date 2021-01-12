@@ -204,7 +204,11 @@ namespace Solti.Utils.Proxy.Internals
             string? metadataName = src.GetQualifiedMetadataName();
             if (metadataName is null) return null;
 
-            IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly /* tombnek nincs tartalmazo szerelvenye forditaskor */ ?? src.ContainingAssembly;
+            //
+            // Tombnek es mutatonak nincs tartalmazo szerelvenye.
+            //
+
+            IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly ?? src.ContainingAssembly;
             if (containingAsm is null) return null;
 
             return $"{metadataName}, {containingAsm.Identity}";
