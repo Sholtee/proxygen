@@ -111,6 +111,14 @@ namespace Solti.Utils.Proxy.Internals
             collector.AddType(type);
 
             //
+            // Korbedolgozas arra az esetre ha a "type" GeneratorExecutionContext-bol jon es nem
+            // teljes ujraforditas van
+            //
+
+            if (collector.References.Any(@ref => @ref.Location is null))
+                return;
+
+            //
             // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
             // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditotol kerjuk
             // el.
@@ -130,6 +138,8 @@ namespace Solti.Utils.Proxy.Internals
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
                 case Accessibility.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
+                case Accessibility.NotApplicable:
+                    throw new InvalidOperationException();
             }
         }
     }

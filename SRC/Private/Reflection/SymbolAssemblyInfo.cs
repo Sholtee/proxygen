@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.IO;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -29,10 +30,25 @@ namespace Solti.Utils.Proxy.Internals
             return new SymbolAssemblyInfo(asm, compilation);
         }
 
-        public string? Location => Compilation
-            .References
-            .First(reference => SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
-            .Display;
+        public string? Location
+        {
+            get
+            {
+                string? nameOrPath = Compilation
+                    .References
+                    .First(reference => SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
+                    .Display;
+
+                //
+                // Ha a Compilation GeneratorExecutionContext-bol jon es nem teljes ujraforditas
+                // van akkor a MetadataReference.Display nem biztos h eleresi utvonal
+                //
+
+                return nameOrPath is not null && File.Exists(nameOrPath)
+                    ? nameOrPath
+                    : null;
+            }
+        }
 
         public bool IsDynamic => false; // forditas idoben nem lehet dinamikus ASM hivatkozva
 
