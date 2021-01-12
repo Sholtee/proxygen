@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     CSharpSyntaxTree.ParseText(src)
                 },
                 Runtime.Assemblies.Select(asm => asm.Location).Concat(additionalReferences).Distinct().Select(location => MetadataReference.CreateFromFile(location)),
-                CompilationOptionsFactory.Create(allowUnsafe: true)
+                CompilationOptionsFactory.Create().WithAllowUnsafe(true)
             );
 
             Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
@@ -34,7 +34,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             return result;
         }
 
-        public static Assembly Compile(string src, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
+        public static Assembly Compile(string src, Func<Compilation, Compilation> customConfig = null, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
         (
             CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
             Guid.NewGuid().ToString(),
@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .Concat(additionalReferences)
                 .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
                 .ToArray(),
-            allowUnsafe: true
+            customConfig
         );
 
         public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));

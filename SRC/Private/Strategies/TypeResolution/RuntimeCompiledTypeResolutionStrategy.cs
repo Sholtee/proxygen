@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
                         .References
                         .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
                         .ToArray(),
-                     allowUnsafe: false,
+                     customConfig: null,
                      cancellation
                  )
             );

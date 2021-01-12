@@ -43,14 +43,13 @@ namespace Solti.Utils.Proxy.Internals
             return (uint) ignoreAccessibility.GetValue(null);
         }
 #endif
-        public static CSharpCompilationOptions Create(bool allowUnsafe = false)
+        public static CSharpCompilationOptions Create()
         {
             var options = new CSharpCompilationOptions
             (
                 outputKind: OutputKind.DynamicallyLinkedLibrary,
                 metadataImportOptions: MetadataImportOptions.All,
-                optimizationLevel: OptimizationLevel.Release,
-                allowUnsafe: allowUnsafe
+                optimizationLevel: OptimizationLevel.Release
             );
 #if IGNORE_VISIBILITY
             TopLevelBinderFlagsProperty.SetValue(options, IgnoreAccessibility);

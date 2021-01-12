@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, bool allowUnsafe = false, CancellationToken cancellation = default)
+        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
         {
             string
                 separator = $",{Environment.NewLine}",
@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             Debug.WriteLine(src);
             Debug.WriteLine(refs);
 
-            CSharpCompilation compilation = CSharpCompilation.Create
+            Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
                 syntaxTrees: new []
@@ -49,8 +49,11 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 },
                 references: references,
-                options: CompilationOptionsFactory.Create(allowUnsafe)
+                options: CompilationOptionsFactory.Create()
             );
+
+            if (customConfig is not null)
+                compilation = customConfig(compilation);
 
             using Stream stm = outputFile != null ? File.Create(outputFile) : (Stream) new MemoryStream();
 
