@@ -197,7 +197,7 @@ namespace Solti.Utils.Proxy.Internals
 
         internal static ITypeSymbol TypeInfoToSymbol(ITypeInfo type, Compilation compilation)
         {
-            INamedTypeSymbol symbol;
+            INamedTypeSymbol? symbol;
 
             if (type.EnclosingTypes.Any())
             {
@@ -227,8 +227,21 @@ namespace Solti.Utils.Proxy.Internals
                 // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
                 //
 
-                symbol = compilation
-                    .GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException()) ?? throw new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, type.FullName));
+                symbol = compilation.GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException());
+
+                if (symbol is null)
+                {
+                    var ex = new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, type.FullName));
+
+                    //
+                    // SourceGenerator-ba nem lehet beleDEBUGolni ezert...
+                    //
+
+                    ex.Data["containingAsm"] = type.DeclaringAssembly?.Name;
+                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Select(@ref => @ref.Display));
+                   
+                    throw ex;
+                }
             }
 
             if (type is IGenericTypeInfo generic && !generic.IsGenericDefinition)
