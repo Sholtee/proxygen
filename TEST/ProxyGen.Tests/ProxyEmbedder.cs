@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -58,6 +59,60 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(File.Exists(path));
         }
 
+        [TestCase
+        (
+            @"
+            using System.Collections.Generic;
+
+            using Solti.Utils.Proxy;
+            using Solti.Utils.Proxy.Attributes;
+            using Solti.Utils.Proxy.Generators;
+
+            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            "
+        )]
+        [TestCase
+        (
+            @"
+            using System.Collections;
+
+            using Solti.Utils.Proxy;
+            using Solti.Utils.Proxy.Attributes;
+            using Solti.Utils.Proxy.Generators;
+
+            [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, IEnumerable>))]
+            "
+        )]
+        public void Execute_ShouldExtendTheOriginalSource(string src) 
+        {
+            Compilation compilation = CreateCompilation
+            (
+                src,
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> _);
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+        }
+
+        internal sealed class AssemblyLoader : IAnalyzerAssemblyLoader
+        {
+            public static AssemblyLoader Instance = new AssemblyLoader();
+
+            public void AddDependencyLocation(string fullPath)
+            {
+            }
+
+            public Assembly LoadFromPath(string fullPath)
+            {
+                return Assembly.LoadFrom(fullPath);
+            }
+        }
+
         private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");
 
         public static IEnumerable<Type> EmbeddedGenerators 
@@ -72,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [TestCaseSource(nameof(EmbeddedGenerators))]
-        public void Execute_ShouldExtendTheOriginalSource(Type generator) 
+        public void BuiltAssembly_ShouldContainTheProxy(Type generator) 
         {
             object generatorInst = generator
                 .GetConstructor(Type.EmptyTypes)
