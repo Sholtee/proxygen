@@ -147,6 +147,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Append(type.Assembly)
+                .Append(typeof(DuckBase<>).Assembly)
                 .Distinct()
                 .ToArray();
 
