@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         )]
         public void EqualsTo_ShouldCompare(string src, bool equals)
         {
-            Assembly asm = Compile(src);
+            Assembly asm = Compile(src, customConfig: comp => comp.WithOptions(((CSharpCompilationOptions) comp.Options).WithAllowUnsafe(true)));
 
             ITypeInfo
                 a1 = MetadataTypeInfo.CreateFrom(asm.GetTypes().Single(t => t.Name.Contains("ClassA")).ListMethods().Single(m => m.Name == "Foo").GetParameters().Single().ParameterType),
