@@ -311,7 +311,7 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        public static string GetDebugString(this ITypeSymbol src) 
+        public static string GetDebugString(this ITypeSymbol src, string? eol = null) 
         {
             var fmt = new SymbolDisplayFormat
             (
@@ -323,20 +323,22 @@ namespace Solti.Utils.Proxy.Internals
                 miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes
             );
 
+            eol ??= Environment.NewLine;
+
             var sb = new StringBuilder()
-            .AppendLine(src.ToDisplayString(fmt))
-            .AppendLine("{");
+            .Append(src.ToDisplayString(fmt))
+            .Append($"{eol}{{");
 
             foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Where(m => !m.IsSpecial()))
-                sb.AppendLine($"  {method.ToDisplayString(fmt)};");
+                sb.Append($"{eol}  {method.ToDisplayString(fmt)};");
 
             foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))
-                sb.AppendLine($"  {property.ToDisplayString(fmt)}");
+                sb.Append($"{eol}  {property.ToDisplayString(fmt)}");
 
             foreach (IEventSymbol evt in src.ListEvents(includeStatic: true))
-                sb.AppendLine($"  {evt.ToDisplayString(fmt)}");
+                sb.Append($"{eol}  {evt.ToDisplayString(fmt)}");
 
-            sb.Append("}");
+            sb.Append($"{eol}}}");
 
             return sb.ToString();
         }

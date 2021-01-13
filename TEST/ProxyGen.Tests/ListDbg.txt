@@ -62,13 +62,13 @@
   public static Equals(object objA, object objB);
   public static ReferenceEquals(object objA, object objB);
   public virtual GetHashCode();
-  public Capacity { get; set; };
-  public Count { get; };
-  private System.Collections.IList.IsFixedSize { get; };
-  private System.Collections.Generic.ICollection<T>.IsReadOnly { get; };
-  private System.Collections.IList.IsReadOnly { get; };
-  private System.Collections.ICollection.IsSynchronized { get; };
-  private System.Collections.ICollection.SyncRoot { get; };
-  public this[int index] { get; set; };
-  private System.Collections.IList.Item[int index] { get; set; };
+  public Capacity { get; set; }
+  public Count { get; }
+  private System.Collections.IList.IsFixedSize { get; }
+  private System.Collections.Generic.ICollection<T>.IsReadOnly { get; }
+  private System.Collections.IList.IsReadOnly { get; }
+  private System.Collections.ICollection.IsSynchronized { get; }
+  private System.Collections.ICollection.SyncRoot { get; }
+  public this[int index] { get; set; }
+  private System.Collections.IList.Item[int index] { get; set; }
 }
