@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -20,6 +21,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Attributes;
     using Primitives;
+    using Properties;
 
     public interface IMyService { }
 
@@ -170,18 +172,31 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
-        internal sealed class AssemblyLoader : IAnalyzerAssemblyLoader
+        [Test]
+        public void Execute_ShouldCreateDiagnosticOnError() 
         {
-            public static AssemblyLoader Instance = new AssemblyLoader();
+            Compilation compilation = CreateCompilation
+            (
+                @"
+                using System.Collections;
 
-            public void AddDependencyLocation(string fullPath)
-            {
-            }
+                using Solti.Utils.Proxy;
+                using Solti.Utils.Proxy.Attributes;
+                using Solti.Utils.Proxy.Generators;
 
-            public Assembly LoadFromPath(string fullPath)
-            {
-                return Assembly.LoadFrom(fullPath);
-            }
+                [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, object>))]
+                ",
+                new[] { typeof(EmbedGeneratedTypeAttribute).Assembly.Location },
+                suppressErrors: true
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))), Is.EqualTo(1));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
         private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");
