@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class CodeAnalysisTestsBase
     {
-        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences) 
+        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences, bool suppressErrors = false) 
         {
             var result = CSharpCompilation.Create
             (
@@ -24,12 +24,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                     CSharpSyntaxTree.ParseText(src)
                 },
-                Runtime.Assemblies.Select(asm => asm.Location).Concat(additionalReferences).Distinct().Select(location => MetadataReference.CreateFromFile(location)),
+                Runtime
+                    .Assemblies
+                    .Select(asm => asm.Location)
+                    .Concat(additionalReferences)
+                    .Distinct()
+                    .Select(location => MetadataReference.CreateFromFile(location)),
                 CompilationOptionsFactory.Create().WithAllowUnsafe(true)
             );
 
-            Diagnostic[] errors = result.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error).ToArray();
-            if (errors.Any()) throw new Exception("Bad source");
+            if (!suppressErrors)
+            {
+                Diagnostic[] errors = result
+                    .GetDiagnostics()
+                    .Where(d => d.Severity == DiagnosticSeverity.Error)
+                    .ToArray();
+                if (errors.Any()) throw new Exception("Bad source");
+            }
 
             return result;
         }

@@ -30,14 +30,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string assemblyName, OutputType outputType): base(outputType) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, IAssemblyInfo thisAsm, string assemblyName, OutputType outputType): base(outputType) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-            BaseType = (ITypeInfo) ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
+            BaseType = (ITypeInfo) ((IGenericTypeInfo) thisAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             AssemblyName = assemblyName;
             ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
 

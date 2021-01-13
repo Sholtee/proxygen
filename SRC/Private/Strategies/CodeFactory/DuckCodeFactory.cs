@@ -31,6 +31,11 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(target, compilation),
+                    SymbolAssemblyInfo.CreateFrom
+                    (
+                        compilation.GetAssemblyByLocation(typeof(DuckCodeFactory).Assembly.Location)!,
+                        compilation
+                    ),
                     compilation.AssemblyName!,
                     OutputType.Unit
                 );

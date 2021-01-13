@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -26,6 +27,15 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsFriend(string asmName) => asmName == UnderlyingAssembly.GetName().Name || UnderlyingAssembly // TODO: strong name support
             .GetCustomAttributes<InternalsVisibleToAttribute>()
             .Any(ivt => ivt.AssemblyName == asmName);
+
+        public ITypeInfo? GetType(string fullName)
+        {
+            Type type = UnderlyingAssembly.GetType(fullName, throwOnError: false);
+
+            return type is not null
+                ? MetadataTypeInfo.CreateFrom(type)
+                : null;
+        }
 
         public string? Location => UnderlyingAssembly.IsDynamic ? null : UnderlyingAssembly.Location;
 

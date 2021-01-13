@@ -22,6 +22,7 @@ namespace Solti.Utils.Proxy.Generators
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)),
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+            MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<,>).Assembly),
             TypeResolutionStrategy.AssemblyName,
             TypeResolutionStrategy.Type
         );

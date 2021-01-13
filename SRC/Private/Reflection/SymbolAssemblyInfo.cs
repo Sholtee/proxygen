@@ -66,6 +66,15 @@ namespace Solti.Utils.Proxy.Internals
             CSharpCompilation.Create(asmName).Assembly
         );
 
+        public ITypeInfo? GetType(string fullName)
+        {
+            INamedTypeSymbol? type = UnderlyingSymbol.GetTypeByMetadataName(fullName);
+
+            return type is not null
+                ? SymbolTypeInfo.CreateFrom(type, Compilation)
+                : null;
+        }
+
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);
 
         public override bool Equals(object obj) => obj is SymbolAssemblyInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);

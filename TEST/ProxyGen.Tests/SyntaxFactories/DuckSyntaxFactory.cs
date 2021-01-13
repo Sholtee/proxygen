@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         }
 
-        private static DuckSyntaxFactory CreateGenerator<TInterface, TTarget>(string asm = null) => new DuckSyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(TInterface)), MetadataTypeInfo.CreateFrom(typeof(TTarget)), asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name, OutputType.Module);
+        private static DuckSyntaxFactory CreateGenerator<TInterface, TTarget>(string asm = null) => new DuckSyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(TInterface)), MetadataTypeInfo.CreateFrom(typeof(TTarget)), MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly),  asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name, OutputType.Module);
 
         [Test]
         public void GenerateDuckMethod_ShouldThrowIfTheMethodNotSupported() =>
@@ -157,8 +157,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
             IUnitSyntaxFactory
-                fact1 = new DuckSyntaxFactory(type1, type1, "cica", outputType),
-                fact2 = new DuckSyntaxFactory(type2, type2, "cica", outputType);
+                fact1 = new DuckSyntaxFactory(type1, type1, MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly), "cica", outputType),
+                fact2 = new DuckSyntaxFactory(type2, type2, SymbolAssemblyInfo.CreateFrom(compilation.GetAssemblyByLocation(typeof(DuckBase<>).Assembly.Location), compilation), "cica", outputType);
 
             Assert.DoesNotThrow(() => fact1.Build());
             Assert.DoesNotThrow(() => fact2.Build());
@@ -178,7 +178,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             {
                 ITypeInfo iface = MetadataTypeInfo.CreateFrom(typeof(IComplex));
 
-                var fact = new DuckSyntaxFactory(iface, iface, "cica", OutputType.Module);
+                var fact = new DuckSyntaxFactory(iface, iface, MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly), "cica", OutputType.Module);
 
                 yield return new ConstructorFactory(fact);
                 yield return new MethodInterceptorFactory(fact);
