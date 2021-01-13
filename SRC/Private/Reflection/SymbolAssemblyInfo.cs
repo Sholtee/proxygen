@@ -34,6 +34,13 @@ namespace Solti.Utils.Proxy.Internals
         {
             get
             {
+                if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.Assembly))
+                    //
+                    // Az epp forditas alatt levo szerelvenynek meg tuti nincs eleresi utvonala
+                    //
+
+                    return null;
+
                 string? nameOrPath = Compilation
                     .References
                     .First(reference => SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
