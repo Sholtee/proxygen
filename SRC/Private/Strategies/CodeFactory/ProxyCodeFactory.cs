@@ -25,6 +25,8 @@ namespace Solti.Utils.Proxy.Internals
 
             Compilation compilation = context.Compilation;
 
+            SourceCode result;
+
             try
             {
                 IUnitSyntaxFactory unitSyntaxFactory = new ProxySyntaxFactory
@@ -35,10 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                     OutputType.Unit
                 );
 
-                return new[] 
-                {
-                    unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken)
-                };
+                result = unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken);
             }
             catch (Exception e) 
             {
@@ -47,6 +46,12 @@ namespace Solti.Utils.Proxy.Internals
 
                 throw;
             }
+
+            //
+            // "yield" nem szerepelhet "try" blokkban
+            //
+
+            yield return result;
         }
     }
 }

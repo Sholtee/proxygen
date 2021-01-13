@@ -25,25 +25,28 @@ namespace Solti.Utils.Proxy.Internals
 
             Compilation compilation = context.Compilation;
 
+            //
+            // A ProxyGen szerelvenyenek mindenkepp hivatkozva kell lennie
+            //
+
+            IAssemblySymbol? self = compilation.GetAssemblyByLocation(typeof(DuckCodeFactory).Assembly.Location);
+            if (self is null)
+                yield break;
+
+            SourceCode result;
+
             try
             {
                 IUnitSyntaxFactory unitSyntaxFactory = new DuckSyntaxFactory
                 (
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(target, compilation),
-                    SymbolAssemblyInfo.CreateFrom
-                    (
-                        compilation.GetAssemblyByLocation(typeof(DuckCodeFactory).Assembly.Location)!,
-                        compilation
-                    ),
+                    SymbolAssemblyInfo.CreateFrom(self, compilation),
                     compilation.AssemblyName!,
                     OutputType.Unit
                 );
 
-                return new[] 
-                {
-                    unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken)
-                };
+                result = unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken);
             }
             catch (Exception e) 
             {
@@ -52,6 +55,12 @@ namespace Solti.Utils.Proxy.Internals
 
                 throw;
             }
+
+            //
+            // "yield" nem szerepelhet "try" blokkban
+            //
+
+            yield return result;
         }
     }
 }
