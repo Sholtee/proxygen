@@ -509,6 +509,19 @@ references:
   commentId: T:Solti.Utils.Proxy.Internals.IAssemblyInfo
   fullName: Solti.Utils.Proxy.Internals.IAssemblyInfo
   nameWithType: IAssemblyInfo
+- uid: Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType(System.String)
+  name: GetType(String)
+  href: Solti.Utils.Proxy.Internals.IAssemblyInfo.html#Solti_Utils_Proxy_Internals_IAssemblyInfo_GetType_System_String_
+  commentId: M:Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType(System.String)
+  fullName: Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType(System.String)
+  nameWithType: IAssemblyInfo.GetType(String)
+- uid: Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType*
+  name: GetType
+  href: Solti.Utils.Proxy.Internals.IAssemblyInfo.html#Solti_Utils_Proxy_Internals_IAssemblyInfo_GetType_
+  commentId: Overload:Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.IAssemblyInfo.GetType
+  nameWithType: IAssemblyInfo.GetType
 - uid: Solti.Utils.Proxy.Internals.IAssemblyInfo.IsDynamic
   name: IsDynamic
   href: Solti.Utils.Proxy.Internals.IAssemblyInfo.html#Solti_Utils_Proxy_Internals_IAssemblyInfo_IsDynamic
