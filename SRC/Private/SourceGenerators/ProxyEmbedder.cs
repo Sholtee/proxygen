@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                logFile = Path.Combine(Path.GetTempPath(), $"ProxyGen_{Guid.NewGuid()}.log");
+                logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using StreamWriter log = File.CreateText(logFile);
 
@@ -120,8 +120,6 @@ namespace Solti.Utils.Proxy.Internals
 
                     foreach (SourceCode source in codeFactory.GetSourceCodes(generator, context))
                     {
-                        source.Dump();
-
                         context.AddSource
                         (
                             source.Hint,

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public RuntimeCompiledTypeResolutionStrategy(ITypeGenerator generator) => Generator = generator;
 
-        public string? CacheDir { get; internal set; } = AppContext.GetData("AssemblyCacheDir") as string; // tesztek miatt van setter
+        public string? CacheDir { get; internal set; } = WorkingDirectories.AssemblyCacheDir; // tesztek miatt van setter
 
         public ITypeGenerator Generator { get; }
 
@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                     Directory.CreateDirectory(CacheDir);
             }
 
-            syntaxFactory.Build(cancellation);
+            syntaxFactory.BuildAndDump(cancellation);
 
             return ExtractType
             (

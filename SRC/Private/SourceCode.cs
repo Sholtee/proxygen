@@ -20,18 +20,5 @@ namespace Solti.Utils.Proxy.Internals
             Hint = hint;
             FValue = value;
         }
-
-        public bool Dump()
-        {
-            try
-            {
-                File.WriteAllText(Path.Combine(Path.GetTempPath(), Hint), FValue);
-                return true;
-            }
-            catch 
-            {
-                return false;
-            }
-        }
     }
 }

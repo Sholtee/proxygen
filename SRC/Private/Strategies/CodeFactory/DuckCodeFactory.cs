@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -46,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
                     OutputType.Unit
                 );
 
-                result = unitSyntaxFactory.GetSourceCode($"{unitSyntaxFactory.DefinedClasses.Single()}.cs", context.CancellationToken);
+                result = unitSyntaxFactory.GetSourceCode(context.CancellationToken);
             }
             catch (Exception e) 
             {
