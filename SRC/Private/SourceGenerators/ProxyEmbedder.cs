@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -29,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
             .Select(attr => attr.ConstructorArguments.Single().Value)
             .Cast<INamedTypeSymbol>();
 
-        internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location) 
+        internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location, CancellationToken cancellation) 
         {
             string? logFile = null;
 
@@ -38,6 +39,7 @@ namespace Solti.Utils.Proxy.Internals
                 logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using StreamWriter log = File.CreateText(logFile);
+                log.AutoFlush = true;
 
                 //
                 // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
@@ -46,16 +48,14 @@ namespace Solti.Utils.Proxy.Internals
 
                 for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
-                    if (current != ex) log.Write($"{NewLine}->{NewLine}");
-                    log.Write(current.ToString());
+                    if (current != ex) log.Write($"{NewLine}->{NewLine}", cancellation);
+                    log.Write(current.ToString(), cancellation);
 
                     foreach (object? key in current.Data.Keys) 
                     {
-                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}");
+                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation);
                     }
                 }
-
-                log.Flush();
             }
             catch { }
 
@@ -152,7 +152,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     context.ReportDiagnostic
                     (
-                        CreateDiagnosticAndLog(e, generator.Locations.Single())
+                        CreateDiagnosticAndLog(e, generator.Locations.Single(), context.CancellationToken)
                     );
                 }
             }

@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void CreateDiagnosticAndLog_ShouldCreateALogFileForTheGivenException() 
         {
-            Diagnostic diag = ProxyEmbedder.CreateDiagnosticAndLog(new InvalidOperationException(), Location.None);
+            Diagnostic diag = ProxyEmbedder.CreateDiagnosticAndLog(new InvalidOperationException(), Location.None, default);
 
             string path = Regex.Match(diag.ToString(), "Details stored in: ([\\w\\\\\\/ -:]+)$").Groups[1].Value;
 
