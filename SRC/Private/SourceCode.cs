@@ -3,22 +3,30 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.IO;
+using System;
+using System.Text;
+
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public record SourceCode 
+    public class SourceCode 
     {
-        private readonly string FValue;
-        public ref readonly string Value => ref FValue;
-
         public string Hint { get; }
 
-        public SourceCode(string hint, in string value) 
+        public SourceText Value { get; }
+
+        public SourceCode(string hint, CompilationUnitSyntax unit) 
         {
             Hint = hint;
-            FValue = value;
+            Value = SourceText.From
+            (
+                unit.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
+                Encoding.UTF8
+            );
         }
     }
 }

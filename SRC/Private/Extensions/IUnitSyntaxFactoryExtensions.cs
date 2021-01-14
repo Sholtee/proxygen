@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             src.BuildAndDump(cancellation);
 
-            return new SourceCode(src.GetHint(), src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString());
+            return new SourceCode(src.GetHint(), src.Unit!);
         }
 
         public static string GetHint(this IUnitSyntaxFactory src) => $"{src.DefinedClasses.Single()}.cs";
@@ -41,13 +41,26 @@ namespace Solti.Utils.Proxy.Internals
                     using (log = File.CreateText(Path.Combine(SourceDump, hint)))
                     {
                         log.AutoFlush = true;
-                        log.Write(src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(), cancellation: cancellation);
+                        src
+                            .Unit!
+                            .NormalizeWhitespace(eol: Environment.NewLine)
+                            .WriteTo(log); // nincs overload ami tamogatna a megszakitast
                     }
 
                     using (log = File.CreateText(Path.Combine(SourceDump, $"{hint}.references")))
                     {
                         log.AutoFlush = true;
-                        log.Write(string.Join(Environment.NewLine, src.References.Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")), cancellation: cancellation);
+                        log.Write
+                        (
+                            string.Join
+                            (
+                                Environment.NewLine,
+                                src
+                                    .References
+                                    .Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
+                            ),
+                            cancellation: cancellation
+                        );
                     }
                 }
                 catch { }
