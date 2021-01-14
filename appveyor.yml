@@ -15,7 +15,7 @@ environment:
   GITHUB_REPO_TOKEN:
     secure: qJEufJv866eebR/Boe1UnV3p1arOIX9BTyqAQnAVY49h4Ks40Sr0rHb3iN70e7BZ 
   NUGET_REPO_TOKEN:
-    secure: 8s8wiYA91dfqtAk4UFBJ9deslrGcfYC2cdOHMhutAtKwMJMOSrmlg+nHjYWfZcW/
+    secure: KMbjGu17OVu+cir5b7wkAzNNMQXzxb3Yuohs1YzdnfXsy5wP50EkBOAEM7FvDLUI
   GITHUB_EMAIL:
     secure: Z6F+xZzdZzc5DMYB/4J0KUhyoTzTlXH75ciGl7hFH9s= 
 # APPVEYOR_RDP_PASSWORD:
