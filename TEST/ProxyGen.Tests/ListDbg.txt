@@ -1,74 +1,16 @@
-﻿System.Collections.Generic.List<T>
+﻿System.Collections.Generic.IList<T>: System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.IEnumerable
 {
-  public Add(T item);
-  private System.Collections.IList.Add(object item);
-  public AddRange(System.Collections.Generic.IEnumerable<T> collection);
-  public AsReadOnly();
-  public BinarySearch(int index, int count, T item, System.Collections.Generic.IComparer<T> comparer);
-  public BinarySearch(T item);
-  public BinarySearch(T item, System.Collections.Generic.IComparer<T> comparer);
-  public Clear();
-  public Contains(T item);
-  private System.Collections.IList.Contains(object item);
-  public ConvertAll<TOutput>(System.Converter<T, TOutput> converter);
-  public CopyTo(T[] array);
-  private System.Collections.ICollection.CopyTo(System.Array array, int arrayIndex);
-  public CopyTo(int index, T[] array, int arrayIndex, int count);
-  public CopyTo(T[] array, int arrayIndex);
-  public Exists(System.Predicate<T> match);
-  public Find(System.Predicate<T> match);
-  public FindAll(System.Predicate<T> match);
-  public FindIndex(System.Predicate<T> match);
-  public FindIndex(int startIndex, System.Predicate<T> match);
-  public FindIndex(int startIndex, int count, System.Predicate<T> match);
-  public FindLast(System.Predicate<T> match);
-  public FindLastIndex(System.Predicate<T> match);
-  public FindLastIndex(int startIndex, System.Predicate<T> match);
-  public FindLastIndex(int startIndex, int count, System.Predicate<T> match);
-  public ForEach(System.Action<T> action);
-  public GetEnumerator();
-  private System.Collections.Generic.IEnumerable<T>.GetEnumerator();
-  private System.Collections.IEnumerable.GetEnumerator();
-  public GetRange(int index, int count);
-  public IndexOf(T item);
-  private System.Collections.IList.IndexOf(object item);
-  public IndexOf(T item, int index);
-  public IndexOf(T item, int index, int count);
-  public Insert(int index, T item);
-  private System.Collections.IList.Insert(int index, object item);
-  public InsertRange(int index, System.Collections.Generic.IEnumerable<T> collection);
-  public LastIndexOf(T item);
-  public LastIndexOf(T item, int index);
-  public LastIndexOf(T item, int index, int count);
-  public Remove(T item);
-  private System.Collections.IList.Remove(object item);
-  public RemoveAll(System.Predicate<T> match);
-  public RemoveAt(int index);
-  public RemoveRange(int index, int count);
-  public Reverse();
-  public Reverse(int index, int count);
-  public Sort();
-  public Sort(System.Collections.Generic.IComparer<T> comparer);
-  public Sort(int index, int count, System.Collections.Generic.IComparer<T> comparer);
-  public Sort(System.Comparison<T> comparison);
-  public ToArray();
-  public TrimExcess();
-  public TrueForAll(System.Predicate<T> match);
-  public GetType();
-  protected MemberwiseClone();
-  protected ~Object();
-  public virtual ToString();
-  public virtual Equals(object obj);
-  public static Equals(object objA, object objB);
-  public static ReferenceEquals(object objA, object objB);
-  public virtual GetHashCode();
-  public Capacity { get; set; }
-  public Count { get; }
-  private System.Collections.IList.IsFixedSize { get; }
-  private System.Collections.Generic.ICollection<T>.IsReadOnly { get; }
-  private System.Collections.IList.IsReadOnly { get; }
-  private System.Collections.ICollection.IsSynchronized { get; }
-  private System.Collections.ICollection.SyncRoot { get; }
-  public this[int index] { get; set; }
-  private System.Collections.IList.Item[int index] { get; set; }
+  Add(T item);
+  Clear();
+  Contains(T item);
+  CopyTo(T[] array, int arrayIndex);
+  Remove(T item);
+  GetEnumerator();
+  GetEnumerator();
+  IndexOf(T item);
+  Insert(int index, T item);
+  RemoveAt(int index);
+  Count { get; }
+  IsReadOnly { get; }
+  this[int index] { get; set; }
 }

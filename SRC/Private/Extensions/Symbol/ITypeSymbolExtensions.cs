@@ -325,9 +325,14 @@ namespace Solti.Utils.Proxy.Internals
 
             eol ??= Environment.NewLine;
 
-            var sb = new StringBuilder()
-            .Append(src.ToDisplayString(fmt))
-            .Append($"{eol}{{");
+            var sb = new StringBuilder().Append(src.ToDisplayString(fmt));
+
+            IEnumerable<ITypeSymbol> bases = src.GetBaseTypes().Concat(src.AllInterfaces);
+
+            if (bases.Any())
+                sb.Append($": {string.Join(", ", bases.Select(@base => @base.ToDisplayString(fmt)))}");
+
+            sb.Append($"{eol}{{");
 
             foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Where(m => !m.IsSpecial()))
                 sb.Append($"{eol}  {method.ToDisplayString(fmt)};");
