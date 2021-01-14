@@ -32,19 +32,36 @@ namespace Solti.Utils.Proxy.Internals
 
             if (SourceDump is not null)
             {
+                string 
+                    hint = src.GetHint(),
+                    hintRefs = $"{hint}.references",
+                    code = src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
+                    references = string.Join(Environment.NewLine, src.References.Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}"));
+
                 try
                 {
 #if NETSTANDARD2_0
                     File.WriteAllText
                     (
-                        Path.Combine(SourceDump, src.GetHint()),
-                        src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString()
+                        Path.Combine(SourceDump, hint),
+                        code
+                    );
+                    File.WriteAllText
+                    (
+                        Path.Combine(SourceDump, hintRefs),
+                        references
                     );
 #else
                     File.WriteAllTextAsync
                     (
-                        Path.Combine(SourceDump, src.GetHint()),
-                        src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
+                        Path.Combine(SourceDump, hint),
+                        code,
+                        cancellation
+                    ).Wait();
+                    File.WriteAllTextAsync
+                    (
+                        Path.Combine(SourceDump, hintRefs),
+                        references,
                         cancellation
                     ).Wait();
 #endif
