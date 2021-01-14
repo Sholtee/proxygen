@@ -512,5 +512,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.AreEqual(WIRED_NAME, new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>().TypeResolutionStrategy.AssemblyName);
             Assert.AreNotEqual(WIRED_NAME, new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>().TypeResolutionStrategy.AssemblyName);
         }
+
+        [Test]
+        public void ProxyGenerator_ShouldAssembleTheProxyOnce() =>
+            Assert.AreSame(ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType(), ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType());
     }
 }

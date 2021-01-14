@@ -269,5 +269,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
             typeof(DuckGenerator<,>)
                 .MakeGenericType(iface, iface)
                 .InvokeMember(nameof(DuckGenerator<object, object>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
+
+        [Test]
+        public void DuckGenerator_ShouldAssembleTheProxyOnce() =>
+            Assert.AreSame(DuckGenerator<ICloneable, ICloneable>.GetGeneratedType(), DuckGenerator<ICloneable, ICloneable>.GetGeneratedType());
     }
 }
