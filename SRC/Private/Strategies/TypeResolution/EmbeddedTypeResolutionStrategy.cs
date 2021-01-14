@@ -19,6 +19,12 @@ namespace Solti.Utils.Proxy.Internals
     {
         private static readonly ConcurrentDictionary<Type, Assembly> FGenerators = new ConcurrentDictionary<Type, Assembly>();
 
+        //
+        // Az osszes ProxyGen-t hivatkozo szerelvenyt megvizsgaljuk betolteskor (nyilvan 
+        // mind ezutan a szerelveny utan toltodnek be). Ez a modszer addig mukodik amig
+        // a EmbedGeneratedTypeAttribute ebben a szerelvenyben talalhato.
+        //
+
         [ModuleInitializer]
         public static void ModuleInit() => AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => 
         {
