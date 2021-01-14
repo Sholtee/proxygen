@@ -48,12 +48,12 @@ namespace Solti.Utils.Proxy.Internals
 
                 for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
-                    if (current != ex) log.Write($"{NewLine}->{NewLine}", cancellation);
-                    log.Write(current.ToString(), cancellation);
+                    if (current != ex) log.Write($"{NewLine}->{NewLine}", cancellation: cancellation);
+                    log.Write(current.ToString(), cancellation: cancellation);
 
                     foreach (object? key in current.Data.Keys) 
                     {
-                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation);
+                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation: cancellation);
                     }
                 }
             }

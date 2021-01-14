@@ -41,13 +41,13 @@ namespace Solti.Utils.Proxy.Internals
                     using (log = File.CreateText(Path.Combine(SourceDump, hint)))
                     {
                         log.AutoFlush = true;
-                        log.Write(src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(), cancellation);
+                        log.Write(src.Unit!.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(), cancellation: cancellation);
                     }
 
                     using (log = File.CreateText(Path.Combine(SourceDump, $"{hint}.references")))
                     {
                         log.AutoFlush = true;
-                        log.Write(string.Join(Environment.NewLine, src.References.Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")), cancellation);
+                        log.Write(string.Join(Environment.NewLine, src.References.Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")), cancellation: cancellation);
                     }
                 }
                 catch { }
