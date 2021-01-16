@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Generators
             MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
             TypeResolutionStrategy.AssemblyName,
             TypeResolutionStrategy.Type,
-            MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<TInterface, TInterceptor>))
+            MetadataTypeInfo.CreateFrom(GetType())
         );
 
         /// <summary>

@@ -44,7 +44,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public Type GeneratorType { get; }
 
-        public EmbeddedTypeResolutionStrategy(Type generatorType) => ShouldUse = FEmbeddedTypes.ContainsKey(GeneratorType = generatorType);
+        public EmbeddedTypeResolutionStrategy(Type generatorType) =>
+            //
+            // Ez jol kezeli azt az esetet ha az EmbedGeneratedTypeAttribute a szerelvenyen van de a
+            // forras nem lett bovitve forditaskor (pl VB-ben irtuk a kodunkat).
+            //
+
+            ShouldUse = FEmbeddedTypes.ContainsKey(GeneratorType = generatorType);
 
         public OutputType Type { get; } = OutputType.Unit;
 
