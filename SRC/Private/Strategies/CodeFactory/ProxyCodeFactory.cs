@@ -33,7 +33,8 @@ namespace Solti.Utils.Proxy.Internals
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(interceptor, compilation),
                     compilation.AssemblyName!,
-                    OutputType.Unit
+                    OutputType.Unit,
+                    SymbolTypeInfo.CreateFrom(generator, compilation)
                 );
 
                 result = unitSyntaxFactory.GetSourceCode(context.CancellationToken);

@@ -135,5 +135,10 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         protected internal TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
+
+        protected internal TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
+        (
+            CreateType(type)
+        );
     }
 }

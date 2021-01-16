@@ -1,20 +1,18 @@
 ﻿/********************************************************************************
-* ITypeResolutionStrategy.cs                                                    *
+* RelatedGeneratorAttribute.cs                                                  *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public interface ITypeResolutionStrategy
+    public sealed class RelatedGeneratorAttribute: Attribute
     {
-        OutputType Type { get; }
-        Type GeneratorType { get; }
-        string AssemblyName { get; }
-        bool ShouldUse { get; }
-        Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation = default);
+        public Type Generator { get; }
+
+        public RelatedGeneratorAttribute(Type generator) => Generator = generator ?? throw new ArgumentNullException(nameof(generator));
     }
 }

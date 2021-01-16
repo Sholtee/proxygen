@@ -13,22 +13,18 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
-
     internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolutionStrategy
     {
-        public RuntimeCompiledTypeResolutionStrategy(ITypeGenerator generator) => Generator = generator;
+        public RuntimeCompiledTypeResolutionStrategy(Type generatorType) => GeneratorType = generatorType;
 
         public string? CacheDir { get; internal set; } = WorkingDirectories.AssemblyCacheDir; // tesztek miatt van setter
 
-        public ITypeGenerator Generator { get; }
+        public Type GeneratorType { get; }
 
         public OutputType Type { get; } = OutputType.Module; 
 
-        public Type Resolve(CancellationToken cancellation)
+        public Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation)
         {
-            IUnitSyntaxFactory syntaxFactory = Generator.SyntaxFactory;
-
             string? cacheFile = null;
 
             if (!string.IsNullOrEmpty(CacheDir))
@@ -69,8 +65,8 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(Generator).ShouldUse;
+        public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(GeneratorType).ShouldUse;
 
-        public string AssemblyName => $"Generated_{MetadataTypeInfo.CreateFrom(Generator.GetType()).GetMD5HashCode()}";
+        public string AssemblyName => $"Generated_{MetadataTypeInfo.CreateFrom(GeneratorType).GetMD5HashCode()}";
     }
 }

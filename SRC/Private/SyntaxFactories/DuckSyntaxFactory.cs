@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, IAssemblyInfo thisAsm, string assemblyName, OutputType outputType): base(outputType) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, IAssemblyInfo thisAsm, string assemblyName, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, relatedGenerator) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
             return base.BuildMembers(cancellation);
         }
 
-        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        protected override ClassDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
             ClassDeclarationSyntax cls = ClassDeclaration
             (

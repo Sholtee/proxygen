@@ -26,6 +26,8 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type? FType;
 
+        private Type ResolveType(CancellationToken cancellation) => TypeResolutionStrategy.Resolve(SyntaxFactory, cancellation);
+
         private static Type GetGeneratedType(CancellationToken cancellation)
         {
             TDescendant self;
@@ -43,7 +45,7 @@ namespace Solti.Utils.Proxy.Abstractions
                 throw ex.InnerException;
             }
 
-            return self.TypeResolutionStrategy.Resolve(cancellation);
+            return self.ResolveType(cancellation);
         }
         #endregion
 
@@ -53,8 +55,8 @@ namespace Solti.Utils.Proxy.Abstractions
         /// </summary>
         protected TypeGenerator() => TypeResolutionStrategy = new ITypeResolutionStrategy[]
         {
-            new RuntimeCompiledTypeResolutionStrategy(this),
-            new EmbeddedTypeResolutionStrategy(this)
+            new RuntimeCompiledTypeResolutionStrategy(typeof(TDescendant)),
+            new EmbeddedTypeResolutionStrategy(typeof(TDescendant))
         }.Single(strat => strat.ShouldUse);
 
         /// <summary>

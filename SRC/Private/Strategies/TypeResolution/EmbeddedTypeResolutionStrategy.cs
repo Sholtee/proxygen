@@ -12,44 +12,46 @@ using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
-    using Attributes;
-
     internal sealed class EmbeddedTypeResolutionStrategy : ITypeResolutionStrategy
     {
-        private static readonly ConcurrentDictionary<Type, Assembly> FGenerators = new ConcurrentDictionary<Type, Assembly>();
+        private static readonly ConcurrentDictionary<Type, Type> FEmbeddedTypes = new ConcurrentDictionary<Type, Type>();
 
         //
         // Az osszes ProxyGen-t hivatkozo szerelvenyt megvizsgaljuk betolteskor (nyilvan 
-        // mind ezutan a szerelveny utan toltodnek be). Ez a modszer addig mukodik amig
-        // a EmbedGeneratedTypeAttribute ebben a szerelvenyben talalhato.
+        // mind ezutan a szerelveny utan toltodnek be).
         //
 
         [ModuleInitializer]
         public static void ModuleInit() => AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => 
         {
-            foreach (EmbedGeneratedTypeAttribute egta in args.LoadedAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>())
+            var embeddedTypes =
+            (
+                from embeddedType in args.LoadedAssembly.GetTypes()
+                let rga = embeddedType.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)
+                where rga is not null
+                select new 
+                {
+                    EmbeddedType = embeddedType,
+                    RelatedGenerator = rga
+                }
+            );
+
+            foreach (var t in embeddedTypes)
             {
-                FGenerators.TryAdd(egta.Generator, args.LoadedAssembly);
+                FEmbeddedTypes.TryAdd(t.RelatedGenerator.Generator, t.EmbeddedType);
             }
         };
 
-        public ITypeGenerator Generator { get; }
+        public Type GeneratorType { get; }
 
-        public EmbeddedTypeResolutionStrategy(ITypeGenerator generator) => Generator = generator;
+        public EmbeddedTypeResolutionStrategy(Type generatorType) => ShouldUse = FEmbeddedTypes.ContainsKey(GeneratorType = generatorType);
 
         public OutputType Type { get; } = OutputType.Unit;
 
-        public Type Resolve(CancellationToken cancellation) => FGenerators[Generator.GetType()].GetType
-        (
-            Generator.SyntaxFactory.DefinedClasses.Single(), 
-            throwOnError: true
-        );
+        public Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation) => FEmbeddedTypes[GeneratorType];
 
-        public bool ShouldUse => FGenerators.ContainsKey(Generator.GetType());
+        public bool ShouldUse { get; }
 
-        public string AssemblyName => FGenerators[Generator.GetType()]
-            .GetName()
-            .Name;
+        public string AssemblyName => FEmbeddedTypes[GeneratorType].Assembly.GetName().Name;
     }
 }

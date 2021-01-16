@@ -482,7 +482,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 File.Delete(cacheFile);
 
             ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = tmpDir;
-            generator.TypeResolutionStrategy.Resolve();
+            generator.TypeResolutionStrategy.Resolve(generator.SyntaxFactory);
 
             Assert.That(File.Exists(cacheFile));               
         }
@@ -499,7 +499,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                     $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
 
             ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = cacheDir;
-            Type gt = generator.TypeResolutionStrategy.Resolve();
+            Type gt = generator.TypeResolutionStrategy.Resolve(generator.SyntaxFactory);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

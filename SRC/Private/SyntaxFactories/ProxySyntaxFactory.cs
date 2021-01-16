@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string AssemblyName { get; }
 
-        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string assemblyName, OutputType outputType): base(outputType) 
+        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string assemblyName, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, relatedGenerator) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -77,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
             return base.BuildMembers(cancellation);
         }
 
-        protected override MemberDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        protected override ClassDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
             ClassDeclarationSyntax cls = ClassDeclaration
             (
