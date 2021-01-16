@@ -1284,25 +1284,25 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.AssemblyName
   nameWithType: ITypeResolutionStrategy.AssemblyName
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator
-  name: Generator
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Generator
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator
-  nameWithType: ITypeResolutionStrategy.Generator
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator*
-  name: Generator
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Generator_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator
+- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  name: GeneratorType
+  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  nameWithType: ITypeResolutionStrategy.GeneratorType
+- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType*
+  name: GeneratorType
+  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Generator
-  nameWithType: ITypeResolutionStrategy.Generator
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
-  name: Resolve(CancellationToken)
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
-  nameWithType: ITypeResolutionStrategy.Resolve(CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  nameWithType: ITypeResolutionStrategy.GeneratorType
+- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(Solti.Utils.Proxy.Internals.IUnitSyntaxFactory,System.Threading.CancellationToken)
+  name: Resolve(IUnitSyntaxFactory, CancellationToken)
+  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_Solti_Utils_Proxy_Internals_IUnitSyntaxFactory_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(Solti.Utils.Proxy.Internals.IUnitSyntaxFactory,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(Solti.Utils.Proxy.Internals.IUnitSyntaxFactory, System.Threading.CancellationToken)
+  nameWithType: ITypeResolutionStrategy.Resolve(IUnitSyntaxFactory, CancellationToken)
 - uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve*
   name: Resolve
   href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_
@@ -1510,6 +1510,38 @@ references:
   commentId: F:Solti.Utils.Proxy.Internals.RefType.Pointer
   fullName: Solti.Utils.Proxy.Internals.RefType.Pointer
   nameWithType: RefType.Pointer
+- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
+  name: RelatedGeneratorAttribute
+  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html
+  commentId: T:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
+  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
+  nameWithType: RelatedGeneratorAttribute
+- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor(System.Type)
+  name: RelatedGeneratorAttribute(Type)
+  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute__ctor_System_Type_
+  commentId: M:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor(System.Type)
+  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.RelatedGeneratorAttribute(System.Type)
+  nameWithType: RelatedGeneratorAttribute.RelatedGeneratorAttribute(Type)
+- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor*
+  name: RelatedGeneratorAttribute
+  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.RelatedGeneratorAttribute
+  nameWithType: RelatedGeneratorAttribute.RelatedGeneratorAttribute
+- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
+  name: Generator
+  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute_Generator
+  commentId: P:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
+  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
+  nameWithType: RelatedGeneratorAttribute.Generator
+- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator*
+  name: Generator
+  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute_Generator_
+  commentId: Overload:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
+  nameWithType: RelatedGeneratorAttribute.Generator
 - uid: Solti.Utils.Proxy.Internals.SourceCode
   name: SourceCode
   href: Solti.Utils.Proxy.Internals.SourceCode.html
