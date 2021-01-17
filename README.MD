@@ -91,12 +91,13 @@ You can do it easily by creating a template file named `runtimeconfig.template.j
 }
 ```
 ## Embedding the generated type
-This library can be used as a [source generator](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/ ) so you can embed the generated proxy type into the assembly that uses it. Since all the time consumig operations happen in compile time this feature can singificantly improve the performance. To enable:
+This library can be used as a [source generator](https://devblogs.microsoft.com/dotnet/introducing-c-source-generators/ ) so you can embed the generated proxy type into the assembly that uses it. This is simply done by the `Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute`:
+```csharp
+[assembly: EmbedGeneratedType(typeof(ProxyGenerator<IMyInterface, MyInterceptor<IMyInterface>>))]
+[assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyClass>))]
 
-1. Reference this library as a source generator: *TODO*
-2. Use the `Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute` to select proxies to be embedded: `[assembly: EmbedGeneratedType(typeof(ProxyGenerator<IMyInterface, MyInterceptor<IMyInterface>>))]` or `[assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyClass>))]`
-
-Note that open generics are not supported.
+```
+Since all the time consumig operations happen in compile time this feature can singificantly improve the performance. Note that open generics are not supported.
 ## Inspecting the generated code
 *ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable, set the `configProperties.SourceDump` property to the desired directory (note that environment variables are supported):
 ```json

@@ -42,9 +42,9 @@
   - *fixed:* Missing reference error
 - 3.1.3:
   - *done:* Reduced reference count in the generated assembly
-- 3.1.4
+- 3.1.4:
   - *fixed:* Possible stack overflow
-- 4.0.0-preview1
+- 4.0.0-preview1:
   - *breaking:* New `Interfaceinterceptor` layout (though it affects the internal parts only)
   - *breaking:* Removed `TypeGenerator.References` property
   - *breaking:* New `ISyntaxFactory` layout
@@ -53,7 +53,7 @@
   - *improved:* Generated code
   - *done:* Enhanced emit process
   - *done:* Interceptors can modify *event* and *property* arguments
-- 4.0.0-preview2
+- 4.0.0-preview2:
   - *breaking:* Removed `TypeGenerator.GeneratedType[Async]` property. It is substituted by the `GetGeneratedType[Async]()` method
   - *breaking:* Assembly cache directory can be set from `appname.runtimeconfig.json`
   - *introduced:* Proxy embedding
@@ -64,4 +64,7 @@
   - *improved:* Generated code
   - *improved:* Visibility check
   - *fixed:* `InterfaceInterceptor.InvokeTarget` cleanup after invocation
-  
+- 4.0.0-preview3:
+  - *breaking:* Removed `TypeGenerator.SyntaxFactory` property (syntax factories are intended to be private)
+  - *done:* Register *ProxyGen* as an analyzer
+  - *fixed:* Missing dependencies (in `Solti.Utils.Proxy.deps.json`)
