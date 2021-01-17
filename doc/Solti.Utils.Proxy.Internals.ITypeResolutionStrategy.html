@@ -42,7 +42,8 @@
   
   <h1 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy" class="text-break">Interface ITypeResolutionStrategy
   </h1>
-  <div class="markdown level0 summary"></div>
+  <div class="markdown level0 summary"><p>Represents the method how the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> will be resolved.</p>
+</div>
   <div class="markdown level0 conceptual"></div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
@@ -52,9 +53,34 @@
   </div>
   <h3 id="properties">Properties
   </h3>
+  <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName">ClassName</h4>
+  <div class="markdown level1 summary"><p>The fully qualified name of the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">string ClassName { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly">ContainingAssembly</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>The name of the <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.assembly">Assembly</a> that contains the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -77,7 +103,8 @@
   </table>
   <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType">GeneratorType</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>The related <a class="xref" href="Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html">TypeGenerator&lt;TDescendant&gt;</a> descendant.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -100,7 +127,8 @@
   </table>
   <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ShouldUse_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ShouldUse" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse">ShouldUse</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Returns true if the strategy should be used.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
@@ -125,7 +153,8 @@
   </h3>
   <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)">Resolve(CancellationToken)</h4>
-  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 summary"><p>Resolves the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">

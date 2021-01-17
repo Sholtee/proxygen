@@ -384,6 +384,19 @@ references:
   commentId: T:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
   fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
   nameWithType: ITypeResolutionStrategy
+- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  name: ClassName
+  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  nameWithType: ITypeResolutionStrategy.ClassName
+- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName*
+  name: ClassName
+  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  nameWithType: ITypeResolutionStrategy.ClassName
 - uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
   name: ContainingAssembly
   href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly
