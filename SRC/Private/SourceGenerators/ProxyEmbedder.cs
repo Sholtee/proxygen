@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        internal static void ReportDiagnosticAndLog(GeneratorExecutionContext context, Exception ex, Location location, CancellationToken cancellation) => ReportDiagnostic
+        internal static void ReportError(GeneratorExecutionContext context, Exception ex, Location location, CancellationToken cancellation) => ReportDiagnostic
         (
             context,
             "PGE01", 
@@ -167,7 +167,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
                 catch (Exception e)
                 {
-                    ReportDiagnosticAndLog
+                    ReportError
                     (
                         context, 
                         e, 
