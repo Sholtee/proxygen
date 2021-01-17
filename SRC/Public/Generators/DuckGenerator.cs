@@ -5,7 +5,6 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Generators
 {
-    using Abstractions;
     using Internals;
 
     /// <summary>

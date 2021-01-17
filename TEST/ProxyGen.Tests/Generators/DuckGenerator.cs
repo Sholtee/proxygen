@@ -19,7 +19,6 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
-    using Abstractions;
     using Internals;
 
     [TestFixture]

@@ -17,7 +17,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
     using Properties;
 
     internal abstract class ClassSyntaxFactory : SyntaxFactoryBase, IUnitSyntaxFactory

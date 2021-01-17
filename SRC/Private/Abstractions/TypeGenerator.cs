@@ -10,10 +10,8 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Solti.Utils.Proxy.Abstractions
+namespace Solti.Utils.Proxy.Internals
 {
-    using Internals;
-
     /// <summary>
     /// Implements the <see cref="ITypeGenerator"/> interface.
     /// </summary>

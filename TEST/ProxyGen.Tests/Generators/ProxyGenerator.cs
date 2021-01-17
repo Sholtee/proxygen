@@ -18,7 +18,6 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
-    using Abstractions;
     using Generators;
     using Internals;
     using Primitives;

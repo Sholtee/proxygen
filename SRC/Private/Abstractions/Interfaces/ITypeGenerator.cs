@@ -5,10 +5,8 @@
 ********************************************************************************/
 using System;
 
-namespace Solti.Utils.Proxy.Abstractions
+namespace Solti.Utils.Proxy.Internals
 {
-    using Internals;
-
     /// <summary>
     /// Describes a type generator.
     /// </summary>

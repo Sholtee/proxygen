@@ -7,7 +7,7 @@ using System;
 
 namespace Solti.Utils.Proxy.Attributes
 {
-    using Abstractions;
+    using Internals;
     using Properties;
 
     /// <summary>

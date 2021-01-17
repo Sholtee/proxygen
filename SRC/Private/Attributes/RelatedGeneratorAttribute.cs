@@ -7,8 +7,6 @@ using System;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
-
     /// <summary>
     /// Binds the related <see cref="TypeGenerator{TDescendant}"/> descendant to the generated proxy <see cref="Type"/>.
     /// </summary>

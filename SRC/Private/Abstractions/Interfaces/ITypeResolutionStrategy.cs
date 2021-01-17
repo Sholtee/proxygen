@@ -9,8 +9,6 @@ using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Abstractions;
-
     /// <summary>
     /// Represents the method how the generated <see cref="Type"/> will be resolved.
     /// </summary>
