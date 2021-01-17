@@ -61,6 +61,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type embedding is supported only in C# compilations..
+        /// </summary>
+        internal static string LNG_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("LNG_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {0} is not a generator.
         /// </summary>
         internal static string NOT_A_GENERATOR {

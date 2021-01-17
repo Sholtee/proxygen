@@ -14,6 +14,7 @@ using System.Text.RegularExpressions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.VisualBasic;
 
 using NUnit.Framework;
 
@@ -52,13 +53,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void CreateDiagnosticAndLog_ShouldCreateALogFileForTheGivenException() 
+        public void LogException_ShouldCreateALogFileForTheGivenException() 
         {
-            Diagnostic diag = ProxyEmbedder.CreateDiagnosticAndLog(new InvalidOperationException(), Location.None, default);
+            string logFile = ProxyEmbedder.LogException(new Exception(), default);
 
-            string path = Regex.Match(diag.ToString(), "Details stored in: ([\\w\\\\\\/ -:]+)$").Groups[1].Value;
-
-            Assert.That(File.Exists(path));
+            Assert.That(File.Exists(logFile));
         }
 
         [TestCase
@@ -173,7 +172,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void Execute_ShouldCreateDiagnosticOnError() 
+        public void Execute_ShouldReportDiagnosticOnError() 
         {
             Compilation compilation = CreateCompilation
             (
@@ -195,8 +194,46 @@ namespace Solti.Utils.Proxy.Internals.Tests
             GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
-            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))), Is.EqualTo(1));
+            Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))));
+            Assert.That(diags.Length, Is.EqualTo(1));
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void Execute_ShouldWarnOnNonCSharCompilation() 
+        {
+            Compilation compilation = VisualBasicCompilation.Create
+            (
+                "cica",
+                new[]
+                {
+                    VisualBasicSyntaxTree.ParseText
+                    (
+                        @"
+                        Imports System.Collections
+
+                        Imports Solti.Utils.Proxy
+                        Imports Solti.Utils.Proxy.Attributes
+                        Imports Solti.Utils.Proxy.Generators
+
+                        <Assembly:EmbedGeneratedType(GetType(DuckGenerator(Of IEnumerable, IEnumerable)))>
+                        "
+                    )
+                },
+                Runtime
+                    .Assemblies
+                    .Select(asm => asm.Location)
+                    .Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
+                    .Distinct()
+                    .Select(location => MetadataReference.CreateFromFile(location)),
+                new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+            );
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Any(diag => diag.Id == "PGE00" && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage() == SGResources.LNG_NOT_SUPPORTED));
+            Assert.That(diags.Length, Is.EqualTo(1));
         }
 
         private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");

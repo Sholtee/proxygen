@@ -29,21 +29,20 @@ namespace Solti.Utils.Proxy.Internals
             .Select(attr => attr.ConstructorArguments.Single().Value)
             .Cast<INamedTypeSymbol>();
 
-        internal static Diagnostic CreateDiagnosticAndLog(Exception ex, Location location, CancellationToken cancellation) 
-        {
-            string? logFile = null;
+        //
+        // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
+        // a Roslyn szamara is), ezert a primitiv naplozas.
+        //
 
+        internal static string? LogException(Exception ex, CancellationToken cancellation)
+        {
             try
             {
-                logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
+                string logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using StreamWriter log = File.CreateText(logFile);
                 log.AutoFlush = true;
 
-                //
-                // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
-                // a Roslyn szamara is), ezert a primitiv naplozas.
-                //
 
                 for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
@@ -55,29 +54,38 @@ namespace Solti.Utils.Proxy.Internals
                         log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation: cancellation);
                     }
                 }
-            }
-            catch { }
 
-            return CreateDiagnostic
-            (
-                "PGE00", 
-                SGResources.TE_FAILED, 
-                string.Format
-                (
-                    SGResources.Culture, 
-                    SGResources.TE_FAILED_FULL, 
-                    ex.Message, 
-                    logFile ?? "NULL"
-                ), 
-                location, 
-                DiagnosticSeverity.Warning
-            );
+                return logFile;
+            }
+            catch 
+            {
+                return null;
+            }
         }
 
-        internal static Diagnostic CreateDiagnostic(string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => Diagnostic.Create
+        internal static void ReportDiagnosticAndLog(GeneratorExecutionContext context, Exception ex, Location location, CancellationToken cancellation) => ReportDiagnostic
         (
-            new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, severity, true),
-            location
+            context,
+            "PGE01", 
+            SGResources.TE_FAILED, 
+            string.Format
+            (
+                SGResources.Culture, 
+                SGResources.TE_FAILED_FULL, 
+                ex.Message,
+                LogException(ex, cancellation) ?? "NULL"
+            ), 
+            location, 
+            DiagnosticSeverity.Warning
+        );
+
+        internal static void ReportDiagnostic(GeneratorExecutionContext context, string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => context.ReportDiagnostic
+        (
+            Diagnostic.Create
+            (
+                new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, severity, true),
+                location
+            )         
         );
 
         public void Initialize(GeneratorInitializationContext context)
@@ -92,16 +100,29 @@ namespace Solti.Utils.Proxy.Internals
 
         public void Execute(GeneratorExecutionContext context)
         {
+            Compilation compilation = context.Compilation;
+
+            IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
+
             //
             // Csak C#-t tamogatjuk
             //
 
-            if (context.ParseOptions.Language != CSharpParseOptions.Default.Language)
+            if (context.Compilation.Language != CSharpParseOptions.Default.Language)
+            {
+                if (aotGenerators.Any()) ReportDiagnostic
+                (
+                    context,
+                    "PGE00",
+                    SGResources.LNG_NOT_SUPPORTED,
+                    SGResources.LNG_NOT_SUPPORTED,
+                    Location.None,
+                    DiagnosticSeverity.Warning
+                );
                 return;
-
-            Compilation compilation = context.Compilation;
-
-            foreach (INamedTypeSymbol generator in GetAOTGenerators(compilation))
+            }
+            
+            foreach (INamedTypeSymbol generator in aotGenerators)
             {
                 try
                 {
@@ -125,21 +146,19 @@ namespace Solti.Utils.Proxy.Internals
                             source.Value
                         );
 
-                        context.ReportDiagnostic
+                        ReportDiagnostic
                         (
-                            CreateDiagnostic
+                            context,
+                            "PGI00",
+                            SGResources.SRC_EXTENDED,
+                            string.Format
                             (
-                                "PGI00",
-                                SGResources.SRC_EXTENDED,
-                                string.Format
-                                (
-                                    SGResources.Culture,
-                                    SGResources.SRC_EXTENDED_FULL,
-                                    source.Hint
-                                ),
-                                generator.Locations.Single(),
-                                DiagnosticSeverity.Info
-                            )
+                                SGResources.Culture,
+                                SGResources.SRC_EXTENDED_FULL,
+                                source.Hint
+                            ),
+                            generator.Locations.Single(),
+                            DiagnosticSeverity.Info
                         );
                     }
                 }
@@ -149,9 +168,12 @@ namespace Solti.Utils.Proxy.Internals
                 }
                 catch (Exception e)
                 {
-                    context.ReportDiagnostic
+                    ReportDiagnosticAndLog
                     (
-                        CreateDiagnosticAndLog(e, generator.Locations.Single(), context.CancellationToken)
+                        context, 
+                        e, 
+                        generator.Locations.Single(),
+                        context.CancellationToken
                     );
                 }
             }
