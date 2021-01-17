@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
                     Visibility.Check
                     (
                         targetProperty, 
-                        Context.AssemblyName, 
+                        Context.ContainingAssembly, 
                         checkGet: ifaceProperty.GetMethod is not null, 
                         checkSet: ifaceProperty.SetMethod is not null
                     );

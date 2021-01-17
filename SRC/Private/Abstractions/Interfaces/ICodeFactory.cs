@@ -9,8 +9,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public interface ICodeFactory
+    internal interface ICodeFactory
     {
         bool ShouldUse(INamedTypeSymbol generator);
         IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);

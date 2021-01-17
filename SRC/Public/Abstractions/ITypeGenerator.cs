@@ -15,11 +15,6 @@ namespace Solti.Utils.Proxy.Abstractions
     public interface ITypeGenerator
     {
         /// <summary>
-        /// The factory that provides the class definition(s).
-        /// </summary>
-        IUnitSyntaxFactory SyntaxFactory { get; }
-
-        /// <summary>
         /// The resolution strategy used to resolve the generated <see cref="Type"/>.
         /// </summary>
         ITypeResolutionStrategy TypeResolutionStrategy { get; }

@@ -11,10 +11,9 @@ namespace Solti.Utils.Proxy.Internals
     #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     public interface ITypeResolutionStrategy
     {
-        OutputType Type { get; }
         Type GeneratorType { get; }
-        string AssemblyName { get; }
+        string ContainingAssembly { get; }
         bool ShouldUse { get; }
-        Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation = default);
+        Type Resolve(CancellationToken cancellation = default);
     }
 }

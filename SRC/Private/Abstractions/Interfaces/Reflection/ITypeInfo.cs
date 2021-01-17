@@ -7,8 +7,7 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public interface ITypeInfo: IHasName
+    internal interface ITypeInfo: IHasName
     {
         IAssemblyInfo? DeclaringAssembly { get; }
         bool IsVoid { get; }
@@ -53,9 +52,9 @@ namespace Solti.Utils.Proxy.Internals
         IReadOnlyList<IConstructorInfo> Constructors { get; }
     }
 
-    public interface IGenericTypeInfo : ITypeInfo, IGeneric { }
+    internal interface IGenericTypeInfo : ITypeInfo, IGeneric { }
 
-    public interface IArrayTypeInfo : ITypeInfo
+    internal interface IArrayTypeInfo : ITypeInfo
     {
         int Rank { get; }
     }

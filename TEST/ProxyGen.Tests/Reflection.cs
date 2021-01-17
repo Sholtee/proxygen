@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.False(set.Add(MetadataTypeInfo.CreateFrom(typeof(object))));
         }
 
-        public static IEnumerable<IAssemblyInfo> FriendAsms 
+        public static IEnumerable<object> FriendAsms 
         {
             get 
             {
@@ -47,8 +47,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [TestCaseSource(nameof(FriendAsms))]
-        public void AssemblyInfo_FriendshipTest(IAssemblyInfo asm) =>
-            Assert.That(asm.IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
+        public void AssemblyInfo_FriendshipTest(object asm) =>
+            Assert.That(((IAssemblyInfo) asm).IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
         [Test]
         public void TypeInfo_AbstractionTest([Values(
@@ -333,7 +333,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             internal void Foo() { }
         }
 
-        public static IEnumerable<ITypeInfo> Generics
+        public static IEnumerable<object> Generics
         {
             get
             {
@@ -346,8 +346,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [TestCaseSource(nameof(Generics))]
-        public void GenericTypeInfo_CanBeSpecialized(IGenericTypeInfo type)
+        public void GenericTypeInfo_CanBeSpecialized(object t)
         {
+            IGenericTypeInfo type = (IGenericTypeInfo) t;
+
             Assert.DoesNotThrow(() => type = (IGenericTypeInfo) type.Close(MetadataTypeInfo.CreateFrom(typeof(string))));
             Assert.That(type.FullName, Is.EqualTo("System.Collections.Generic.List`1"));
             Assert.That(type.GenericArguments.Single().FullName, Is.EqualTo("System.String"));

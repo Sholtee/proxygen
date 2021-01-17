@@ -24,21 +24,21 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseType { get; }
 
-        public override string AssemblyName { get; }
-
         public override string ClassName { get; }
 
         public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
 
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, IAssemblyInfo thisAsm, string assemblyName, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, relatedGenerator) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, containingAssembly, relatedGenerator) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-            BaseType = (ITypeInfo) ((IGenericTypeInfo) thisAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
-            AssemblyName = assemblyName;
+            BaseType = (ITypeInfo) 
+            (
+                (IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!
+            ).Close(targetType);
             ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[]
@@ -52,8 +52,8 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
         {
-            Visibility.Check(InterfaceType, AssemblyName);
-            Visibility.Check(TargetType, AssemblyName);
+            Visibility.Check(InterfaceType, ContainingAssembly);
+            Visibility.Check(TargetType, ContainingAssembly);
 
             return base.BuildMembers(cancellation);
         }

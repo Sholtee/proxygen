@@ -234,14 +234,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
+            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
             ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = tmpDir;
 
-            generator.TypeResolutionStrategy.Resolve(generator.SyntaxFactory);
+            generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -253,11 +253,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                cacheFile = Path.Combine(cacheDir, $"{generator.TypeResolutionStrategy.AssemblyName}.dll");
+                cacheFile = Path.Combine(cacheDir, $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
          
             ((RuntimeCompiledTypeResolutionStrategy) generator.TypeResolutionStrategy).CacheDir = cacheDir;
 
-            Type gt = generator.TypeResolutionStrategy.Resolve(generator.SyntaxFactory);
+            Type gt = generator.TypeResolutionStrategy.Resolve();
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

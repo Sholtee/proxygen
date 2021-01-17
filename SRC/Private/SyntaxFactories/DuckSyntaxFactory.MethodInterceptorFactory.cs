@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
                     // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
                     //
 
-                    Visibility.Check(targetMethod, Context.AssemblyName);
+                    Visibility.Check(targetMethod, Context.ContainingAssembly);
 
                     //
                     // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok

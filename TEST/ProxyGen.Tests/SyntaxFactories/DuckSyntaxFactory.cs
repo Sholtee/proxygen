@@ -16,6 +16,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
+    using Generators;
     using Internals;
     using Properties;
 
@@ -53,11 +54,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private static DuckSyntaxFactory CreateGenerator<TInterface, TTarget>(string asm = null) where TInterface: class => new DuckSyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)), 
-            MetadataTypeInfo.CreateFrom(typeof(TTarget)), 
-            MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly), 
+            MetadataTypeInfo.CreateFrom(typeof(TTarget)),
             asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name,
             OutputType.Module, 
-            MetadataTypeInfo.CreateFrom(typeof(void))
+            MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>))
         );
 
         [Test]
@@ -143,12 +143,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.Throws<AmbiguousMatchException>(() => new DuckSyntaxFactory.PropertyInterceptorFactory(CreateGenerator<IList<int>, List<int>>()).Build(default));
+            Assert.Throws<AmbiguousMatchException>(() => new PropertyInterceptorFactory(CreateGenerator<IList<int>, List<int>>()).Build(default));
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [Test]
-        public void GenerateDuckClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType)
+        public void GenerateDuckClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType)
         {
             Assembly[] refs = type
                 .Assembly
@@ -166,8 +166,31 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
             IUnitSyntaxFactory
-                fact1 = new DuckSyntaxFactory(type1, type1, MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly), "cica", outputType, MetadataTypeInfo.CreateFrom(typeof(void))),
-                fact2 = new DuckSyntaxFactory(type2, type2, SymbolAssemblyInfo.CreateFrom(compilation.GetAssemblyByLocation(typeof(DuckBase<>).Assembly.Location), compilation), "cica", outputType, SymbolTypeInfo.CreateFrom(compilation.GetSpecialType(SpecialType.System_Void), compilation));
+                fact1 = new DuckSyntaxFactory
+                (
+                    type1, 
+                    type1, 
+                    "cica", 
+                    (OutputType) outputType, 
+                    MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<,>).MakeGenericType(type, type))
+                ),
+                fact2 = new DuckSyntaxFactory
+                (
+                    type2, 
+                    type2, 
+                    "cica", 
+                    (OutputType) outputType, 
+                    SymbolTypeInfo.CreateFrom
+                    (
+                        compilation
+                            .GetTypeByMetadataName(typeof(DuckGenerator<,>).FullName).Construct
+                            (
+                                SymbolTypeInfo.TypeInfoToSymbol(type2, compilation), 
+                                SymbolTypeInfo.TypeInfoToSymbol(type2, compilation)
+                            ), 
+                        compilation
+                    )
+                );
 
             Assert.DoesNotThrow(() => fact1.Build());
             Assert.DoesNotThrow(() => fact2.Build());
@@ -181,13 +204,23 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
         }
 
-        public static IEnumerable<ISyntaxFactory> Factories
+        public static IEnumerable<object> Factories
         {
             get
             {
                 ITypeInfo iface = MetadataTypeInfo.CreateFrom(typeof(IComplex));
 
-                var fact = new DuckSyntaxFactory(iface, iface, MetadataAssemblyInfo.CreateFrom(typeof(DuckBase<>).Assembly), "cica", OutputType.Module, MetadataTypeInfo.CreateFrom(typeof(void)));
+                var fact = new DuckSyntaxFactory
+                (
+                    iface, 
+                    iface, 
+                    "cica", 
+                    OutputType.Module, 
+                    MetadataTypeInfo.CreateFrom
+                    (
+                        typeof(DuckGenerator<,>).MakeGenericType(typeof(IComplex), typeof(IComplex))
+                    )
+                );
 
                 yield return new ConstructorFactory(fact);
                 yield return new MethodInterceptorFactory(fact);
@@ -197,8 +230,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [TestCaseSource(nameof(Factories))]
-        public void Factory_CanBeCancelled(ISyntaxFactory fact)
+        public void Factory_CanBeCancelled(object f)
         {
+            ISyntaxFactory fact = (ISyntaxFactory) f;
+
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {
                 cancellation.Cancel();

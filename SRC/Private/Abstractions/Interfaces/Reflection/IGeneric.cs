@@ -7,8 +7,7 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public interface IGeneric 
+    internal interface IGeneric 
     {
         /// <summary>
         /// Returns true for unbound generics false otherwise.

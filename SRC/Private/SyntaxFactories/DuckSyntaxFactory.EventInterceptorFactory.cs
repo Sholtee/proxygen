@@ -40,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
                     Visibility.Check
                     (
                         targetEvt, 
-                        Context.AssemblyName, 
+                        Context.ContainingAssembly, 
                         checkAdd: ifaceEvt.AddMethod is not null, 
                         checkRemove: ifaceEvt.RemoveMethod is not null
                     );

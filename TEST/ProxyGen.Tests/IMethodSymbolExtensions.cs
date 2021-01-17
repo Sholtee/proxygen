@@ -19,8 +19,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase("Bar", AccessModifiers.Explicit)]
         [TestCase("Baz", AccessModifiers.Public)]
         [TestCase("FooBar", AccessModifiers.Internal)]
-        public void GetAccessModifiers_ShouldReturnTheCorrectAccessModifier(string name, AccessModifiers accessModifiers) 
+        public void GetAccessModifiers_ShouldReturnTheCorrectAccessModifier(string name, int am) 
         {
+            AccessModifiers accessModifiers = (AccessModifiers) am;
+
             CSharpCompilation compilation = CreateCompilation
             (@"
                 interface IInterface 

@@ -15,6 +15,6 @@ namespace Solti.Utils.Proxy.Internals
 
         string ClassName { get; }
 
-        string AssemblyName { get; }
+        string ContainingAssembly { get; }
     }
 }

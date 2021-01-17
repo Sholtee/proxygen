@@ -27,9 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ClassName { get; }
 
-        public override string AssemblyName { get; }
-
-        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string assemblyName, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, relatedGenerator) 
+        public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, containingAssembly, relatedGenerator) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -50,7 +48,6 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
-            AssemblyName = assemblyName;
             ClassName = $"GeneratedClass_{InterceptorType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[] 
@@ -71,8 +68,8 @@ namespace Solti.Utils.Proxy.Internals
             if (InterceptorType.IsAbstract)
                 throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
 
-            Visibility.Check(InterfaceType, AssemblyName);
-            Visibility.Check(InterceptorType, AssemblyName);
+            Visibility.Check(InterfaceType, ContainingAssembly);
+            Visibility.Check(InterceptorType, ContainingAssembly);
 
             return base.BuildMembers(cancellation);
         }

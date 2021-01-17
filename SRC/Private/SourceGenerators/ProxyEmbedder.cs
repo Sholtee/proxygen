@@ -20,9 +20,8 @@ namespace Solti.Utils.Proxy.Internals
     using Attributes;
     using Properties;
 
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     [Generator]
-    public class ProxyEmbedder: ISourceGenerator
+    internal class ProxyEmbedder: ISourceGenerator
     {
         internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) => compilation
             .Assembly

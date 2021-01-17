@@ -15,21 +15,25 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolutionStrategy
     {
-        public RuntimeCompiledTypeResolutionStrategy(Type generatorType) => GeneratorType = generatorType;
+        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ClassSyntaxFactory syntaxFactory)
+        {
+            GeneratorType = generatorType;
+            SyntaxFactory = syntaxFactory;
+        }
 
         public string? CacheDir { get; internal set; } = WorkingDirectories.AssemblyCacheDir; // tesztek miatt van setter
 
+        public ClassSyntaxFactory SyntaxFactory { get; }
+
         public Type GeneratorType { get; }
 
-        public OutputType Type { get; } = OutputType.Module; 
-
-        public Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation)
+        public Type Resolve(CancellationToken cancellation)
         {
             string? cacheFile = null;
 
             if (!string.IsNullOrEmpty(CacheDir))
             {
-                cacheFile = Path.Combine(CacheDir, $"{AssemblyName}.dll");
+                cacheFile = Path.Combine(CacheDir, $"{ContainingAssembly}.dll");
 
                 if (File.Exists(cacheFile)) return ExtractType
                 (
@@ -40,16 +44,16 @@ namespace Solti.Utils.Proxy.Internals
                     Directory.CreateDirectory(CacheDir);
             }
 
-            syntaxFactory.BuildAndDump(cancellation);
+            SyntaxFactory.BuildAndDump(cancellation);
 
             return ExtractType
             (
                  Compile.ToAssembly
                  (
-                     syntaxFactory.Unit!,
-                     AssemblyName,
+                     SyntaxFactory.Unit!,
+                     ContainingAssembly,
                      cacheFile,
-                     syntaxFactory
+                     SyntaxFactory
                         .References
                         .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
                         .ToArray(),
@@ -60,13 +64,13 @@ namespace Solti.Utils.Proxy.Internals
 
             Type ExtractType(Assembly asm) => asm.GetType
             (
-                syntaxFactory.DefinedClasses.Single(), 
+                SyntaxFactory.ClassName, 
                 throwOnError: true
             );
         }
 
         public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(GeneratorType).ShouldUse;
 
-        public string AssemblyName => $"Generated_{MetadataTypeInfo.CreateFrom(GeneratorType).GetMD5HashCode()}";
+        public string ContainingAssembly => SyntaxFactory.ContainingAssembly;
     }
 }

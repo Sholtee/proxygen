@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -16,6 +17,9 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Abstractions;
+    using Properties;
+
     internal abstract class ClassSyntaxFactory : SyntaxFactoryBase, IUnitSyntaxFactory
     {
         #region Private
@@ -51,9 +55,14 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        protected ClassSyntaxFactory(OutputType outputType, ITypeInfo relatedGenerator)
+        protected ClassSyntaxFactory(OutputType outputType, string containingAssembly, ITypeInfo relatedGenerator)
         {
             OutputType = outputType;
+            ContainingAssembly = containingAssembly;
+
+            if (!relatedGenerator.Bases.Any(@base => @base.FullName == typeof(TypeGenerator<>).FullName))
+                throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(relatedGenerator));
+
             RelatedGenerator = relatedGenerator;
         }
         #endregion
@@ -69,7 +78,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public abstract string ClassName { get; }
 
-        public abstract string AssemblyName { get; }
+        public string ContainingAssembly { get; }
 
         public override bool Build(CancellationToken cancellation)
         {

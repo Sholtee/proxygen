@@ -18,6 +18,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
+    using Generators;
     using Internals;
 
     using static Internals.Tests.CodeAnalysisTestsBase;
@@ -48,7 +49,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)), 
             typeof(ProxySyntaxFactoryTests).Assembly.GetName().Name, 
             OutputType.Module,
-            MetadataTypeInfo.CreateFrom(typeof(void))
+            MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<IFoo<int>, FooInterceptor>))
         );
 
         private class NonAbstractProxyMemberSyntaxFactory : ProxyMemberSyntaxFactory
@@ -189,13 +190,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
 
         [Test]
-        public void GenerateProxyClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] OutputType outputType) 
+        public void GenerateProxyClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType) 
         {
             Assembly[] refs = type
                 .Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
                 .Append(type.Assembly)
+                .Append(typeof(InterfaceInterceptor<>).Assembly)
                 .Distinct()
                 .ToArray();
 
@@ -206,11 +208,45 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
 
             IGenericTypeInfo
-                interceptor = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>));
+                interceptor1 = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>)),
+                interceptor2 = (IGenericTypeInfo) SymbolTypeInfo.CreateFrom(compilation.GetTypeByMetadataName(typeof(InterfaceInterceptor<>).FullName), compilation);
 
             IUnitSyntaxFactory
-                fact1 = new ProxySyntaxFactory(type1, (ITypeInfo) interceptor.Close(type1), "cica", outputType, MetadataTypeInfo.CreateFrom(typeof(void))),
-                fact2 = new ProxySyntaxFactory(type2, (ITypeInfo) interceptor.Close(type2), "cica", outputType, SymbolTypeInfo.CreateFrom(compilation.GetSpecialType(SpecialType.System_Void), compilation));
+                fact1 = new ProxySyntaxFactory
+                (
+                    type1, 
+                    (ITypeInfo) interceptor1.Close(type1), 
+                    "cica", 
+                    (OutputType) outputType, 
+                    MetadataTypeInfo.CreateFrom
+                    (
+                        typeof(ProxyGenerator<,>).MakeGenericType
+                        (
+                            type, 
+                            typeof(InterfaceInterceptor<>).MakeGenericType(type)
+                        )
+                    )
+                ),
+                fact2 = new ProxySyntaxFactory
+                (
+                    type2, 
+                    (ITypeInfo) interceptor2.Close(type2), 
+                    "cica", 
+                    (OutputType) outputType, 
+                    SymbolTypeInfo.CreateFrom
+                    (
+                        compilation.GetTypeByMetadataName(typeof(ProxyGenerator<,>).FullName).Construct
+                        (
+                            SymbolTypeInfo.TypeInfoToSymbol(type2, compilation),
+                            SymbolTypeInfo.TypeInfoToSymbol
+                            (
+                                (ITypeInfo) interceptor2.Close(type2), 
+                                compilation
+                            )
+                        ), 
+                        compilation
+                    )
+                );
 
             Assert.DoesNotThrow(() => fact1.Build());
             Assert.DoesNotThrow(() => fact2.Build());
@@ -224,7 +260,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
         }
 
-        public static IEnumerable<ISyntaxFactory> Factories 
+        public static IEnumerable<object> Factories 
         {
             get 
             {
@@ -232,7 +268,17 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     iface = MetadataTypeInfo.CreateFrom(typeof(IComplex)),
                     interceptor = MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IComplex>));
 
-                var fact = new ProxySyntaxFactory(iface, interceptor, "cica", OutputType.Module, MetadataTypeInfo.CreateFrom(typeof(void)));
+                var fact = new ProxySyntaxFactory
+                (
+                    iface, 
+                    interceptor, 
+                    "cica", 
+                    OutputType.Module, 
+                    MetadataTypeInfo.CreateFrom
+                    (
+                        typeof(ProxyGenerator<,>).MakeGenericType(typeof(IComplex), typeof(InterfaceInterceptor<IComplex>))
+                    )
+                );
 
                 yield return new ConstructorFactory(fact);
                 yield return new InvokeFactory(fact);
@@ -243,8 +289,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [TestCaseSource(nameof(Factories))]
-        public void Factory_CanBeCancelled(ISyntaxFactory fact)
+        public void Factory_CanBeCancelled(object f)
         {
+            ISyntaxFactory fact = (ISyntaxFactory) f;
+
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {
                 cancellation.Cancel();

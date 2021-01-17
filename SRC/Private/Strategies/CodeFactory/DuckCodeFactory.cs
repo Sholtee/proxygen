@@ -24,14 +24,6 @@ namespace Solti.Utils.Proxy.Internals
 
             Compilation compilation = context.Compilation;
 
-            //
-            // A ProxyGen szerelvenyenek mindenkepp hivatkozva kell lennie
-            //
-
-            IAssemblySymbol? self = compilation.GetAssemblyByLocation(typeof(DuckCodeFactory).Assembly.Location);
-            if (self is null)
-                yield break;
-
             SourceCode result;
 
             try
@@ -40,7 +32,6 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(target, compilation),
-                    SymbolAssemblyInfo.CreateFrom(self, compilation),
                     compilation.AssemblyName!,
                     OutputType.Unit,
                     SymbolTypeInfo.CreateFrom(generator, compilation)

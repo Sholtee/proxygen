@@ -52,12 +52,10 @@ namespace Solti.Utils.Proxy.Internals
 
             ShouldUse = FEmbeddedTypes.ContainsKey(GeneratorType = generatorType);
 
-        public OutputType Type { get; } = OutputType.Unit;
-
-        public Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation) => FEmbeddedTypes[GeneratorType];
+        public Type Resolve(CancellationToken cancellation) => FEmbeddedTypes[GeneratorType];
 
         public bool ShouldUse { get; }
 
-        public string AssemblyName => FEmbeddedTypes[GeneratorType].Assembly.GetName().Name;
+        public string ContainingAssembly => FEmbeddedTypes[GeneratorType].Assembly.GetName().Name;
     }
 }

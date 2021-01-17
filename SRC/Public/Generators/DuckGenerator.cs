@@ -18,19 +18,22 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="DuckGenerator{TInterface, TTarget}"/> instance
         /// </summary>
-        public DuckGenerator() => SyntaxFactory = new DuckSyntaxFactory
+        public DuckGenerator() : base
         (
-            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-            MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-            MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<,>).Assembly),
-            TypeResolutionStrategy.AssemblyName,
-            TypeResolutionStrategy.Type,
-            MetadataTypeInfo.CreateFrom(GetType())
-        );
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public override IUnitSyntaxFactory SyntaxFactory { get; }
+            new EmbeddedTypeResolutionStrategy(typeof(DuckGenerator<TInterface, TTarget>)),
+            new RuntimeCompiledTypeResolutionStrategy
+            (
+                typeof(DuckGenerator<TInterface, TTarget>),
+                new DuckSyntaxFactory
+                (
+                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                    MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+                    $"Generated_{MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>)).GetMD5HashCode()}",
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>))
+                )
+            )
+        )
+        { }
     }
 }

@@ -26,14 +26,11 @@ namespace Solti.Utils.Proxy.Abstractions
 
         private static Type? FType;
 
-        private Type ResolveType(CancellationToken cancellation) => TypeResolutionStrategy.Resolve(SyntaxFactory, cancellation);
-
         private static Type GetGeneratedType(CancellationToken cancellation)
         {
-            TDescendant self;
             try
             {
-                self = new TDescendant();
+                return new TDescendant().TypeResolutionStrategy.Resolve(cancellation);
             }
 
             //
@@ -44,8 +41,6 @@ namespace Solti.Utils.Proxy.Abstractions
             {
                 throw ex.InnerException;
             }
-
-            return self.ResolveType(cancellation);
         }
         #endregion
 
@@ -53,11 +48,8 @@ namespace Solti.Utils.Proxy.Abstractions
         /// <summary>
         /// Creates a new <see cref="TypeGenerator{TDescendant}"/> instance.
         /// </summary>
-        protected TypeGenerator() => TypeResolutionStrategy = new ITypeResolutionStrategy[]
-        {
-            new RuntimeCompiledTypeResolutionStrategy(typeof(TDescendant)),
-            new EmbeddedTypeResolutionStrategy(typeof(TDescendant))
-        }.Single(strat => strat.ShouldUse);
+        protected TypeGenerator(params ITypeResolutionStrategy[] supportedResolutions) => 
+            TypeResolutionStrategy = supportedResolutions.Single(strat => strat.ShouldUse);
 
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
@@ -92,11 +84,6 @@ namespace Solti.Utils.Proxy.Abstractions
             }
             finally { FLock.Release(); }
         }
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public abstract IUnitSyntaxFactory SyntaxFactory { get; }
 
         /// <summary>
         /// The strategy used to resolve the generated <see cref="Type"/>.

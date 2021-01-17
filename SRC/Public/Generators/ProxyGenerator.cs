@@ -18,18 +18,21 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="ProxyGenerator{TInterface, TInterceptor}"/> instance.
         /// </summary>
-        public ProxyGenerator() => SyntaxFactory = new ProxySyntaxFactory
+        public ProxyGenerator(): base
         (
-            MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-            MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
-            TypeResolutionStrategy.AssemblyName,
-            TypeResolutionStrategy.Type,
-            MetadataTypeInfo.CreateFrom(GetType())
-        );
-
-        /// <summary>
-        /// See <see cref="ITypeGenerator"/>.
-        /// </summary>
-        public override IUnitSyntaxFactory SyntaxFactory { get; }
+            new EmbeddedTypeResolutionStrategy(typeof(ProxyGenerator<TInterface, TInterceptor>)),
+            new RuntimeCompiledTypeResolutionStrategy
+            (
+                typeof(ProxyGenerator<TInterface, TInterceptor>),
+                new ProxySyntaxFactory
+                (
+                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                    MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
+                    $"Generated_{MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<TInterface, TInterceptor>)).GetMD5HashCode()}",
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<TInterface, TInterceptor>))
+                )
+            )
+        ){ }
     }
 }
