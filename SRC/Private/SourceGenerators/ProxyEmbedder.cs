@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
     using Properties;
 
     [Generator]
-    internal class ProxyEmbedder: ISourceGenerator
+    internal sealed class ProxyEmbedder: ISourceGenerator
     {
         internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) => compilation
             .Assembly
@@ -42,7 +42,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 using StreamWriter log = File.CreateText(logFile);
                 log.AutoFlush = true;
-
 
                 for (Exception? current = ex; current is not null; current = current.InnerException)
                 {
