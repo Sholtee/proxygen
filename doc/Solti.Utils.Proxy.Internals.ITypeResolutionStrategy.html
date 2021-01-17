@@ -52,13 +52,13 @@
   </div>
   <h3 id="properties">Properties
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_AssemblyName_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.AssemblyName*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_AssemblyName" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.AssemblyName">AssemblyName</h4>
+  <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly">ContainingAssembly</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">string AssemblyName { get; }</code></pre>
+    <pre><code class="lang-csharp hljs">string ContainingAssembly { get; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -121,38 +121,15 @@
       </tr>
     </tbody>
   </table>
-  <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Type_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Type*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Type" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Type">Type</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">OutputType Type { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Solti.Utils.Proxy.Internals.OutputType.html">OutputType</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
   <h3 id="methods">Methods
   </h3>
   <a id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_Solti_Utils_Proxy_Internals_IUnitSyntaxFactory_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(Solti.Utils.Proxy.Internals.IUnitSyntaxFactory,System.Threading.CancellationToken)">Resolve(IUnitSyntaxFactory, CancellationToken)</h4>
+  <h4 id="Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)">Resolve(CancellationToken)</h4>
   <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">Type Resolve(IUnitSyntaxFactory syntaxFactory, CancellationToken cancellation = default(CancellationToken))</code></pre>
+    <pre><code class="lang-csharp hljs">Type Resolve(CancellationToken cancellation = default(CancellationToken))</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -164,11 +141,6 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
-        <td><a class="xref" href="Solti.Utils.Proxy.Internals.IUnitSyntaxFactory.html">IUnitSyntaxFactory</a></td>
-        <td><span class="parametername">syntaxFactory</span></td>
-        <td></td>
-      </tr>
       <tr>
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
         <td><span class="parametername">cancellation</span></td>
