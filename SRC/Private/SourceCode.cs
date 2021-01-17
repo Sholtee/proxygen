@@ -12,8 +12,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    public class SourceCode 
+    internal class SourceCode 
     {
         public string Hint { get; }
 
