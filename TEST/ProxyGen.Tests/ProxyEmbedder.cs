@@ -220,12 +220,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .ToStaticDelegate()
                 .Invoke(new object[0]);
 
-            IUnitSyntaxFactory syntaxFactory = (IUnitSyntaxFactory) generator
-                .GetProperty("SyntaxFactory")
+            ITypeResolutionStrategy typeResolutionStrategy = (ITypeResolutionStrategy) generator
+                .GetProperty("TypeResolutionStrategy")
                 .ToGetter()
                 .Invoke(generatorInst);
 
-            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType(syntaxFactory.DefinedClasses.Single(), throwOnError: false));
+            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType(typeResolutionStrategy.ClassName, throwOnError: false));
         }
     }
 }

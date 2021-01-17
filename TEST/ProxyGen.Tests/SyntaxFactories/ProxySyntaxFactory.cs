@@ -160,7 +160,17 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyIndexer_Test()
         {
-            var fact = new PropertyInterceptorFactory(new ProxySyntaxFactory(MetadataTypeInfo.CreateFrom(typeof(IList<int>)), MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), "cica", OutputType.Module, MetadataTypeInfo.CreateFrom(typeof(void))));
+            var fact = new PropertyInterceptorFactory
+            (
+                new ProxySyntaxFactory
+                (
+                    MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
+                    MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
+                    "cica", 
+                    OutputType.Module, 
+                    MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))
+                )
+            );
             fact.Build(default);
 
             Assert.That(fact.Members, Is.Not.Null);

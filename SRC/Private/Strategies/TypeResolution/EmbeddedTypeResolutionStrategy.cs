@@ -56,6 +56,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool ShouldUse { get; }
 
+        public string ClassName => FEmbeddedTypes[GeneratorType].FullName;
+
         public string ContainingAssembly => FEmbeddedTypes[GeneratorType].Assembly.GetName().Name;
     }
 }

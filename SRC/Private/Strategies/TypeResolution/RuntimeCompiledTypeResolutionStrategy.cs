@@ -64,12 +64,14 @@ namespace Solti.Utils.Proxy.Internals
 
             Type ExtractType(Assembly asm) => asm.GetType
             (
-                SyntaxFactory.ClassName, 
+                ClassName, 
                 throwOnError: true
             );
         }
 
         public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(GeneratorType).ShouldUse;
+
+        public string ClassName => SyntaxFactory.ClassName;
 
         public string ContainingAssembly => SyntaxFactory.ContainingAssembly;
     }
