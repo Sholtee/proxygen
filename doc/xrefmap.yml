@@ -7,57 +7,6 @@ references:
   commentId: N:Solti.Utils.Proxy
   fullName: Solti.Utils.Proxy
   nameWithType: Solti.Utils.Proxy
-- uid: Solti.Utils.Proxy.Abstractions
-  name: Solti.Utils.Proxy.Abstractions
-  href: Solti.Utils.Proxy.Abstractions.html
-  commentId: N:Solti.Utils.Proxy.Abstractions
-  fullName: Solti.Utils.Proxy.Abstractions
-  nameWithType: Solti.Utils.Proxy.Abstractions
-- uid: Solti.Utils.Proxy.Abstractions.ITypeGenerator
-  name: ITypeGenerator
-  href: Solti.Utils.Proxy.Abstractions.ITypeGenerator.html
-  commentId: T:Solti.Utils.Proxy.Abstractions.ITypeGenerator
-  fullName: Solti.Utils.Proxy.Abstractions.ITypeGenerator
-  nameWithType: ITypeGenerator
-- uid: Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Abstractions.ITypeGenerator.html#Solti_Utils_Proxy_Abstractions_ITypeGenerator_TypeResolutionStrategy
-  commentId: P:Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy
-  fullName: Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy
-  nameWithType: ITypeGenerator.TypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy*
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Abstractions.ITypeGenerator.html#Solti_Utils_Proxy_Abstractions_ITypeGenerator_TypeResolutionStrategy_
-  commentId: Overload:Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Abstractions.ITypeGenerator.TypeResolutionStrategy
-  nameWithType: ITypeGenerator.TypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1
-  name: TypeGenerator<TDescendant>
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html
-  commentId: T:Solti.Utils.Proxy.Abstractions.TypeGenerator`1
-  name.vb: TypeGenerator(Of TDescendant)
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant)
-  nameWithType: TypeGenerator<TDescendant>
-  nameWithType.vb: TypeGenerator(Of TDescendant)
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.TypeResolutionStrategy
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_TypeResolutionStrategy
-  commentId: P:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.TypeResolutionStrategy
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.TypeResolutionStrategy
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).TypeResolutionStrategy
-  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
-  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Abstractions.TypeGenerator`1.TypeResolutionStrategy*
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Abstractions.TypeGenerator-1.html#Solti_Utils_Proxy_Abstractions_TypeGenerator_1_TypeResolutionStrategy_
-  commentId: Overload:Solti.Utils.Proxy.Abstractions.TypeGenerator`1.TypeResolutionStrategy
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Abstractions.TypeGenerator<TDescendant>.TypeResolutionStrategy
-  fullName.vb: Solti.Utils.Proxy.Abstractions.TypeGenerator(Of TDescendant).TypeResolutionStrategy
-  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
-  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
 - uid: Solti.Utils.Proxy.Attributes
   name: Solti.Utils.Proxy.Attributes
   href: Solti.Utils.Proxy.Attributes.html
@@ -378,6 +327,25 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
+- uid: Solti.Utils.Proxy.Internals.ITypeGenerator
+  name: ITypeGenerator
+  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html
+  commentId: T:Solti.Utils.Proxy.Internals.ITypeGenerator
+  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator
+  nameWithType: ITypeGenerator
+- uid: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
+  name: TypeResolutionStrategy
+  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html#Solti_Utils_Proxy_Internals_ITypeGenerator_TypeResolutionStrategy
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
+  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
+  nameWithType: ITypeGenerator.TypeResolutionStrategy
+- uid: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy*
+  name: TypeResolutionStrategy
+  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html#Solti_Utils_Proxy_Internals_ITypeGenerator_TypeResolutionStrategy_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
+  nameWithType: ITypeGenerator.TypeResolutionStrategy
 - uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
   name: ITypeResolutionStrategy
   href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html
@@ -481,3 +449,29 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
   nameWithType: RelatedGeneratorAttribute.Generator
+- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1
+  name: TypeGenerator<TDescendant>
+  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html
+  commentId: T:Solti.Utils.Proxy.Internals.TypeGenerator`1
+  name.vb: TypeGenerator(Of TDescendant)
+  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant)
+  nameWithType: TypeGenerator<TDescendant>
+  nameWithType.vb: TypeGenerator(Of TDescendant)
+- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
+  name: TypeResolutionStrategy
+  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_TypeResolutionStrategy
+  commentId: P:Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
+  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeResolutionStrategy
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeResolutionStrategy
+  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
+  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
+- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy*
+  name: TypeResolutionStrategy
+  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_TypeResolutionStrategy_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeResolutionStrategy
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeResolutionStrategy
+  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
+  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
