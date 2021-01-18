@@ -344,25 +344,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
-- uid: Solti.Utils.Proxy.Internals.ITypeGenerator
-  name: ITypeGenerator
-  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html
-  commentId: T:Solti.Utils.Proxy.Internals.ITypeGenerator
-  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator
-  nameWithType: ITypeGenerator
-- uid: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html#Solti_Utils_Proxy_Internals_ITypeGenerator_TypeResolutionStrategy
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
-  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
-  nameWithType: ITypeGenerator.TypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy*
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Internals.ITypeGenerator.html#Solti_Utils_Proxy_Internals_ITypeGenerator_TypeResolutionStrategy_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeGenerator.TypeResolutionStrategy
-  nameWithType: ITypeGenerator.TypeResolutionStrategy
 - uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
   name: ITypeResolutionStrategy
   href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html
