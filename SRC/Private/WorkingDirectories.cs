@@ -12,13 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static string? AssemblyCacheDir { get; } = GetFromRuntimeConfig(nameof(AssemblyCacheDir));
 
-        public static string? SourceDump { get; } = GetFromRuntimeConfig
-        (
-            nameof(SourceDump)
-#if DEBUG
-            , Path.GetTempPath()
-#endif
-        );
+        public static string? SourceDump { get; } = GetFromRuntimeConfig(nameof(SourceDump));
 
         public static string LogDump { get; } = GetFromRuntimeConfig(nameof(LogDump), Path.GetTempPath())!;
 
