@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Implements the <see cref="ITypeGenerator"/> interface.
+    /// Base of the generators.
     /// </summary>
     /// <remarks>Generators can not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]

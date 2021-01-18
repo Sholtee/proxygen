@@ -10,7 +10,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Describes a type generator.
     /// </summary>
-    public interface ITypeGenerator
+    internal interface ITypeGenerator
     {
         /// <summary>
         /// The resolution strategy used to resolve the generated <see cref="Type"/>.
