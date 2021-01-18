@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Generators
                     (
                         MetadataTypeInfo.CreateFrom(typeof(TInterface)),
                         MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-                        $"Generated_{MetadataTypeInfo.CreateFrom(generatorType)}",
+                        $"Generated_{MetadataTypeInfo.CreateFrom(generatorType).GetMD5HashCode()}",
                         OutputType.Module,
                         MetadataTypeInfo.CreateFrom(generatorType)
                     )
