@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
     /// <remarks>This class is not thread safe even if the <see cref="InterfaceInterceptor{TInterface}.Target"/> is it.</remarks>
-    public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?> where TInterface: class
+    public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?>, IProxyAccess<TInterface> where TInterface: class
     {
         /// <summary>
         /// Extracts the <see cref="MethodInfo"/> from the given delegate.
@@ -48,6 +48,18 @@ namespace Solti.Utils.Proxy
         /// The target of this interceptor.
         /// </summary>
         public TInterface? Target { get; }
+
+        /// <summary>
+        /// The most outer enclosing proxy.
+        /// </summary>
+        public TInterface Proxy
+        {
+            set 
+            {
+                if (Target is IProxyAccess<TInterface> proxyAccess)
+                    proxyAccess.Proxy = value ?? throw new ArgumentNullException(nameof(value));
+            } 
+        }
 
         /// <summary>
         /// Invokes the original <see cref="Target"/> method.

@@ -68,3 +68,5 @@
   - *breaking:* Removed `TypeGenerator.SyntaxFactory` property (syntax factories are intended to be private)
   - *done:* Register *ProxyGen* as an analyzer
   - *fixed:* Missing dependencies (in `Solti.Utils.Proxy.deps.json`)
+- 4.0.0-preview4:
+  - *introduced:* `IProxyAccess` interface

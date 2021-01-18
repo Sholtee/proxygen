@@ -40,11 +40,22 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ```csharp
   using System;
   ...
-  IMyInterface target = ...;
+  IMyInterface target = new MyClass();
   ...
   IMyInterface proxy = (IMyInterface) Activator.CreateInstance(proxyType, new object[]{target});
   ```
 4. Enjoy
+
+Note that the *target* can access its most outer enclosing proxy. To achieve this it just has to implement the `IProxyAccess<IMyInterface>` interface:
+```csharp
+using Solti.Utils.Proxy;
+
+public class MyClass : IMyInterface, IProxyAccess<IMyInterface>
+{
+    ...
+	public IList<object> Proxy { get; set; }
+}
+```
 
 For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/ProxyGenerator.cs ) or [that](https://github.com/Sholtee/injector#decorating-services ).
 ### To create ducks:

@@ -6,6 +6,10 @@
 using System.Linq;
 using System.Threading;
 
+using Microsoft.CodeAnalysis.CSharp;
+
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
 namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
@@ -14,7 +18,17 @@ namespace Solti.Utils.Proxy.Internals
         {
             public IProxyContext Context { get; }
 
-            public ConstructorFactory(IProxyContext context) : base(context.InterceptorType) => Context = context;
+            public IPropertyInfo Proxy { get; }
+
+            public ConstructorFactory(IProxyContext context) : base(context.InterceptorType)
+            {
+                Context = context;
+
+                Proxy = Context.InterceptorType.Properties.Single
+                (
+                    prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
+                );
+            }
 
             public override bool Build(CancellationToken cancellation)
             {
@@ -27,7 +41,30 @@ namespace Solti.Utils.Proxy.Internals
                     {
                         cancellation.ThrowIfCancellationRequested();
 
-                        return DeclareCtor(ctor, Context.ClassName);
+                        return DeclareCtor(ctor, Context.ClassName).WithBody
+                        (
+                            Block
+                            (      
+                                //
+                                // Proxy = this;
+                                //
+
+                                ExpressionStatement
+                                (
+                                    AssignmentExpression
+                                    (
+                                        kind: SyntaxKind.SimpleAssignmentExpression,
+                                        left: PropertyAccess
+                                        (
+                                            Proxy,
+                                            target: null,
+                                            castTargetTo: null
+                                        ),
+                                        right: ThisExpression()
+                                    )
+                                )
+                            )
+                        );
                     })
                     .ToArray();
 
