@@ -3,6 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
+
 namespace Solti.Utils.Proxy.Generators
 {
     using Internals;
@@ -14,24 +17,27 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TInterceptor">An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.</typeparam>
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
-        /// <summary>
-        /// Creates a new <see cref="ProxyGenerator{TInterface, TInterceptor}"/> instance.
-        /// </summary>
-        public ProxyGenerator(): base
-        (
-            new EmbeddedTypeResolutionStrategy(typeof(ProxyGenerator<TInterface, TInterceptor>)),
-            new RuntimeCompiledTypeResolutionStrategy
-            (
-                typeof(ProxyGenerator<TInterface, TInterceptor>),
-                new ProxySyntaxFactory
+        /// <inheritdoc/>
+        protected override IEnumerable<ITypeResolutionStrategy> SupportedResolutions
+        {
+            get
+            {
+                Type generatorType = GetType();
+
+                yield return new EmbeddedTypeResolutionStrategy(generatorType);
+                yield return new RuntimeCompiledTypeResolutionStrategy
                 (
-                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                    MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
-                    $"Generated_{MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<TInterface, TInterceptor>)).GetMD5HashCode()}",
-                    OutputType.Module,
-                    MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<TInterface, TInterceptor>))
-                )
-            )
-        ){ }
+                    generatorType,
+                    new ProxySyntaxFactory
+                    (
+                        MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                        MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
+                        $"Generated_{MetadataTypeInfo.CreateFrom(generatorType)}",
+                        OutputType.Module,
+                        MetadataTypeInfo.CreateFrom(generatorType)
+                    )
+                );
+            }
+        }
     }
 }

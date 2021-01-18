@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
@@ -42,13 +43,19 @@ namespace Solti.Utils.Proxy.Internals
         }
         #endregion
 
-        #region Public
+        #region Protected
         /// <summary>
         /// Creates a new <see cref="TypeGenerator{TDescendant}"/> instance.
         /// </summary>
-        protected TypeGenerator(params ITypeResolutionStrategy[] supportedResolutions) => 
-            TypeResolutionStrategy = supportedResolutions.Single(strat => strat.ShouldUse);
+        protected TypeGenerator() => TypeResolutionStrategy = SupportedResolutions.Single(strat => strat.ShouldUse);
 
+        /// <summary>
+        /// Returns the supported type resolution strategies.
+        /// </summary>
+        protected abstract IEnumerable<ITypeResolutionStrategy> SupportedResolutions { get; }
+        #endregion
+
+        #region Public
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>

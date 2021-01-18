@@ -3,6 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Collections.Generic;
+
 namespace Solti.Utils.Proxy.Generators
 {
     using Internals;
@@ -14,25 +17,27 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TTarget">The target who implements all the <typeparamref name="TInterface"/> members.</typeparam>
     public sealed class DuckGenerator<TInterface, TTarget>: TypeGenerator<DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
-        /// <summary>
-        /// Creates a new <see cref="DuckGenerator{TInterface, TTarget}"/> instance
-        /// </summary>
-        public DuckGenerator() : base
-        (
-            new EmbeddedTypeResolutionStrategy(typeof(DuckGenerator<TInterface, TTarget>)),
-            new RuntimeCompiledTypeResolutionStrategy
-            (
-                typeof(DuckGenerator<TInterface, TTarget>),
-                new DuckSyntaxFactory
+        /// <inheritdoc/>
+        protected override IEnumerable<ITypeResolutionStrategy> SupportedResolutions
+        {
+            get 
+            {
+                Type generatorType = GetType();
+
+                yield return new EmbeddedTypeResolutionStrategy(generatorType);
+                yield return new RuntimeCompiledTypeResolutionStrategy
                 (
-                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                    MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-                    $"Generated_{MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>)).GetMD5HashCode()}",
-                    OutputType.Module,
-                    MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>))
-                )
-            )
-        )
-        { }
+                    generatorType,
+                    new DuckSyntaxFactory
+                    (
+                        MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                        MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+                        $"Generated_{MetadataTypeInfo.CreateFrom(generatorType)}",
+                        OutputType.Module,
+                        MetadataTypeInfo.CreateFrom(generatorType)
+                    )
+                );
+            }
+        }
     }
 }
