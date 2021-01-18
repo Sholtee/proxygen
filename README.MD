@@ -53,7 +53,7 @@ using Solti.Utils.Proxy;
 public class MyClass : IMyInterface, IProxyAccess<IMyInterface>
 {
     ...
-    public IList<object> Proxy { get; set; }
+    public IMyInterface Proxy { get; set; }
 }
 ```
 
