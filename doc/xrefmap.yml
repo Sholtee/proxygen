@@ -207,6 +207,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).InvokeTarget
   nameWithType: InterfaceInterceptor<TInterface>.InvokeTarget
   nameWithType.vb: InterfaceInterceptor(Of TInterface).InvokeTarget
+- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy
+  name: Proxy
+  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Proxy
+  commentId: P:Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy
+  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Proxy
+  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Proxy
+  nameWithType: InterfaceInterceptor<TInterface>.Proxy
+  nameWithType.vb: InterfaceInterceptor(Of TInterface).Proxy
+- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy*
+  name: Proxy
+  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Proxy_
+  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Proxy
+  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).Proxy
+  nameWithType: InterfaceInterceptor<TInterface>.Proxy
+  nameWithType.vb: InterfaceInterceptor(Of TInterface).Proxy
 - uid: Solti.Utils.Proxy.InterfaceInterceptor`1.ResolveEvent(System.Func{System.Object})
   name: ResolveEvent(Func<Object>)
   href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_ResolveEvent_System_Func_System_Object__
@@ -526,3 +543,29 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeResolutionStrategy
   nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
   nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
+- uid: Solti.Utils.Proxy.IProxyAccess`1
+  name: IProxyAccess<TInterface>
+  href: Solti.Utils.Proxy.IProxyAccess-1.html
+  commentId: T:Solti.Utils.Proxy.IProxyAccess`1
+  name.vb: IProxyAccess(Of TInterface)
+  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>
+  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface)
+  nameWithType: IProxyAccess<TInterface>
+  nameWithType.vb: IProxyAccess(Of TInterface)
+- uid: Solti.Utils.Proxy.IProxyAccess`1.Proxy
+  name: Proxy
+  href: Solti.Utils.Proxy.IProxyAccess-1.html#Solti_Utils_Proxy_IProxyAccess_1_Proxy
+  commentId: P:Solti.Utils.Proxy.IProxyAccess`1.Proxy
+  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy
+  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface).Proxy
+  nameWithType: IProxyAccess<TInterface>.Proxy
+  nameWithType.vb: IProxyAccess(Of TInterface).Proxy
+- uid: Solti.Utils.Proxy.IProxyAccess`1.Proxy*
+  name: Proxy
+  href: Solti.Utils.Proxy.IProxyAccess-1.html#Solti_Utils_Proxy_IProxyAccess_1_Proxy_
+  commentId: Overload:Solti.Utils.Proxy.IProxyAccess`1.Proxy
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy
+  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface).Proxy
+  nameWithType: IProxyAccess<TInterface>.Proxy
+  nameWithType.vb: IProxyAccess(Of TInterface).Proxy
