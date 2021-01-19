@@ -38,6 +38,8 @@ namespace Solti.Utils.Proxy.Internals
         {
             try
             {
+                Directory.CreateDirectory(WorkingDirectories.LogDump);
+
                 string logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using StreamWriter log = File.CreateText(logFile);

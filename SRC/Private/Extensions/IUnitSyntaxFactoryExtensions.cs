@@ -38,6 +38,8 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     StreamWriter log;
 
+                    Directory.CreateDirectory(SourceDump);
+
                     using (log = File.CreateText(Path.Combine(SourceDump, hint)))
                     {
                         log.AutoFlush = true;
@@ -63,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
                         );
                     }
                 }
-                catch { }
+                catch {}
             }
 
             return true;

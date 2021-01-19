@@ -40,8 +40,7 @@ namespace Solti.Utils.Proxy.Internals
                     Assembly.LoadFile(cacheFile)
                 );
 
-                if (!Directory.Exists(CacheDir))
-                    Directory.CreateDirectory(CacheDir);
+                Directory.CreateDirectory(CacheDir);
             }
 
             SyntaxFactory.BuildAndDump(cancellation);

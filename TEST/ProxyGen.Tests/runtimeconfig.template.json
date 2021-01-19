@@ -1,5 +1,6 @@
 ﻿{
   "configProperties": {
-    "SourceDump": "%TEMP%"
+    "SourceDump": "Logs",
+    "LogDump":  "Logs"
   }
 }
