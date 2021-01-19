@@ -257,7 +257,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .ToStaticDelegate()
                 .Invoke(new object[0]);
 
-            ITypeResolutionStrategy typeResolutionStrategy = (ITypeResolutionStrategy) generator
+            ITypeResolution typeResolutionStrategy = (ITypeResolution) generator
                 .GetProperty("TypeResolutionStrategy")
                 .ToGetter()
                 .Invoke(generatorInst);

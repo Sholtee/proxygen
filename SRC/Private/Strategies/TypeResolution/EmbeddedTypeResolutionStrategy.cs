@@ -12,7 +12,7 @@ using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class EmbeddedTypeResolutionStrategy : ITypeResolutionStrategy
+    internal sealed class EmbeddedTypeResolutionStrategy : ITypeResolution
     {
         private static readonly ConcurrentDictionary<Type, Type> FEmbeddedTypes = new ConcurrentDictionary<Type, Type>();
 

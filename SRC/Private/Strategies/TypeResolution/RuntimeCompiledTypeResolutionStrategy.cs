@@ -13,7 +13,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolutionStrategy
+    internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolution
     {
         public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ClassSyntaxFactory syntaxFactory)
         {

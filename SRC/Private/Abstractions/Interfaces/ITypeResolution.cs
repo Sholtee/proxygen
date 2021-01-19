@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ITypeResolutionStrategy.cs                                                    *
+* ITypeResolution.cs                                                            *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Represents the method how the generated <see cref="Type"/> will be resolved.
     /// </summary>
-    public interface ITypeResolutionStrategy
+    public interface ITypeResolution
     {
         /// <summary>
         /// The related <see cref="TypeGenerator{TDescendant}"/> descendant.

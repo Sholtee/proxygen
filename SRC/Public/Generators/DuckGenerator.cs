@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class DuckGenerator<TInterface, TTarget>: TypeGenerator<DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
         /// <inheritdoc/>
-        protected override IEnumerable<ITypeResolutionStrategy> SupportedResolutions
+        protected override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get 
             {

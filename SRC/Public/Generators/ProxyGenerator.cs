@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Generators
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         /// <inheritdoc/>
-        protected override IEnumerable<ITypeResolutionStrategy> SupportedResolutions
+        protected override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get
             {

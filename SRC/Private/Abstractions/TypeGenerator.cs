@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Returns the supported type resolution strategies.
         /// </summary>
-        protected abstract IEnumerable<ITypeResolutionStrategy> SupportedResolutions { get; }
+        protected abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
         #endregion
 
         #region Public
@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// The strategy used to resolve the generated <see cref="Type"/>.
         /// </summary>
-        public ITypeResolutionStrategy TypeResolutionStrategy { get; }
+        public ITypeResolution TypeResolutionStrategy { get; }
         #endregion
     }
 }

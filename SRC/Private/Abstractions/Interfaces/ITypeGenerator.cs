@@ -15,6 +15,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// The resolution strategy used to resolve the generated <see cref="Type"/>.
         /// </summary>
-        ITypeResolutionStrategy TypeResolutionStrategy { get; }
+        ITypeResolution TypeResolutionStrategy { get; }
     }
 }
