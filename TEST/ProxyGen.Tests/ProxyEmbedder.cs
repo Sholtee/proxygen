@@ -262,6 +262,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .ToGetter()
                 .Invoke(generatorInst);
 
+            Assert.That(typeResolutionStrategy, Is.InstanceOf<EmbeddedTypeResolutionStrategy>());
             Assert.IsNotNull(EmbeddedGeneratorHolder.GetType(typeResolutionStrategy.ClassName, throwOnError: false));
         }
     }
