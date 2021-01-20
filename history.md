@@ -71,3 +71,4 @@
 - 4.0.0-preview4:
   - *breaking:* Related property names in `appname.runtimeconfig.json` should be prefixed with "ProxyGen."
   - *introduced:* `IProxyAccess` interface
+  - *introduced:* Source code dumping is available in compile time

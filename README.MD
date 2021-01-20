@@ -124,7 +124,7 @@ Since all the time consumig operations happen in compile time this feature can s
   
 - In compile time (source generator):
 
-  Extend you `.csproj` with the following:
+  Extend your `.csproj` with the following:
   ```xml
   <PropertyGroup>
     <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
