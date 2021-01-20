@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        internal static void ReportError(GeneratorExecutionContext context, Exception ex, Location location, CancellationToken cancellation) => ReportDiagnostic
+        internal static void ReportError(GeneratorExecutionContext context, Exception ex, Location location) => ReportDiagnostic
         (
             context,
             "PGE01", 
@@ -74,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals
                 SGResources.Culture, 
                 SGResources.TE_FAILED_FULL, 
                 ex.Message,
-                LogException(ex, cancellation) ?? "NULL"
+                LogException(ex, context.CancellationToken) ?? "NULL"
             ), 
             location, 
             DiagnosticSeverity.Warning
@@ -173,8 +173,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         context, 
                         e, 
-                        generator.Locations.Single(),
-                        context.CancellationToken
+                        generator.Locations.Single()
                     );
                 }
             }
