@@ -93,11 +93,11 @@ namespace Solti.Utils.Proxy.Internals
         {
         }
 
-        public static IList<ICodeFactory> CodeFactories { get; } = new List<ICodeFactory>
-        {
-            new ProxyCodeFactory(),
-            new DuckCodeFactory()
-        };
+        //
+        // xXxCodeFactory-k toltik fel...
+        //
+
+        public static ICollection<ICodeFactory> CodeFactories { get; } = new HashSet<ICodeFactory>();
 
         public void Execute(GeneratorExecutionContext context)
         {

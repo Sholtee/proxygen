@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis;
 
@@ -14,6 +15,9 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class ProxyCodeFactory : ICodeFactory
     {
+        [ModuleInitializer]
+        public static void Init() => ProxyEmbedder.CodeFactories.Add(new ProxyCodeFactory());
+
         public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(ProxyGenerator<,>).FullName;
 
         public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
