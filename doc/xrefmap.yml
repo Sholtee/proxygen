@@ -344,77 +344,77 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
-  name: ITypeResolutionStrategy
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html
-  commentId: T:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy
-  nameWithType: ITypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution
+  name: ITypeResolution
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html
+  commentId: T:Solti.Utils.Proxy.Internals.ITypeResolution
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution
+  nameWithType: ITypeResolution
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
   name: ClassName
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
-  nameWithType: ITypeResolutionStrategy.ClassName
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName*
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ClassName
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
+  nameWithType: ITypeResolution.ClassName
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName*
   name: ClassName
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ClassName_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ClassName_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ClassName
-  nameWithType: ITypeResolutionStrategy.ClassName
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
+  nameWithType: ITypeResolution.ClassName
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
   name: ContainingAssembly
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
-  nameWithType: ITypeResolutionStrategy.ContainingAssembly
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly*
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ContainingAssembly
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
+  nameWithType: ITypeResolution.ContainingAssembly
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly*
   name: ContainingAssembly
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ContainingAssembly_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ContainingAssembly_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ContainingAssembly
-  nameWithType: ITypeResolutionStrategy.ContainingAssembly
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
+  nameWithType: ITypeResolution.ContainingAssembly
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
   name: GeneratorType
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
-  nameWithType: ITypeResolutionStrategy.GeneratorType
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType*
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_GeneratorType
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
+  nameWithType: ITypeResolution.GeneratorType
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType*
   name: GeneratorType
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_GeneratorType_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_GeneratorType_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.GeneratorType
-  nameWithType: ITypeResolutionStrategy.GeneratorType
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
+  nameWithType: ITypeResolution.GeneratorType
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
   name: Resolve(CancellationToken)
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve(System.Threading.CancellationToken)
-  nameWithType: ITypeResolutionStrategy.Resolve(CancellationToken)
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve*
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_Resolve_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
+  nameWithType: ITypeResolution.Resolve(CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve*
   name: Resolve
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_Resolve_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_Resolve_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.Resolve
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.Resolve
-  nameWithType: ITypeResolutionStrategy.Resolve
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve
+  nameWithType: ITypeResolution.Resolve
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
   name: ShouldUse
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ShouldUse
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse
-  nameWithType: ITypeResolutionStrategy.ShouldUse
-- uid: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse*
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ShouldUse
+  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
+  nameWithType: ITypeResolution.ShouldUse
+- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse*
   name: ShouldUse
-  href: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.html#Solti_Utils_Proxy_Internals_ITypeResolutionStrategy_ShouldUse_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse
+  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ShouldUse_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolutionStrategy.ShouldUse
-  nameWithType: ITypeResolutionStrategy.ShouldUse
+  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
+  nameWithType: ITypeResolution.ShouldUse
 - uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
   name: RelatedGeneratorAttribute
   href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html
