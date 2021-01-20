@@ -91,13 +91,13 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   
 Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/DuckGenerator.cs ).
 ## Caching the generated assembly
-By setting the `configProperties.AssemblyCacheDir` property in `YourApp.runtimeconfig.json` you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation.
+By setting the `ProxyGen.AssemblyCacheDir` property in `YourApp.runtimeconfig.json` you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation.
 
 You can do it easily by creating a template file named `runtimeconfig.template.json` in your project folder:
 ```json
 {
   "configProperties": {
-    "AssemblyCacheDir": "GeneratedAssemblies"
+    "ProxyGen.AssemblyCacheDir": "GeneratedAssemblies"
   }
 }
 ```
@@ -114,7 +114,7 @@ Since all the time consumig operations happen in compile time this feature can s
 ```json
 {
   "configProperties": {
-    "AssemblyCacheDir": "%TEMP%"
+    "ProxyGen.SourceDump": "%TEMP%"
   }
 }
 ```

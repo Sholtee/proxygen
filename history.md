@@ -69,4 +69,5 @@
   - *done:* Register *ProxyGen* as an analyzer
   - *fixed:* Missing dependencies (in `Solti.Utils.Proxy.deps.json`)
 - 4.0.0-preview4:
+  - *breaking:* Related property names in `appname.runtimeconfig.json` should be prefixed with "ProxyGen."
   - *introduced:* `IProxyAccess` interface

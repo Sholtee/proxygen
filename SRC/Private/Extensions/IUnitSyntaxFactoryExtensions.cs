@@ -12,8 +12,6 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using static WorkingDirectories;
-
     internal static class IUnitSyntaxFactoryExtensions
     {
         public static SourceCode GetSourceCode(this IUnitSyntaxFactory src, CancellationToken cancellation) 
@@ -30,7 +28,9 @@ namespace Solti.Utils.Proxy.Internals
             if (!src.Build(cancellation))
                 return false;
 
-            if (SourceDump is not null)
+            string? sourceDump = WorkingDirectories.Instance.SourceDump;
+
+            if (sourceDump is not null)
             {
                 string hint = src.GetHint();
 
@@ -38,9 +38,9 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     StreamWriter log;
 
-                    Directory.CreateDirectory(SourceDump);
+                    Directory.CreateDirectory(sourceDump);
 
-                    using (log = File.CreateText(Path.Combine(SourceDump, hint)))
+                    using (log = File.CreateText(Path.Combine(sourceDump, hint)))
                     {
                         log.AutoFlush = true;
                         src
@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                             .WriteTo(log); // nincs overload ami tamogatna a megszakitast
                     }
 
-                    using (log = File.CreateText(Path.Combine(SourceDump, $"{hint}.references")))
+                    using (log = File.CreateText(Path.Combine(sourceDump, $"{hint}.references")))
                     {
                         log.AutoFlush = true;
                         log.Write

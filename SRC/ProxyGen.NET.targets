@@ -1,0 +1,9 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- Our source generator will have access to these properties -->
+  <ItemGroup>
+    <CompilerVisibleProperty Include="MSBuildThisFileDirectory" />
+    <CompilerVisibleProperty Include="ProxyGen_SourceDump" />
+    <CompilerVisibleProperty Include="ProxyGen_LogDump" />
+    <!-- ProxyGen_AssemblyCacheDir not needed -->
+  </ItemGroup>
+</Project>

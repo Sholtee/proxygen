@@ -34,13 +34,13 @@ namespace Solti.Utils.Proxy.Internals
         // a Roslyn szamara is), ezert a primitiv naplozas.
         //
 
-        internal static string? LogException(Exception ex, CancellationToken cancellation)
+        internal static string? LogException(Exception ex, in CancellationToken cancellation)
         {
             try
             {
-                Directory.CreateDirectory(WorkingDirectories.LogDump);
+                Directory.CreateDirectory(WorkingDirectories.Instance.LogDump);
 
-                string logFile = Path.Combine(WorkingDirectories.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
+                string logFile = Path.Combine(WorkingDirectories.Instance.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
 
                 using StreamWriter log = File.CreateText(logFile);
                 log.AutoFlush = true;
@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        internal static void ReportError(GeneratorExecutionContext context, Exception ex, Location location) => ReportDiagnostic
+        internal static void ReportError(in GeneratorExecutionContext context, Exception ex, Location location) => ReportDiagnostic
         (
             context,
             "PGE01", 
@@ -80,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
             DiagnosticSeverity.Warning
         );
 
-        internal static void ReportDiagnostic(GeneratorExecutionContext context, string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => context.ReportDiagnostic
+        internal static void ReportDiagnostic(in GeneratorExecutionContext context, string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => context.ReportDiagnostic
         (
             Diagnostic.Create
             (
@@ -109,7 +109,7 @@ namespace Solti.Utils.Proxy.Internals
             // Csak C#-t tamogatjuk
             //
 
-            if (context.Compilation.Language != CSharpParseOptions.Default.Language)
+            if (compilation.Language != CSharpParseOptions.Default.Language)
             {
                 if (aotGenerators.Any()) ReportDiagnostic
                 (
@@ -122,6 +122,8 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 return;
             }
+
+            WorkingDirectories.Setup(new AnalyzerConfigReader(context));
             
             foreach (INamedTypeSymbol generator in aotGenerators)
             {

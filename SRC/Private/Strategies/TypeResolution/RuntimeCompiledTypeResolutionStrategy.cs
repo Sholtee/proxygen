@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
             SyntaxFactory = syntaxFactory;
         }
 
-        public string? CacheDir { get; internal set; } = WorkingDirectories.AssemblyCacheDir; // tesztek miatt van setter
+        public string? CacheDir { get; internal set; } = WorkingDirectories.Instance.AssemblyCacheDir; // tesztek miatt van setter
 
         public ClassSyntaxFactory SyntaxFactory { get; }
 
