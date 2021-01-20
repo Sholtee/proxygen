@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public AnalyzerConfigOptions ConfigOptions { get; }
 
-        public string BasePath => ReadValueInternal("MSBuildThisFileDirectory")!;
+        public string BasePath => ReadValueInternal("MSBuildProjectDirectory")!;
 
         public AnalyzerConfigReader(in GeneratorExecutionContext context) =>
             ConfigOptions = context.AnalyzerConfigOptions.GlobalOptions;

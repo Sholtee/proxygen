@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -101,6 +102,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public void Execute(GeneratorExecutionContext context)
         {
+            IConfigReader configReader = new AnalyzerConfigReader(context);
+#if DEBUG
+            if (configReader.ReadValue("DebugGenerator")?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
+            {
+                Debugger.Launch();
+            }
+#endif
             Compilation compilation = context.Compilation;
 
             IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
@@ -111,6 +119,10 @@ namespace Solti.Utils.Proxy.Internals
 
             if (compilation.Language != CSharpParseOptions.Default.Language)
             {
+                //
+                // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
+                //
+
                 if (aotGenerators.Any()) ReportDiagnostic
                 (
                     context,
@@ -123,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            WorkingDirectories.Setup(new AnalyzerConfigReader(context));
+            WorkingDirectories.Setup(configReader);
             
             foreach (INamedTypeSymbol generator in aotGenerators)
             {

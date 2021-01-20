@@ -1,6 +1,6 @@
 ﻿{
   "configProperties": {
-    "ProxyGen.SourceDump": "Logs",
-    "ProxyGen.LogDump": "Logs"
+    "ProxyGen.SourceDump": "..\\Logs",
+    "ProxyGen.LogDump": "..\\Logs"
   }
 }

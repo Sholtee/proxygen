@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- "OutputItemType" is needed because we reference ProxyGen as a csproj. -->
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" OutputItemType="Analyzer" />
     <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
   </ItemGroup>
@@ -18,8 +19,9 @@
   <Import Project="..\..\SRC\ProxyGen.NET.targets" />
     
   <PropertyGroup>
-    <ProxyGen_SourceDump>$(OutputPath)\Logs</ProxyGen_SourceDump>
-    <ProxyGen_LogDump>$(OutputPath)\Logs</ProxyGen_LogDump>
+    <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
+    <ProxyGen_LogDump>$(OutputPath)Logs</ProxyGen_LogDump>
+    <ProxyGen_DebugGenerator>false</ProxyGen_DebugGenerator>
   </PropertyGroup>
 
 </Project>

@@ -1,9 +1,17 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <!-- Our source generator will have access to these properties -->
   <ItemGroup>
-    <CompilerVisibleProperty Include="MSBuildThisFileDirectory" />
+    <CompilerVisibleProperty Include="MSBuildProjectDirectory" />
     <CompilerVisibleProperty Include="ProxyGen_SourceDump" />
     <CompilerVisibleProperty Include="ProxyGen_LogDump" />
+    <CompilerVisibleProperty Include="ProxyGen_DebugGenerator" />
     <!-- ProxyGen_AssemblyCacheDir not needed -->
   </ItemGroup>
+
+  <Target Name="LogProperties" AfterTargets="BeforeBuild"  Condition="'$(Configuration)'=='Debug'">
+    <Message Text=" MSBuildProjectDirectory = $(MSBuildProjectDirectory)" Importance="high" />
+    <Message Text=" ProxyGen_SourceDump     = $(ProxyGen_SourceDump)" Importance="high" />
+    <Message Text=" ProxyGen_LogDump        = $(ProxyGen_LogDump)" Importance="high" />
+    <Message Text=" ProxyGen_DebugGenerator = $(ProxyGen_DebugGenerator)" Importance="high" />
+  </Target>
 </Project>
