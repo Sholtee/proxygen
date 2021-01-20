@@ -110,14 +110,26 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 ```
 Since all the time consumig operations happen in compile time this feature can singificantly improve the performance. Note that open generics are not supported.
 ## Inspecting the generated code
-*ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable, set the `ProxyGen.SourceDump` property to the desired directory (note that environment variables are supported):
-```json
-{
-  "configProperties": {
-    "ProxyGen.SourceDump": "%TEMP%"
+*ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable 
+- In runtime:
+
+  Set the `ProxyGen.SourceDump` property (in the same way you could see [above](#caching-the-generated-assembly)) to the desired directory (note that environment variables are supported):
+  ```json
+  {
+    "configProperties": {
+      "ProxyGen.SourceDump": "%TEMP%"
+    }
   }
-}
-```
+  ```
+  
+- In compile time (source generator):
+
+  Extend you `.csproj` with the following:
+  ```xml
+  <PropertyGroup>
+    <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
+  </PropertyGroup>
+  ```
 ## Migrating from version 
 - 2.X
   - Delete all the cached assemblies (if the `[Proxy|Duck]Generator.CacheDirectory` is set somewhere)
