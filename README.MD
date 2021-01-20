@@ -110,7 +110,7 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 ```
 Since all the time consumig operations happen in compile time this feature can singificantly improve the performance. Note that open generics are not supported.
 ## Inspecting the generated code
-*ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable, set the `configProperties.SourceDump` property to the desired directory (note that environment variables are supported):
+*ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable, set the `ProxyGen.SourceDump` property to the desired directory (note that environment variables are supported):
 ```json
 {
   "configProperties": {
