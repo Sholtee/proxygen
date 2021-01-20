@@ -30,11 +30,11 @@ namespace Solti.Utils.Proxy.Internals
 
         private WorkingDirectories(IConfigReader configReader)
         {
-            AssemblyCacheDir = GetPath(configReader, nameof(AssemblyCacheDir));
-            SourceDump       = GetPath(configReader, nameof(SourceDump));
-            LogDump          = GetPath(configReader, nameof(LogDump)) ?? Path.GetTempPath();
+            AssemblyCacheDir = GetPath(nameof(AssemblyCacheDir));
+            SourceDump       = GetPath(nameof(SourceDump));
+            LogDump          = GetPath(nameof(LogDump)) ?? Path.GetTempPath();
 
-            static string? GetPath(IConfigReader configReader, string name)
+            string? GetPath(string name)
             {
                 string? result = configReader.ReadValue(name);
 
