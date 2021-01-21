@@ -9,9 +9,8 @@
     <Configurations>Debug;Release;Perf</Configurations>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -37,6 +36,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.*">
+      <!-- This package is develpement dependency -->
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Mono.Reflection" Version="2.*" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.*" />
     <PackageReference Include="System.Runtime.Loader" Version="4.*" />
