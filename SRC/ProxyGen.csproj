@@ -44,8 +44,6 @@
 
   <!-- This packages must be loaded by Roslyn when it executes our source generator -->
   <ItemGroup>
-    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" GeneratePathProperty="true" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="1.*" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='netstandard2.0'" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="1.*" GeneratePathProperty="true" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
 
@@ -55,8 +53,6 @@
 
   <Target Name="GetDependencyTargetPaths">
     <ItemGroup>           
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGSolti_Utils_Primitives)\lib\netstandard2.0\Solti.Utils.Primitives.dll" IncludeRuntimeDependency="false" />
-      <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_AsyncInterfaces)\lib\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" IncludeRuntimeDependency="false" Condition="'$(TargetFramework)'=='netstandard2.0'" />
       <TargetPathWithTargetPlatformMoniker Include="$(PKGMicrosoft_Bcl_HashCode)\lib\netstandard2.0\Microsoft.Bcl.HashCode.dll" IncludeRuntimeDependency="false" Condition="'$(TargetFramework)'=='netstandard2.0'" />
     </ItemGroup>  
   </Target>
@@ -109,8 +105,6 @@
   -->
   <ItemGroup>
     <None Include="$(OutputPath)\netstandard2.0\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\netstandard2.0\Solti.Utils.Primitives.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    <None Include="$(OutputPath)\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="$(OutputPath)\netstandard2.0\Microsoft.Bcl.HashCode.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     <None Include="ProxyGen.NET.targets" Pack="true" PackagePath="build" />
   </ItemGroup>
