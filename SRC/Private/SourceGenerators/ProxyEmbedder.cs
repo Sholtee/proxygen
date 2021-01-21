@@ -37,32 +37,34 @@ namespace Solti.Utils.Proxy.Internals
 
         internal static string? LogException(Exception ex, in CancellationToken cancellation)
         {
-            try
+            string? logDump = WorkingDirectories.Instance.LogDump;
+            if (logDump is not null)
             {
-                Directory.CreateDirectory(WorkingDirectories.Instance.LogDump);
-
-                string logFile = Path.Combine(WorkingDirectories.Instance.LogDump, $"ProxyGen_{Guid.NewGuid()}.log");
-
-                using StreamWriter log = File.CreateText(logFile);
-                log.AutoFlush = true;
-
-                for (Exception? current = ex; current is not null; current = current.InnerException)
+                try
                 {
-                    if (current != ex) log.Write($"{NewLine}->{NewLine}", cancellation: cancellation);
-                    log.Write(current.ToString(), cancellation: cancellation);
+                    Directory.CreateDirectory(logDump);
 
-                    foreach (object? key in current.Data.Keys) 
+                    string logFile = Path.Combine(logDump, $"ProxyGen_{Guid.NewGuid()}.log");
+
+                    using StreamWriter log = File.CreateText(logFile);
+                    log.AutoFlush = true;
+
+                    for (Exception? current = ex; current is not null; current = current.InnerException)
                     {
-                        log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation: cancellation);
-                    }
-                }
+                        if (current != ex) log.Write($"{NewLine}->{NewLine}", cancellation: cancellation);
+                        log.Write(current.ToString(), cancellation: cancellation);
 
-                return logFile;
+                        foreach (object? key in current.Data.Keys)
+                        {
+                            log.Write($"{NewLine + key}:{NewLine + current.Data[key]}", cancellation: cancellation);
+                        }
+                    }
+
+                    return logFile;
+                }
+                catch {}
             }
-            catch 
-            {
-                return null;
-            }
+            return null;
         }
 
         internal static void ReportError(in GeneratorExecutionContext context, Exception ex, Location location) => context.ReportDiagnostic
@@ -84,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             IConfigReader configReader = new AnalyzerConfigReader(context);
 #if DEBUG
-            if (configReader.ReadValue("DebugGenerator")?.Equals("true", StringComparison.OrdinalIgnoreCase) == true)
+            if (configReader.ReadValue("DebugGenerator")?.Equals(true.ToString(), StringComparison.OrdinalIgnoreCase) == true)
             {
                 Debugger.Launch();
             }

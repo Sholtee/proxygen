@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string? SourceDump { get; }
 
-        public string LogDump { get; }
+        public string? LogDump { get; }
 
         public static WorkingDirectories Instance => FInstance.Value;
 
@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             AssemblyCacheDir = GetPath(nameof(AssemblyCacheDir));
             SourceDump       = GetPath(nameof(SourceDump));
-            LogDump          = GetPath(nameof(LogDump)) ?? Path.GetTempPath();
+            LogDump          = GetPath(nameof(LogDump));
 
             string? GetPath(string name)
             {
