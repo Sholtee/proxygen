@@ -65,29 +65,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        internal static void ReportError(in GeneratorExecutionContext context, Exception ex, Location location) => ReportDiagnostic
+        internal static void ReportError(in GeneratorExecutionContext context, Exception ex, Location location) => context.ReportDiagnostic
         (
-            context,
-            "PGE01", 
-            SGResources.TE_FAILED, 
-            string.Format
-            (
-                SGResources.Culture, 
-                SGResources.TE_FAILED_FULL, 
-                ex.Message,
-                LogException(ex, context.CancellationToken) ?? "NULL"
-            ), 
-            location, 
-            DiagnosticSeverity.Warning
-        );
-
-        internal static void ReportDiagnostic(in GeneratorExecutionContext context, string id, string msg, string fullMsg, Location location, DiagnosticSeverity severity) => context.ReportDiagnostic
-        (
-            Diagnostic.Create
-            (
-                new DiagnosticDescriptor(id, msg, fullMsg, SGResources.TE, severity, true),
-                location
-            )         
+            Diagnostics.PGE01(location, ex.Message, LogException(ex, context.CancellationToken) ?? "NULL")
         );
 
         public void Initialize(GeneratorInitializationContext context)
@@ -123,14 +103,9 @@ namespace Solti.Utils.Proxy.Internals
                 // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
                 //
 
-                if (aotGenerators.Any()) ReportDiagnostic
+                if (aotGenerators.Any()) context.ReportDiagnostic
                 (
-                    context,
-                    "PGE00",
-                    SGResources.LNG_NOT_SUPPORTED,
-                    SGResources.LNG_NOT_SUPPORTED,
-                    Location.None,
-                    DiagnosticSeverity.Warning
+                    Diagnostics.PGE00(Location.None)
                 );
                 return;
             }
@@ -161,25 +136,17 @@ namespace Solti.Utils.Proxy.Internals
                             source.Value
                         );
 
-                        ReportDiagnostic
+                        context.ReportDiagnostic
                         (
-                            context,
-                            "PGI00",
-                            SGResources.SRC_EXTENDED,
-                            string.Format
-                            (
-                                SGResources.Culture,
-                                SGResources.SRC_EXTENDED_FULL,
-                                source.Hint
-                            ),
-                            generator.Locations.Single(),
-                            DiagnosticSeverity.Info
+                            Diagnostics.PGI00(generator.Locations.Single(), source.Hint)
                         );
                     }
                 }
                 catch (InvalidSymbolException)
                 {
-                    continue;
+                    //
+                    // Ugras a kovetkezo generatorra
+                    //
                 }
                 catch (Exception e)
                 {
