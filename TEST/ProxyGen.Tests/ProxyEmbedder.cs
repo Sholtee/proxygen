@@ -61,11 +61,18 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             if (WorkingDirectories.Instance.LogDump is null)
             {
-                var dataStore = (IDictionary<string, object>) typeof(AppContext)
-                    .GetField("s_dataStore", BindingFlags.Static | BindingFlags.NonPublic)
-                    .GetValue(null);
-
-                dataStore["ProxyGen.LogDump"] = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs");
+                typeof(AppContext).InvokeMember
+                (
+                    "SetData", // netcore 2.x-ben van 3.x-ben nincs
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, 
+                    null, 
+                    null, 
+                    new object[] 
+                    { 
+                        "ProxyGen.LogDump", 
+                        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs") 
+                    }
+                );
 
                 WorkingDirectories.Setup(new RuntimeConfigReader());
             }
