@@ -10,7 +10,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -55,6 +54,22 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [Test]
         public void LogException_ShouldCreateALogFileForTheGivenException() 
         {
+            //
+            // Ha a tesztunket az OpenCover hivta akkor ertelemszeruen a "runtimeconfig.json" nem lesz
+            // alkalmazva
+            //
+
+            if (WorkingDirectories.Instance.LogDump is null)
+            {
+                var dataStore = (IDictionary<string, object>) typeof(AppContext)
+                    .GetField("s_dataStore", BindingFlags.Static | BindingFlags.NonPublic)
+                    .GetValue(null);
+
+                dataStore["ProxyGen.LogDump"] = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs");
+
+                WorkingDirectories.Setup(new RuntimeConfigReader());
+            }
+
             string logFile = ProxyEmbedder.LogException(new Exception(), default);
 
             Assert.That(File.Exists(logFile));
