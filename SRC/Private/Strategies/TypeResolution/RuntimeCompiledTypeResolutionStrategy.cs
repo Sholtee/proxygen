@@ -19,6 +19,8 @@ namespace Solti.Utils.Proxy.Internals
         {
             GeneratorType = generatorType;
             SyntaxFactory = syntaxFactory;
+            ClassName = syntaxFactory.ClassName;
+            ContainingAssembly  = syntaxFactory.ContainingAssembly;
         }
 
         public string? CacheDir { get; internal set; } = WorkingDirectories.Instance.AssemblyCacheDir; // tesztek miatt van setter
@@ -70,8 +72,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(GeneratorType).ShouldUse;
 
-        public string ClassName => SyntaxFactory.ClassName;
+        public string ClassName { get; }
 
-        public string ContainingAssembly => SyntaxFactory.ContainingAssembly;
+        public string ContainingAssembly { get; internal set; } // tesztek miat van setter
     }
 }

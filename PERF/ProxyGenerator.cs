@@ -10,6 +10,7 @@ using BenchmarkDotNet.Attributes;
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
+    using Internals;
 
     [MemoryDiagnoser]
     public class ProxyGenerator
@@ -20,10 +21,17 @@ namespace Solti.Utils.Proxy.Perf
             {
             }
         }
-        /*
+
+        internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
+
+        [GlobalSetup]
+        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) new ProxyGenerator<IInterface, InterfaceProxy>().TypeResolutionStrategy;
+
         [Benchmark]
-        public void AssemblingProxyType() =>
-            new ProxyGenerator<IInterface, InterfaceProxy>().GenerateType(null, Guid.NewGuid().ToString());
-        */
+        public void AssemblingProxyType()
+        {
+            TypeResolution.ContainingAssembly = Guid.NewGuid().ToString();
+            TypeResolution.Resolve(default);
+        }
     }
 }

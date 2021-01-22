@@ -10,6 +10,7 @@ using BenchmarkDotNet.Attributes;
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
+    using Internals;
 
     [MemoryDiagnoser]
     public class DuckGenerator
@@ -18,10 +19,17 @@ namespace Solti.Utils.Proxy.Perf
         {
             public int DoSomething(string param) => param.GetHashCode();
         }
-        /*
+
+        internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
+
+        [GlobalSetup]
+        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) new DuckGenerator<IInterface, Implementation>().TypeResolutionStrategy;       
+
         [Benchmark]
-        public void AssemblingDuckType() =>
-            new DuckGenerator<IInterface, Implementation>().GenerateType(null, Guid.NewGuid().ToString());
-        */
+        public void AssemblingProxyType()
+        {
+            TypeResolution.ContainingAssembly = Guid.NewGuid().ToString();
+            TypeResolution.Resolve(default);
+        }
     }
 }
