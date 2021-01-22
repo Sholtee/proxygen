@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         public AnalyzerConfigReader(in GeneratorExecutionContext context) =>
             ConfigOptions = context.AnalyzerConfigOptions.GlobalOptions;
 
-        private string? ReadValueInternal(string name) => ConfigOptions.TryGetValue($"build_property.{name}", out string? value)
+        private string? ReadValueInternal(string name) => ConfigOptions.TryGetValue($"build_property.{name}", out string? value) && !string.IsNullOrEmpty(value)
             ? value
             : null;
 
