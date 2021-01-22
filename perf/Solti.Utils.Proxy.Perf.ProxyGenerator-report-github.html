@@ -40,9 +40,9 @@
 <pre><code class="lang-ini">
 BenchmarkDotNet=v0.12.0, OS=Windows 10.0.17763.1098 (1809/October2018Update/Redstone5)
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
-.NET Core SDK=3.1.202
-  [Host]     : .NET Core 3.1.4 (CoreCLR 4.700.20.20201, CoreFX 4.700.20.22101), X64 RyuJIT
-  DefaultJob : .NET Core 3.1.4 (CoreCLR 4.700.20.20201, CoreFX 4.700.20.22101), X64 RyuJIT
+.NET Core SDK=5.0.102
+  [Host]     : .NET Core 3.1.11 (CoreCLR 4.700.20.56602, CoreFX 4.700.20.56604), X64 RyuJIT
+  DefaultJob : .NET Core 3.1.11 (CoreCLR 4.700.20.56602, CoreFX 4.700.20.56604), X64 RyuJIT
 
 </code></pre><table>
 <thead>
@@ -51,7 +51,6 @@ Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 <th style="text-align:right">Mean</th>
 <th style="text-align:right">Error</th>
 <th style="text-align:right">StdDev</th>
-<th style="text-align:right">Median</th>
 <th style="text-align:right">Gen 0</th>
 <th style="text-align:right">Gen 1</th>
 <th style="text-align:right">Gen 2</th>
@@ -61,14 +60,13 @@ Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 <tbody>
 <tr>
 <td>AssemblingProxyType</td>
-<td style="text-align:right">29.91 ms</td>
-<td style="text-align:right">2.439 ms</td>
-<td style="text-align:right">7.037 ms</td>
-<td style="text-align:right">26.75 ms</td>
+<td style="text-align:right">23.56 ms</td>
+<td style="text-align:right">1.887 ms</td>
+<td style="text-align:right">5.474 ms</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">2.46 MB</td>
+<td style="text-align:right">2.11 MB</td>
 </tr>
 </tbody>
 </table>
