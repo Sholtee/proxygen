@@ -41,6 +41,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ClsSrcUnit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Generated_58FE2F468ED7922B66B7373FBC0D23A1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -50,7 +53,7 @@
     <None Update="CallbackSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ClsSrc.txt">
+    <None Update="ClsSrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="DuckClsSrc.txt">

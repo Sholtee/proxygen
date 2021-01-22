@@ -111,6 +111,23 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             IdentifierName(CONTAINING_NS)
                         )
+
+                        //
+                        // #nullable disable
+                        //
+
+                        .WithNamespaceKeyword
+                        (
+                            Token
+                            (
+                                TriviaList
+                                (
+                                    Trivia(NullableDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true))
+                                ),
+                                SyntaxKind.NamespaceKeyword,
+                                TriviaList()
+                            )
+                        )
                         .WithMembers
                         (
                             members: classImpl

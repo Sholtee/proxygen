@@ -7,6 +7,8 @@
     <OutputPath>..\..\BIN\</OutputPath>
     <AssemblyName>Solti.Utils.Proxy.Tests.EmbeddedTypes</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests.EmbeddedTypes</RootNamespace>
+    <LangVersion>9</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
