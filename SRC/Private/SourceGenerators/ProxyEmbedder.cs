@@ -99,7 +99,7 @@ namespace Solti.Utils.Proxy.Internals
             // Csak C# 7.0+ tamogatjuk
             //
 
-            if (context.ParseOptions is not CSharpParseOptions parseOptions || parseOptions.LanguageVersion < LanguageVersion.CSharp7)
+            if (compilation.Language != CSharpParseOptions.Default.Language /*context.ParseOptions is not CSharpParseOptions parseOptions*/ || ((CSharpParseOptions) context.ParseOptions).LanguageVersion < LanguageVersion.CSharp7)
             {
                 //
                 // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
