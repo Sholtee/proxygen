@@ -258,6 +258,39 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(diags.Length, Is.EqualTo(1));
         }
 
+        [Test]
+        public void Execute_ShouldWarnOnUnsupportedLanguageVersion() 
+        {
+            Compilation compilation = CreateCompilation
+            (
+                @"
+                using System.Collections;
+
+                using Solti.Utils.Proxy;
+                using Solti.Utils.Proxy.Attributes;
+                using Solti.Utils.Proxy.Generators;
+
+                [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, IEnumerable>))]
+                ",
+                Runtime
+                    .Assemblies
+                    .Select(asm => asm.Location)
+                    .Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
+                    .Distinct(),
+                Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6
+            );
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create
+            (
+                new ISourceGenerator[] { new ProxyEmbedder() }, 
+                parseOptions: new CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6)
+            );
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Any(diag => diag.Id == "PGE00" && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage() == SGResources.LNG_NOT_SUPPORTED));
+            Assert.That(diags.Length, Is.EqualTo(1));
+        }
+
         private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");
 
         public static IEnumerable<Type> EmbeddedGenerators 

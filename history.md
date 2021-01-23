@@ -74,3 +74,6 @@
   - *introduced:* Source code dumping is available in compile time
 - 4.0.0-preview5:
   - *fixed:* MSBuild property reading issue
+- 4.0.0-preview6:
+  - *done:* Disable "nullabe annotation context" in generated sources
+  - *done:* Source generator warns on unsupported language version

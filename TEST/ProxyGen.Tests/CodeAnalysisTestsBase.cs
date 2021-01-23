@@ -15,14 +15,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     public abstract class CodeAnalysisTestsBase
     {
-        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences, bool suppressErrors = false) 
+        public static CSharpCompilation CreateCompilation(string src, IEnumerable<string> additionalReferences, LanguageVersion languageVersion = LanguageVersion.Latest, bool suppressErrors = false) 
         {
             var result = CSharpCompilation.Create
             (
                 "cica",
                 new[]
                 {
-                    CSharpSyntaxTree.ParseText(src)
+                    CSharpSyntaxTree.ParseText(src, new CSharpParseOptions(languageVersion))
                 },
                 Runtime
                     .Assemblies

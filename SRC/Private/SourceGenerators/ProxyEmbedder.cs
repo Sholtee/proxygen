@@ -96,10 +96,10 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
 
             //
-            // Csak C#-t tamogatjuk
+            // Csak C# 7.0+ tamogatjuk
             //
 
-            if (compilation.Language != CSharpParseOptions.Default.Language)
+            if (context.ParseOptions is not CSharpParseOptions parseOptions || parseOptions.LanguageVersion < LanguageVersion.CSharp7)
             {
                 //
                 // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
