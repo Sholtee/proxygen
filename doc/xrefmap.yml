@@ -103,23 +103,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget)
   nameWithType: DuckGenerator<TInterface, TTarget>
   nameWithType.vb: DuckGenerator(Of TInterface, TTarget)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.SupportedResolutions
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_SupportedResolutions
-  commentId: P:Solti.Utils.Proxy.Generators.DuckGenerator`2.SupportedResolutions
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).SupportedResolutions
-  nameWithType: DuckGenerator<TInterface, TTarget>.SupportedResolutions
-  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).SupportedResolutions
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.SupportedResolutions*
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_SupportedResolutions_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator`2.SupportedResolutions
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).SupportedResolutions
-  nameWithType: DuckGenerator<TInterface, TTarget>.SupportedResolutions
-  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).SupportedResolutions
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2
   name: ProxyGenerator<TInterface, TInterceptor>
   href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html
@@ -129,23 +112,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor)
   nameWithType: ProxyGenerator<TInterface, TInterceptor>
   nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.SupportedResolutions
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_SupportedResolutions
-  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator`2.SupportedResolutions
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).SupportedResolutions
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.SupportedResolutions
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).SupportedResolutions
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.SupportedResolutions*
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_SupportedResolutions_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator`2.SupportedResolutions
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).SupportedResolutions
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.SupportedResolutions
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).SupportedResolutions
 - uid: Solti.Utils.Proxy.InterfaceInterceptor`1
   name: InterfaceInterceptor<TInterface>
   href: Solti.Utils.Proxy.InterfaceInterceptor-1.html
@@ -344,77 +310,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution
-  name: ITypeResolution
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html
-  commentId: T:Solti.Utils.Proxy.Internals.ITypeResolution
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution
-  nameWithType: ITypeResolution
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
-  name: ClassName
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ClassName
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
-  nameWithType: ITypeResolution.ClassName
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName*
-  name: ClassName
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ClassName_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ClassName
-  nameWithType: ITypeResolution.ClassName
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
-  name: ContainingAssembly
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ContainingAssembly
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
-  nameWithType: ITypeResolution.ContainingAssembly
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly*
-  name: ContainingAssembly
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ContainingAssembly_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ContainingAssembly
-  nameWithType: ITypeResolution.ContainingAssembly
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
-  name: GeneratorType
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_GeneratorType
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
-  nameWithType: ITypeResolution.GeneratorType
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType*
-  name: GeneratorType
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_GeneratorType_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.GeneratorType
-  nameWithType: ITypeResolution.GeneratorType
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
-  name: Resolve(CancellationToken)
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_Resolve_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve(System.Threading.CancellationToken)
-  nameWithType: ITypeResolution.Resolve(CancellationToken)
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve*
-  name: Resolve
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_Resolve_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.Resolve
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.Resolve
-  nameWithType: ITypeResolution.Resolve
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
-  name: ShouldUse
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ShouldUse
-  commentId: P:Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
-  nameWithType: ITypeResolution.ShouldUse
-- uid: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse*
-  name: ShouldUse
-  href: Solti.Utils.Proxy.Internals.ITypeResolution.html#Solti_Utils_Proxy_Internals_ITypeResolution_ShouldUse_
-  commentId: Overload:Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.ITypeResolution.ShouldUse
-  nameWithType: ITypeResolution.ShouldUse
 - uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
   name: RelatedGeneratorAttribute
   href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html
@@ -456,6 +351,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant)
   nameWithType: TypeGenerator<TDescendant>
   nameWithType.vb: TypeGenerator(Of TDescendant)
+- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.#ctor
+  name: TypeGenerator()
+  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1__ctor
+  commentId: M:Solti.Utils.Proxy.Internals.TypeGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeGenerator()
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeGenerator()
+  nameWithType: TypeGenerator<TDescendant>.TypeGenerator()
+  nameWithType.vb: TypeGenerator(Of TDescendant).TypeGenerator()
+- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.#ctor*
+  name: TypeGenerator
+  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeGenerator
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeGenerator
+  nameWithType: TypeGenerator<TDescendant>.TypeGenerator
+  nameWithType.vb: TypeGenerator(Of TDescendant).TypeGenerator
 - uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType
   name: GetGeneratedType()
   href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType
@@ -490,40 +402,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
   nameWithType: TypeGenerator<TDescendant>.GetGeneratedTypeAsync
   nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.SupportedResolutions
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_SupportedResolutions
-  commentId: P:Solti.Utils.Proxy.Internals.TypeGenerator`1.SupportedResolutions
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).SupportedResolutions
-  nameWithType: TypeGenerator<TDescendant>.SupportedResolutions
-  nameWithType.vb: TypeGenerator(Of TDescendant).SupportedResolutions
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.SupportedResolutions*
-  name: SupportedResolutions
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_SupportedResolutions_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.SupportedResolutions
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.SupportedResolutions
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).SupportedResolutions
-  nameWithType: TypeGenerator<TDescendant>.SupportedResolutions
-  nameWithType.vb: TypeGenerator(Of TDescendant).SupportedResolutions
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_TypeResolutionStrategy
-  commentId: P:Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeResolutionStrategy
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeResolutionStrategy
-  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
-  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy*
-  name: TypeResolutionStrategy
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_TypeResolutionStrategy_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.TypeResolutionStrategy
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.TypeResolutionStrategy
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).TypeResolutionStrategy
-  nameWithType: TypeGenerator<TDescendant>.TypeResolutionStrategy
-  nameWithType.vb: TypeGenerator(Of TDescendant).TypeResolutionStrategy
 - uid: Solti.Utils.Proxy.IProxyAccess`1
   name: IProxyAccess<TInterface>
   href: Solti.Utils.Proxy.IProxyAccess-1.html
