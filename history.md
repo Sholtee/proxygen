@@ -77,3 +77,6 @@
 - 4.0.0-preview6:
   - *done:* Disable "nullabe annotation context" in generated sources
   - *done:* Source generator warns on unsupported language version
+- 4.0.0-preview7:
+  - *breaking:* `ITypeResolution` became internal
+  - *fixed:* Embedded type resolution issue
