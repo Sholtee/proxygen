@@ -4,60 +4,58 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Attributes;
+
     internal sealed class EmbeddedTypeResolutionStrategy : ITypeResolution
     {
-        private static readonly ConcurrentDictionary<Type, Type> FEmbeddedTypes = new ConcurrentDictionary<Type, Type>();
-
-        //
-        // Az osszes ProxyGen-t hivatkozo szerelvenyt megvizsgaljuk betolteskor (nyilvan 
-        // mind ezutan a szerelveny utan toltodnek be).
-        //
-
-        [ModuleInitializer]
-        public static void ModuleInit() => AppDomain.CurrentDomain.AssemblyLoad += (sender, args) => 
-        {
-            var embeddedTypes =
-            (
-                from embeddedType in args.LoadedAssembly.GetTypes()
-                let rga = embeddedType.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)
-                where rga is not null
-                select new 
-                {
-                    EmbeddedType = embeddedType,
-                    RelatedGenerator = rga
-                }
-            );
-
-            foreach (var t in embeddedTypes)
-            {
-                FEmbeddedTypes.TryAdd(t.RelatedGenerator.Generator, t.EmbeddedType);
-            }
-        };
-
         public Type GeneratorType { get; }
 
-        public EmbeddedTypeResolutionStrategy(Type generatorType) =>
-            //
-            // Ez jol kezeli azt az esetet ha az EmbedGeneratedTypeAttribute a szerelvenyen van de a
-            // forras nem lett bovitve forditaskor (pl VB-ben irtuk a kodunkat).
-            //
+        private readonly Type? FResolvedType;
 
-            ShouldUse = FEmbeddedTypes.ContainsKey(GeneratorType = generatorType);
+        public EmbeddedTypeResolutionStrategy(Type generatorType)
+        {
+            var trace = new StackTrace();
 
-        public Type Resolve(CancellationToken cancellation) => FEmbeddedTypes[GeneratorType];
+            Assembly inspectedAssembly = typeof(EmbeddedTypeResolutionStrategy).Assembly;
 
-        public bool ShouldUse { get; }
+            for (int i = 1; i < trace.FrameCount; i++) 
+            {
+                Assembly callingAssembly = trace
+                    .GetFrame(i)
+                    .GetMethod()
+                    .DeclaringType
+                    .Assembly;
+                
+                if (callingAssembly != inspectedAssembly)
+                {
+                    if (callingAssembly.GetCustomAttribute<EmbedGeneratedTypeAttribute>()?.Generator == generatorType)
+                    {
+                        FResolvedType = callingAssembly
+                            .GetTypes()
+                            .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == generatorType);
+                        break;
+                    }
+                }
 
-        public string ClassName => FEmbeddedTypes[GeneratorType].FullName;
+                inspectedAssembly = callingAssembly;
+            }
 
-        public string ContainingAssembly => FEmbeddedTypes[GeneratorType].Assembly.GetName().Name;
+            GeneratorType = generatorType;
+        }
+
+        public Type Resolve(CancellationToken cancellation) => FResolvedType!;
+
+        public bool ShouldUse => FResolvedType is not null;
+
+        public string ClassName => FResolvedType?.FullName!;
+
+        public string ContainingAssembly => FResolvedType?.Assembly.GetName().Name!;
     }
 }
