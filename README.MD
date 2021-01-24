@@ -108,9 +108,9 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyClass>))]
 
 ```
-`xXxGenerator.GetGeneratedType()` will return the embedded type if it presents in the assembly in which the `GetGeneratedType()` was called. Since all the time consumig operations happen in compile time this feature can singificantly improve the performance.
+The `xXxGenerator.GetGeneratedType()` method returns the embedded type if it presents in the assembly in which the `GetGeneratedType()` was called. Since all the time consumig operations already happened in compile time, requesting embedded types can singificantly improve the performance.
 
-Note thatopen generics are not supported.
+Note that open generics are not supported.
 ## Inspecting the generated code
 *ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable 
 - In runtime:
