@@ -27,14 +27,14 @@ namespace Solti.Utils.Proxy.Internals
 
             for (int i = 1; i < trace.FrameCount; i++) 
             {
-                Type? contaningType = trace
+                Type? containingType = trace
                     .GetFrame(i)
                     .GetMethod()
                     .DeclaringType;
 
-                if (contaningType is not null) // delegatumoknak nincs deklaralo tipusa
+                if (containingType is not null) // delegatumoknak nincs deklaralo tipusa
                 {
-                    Assembly callingAssembly = contaningType.Assembly;
+                    Assembly callingAssembly = containingType.Assembly;
 
                     if (callingAssembly != inspectedAssembly)
                     {
