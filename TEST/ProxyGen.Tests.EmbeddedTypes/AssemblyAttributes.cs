@@ -17,4 +17,4 @@ using Solti.Utils.Proxy.Tests.EmbeddedTypes;
     EmbedGeneratedType(typeof(ProxyGenerator<IList<string>, ExternalInterceptor<IList<string>>>)),
     EmbedGeneratedType(typeof(ProxyGenerator<IInternalInterface, InterfaceInterceptor<IInternalInterface>>)),
     EmbedGeneratedType(typeof(DuckGenerator<IInternalInterface, IInternalInterface>)),
-    EmbedGeneratedType(typeof(DuckGenerator<IList, IList>))]
+    EmbedGeneratedType(typeof(DuckGenerator<IReadOnlyCollection<string>, List<string>>))]
