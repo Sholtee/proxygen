@@ -21,30 +21,34 @@ namespace Solti.Utils.Proxy.Internals
 
         public EmbeddedTypeResolutionStrategy(Type generatorType)
         {
-            var trace = new StackTrace();
+            StackTrace trace = new();
 
             Assembly inspectedAssembly = typeof(EmbeddedTypeResolutionStrategy).Assembly;
 
             for (int i = 1; i < trace.FrameCount; i++) 
             {
-                Assembly callingAssembly = trace
+                Type? contaningType = trace
                     .GetFrame(i)
                     .GetMethod()
-                    .DeclaringType
-                    .Assembly;
-                
-                if (callingAssembly != inspectedAssembly)
-                {
-                    if (callingAssembly.GetCustomAttribute<EmbedGeneratedTypeAttribute>()?.Generator == generatorType)
-                    {
-                        FResolvedType = callingAssembly
-                            .GetTypes()
-                            .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == generatorType);
-                        break;
-                    }
-                }
+                    .DeclaringType;
 
-                inspectedAssembly = callingAssembly;
+                if (contaningType is not null) // delegatumoknak nincs deklaralo tipusa
+                {
+                    Assembly callingAssembly = contaningType.Assembly;
+
+                    if (callingAssembly != inspectedAssembly)
+                    {
+                        if (callingAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>().Any(egta => egta.Generator == generatorType))
+                        {
+                            FResolvedType = callingAssembly
+                                .GetTypes()
+                                .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == generatorType);
+                            break;
+                        }
+                    }
+
+                    inspectedAssembly = callingAssembly;
+                }
             }
 
             GeneratorType = generatorType;

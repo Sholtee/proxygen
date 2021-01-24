@@ -22,6 +22,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
     using Attributes;
     using Primitives;
     using Properties;
+    using Proxy.Tests.EmbeddedTypes;
 
     public interface IMyService { }
 
@@ -291,13 +292,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(diags.Length, Is.EqualTo(1));
         }
 
-        private static readonly Assembly EmbeddedGeneratorHolder = Assembly.Load("Solti.Utils.Proxy.Tests.EmbeddedTypes");
-
         public static IEnumerable<Type> EmbeddedGenerators 
         {
             get 
             {
-                foreach (var egta in EmbeddedGeneratorHolder.GetCustomAttributes<EmbedGeneratedTypeAttribute>())
+                foreach (var egta in typeof(EmbeddedTypeExposer).Assembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>())
                 {
                     yield return egta.Generator;
                 }
@@ -307,18 +306,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(EmbeddedGenerators))]
         public void BuiltAssembly_ShouldContainTheProxy(Type generator) 
         {
-            object generatorInst = generator
-                .GetConstructor(Type.EmptyTypes)
-                .ToStaticDelegate()
-                .Invoke(new object[0]);
+            Type generatedType = (Type) typeof(EmbeddedTypeExposer)
+                .GetMethod(nameof(EmbeddedTypeExposer.GetGeneratedTypeByGenerator), BindingFlags.Public | BindingFlags.Static)
+                .MakeGenericMethod(generator)
+                .Invoke(null, null);
 
-            ITypeResolution typeResolutionStrategy = (ITypeResolution) generator
-                .GetProperty("TypeResolutionStrategy")
-                .ToGetter()
-                .Invoke(generatorInst);
-
-            Assert.That(typeResolutionStrategy, Is.InstanceOf<EmbeddedTypeResolutionStrategy>());
-            Assert.IsNotNull(EmbeddedGeneratorHolder.GetType(typeResolutionStrategy.ClassName, throwOnError: false));
+            Assert.That(generatedType.Assembly, Is.EqualTo(typeof(EmbeddedTypeExposer).Assembly));
         }
     }
 }
