@@ -91,7 +91,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   
 Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/DuckGenerator.cs ).
 ## Caching the generated assembly
-By setting the `ProxyGen.AssemblyCacheDir` property in [YourApp.runtimeconfig.json](https://docs.microsoft.com/en-us/dotnet/core/run-time-config/ ) you can make the system cache the generated assembly, so next time your app starts and requires the proxy there won't be time consuming emitting operation.
+By setting the `ProxyGen.AssemblyCacheDir` property in [YourApp.runtimeconfig.json](https://docs.microsoft.com/en-us/dotnet/core/run-time-config/ ) you can make the system cache the generated assembly, so next time your app starts and requests the proxy there won't be time consuming emitting operation.
 
 You can do it easily by creating a template file named `runtimeconfig.template.json` in your project folder:
 ```json
@@ -108,7 +108,9 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyClass>))]
 
 ```
-Since all the time consumig operations happen in compile time this feature can singificantly improve the performance. Note that open generics are not supported.
+`xXxGenerator.GetGeneratedType()` will return the embedded type if it presents in the assembly in which the `GetGeneratedType()` was called. Since all the time consumig operations happen in compile time this feature can singificantly improve the performance.
+
+Note thatopen generics are not supported.
 ## Inspecting the generated code
 *ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable 
 - In runtime:
