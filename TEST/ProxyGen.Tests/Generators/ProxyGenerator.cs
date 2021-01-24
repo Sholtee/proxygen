@@ -508,8 +508,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
         {
-            Assert.AreEqual(WIRED_NAME, new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>().TypeResolutionStrategy.ContainingAssembly);
-            Assert.AreNotEqual(WIRED_NAME, new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>().TypeResolutionStrategy.ContainingAssembly);
+            Assert.AreEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>()).TypeResolutionStrategy.ContainingAssembly);
+            Assert.AreNotEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>()).TypeResolutionStrategy.ContainingAssembly);
         }
 
         [Test]

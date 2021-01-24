@@ -29,7 +29,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             try
             {
-                return new TDescendant().TypeResolutionStrategy.Resolve(cancellation);
+                ITypeGenerator self = new TDescendant();
+
+                return self
+                    .TypeResolutionStrategy
+                    .Resolve(cancellation);
             }
 
             //
@@ -41,18 +45,21 @@ namespace Solti.Utils.Proxy.Internals
                 throw ex.InnerException;
             }
         }
+
+        private readonly ITypeResolution FTypeResolution;
+        ITypeResolution ITypeGenerator.TypeResolutionStrategy => FTypeResolution;
         #endregion
 
         #region Protected
         /// <summary>
         /// Creates a new <see cref="TypeGenerator{TDescendant}"/> instance.
         /// </summary>
-        protected TypeGenerator() => TypeResolutionStrategy = SupportedResolutions.Single(strat => strat.ShouldUse);
+        protected TypeGenerator() => FTypeResolution = SupportedResolutions.Single(strat => strat.ShouldUse);
 
         /// <summary>
         /// Returns the supported type resolution strategies.
         /// </summary>
-        protected abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
+        private protected abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
         #endregion
 
         #region Public
@@ -89,11 +96,6 @@ namespace Solti.Utils.Proxy.Internals
             }
             finally { FLock.Release(); }
         }
-
-        /// <summary>
-        /// The strategy used to resolve the generated <see cref="Type"/>.
-        /// </summary>
-        public ITypeResolution TypeResolutionStrategy { get; }
         #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Represents the method how the generated <see cref="Type"/> will be resolved.
     /// </summary>
-    public interface ITypeResolution
+    internal interface ITypeResolution
     {
         /// <summary>
         /// The related <see cref="TypeGenerator{TDescendant}"/> descendant.

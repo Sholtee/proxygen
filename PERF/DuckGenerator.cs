@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Perf
         internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
 
         [GlobalSetup]
-        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) new DuckGenerator<IInterface, Implementation>().TypeResolutionStrategy;       
+        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) ((ITypeGenerator) new DuckGenerator<IInterface, Implementation>()).TypeResolutionStrategy;       
 
         [Benchmark]
         public void AssemblingProxyType()
