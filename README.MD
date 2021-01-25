@@ -110,7 +110,19 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 ```
 The `xXxGenerator.GetGeneratedType()` method returns the embedded type if it presents in the assembly in which the `GetGeneratedType()` was called. Since all the time consumig operations already happened in compile time, requesting embedded types can singificantly improve the performance.
 
-Note that open generics are not supported.
+Note that:
+- Open generics are not supported.
+- [coveralls.io](https://www.nuget.org/packages/coveralls.io/ ) (and other coverage reporters) may crash if your project was augmented by a source generator. To work this issue around:
+  - Ignore the generated sources in you coverage app (e.g.: in [OpenCover](https://www.nuget.org/packages/OpenCover/ use the `-filter:-[*]Proxies.GeneratedClass_*` switch)
+  - Create an empty file for each generated class (e.g.: `YourProject\Solti.Utils.Proxy\Solti.Utils.Proxy.Internals.ProxyEmbedder\Proxies.GeneratedClass_XxX.cs`)
+  - Exclude these files from your project:
+  ```xml
+  <ItemGroup>
+    <Compile Remove="Solti.Utils.Proxy\**" />
+    <EmbeddedResource Remove="Solti.Utils.Proxy\**" />
+    <None Remove="Solti.Utils.Proxy\**" />
+  </ItemGroup>
+  ```  
 ## Inspecting the generated code
 *ProxyGen* is able to dump the generated sources. Due to performance considerations it is disabled by default. To enable 
 - In runtime:
