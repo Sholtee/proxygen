@@ -43,9 +43,20 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsVoid => UnderlyingType == typeof(void);
 
         private ITypeInfo? FEnclosingType;
-        public ITypeInfo? EnclosingType => UnderlyingType.DeclaringType is not null
-            ? FEnclosingType ??= CreateFrom(UnderlyingType.DeclaringType)
-            : null;
+        public ITypeInfo? EnclosingType
+        {
+            get 
+            {
+                if (FEnclosingType is null)
+                {
+                    Type? enclosingType = UnderlyingType.GetEnclosingType();
+
+                    if (enclosingType is not null)
+                        FEnclosingType = CreateFrom(enclosingType);
+                }
+                return FEnclosingType;
+            }
+        }
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
@@ -73,11 +84,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             get
             {
-                if (FElementType == null)
+                if (FElementType is null)
                 {
                     Type? realType = UnderlyingType.GetElementType();
 
-                    if (realType != null)
+                    if (realType is not null)
                         FElementType = CreateFrom(realType);
                 }
                 return FElementType;

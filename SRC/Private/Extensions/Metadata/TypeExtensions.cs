@@ -66,6 +66,31 @@ namespace Solti.Utils.Proxy.Internals
             return prev;
         }
 
+        public static Type? GetEnclosingType(this Type src) 
+        {
+            if (src.IsGenericParameter)
+                return null;
+
+            Type? enclosingType = src.DeclaringType;
+            if (enclosingType is null)
+                return null;
+
+            //
+            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
+            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
+            // Ami azert lassuk be igy eleg szopas.
+            //
+
+            int gaCount = enclosingType.GetGenericArguments().Length;
+            if (gaCount is 0)
+                return enclosingType;
+
+            return enclosingType.MakeGenericType
+            (
+                src.GetGenericArguments().Take(gaCount).ToArray()
+            );
+        }
+
         public static bool IsNested(this Type src) =>
             //
             // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb

@@ -54,6 +54,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             }
         }
 
+        private class CicaNestedDescendant : CicaNested<IAliasSymbol> { }
+
         [TestCase(typeof(Cica<>.Mica<>.Hajj), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<T>.Mica<TT>.Hajj")]
         [TestCase(typeof(Cica<>.Mica.Hajj<,>), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<T>.Mica.Hajj<TT, TTT>")]
         [TestCase(typeof(Cica<List<int>>.Mica<string>.Hajj), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.Cica<global::System.Collections.Generic.List<global::System.Int32>>.Mica<global::System.String>.Hajj")]
@@ -62,6 +64,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(CicaNested<>.Mica.Hajj<,>), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<T>.Mica.Hajj<TT, TTT>")]
         [TestCase(typeof(CicaNested<List<int>>.Mica<string>.Hajj), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<global::System.Collections.Generic.List<global::System.Int32>>.Mica<global::System.String>.Hajj")]
         [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<global::System.Int32>.Mica.Hajj<global::System.String, global::System.Object>")]
+        [TestCase(typeof(CicaNestedDescendant.Mica), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.CicaNested<global::Microsoft.CodeAnalysis.IAliasSymbol>.Mica")]
         public void CreateType_ShouldHandleNestedTypes(Type type, string expected) =>
             Assert.That(new MemberSyntaxFactory(default).CreateType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
