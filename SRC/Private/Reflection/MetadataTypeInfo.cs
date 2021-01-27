@@ -210,37 +210,11 @@ namespace Solti.Utils.Proxy.Internals
                     UnderlyingType.MakeGenericType
                     (
                         genericArgs
-                            .Select(TypeInfoToMetadata)
+                            .Select(arg => arg.ToMetadata())
                             .ToArray()
                     )
                 );
             }
-        }
-
-        internal static Type TypeInfoToMetadata(ITypeInfo type)
-        {
-            //
-            // Az AssemblyQualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
-            //
-
-            Type queried = Type.GetType(type.AssemblyQualifiedName, throwOnError: true);
-
-            if (type is IGenericTypeInfo generic && generic.IsGenericDefinition)
-                return queried;
-
-            if (queried.IsGenericType)
-            {
-                Type[] gas = type
-                    .GetParentTypes()
-                    .Append(type)
-                    .OfType<IGenericTypeInfo>()
-                    .SelectMany(g => g.GenericArguments.Select(TypeInfoToMetadata))
-                    .ToArray();
-
-                return queried.MakeGenericType(gas);
-            }
-
-            return queried;
         }
 
         private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 

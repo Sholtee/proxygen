@@ -186,73 +186,11 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     UnderlyingSymbol.Construct
                     (
-                        genericArgs.Select(ga => TypeInfoToSymbol(ga, Compilation)).ToArray()
+                        genericArgs.Select(ga => ga.ToSymbol(Compilation)).ToArray()
                     ),
                     Compilation
                 );
             }
-        }
-
-        internal static ITypeSymbol TypeInfoToSymbol(ITypeInfo type, Compilation compilation)
-        {
-            INamedTypeSymbol? symbol;
-
-            if (type.GetEnclosingTypes().Any())
-            {
-                int arity = (type as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
-
-                symbol = TypeInfoToSymbol(type.GetParentTypes().Last(), compilation)
-                    .GetTypeMembers(type.Name, arity)
-                    .Single();
-            }
-            else
-            {
-                //
-                // Tombot es mutatot nem lehet lekerdezni nev alapjan
-                //
-
-                switch (type.RefType)
-                {
-                    case RefType.Array:
-                        IArrayTypeInfo ar = (IArrayTypeInfo) type;
-                        return compilation.CreateArrayTypeSymbol(TypeInfoToSymbol(ar.ElementType!, compilation), ar.Rank);
-                    case RefType.Pointer:
-                        return compilation.CreatePointerTypeSymbol(TypeInfoToSymbol(type.ElementType!, compilation));
-                }
-
-                //
-                // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
-                // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
-                //
-
-                symbol = compilation.GetTypeByMetadataName(type.FullName ?? throw new NotSupportedException());
-
-                if (symbol is null)
-                {
-                    var ex = new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, type.FullName));
-
-                    //
-                    // SourceGenerator-ba nem lehet beleDEBUGolni ezert...
-                    //
-
-                    ex.Data["containingAsm"] = type.DeclaringAssembly?.Name;
-                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Select(@ref => @ref.Display));
-                   
-                    throw ex;
-                }
-            }
-
-            if (type is IGenericTypeInfo generic && !generic.IsGenericDefinition)
-            {
-                ITypeSymbol[] gaSymbols = generic
-                    .GenericArguments
-                    .Select(ga => TypeInfoToSymbol(ga, compilation))
-                    .ToArray();
-
-                return symbol.Construct(gaSymbols);
-            }
-
-            return symbol;
         }
 
         private sealed class SymbolArrayTypeInfo : SymbolTypeInfo, IArrayTypeInfo

@@ -132,7 +132,7 @@ namespace Solti.Utils.Proxy.Internals
                     .Select(@ref => MetadataReference.CreateFromFile(@ref.Location!))
             );
 
-            switch (TypeInfoToSymbol(type, comp).DeclaredAccessibility) 
+            switch (type.ToSymbol(comp).DeclaredAccessibility) 
             {
                 case Accessibility.Private:
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));

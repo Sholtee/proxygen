@@ -35,7 +35,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return CreateTI(typeof(ISyntaxFactory).Assembly);
                 yield return MetadataAssemblyInfo.CreateFrom(typeof(ReflectionTests).Assembly);
                 yield return CreateTI(typeof(ReflectionTests).Assembly);
-
             }
         }
 
@@ -84,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
-                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+                type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
             var processed = new HashSet<string>();
 
@@ -375,7 +374,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             Compilation compilation = CreateCompilation(string.Empty, data.Type.Assembly);
 
-            ITypeSymbol resolved = SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(data.Type), compilation);
+            ITypeSymbol resolved = MetadataTypeInfo.CreateFrom(data.Type).ToSymbol(compilation);
 
             Assert.That(resolved.ToString(), Is.EqualTo(data.Name));
         }
@@ -384,13 +383,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void TypeInfoToSymbol_ShouldThrowIfTheTypeNotFound() 
         {
             Compilation compilation = CreateCompilation(string.Empty);
-            Assert.Throws<TypeLoadException>(() => SymbolTypeInfo.TypeInfoToSymbol(MetadataTypeInfo.CreateFrom(typeof(NestedGeneric<>)), compilation));
+            Assert.Throws<TypeLoadException>(() => MetadataTypeInfo.CreateFrom(typeof(NestedGeneric<>)).ToSymbol(compilation));
         }
 
         [TestCaseSource(nameof(Types))]
         public void TypeInfoToMetadata_ShouldReturnTheDesiredMetadata((Type Type, string _) data)
         {
-            Type resolved = MetadataTypeInfo.TypeInfoToMetadata(MetadataTypeInfo.CreateFrom(data.Type));
+            Type resolved = MetadataTypeInfo.CreateFrom(data.Type).ToMetadata();
             Assert.That(resolved, Is.EqualTo(data.Type));
         }
     }

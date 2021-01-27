@@ -10,6 +10,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
+using Microsoft.CodeAnalysis;
+
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
@@ -139,5 +141,93 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<ITypeInfo> GetEnclosingTypes(this ITypeInfo src) => src.IterateOn(x => x.EnclosingType);
 
         public static IEnumerable<ITypeInfo> GetParentTypes(this ITypeInfo src) => src.GetEnclosingTypes().Reverse();
+
+        public static ITypeSymbol ToSymbol(this ITypeInfo src, Compilation compilation)
+        {
+            INamedTypeSymbol? symbol;
+
+            if (src.GetEnclosingTypes().Any())
+            {
+                int arity = (src as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
+
+                symbol = ToSymbol(src.GetParentTypes().Last(), compilation)
+                    .GetTypeMembers(src.Name, arity)
+                    .Single();
+            }
+            else
+            {
+                //
+                // Tombot es mutatot nem lehet lekerdezni nev alapjan
+                //
+
+                switch (src.RefType)
+                {
+                    case RefType.Array:
+                        IArrayTypeInfo ar = (IArrayTypeInfo)src;
+                        return compilation.CreateArrayTypeSymbol(ToSymbol(ar.ElementType!, compilation), ar.Rank);
+                    case RefType.Pointer:
+                        return compilation.CreatePointerTypeSymbol(ToSymbol(src.ElementType!, compilation));
+                }
+
+                //
+                // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
+                // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
+                //
+
+                symbol = compilation.GetTypeByMetadataName(src.FullName ?? throw new NotSupportedException());
+
+                if (symbol is null)
+                {
+                    var ex = new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, src.FullName));
+
+                    //
+                    // SourceGenerator-ba nem lehet beleDEBUGolni ezert...
+                    //
+
+                    ex.Data["containingAsm"] = src.DeclaringAssembly?.Name;
+                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Select(@ref => @ref.Display));
+
+                    throw ex;
+                }
+            }
+
+            if (src is IGenericTypeInfo generic && !generic.IsGenericDefinition)
+            {
+                ITypeSymbol[] gaSymbols = generic
+                    .GenericArguments
+                    .Select(ga => ToSymbol(ga, compilation))
+                    .ToArray();
+
+                return symbol.Construct(gaSymbols);
+            }
+
+            return symbol;
+        }
+
+        public static Type ToMetadata(this ITypeInfo src)
+        {
+            //
+            // Az AssemblyQualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
+            //
+
+            Type queried = Type.GetType(src.AssemblyQualifiedName, throwOnError: true);
+
+            if (src is IGenericTypeInfo generic && generic.IsGenericDefinition)
+                return queried;
+
+            if (queried.IsGenericType)
+            {
+                Type[] gas = src
+                    .GetParentTypes()
+                    .Append(src)
+                    .OfType<IGenericTypeInfo>()
+                    .SelectMany(g => g.GenericArguments.Select(ToMetadata))
+                    .ToArray();
+
+                return queried.MakeGenericType(gas);
+            }
+
+            return queried;
+        }
     }
 }

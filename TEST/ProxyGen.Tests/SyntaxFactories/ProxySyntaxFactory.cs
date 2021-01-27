@@ -214,7 +214,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
-                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+                type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
             IGenericTypeInfo
                 interceptor1 = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>)),
@@ -246,12 +246,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     (
                         compilation.GetTypeByMetadataName(typeof(ProxyGenerator<,>).FullName).Construct
                         (
-                            SymbolTypeInfo.TypeInfoToSymbol(type2, compilation),
-                            SymbolTypeInfo.TypeInfoToSymbol
-                            (
-                                (ITypeInfo) interceptor2.Close(type2), 
-                                compilation
-                            )
+                            type2.ToSymbol(compilation),
+                            ((ITypeInfo) interceptor2.Close(type2)).ToSymbol(compilation)
                         ), 
                         compilation
                     )

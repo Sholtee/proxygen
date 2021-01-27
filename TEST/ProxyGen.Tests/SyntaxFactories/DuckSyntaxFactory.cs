@@ -163,7 +163,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             ITypeInfo
                 type1 = MetadataTypeInfo.CreateFrom(type),
-                type2 = SymbolTypeInfo.CreateFrom(SymbolTypeInfo.TypeInfoToSymbol(type1, compilation), compilation);
+                type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
             IUnitSyntaxFactory
                 fact1 = new DuckSyntaxFactory
@@ -185,8 +185,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                         compilation
                             .GetTypeByMetadataName(typeof(DuckGenerator<,>).FullName).Construct
                             (
-                                SymbolTypeInfo.TypeInfoToSymbol(type2, compilation), 
-                                SymbolTypeInfo.TypeInfoToSymbol(type2, compilation)
+                                type2.ToSymbol(compilation), 
+                                type2.ToSymbol(compilation)
                             ), 
                         compilation
                     )
