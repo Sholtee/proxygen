@@ -80,3 +80,6 @@
 - 4.0.0-preview7:
   - *breaking:* `ITypeResolution` became internal
   - *fixed:* Embedded type resolution issue
+- 4.0.0-preview8:
+  - *fixed:* Missing reference issue
+  - *imporved:* Syntax factory performance 
