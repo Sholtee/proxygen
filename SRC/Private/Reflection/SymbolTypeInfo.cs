@@ -11,8 +11,6 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal class SymbolTypeInfo : ITypeInfo
     {
         protected ITypeSymbol UnderlyingSymbol { get; }
