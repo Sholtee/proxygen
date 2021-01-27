@@ -37,15 +37,9 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         ITypeInfo? ElementType { get; }
         IHasName? ContainingMember { get; }
-        /// <summary>
-        /// Returns the declaring types starting with the closest one. In case of non nested types this property returns an empty list.
-        /// </summary>
-        IReadOnlyList<ITypeInfo> EnclosingTypes { get; }
+        ITypeInfo? EnclosingType { get; }
         IReadOnlyList<ITypeInfo> Interfaces { get; }
-        /// <summary>
-        /// Returns the base types starting with the closest one.
-        /// </summary>
-        IReadOnlyList<ITypeInfo> Bases { get; }
+        ITypeInfo? BaseType { get; }
         IReadOnlyList<IPropertyInfo> Properties { get; }
         IReadOnlyList<IEventInfo> Events { get; }
         IReadOnlyList<IMethodInfo> Methods { get; }

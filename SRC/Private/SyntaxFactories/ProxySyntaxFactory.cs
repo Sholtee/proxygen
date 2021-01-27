@@ -40,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
             // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
             //
 
-            if (!interceptorType.Bases.Append(interceptorType).Any(ic => ic.FullName == typeof(InterfaceInterceptor<>).FullName))
+            if (!interceptorType.GetBaseTypes().Append(interceptorType).Any(ic => ic.FullName == typeof(InterfaceInterceptor<>).FullName))
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)

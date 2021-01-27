@@ -154,10 +154,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void GetEnclosingTypes_ShouldReturnTheParentTypes() =>
-            Assert.That(typeof(Class.Nested).GetEnclosingTypes().SequenceEqual(new[] { typeof(TypeExtensionsTests), typeof(Class) }));
-
-        [Test]
         public void GetOwnGenericArguments_ShouldDoWhatTheNameSuggests() 
         {
             Type child = typeof(GenericParent<>.GenericChild<>);

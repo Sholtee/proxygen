@@ -59,26 +59,37 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
+            // Az os (osztaly) szerepelhet masik szerelvenyben.
+            //
+
+            if (type.BaseType is not null)
+                AddType(type.BaseType);
+
+            //
+            // Befoglalo tipus(ok) generikus parameterei szarmazhatnak masik szerelvenybol
+            //
+
+            if (type.EnclosingType is not null)
+                AddType(type.EnclosingType);
+
+            //
             // Generikus parameterek szerepelhetnek masik szerelvenyben.
             //
 
             if (genericType is not null)
-                foreach (ITypeInfo genericArg in genericType.GenericArguments)
-                    AddType(genericArg);
-  
-            //
-            // Az os (osztaly) szerepelhet masik szerelvenyben.
-            //
-
-            foreach (ITypeInfo @base in type.Bases)
-                AddType(@base);
+                AddTypesFrom(genericType.GenericArguments);
 
             //
             // "os" interface-ek szarmazhatnak masik szerelvenybol.
             //
 
-            foreach (ITypeInfo iface in type.Interfaces)
-                AddType(iface);
+            AddTypesFrom(type.Interfaces);
+
+            void AddTypesFrom(IEnumerable<ITypeInfo> types) 
+            {
+                foreach (ITypeInfo type in types)
+                    AddType(type);
+            }
         }
     }
 }

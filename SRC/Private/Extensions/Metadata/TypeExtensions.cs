@@ -177,31 +177,6 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<TMember> GetMembers(Type t) => getter(t, flags);
         }
 
-        public static IEnumerable<Type> GetParents(this Type type)
-        {
-            //
-            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
-            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
-            // Ami azert lassuk be igy eleg szopas.
-            //
-
-            IEnumerable<Type> genericArgs = type.GetGenericArguments();
-
-            for (Type parent = type; (parent = parent.DeclaringType) != null;)
-            {
-                int gaCount = parent.GetGenericArguments().Length;
-
-                yield return gaCount == 0
-                    ? parent
-                    : parent.MakeGenericType
-                    (
-                        genericArgs.Take(gaCount).ToArray()
-                    );
-            }
-        }
-
-        public static IEnumerable<Type> GetEnclosingTypes(this Type type) => type.GetParents().Reverse();
-
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
             for (Type? baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)

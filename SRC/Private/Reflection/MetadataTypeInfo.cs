@@ -42,11 +42,10 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsVoid => UnderlyingType == typeof(void);
 
-        private IReadOnlyList<ITypeInfo>? FEnclosingTypes;
-        public IReadOnlyList<ITypeInfo> EnclosingTypes => FEnclosingTypes ??= UnderlyingType
-            .GetEnclosingTypes()
-            .Select(CreateFrom)
-            .ToArray();
+        private ITypeInfo? FEnclosingType;
+        public ITypeInfo? EnclosingType => UnderlyingType.DeclaringType is not null
+            ? FEnclosingType ??= CreateFrom(UnderlyingType.DeclaringType)
+            : null;
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
@@ -54,11 +53,10 @@ namespace Solti.Utils.Proxy.Internals
             .Select(CreateFrom)
             .ToArray();
 
-        private IReadOnlyList<ITypeInfo>? FBases;
-        public IReadOnlyList<ITypeInfo> Bases => FBases ??= UnderlyingType
-            .GetBaseTypes()
-            .Select(CreateFrom)
-            .ToArray();
+        private ITypeInfo? FBaseType;
+        public ITypeInfo? BaseType => UnderlyingType.BaseType is not null
+            ? FBaseType ??= CreateFrom(UnderlyingType.BaseType)
+            : null;
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
@@ -222,7 +220,7 @@ namespace Solti.Utils.Proxy.Internals
             if (queried.IsGenericType)
             {
                 Type[] gas = type
-                    .EnclosingTypes
+                    .GetEnclosingTypes()
                     .Append(type)
                     .OfType<IGenericTypeInfo>()
                     .SelectMany(g => g.GenericArguments.Select(TypeInfoToMetadata))

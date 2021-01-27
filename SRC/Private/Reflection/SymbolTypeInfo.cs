@@ -86,11 +86,10 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private IReadOnlyList<ITypeInfo>? FEnclosingTypes;
-        public IReadOnlyList<ITypeInfo> EnclosingTypes => FEnclosingTypes ??= UnderlyingSymbol
-            .GetEnclosingTypes()
-            .Select(ti => CreateFrom(ti, Compilation))
-            .ToArray();
+        private ITypeInfo? FEnclosingType;
+        public ITypeInfo? EnclosingType => UnderlyingSymbol.ContainingType is not null
+            ? FEnclosingType ??= CreateFrom(UnderlyingSymbol.ContainingType, Compilation)
+            : null;
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
@@ -98,11 +97,10 @@ namespace Solti.Utils.Proxy.Internals
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 
-        private IReadOnlyList<ITypeInfo>? FBases;
-        public IReadOnlyList<ITypeInfo> Bases => FBases ??= UnderlyingSymbol
-            .GetBaseTypes()
-            .Select(ti => CreateFrom(ti, Compilation))
-            .ToArray();
+        private ITypeInfo? FBaseType;
+        public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
+            ? FBaseType ??= CreateFrom(UnderlyingSymbol.BaseType, Compilation)
+            : null;
 
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
@@ -199,11 +197,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             INamedTypeSymbol? symbol;
 
-            if (type.EnclosingTypes.Any())
+            if (type.GetEnclosingTypes().Any())
             {
                 int arity = (type as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
 
-                symbol = TypeInfoToSymbol(type.EnclosingTypes[type.EnclosingTypes.Count - 1], compilation)
+                symbol = TypeInfoToSymbol(type.GetEnclosingTypes().Last(), compilation)
                     .GetTypeMembers(type.Name, arity)
                     .Single();
             }

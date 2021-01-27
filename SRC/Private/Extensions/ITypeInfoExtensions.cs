@@ -127,5 +127,15 @@ namespace Solti.Utils.Proxy.Internals
 
             return ctors;
         }
+
+        private static IEnumerable<ITypeInfo> IterateOn(this ITypeInfo src, Func<ITypeInfo, ITypeInfo?> selector) 
+        {
+            for (ITypeInfo? type = selector(src); type != null; type = selector(type))
+                yield return type;
+        }
+
+        public static IEnumerable<ITypeInfo> GetBaseTypes(this ITypeInfo src) => src.IterateOn(x => x.BaseType);
+
+        public static IEnumerable<ITypeInfo> GetEnclosingTypes(this ITypeInfo src) => src.IterateOn(x => x.EnclosingType);
     }
 }

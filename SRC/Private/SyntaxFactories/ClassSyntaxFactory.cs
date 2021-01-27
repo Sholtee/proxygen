@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
             OutputType = outputType;
             ContainingAssembly = containingAssembly;
 
-            if (!relatedGenerator.Bases.Any(@base => @base.FullName == typeof(TypeGenerator<>).FullName))
+            if (!relatedGenerator.GetBaseTypes().Any(@base => @base.FullName == typeof(TypeGenerator<>).FullName))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(relatedGenerator));
 
             RelatedGenerator = relatedGenerator;

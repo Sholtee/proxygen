@@ -74,8 +74,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<ITypeSymbol> GetEnclosingTypes(this ITypeSymbol src) => src.GetParents().Reverse();
-
         public static IEnumerable<ITypeSymbol> GetBaseTypes(this ITypeSymbol src)
         {
             for (ITypeSymbol? baseType = src.BaseType; baseType != null; baseType = baseType.BaseType)
@@ -263,7 +261,7 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(Type.Delimiter);
             }
 
-            foreach (ITypeSymbol enclosingType in src.GetEnclosingTypes())
+            foreach (ITypeSymbol enclosingType in src.GetParents().Reverse())
             {
                 sb.Append($"{GetName(enclosingType)}+");
             }

@@ -114,10 +114,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
                 AssertEqualsT(type1.ElementType, type2.ElementType);
+                AssertEqualsT(type1.EnclosingType, type2.EnclosingType);
+                AssertEqualsT(type1.BaseType, type2.BaseType);
                 AssertEqualsN(type1.ContainingMember, type2.ContainingMember);
-                AssertSequenceEqualsT(type1.Bases, type2.Bases);
                 AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
-                AssertSequenceEqualsT(type1.EnclosingTypes, type2.EnclosingTypes);
                 AssertSequenceEqualsM(OrderCtors(type1).ToArray(), OrderCtors(type2).ToArray());
                 AssertSequenceEqualsM(OrderMethods(type1).ToArray(), OrderMethods(type2).ToArray());
                 AssertSequenceEqualsPr(OrderProperties(type1).ToArray(), OrderProperties(type2).ToArray());

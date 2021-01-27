@@ -107,7 +107,7 @@ namespace Solti.Utils.Proxy.Internals
                 ),
 
                 _ when type.IsNested => type
-                    .EnclosingTypes
+                    .GetEnclosingTypes()
                     .Append(type)
                     .Select(GetQualifiedName)
                     .Qualify(),
