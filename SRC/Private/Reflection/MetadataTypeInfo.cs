@@ -231,7 +231,7 @@ namespace Solti.Utils.Proxy.Internals
             if (queried.IsGenericType)
             {
                 Type[] gas = type
-                    .GetEnclosingTypes()
+                    .GetParentTypes()
                     .Append(type)
                     .OfType<IGenericTypeInfo>()
                     .SelectMany(g => g.GenericArguments.Select(TypeInfoToMetadata))

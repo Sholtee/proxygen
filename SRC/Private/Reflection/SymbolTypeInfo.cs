@@ -201,7 +201,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 int arity = (type as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
 
-                symbol = TypeInfoToSymbol(type.GetEnclosingTypes().Last(), compilation)
+                symbol = TypeInfoToSymbol(type.GetParentTypes().Last(), compilation)
                     .GetTypeMembers(type.Name, arity)
                     .Single();
             }
