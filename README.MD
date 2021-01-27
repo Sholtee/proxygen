@@ -113,7 +113,7 @@ The `xXxGenerator.GetGeneratedType()` method returns the embedded type if it pre
 Note that:
 - Open generics are not supported.
 - [coveralls.io](https://www.nuget.org/packages/coveralls.io/ ) (and other coverage reporters) may crash if your project was augmented by a source generator. To work this issue around:
-  - Ignore the generated sources in you coverage app (e.g.: in [OpenCover](https://www.nuget.org/packages/OpenCover/ ) use the `-filter:-[*]Proxies.GeneratedClass_*` switch)
+  - Ignore the generated sources in your coverage app (e.g.: in [OpenCover](https://www.nuget.org/packages/OpenCover/ ) use the `-filter:-[*]Proxies.GeneratedClass_*` switch)
   - Create an empty file for each generated class (e.g.: `YourProject\Solti.Utils.Proxy\Solti.Utils.Proxy.Internals.ProxyEmbedder\Proxies.GeneratedClass_XxX.cs`)
   - Exclude these files from your project:
   ```xml
