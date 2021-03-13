@@ -82,4 +82,6 @@
   - *fixed:* Embedded type resolution issue
 - 4.0.0-preview8:
   - *fixed:* Missing reference issue
-  - *imporved:* Syntax factory performance 
+  - *imporved:* Syntax factory performance
+- 4.0.0:
+  - *done:* Some code cosmetics
