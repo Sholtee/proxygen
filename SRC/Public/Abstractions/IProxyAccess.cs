@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Diagnostics.CodeAnalysis;
+
 namespace Solti.Utils.Proxy
 {
     /// <summary>
@@ -13,6 +15,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The most outer enclosing proxy.
         /// </summary>
+        [SuppressMessage("Design", "CA1044:Properties should not be write only", Justification = "The system needs a setter only although the implementers may define a getter for this property")]
         TInterface Proxy { set; }
     }
 }

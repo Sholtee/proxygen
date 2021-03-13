@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
     public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
     {
         #region Private
-        private static readonly SemaphoreSlim FLock = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim FLock = new(1, 1);
 
         private static Type? FType;
 
@@ -75,7 +75,9 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
+                #pragma warning disable CA1508 // This method can be called parallelly so there is no dead code
                 return FType ??= GetGeneratedType(cancellation);
+                #pragma warning restore CA1508
             }
             finally { FLock.Release(); }
         }
@@ -92,7 +94,9 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
+                #pragma warning disable CA1508 // This method can be called parallelly so there is no dead code
                 return FType ??= GetGeneratedType(default);
+                #pragma warning restore CA1508
             }
             finally { FLock.Release(); }
         }

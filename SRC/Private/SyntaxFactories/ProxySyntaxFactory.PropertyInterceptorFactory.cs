@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
 
             private IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
             {
-                if (property.GetMethod == null) yield break;
+                if (property.GetMethod is null) yield break;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
@@ -116,7 +116,7 @@ namespace Solti.Utils.Proxy.Internals
 
             private IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
             {
-                if (property.SetMethod == null) yield break;
+                if (property.SetMethod is null) yield break;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;

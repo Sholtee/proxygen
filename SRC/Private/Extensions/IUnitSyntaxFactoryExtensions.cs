@@ -65,7 +65,9 @@ namespace Solti.Utils.Proxy.Internals
                         );
                     }
                 }
+                #pragma warning disable CA1031 // This method should not throw
                 catch {}
+                #pragma warning restore CA1031
             }
 
             return true;

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading;
 
@@ -101,6 +102,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
+            [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
             protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
                 if (targetMember is not IPropertyInfo targetProp || ifaceMember is not IPropertyInfo ifaceProp)
@@ -113,13 +115,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (ifaceProp.GetMethod is not null) 
                 {
-                    if (targetProp.GetMethod is null || !targetProp.GetMethod.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true))
+                    if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true) is not true)
                         return false;
                 }
 
                 if (ifaceProp.SetMethod is not null) 
                 {
-                    if (targetProp.SetMethod is null || !targetProp.SetMethod.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true))
+                    if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true) is not true)
                         return false;
                 }
 

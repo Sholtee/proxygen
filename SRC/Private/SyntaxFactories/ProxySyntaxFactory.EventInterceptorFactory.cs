@@ -52,7 +52,9 @@ namespace Solti.Utils.Proxy.Internals
 
             private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
             {
-                IMethodInfo targetMethod = add ? member.AddMethod : member.RemoveMethod;
+                IMethodInfo? targetMethod = add ? member.AddMethod : member.RemoveMethod;
+                if (targetMethod is null)
+                    yield break;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
                 yield return argsArray;

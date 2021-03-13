@@ -67,7 +67,9 @@ namespace Solti.Utils.Proxy.Internals
                     .Diagnostics
                     .Where(d => d.Severity == DiagnosticSeverity.Error));
 
+                #pragma warning disable CA2201 // To preserve backward compatibility, don't throw specific exception here
                 var ex = new Exception(Resources.COMPILATION_FAILED);
+                #pragma warning restore CA2201
 
                 IDictionary extra = ex.Data;
 
