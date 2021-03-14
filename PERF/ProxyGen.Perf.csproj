@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <IsPackable>false</IsPackable>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <!--BenchmarkDotNet requires the exe and csproj name to be equal-->
     <AssemblyName>ProxyGen.Perf</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
-    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" />
+    <PackageReference Include="Solti.Utils.Primitives" Version="2.*" />
     <PackageReference Condition="'$(LibVersion)' != ''" Include="ProxyGen.NET" Version="$(LibVersion)"></PackageReference>
   </ItemGroup>
 

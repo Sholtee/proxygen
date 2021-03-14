@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
@@ -9,11 +9,6 @@
     <Configurations>Debug</Configurations>
     <OutputType>Library</OutputType>
     <Configurations>Debug</Configurations>
-  </PropertyGroup>
-
-  <!--OpenCover requires .NET Core 2.2 while Test Explorer needs 3.X-->
-  <PropertyGroup Condition="'$(CI)'==''">
-    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -31,7 +26,7 @@
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.8.*" />
-    <PackageReference Include="Solti.Utils.Primitives" Version="1.*" />
+    <PackageReference Include="Solti.Utils.Primitives" Version="2.*" />
   </ItemGroup>
 
   <ItemGroup>
