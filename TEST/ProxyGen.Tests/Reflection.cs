@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 if (!processed.Add(t1.Name)) return;
 
                 Assert.AreEqual(t1.Name, t2.Name);
-                Assert.AreEqual(t1.FullName, t2.FullName);
+                Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
                 Assert.AreEqual(t1.IsNested, t2.IsNested);
                 Assert.AreEqual(t1.IsClass, t2.IsClass);
@@ -146,8 +146,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .ThenBy(m => m.IsStatic)
                     .ThenBy(m => m.Name)
                     .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.FullName ?? p.Type.Name)))
-                    .ThenBy(m => m.ReturnValue.Type.FullName ?? m.ReturnValue.Type.Name);
+                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.QualifiedName ?? p.Type.Name)))
+                    .ThenBy(m => m.ReturnValue.Type.QualifiedName ?? m.ReturnValue.Type.Name);
 
                 IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
                     .Properties
@@ -350,8 +350,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             IGenericTypeInfo type = (IGenericTypeInfo) t;
 
             Assert.DoesNotThrow(() => type = (IGenericTypeInfo) type.Close(MetadataTypeInfo.CreateFrom(typeof(string))));
-            Assert.That(type.FullName, Is.EqualTo("System.Collections.Generic.List`1"));
-            Assert.That(type.GenericArguments.Single().FullName, Is.EqualTo("System.String"));
+            Assert.That(type.QualifiedName, Is.EqualTo("System.Collections.Generic.List`1"));
+            Assert.That(type.GenericArguments.Single().QualifiedName, Is.EqualTo("System.String"));
         }
 
         public static IEnumerable<(Type Type, string Name)> Types 

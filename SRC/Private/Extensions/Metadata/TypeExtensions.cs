@@ -42,10 +42,10 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        public static string? GetFullName(this Type src) 
+        public static string? GetQualifiedName(this Type src) 
         {
             if (src.IsByRef)
-                return src.GetElementType()!.GetFullName();
+                return src.GetElementType()!.GetQualifiedName();
 
             if (src.IsGenericType)
                 src = src.GetGenericTypeDefinition();

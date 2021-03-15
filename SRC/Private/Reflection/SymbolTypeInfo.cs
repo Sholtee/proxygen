@@ -66,7 +66,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetAssemblyQualifiedName() : null;
 
-        public string? FullName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
+        public string? QualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
 
         private ITypeInfo? FElementType;
         public ITypeInfo? ElementType

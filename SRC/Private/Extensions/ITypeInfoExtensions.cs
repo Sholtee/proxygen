@@ -42,19 +42,19 @@ namespace Solti.Utils.Proxy.Internals
 
             static void Hash(ITypeInfo t, ICryptoTransform transform)
             {
-                string? fullName = t.FullName;
+                string? qualifiedName = t.QualifiedName;
 
                 if (t.RefType > RefType.None)
                 {
                     Hash(t.ElementType!, transform);
 
-                    fullName ??= t.RefType.ToString();
+                    qualifiedName ??= t.RefType.ToString();
                 }
 
-                if (fullName is null)
+                if (qualifiedName is null)
                     return;
 
-                byte[] inputBuffer = Encoding.UTF8.GetBytes(fullName);
+                byte[] inputBuffer = Encoding.UTF8.GetBytes(qualifiedName);
 
                 transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
 
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
                     src.RefType == that.RefType &&
                     src.ElementType.EqualsTo(that.ElementType!);
 
-            if (src.FullName != that.FullName)
+            if (src.QualifiedName != that.QualifiedName)
                 return false;
 
             //
@@ -125,7 +125,7 @@ namespace Solti.Utils.Proxy.Internals
             IEnumerable<IConstructorInfo> ctors = src.Constructors.Where(ctor => ctor.AccessModifiers == AccessModifiers.Public);
 
             if (!ctors.Any())
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.FullName));
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.QualifiedName));
 
             return ctors;
         }
@@ -174,11 +174,11 @@ namespace Solti.Utils.Proxy.Internals
                 // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
                 //
 
-                symbol = compilation.GetTypeByMetadataName(src.FullName ?? throw new NotSupportedException());
+                symbol = compilation.GetTypeByMetadataName(src.QualifiedName ?? throw new NotSupportedException());
 
                 if (symbol is null)
                 {
-                    var ex = new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, src.FullName));
+                    var ex = new TypeLoadException(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, src.QualifiedName));
 
                     //
                     // SourceGenerator-ba nem lehet beleDEBUGolni ezert...

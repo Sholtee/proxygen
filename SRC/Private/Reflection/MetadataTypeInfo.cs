@@ -146,14 +146,14 @@ namespace Solti.Utils.Proxy.Internals
                     .Cast<IConstructorInfo>()
                     .ToArray();
 
-        public string? AssemblyQualifiedName => FullName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
-            ? $"{FullName}, {UnderlyingType.Assembly}"
+        public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
+            ? $"{QualifiedName}, {UnderlyingType.Assembly}"
             : null;
 
         public bool IsGenericParameter => (UnderlyingType.GetElementType(recurse: true) ?? UnderlyingType).IsGenericParameter;
 
-        public string? FullName => UnderlyingType
-            .GetFullName()
+        public string? QualifiedName => UnderlyingType
+            .GetQualifiedName()
             ?.TrimEnd('&'); // FIXME: ez nem kene de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
 
         public bool IsClass => UnderlyingType.IsClass();

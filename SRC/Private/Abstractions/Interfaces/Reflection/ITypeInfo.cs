@@ -25,13 +25,14 @@ namespace Solti.Utils.Proxy.Internals
         bool IsFinal { get; }
         bool IsAbstract { get; }
         /// <summary>
-        /// The <see cref="FullName"/> of the type followed by the identity of the containing assembly. The result should not reflect the type arguments.
+        /// The <see cref="QualifiedName"/> of the type followed by the identity of the containing assembly. The result should not reflect the type arguments.
         /// </summary>
         string? AssemblyQualifiedName { get; }
         /// <summary>
         /// The name of the type including its enclosing types and namespace. The result should not reflect the type arguments.
         /// </summary>
-        string? FullName { get; }
+        /// <remarks>The value returned by this property is suitable to be passed to <see cref="System.Type.GetType(string)"/> or <see cref="Microsoft.CodeAnalysis.Compilation.GetTypeByMetadataName(string)"/>.</remarks>
+        string? QualifiedName { get; }
         /// <summary>
         /// Returns the underlying element type (for e.g.: <see cref="int"/> for <i>int*</i>). Yields non null for pointers, ref types and arrays.
         /// </summary>
