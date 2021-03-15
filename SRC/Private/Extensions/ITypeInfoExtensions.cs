@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
 
             md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
 
             for (int i = 0; i < md5.Hash.Length; i++)
             {
@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
                 if (fullName is null)
                     return;
 
-                byte[] inputBuffer = Encoding.UTF8.GetBytes(t.FullName);
+                byte[] inputBuffer = Encoding.UTF8.GetBytes(fullName);
 
                 transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
 
