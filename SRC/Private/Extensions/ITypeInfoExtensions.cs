@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     Hash(t.ElementType!, transform);
 
-                    qualifiedName ??= t.RefType.ToString();
+                    qualifiedName += t.RefType.ToString();
                 }
 
                 if (qualifiedName is null)

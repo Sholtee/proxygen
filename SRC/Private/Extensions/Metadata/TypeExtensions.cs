@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetQualifiedName(this Type src) 
         {
-            if (src.IsByRef)
+            if (src.HasElementType)
                 return src.GetElementType()!.GetQualifiedName();
 
             if (src.IsGenericType)

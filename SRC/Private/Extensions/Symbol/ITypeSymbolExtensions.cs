@@ -266,7 +266,7 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append($"{GetName(enclosingType)}+");
             }
 
-            sb.Append($"{GetName(src)}");
+            sb.Append($"{GetName(elementType ?? src)}");
 
             return sb.ToString();
 
