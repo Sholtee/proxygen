@@ -237,21 +237,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             ITypeSymbol? elementType = src.GetElementType(recurse: true);
 
-            //
-            // Specialis eset h reflexiohoz hasonloan mukodjunk:
-            //
-            // class Generic<T>
-            // {
-            //    void Foo(List<T>[] para) {}
-            // }
-            //
-            // Ez esetben "para" tipus-neve NULL kell legyen
-            //
-
-            if (elementType?.IsGenericParameter() == true || (elementType is INamedTypeSymbol namedElement && namedElement.IsGenericTypeDefinition())) 
-                return null;
-
-            var sb = new StringBuilder();
+            StringBuilder sb = new();
 
             INamespaceSymbol? ns = elementType?.ContainingNamespace ?? src.ContainingNamespace;  // tombnek, mutatonak nincs tartalmazo nevtere forditaskor
 
