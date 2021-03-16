@@ -102,6 +102,7 @@ namespace Solti.Utils.Proxy.Internals
                 return new
                 {
                     m.Name,
+                    m.TypeArguments.Length,
                     ParamzHash = hk.ToHashCode()
                 };
             },

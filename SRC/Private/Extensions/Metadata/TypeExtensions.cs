@@ -109,7 +109,8 @@ namespace Solti.Utils.Proxy.Internals
             m => m.GetAccessModifiers(),
 
             //
-            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa kell
+            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa, valamint a generikus argumentumok
+            // szama a lenyeges.
             //
 
             m =>
@@ -124,6 +125,7 @@ namespace Solti.Utils.Proxy.Internals
                 return new
                 {
                     m.Name,
+                    m.GetGenericArguments().Length,
                     ParamzHash = hk.ToHashCode()
                 };
             },
