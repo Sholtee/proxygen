@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
-            .AllInterfaces
+            .GetAllInterfaces()
             .Select(ti => CreateFrom(ti, Compilation))
             .ToArray();
 

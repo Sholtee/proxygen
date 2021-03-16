@@ -295,6 +295,29 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
+        public static IEnumerable<ITypeSymbol> GetAllInterfaces(this ITypeSymbol src) 
+        {
+            //
+            // AllInterfaces-ben egy generikus interface szerepelhet tobbszor ha a tipus argumentumok csak a Nullable
+            // ertekukben ternek el:
+            //
+            // interface IA: IB, IC<string> {}, interface IB: IC<string?> -> ekkor IC<string> ketszer fog szerepelni
+            //
+
+            return src.AllInterfaces.Select(WithoutNullableAnnotations).Distinct(SymbolEqualityComparer.Default).Cast<ITypeSymbol>();
+
+            static ITypeSymbol WithoutNullableAnnotations(INamedTypeSymbol type)
+            {
+                if (type.IsGenericType())
+                {
+                    INamedTypeSymbol genericDef = type.OriginalDefinition;
+                    type = genericDef.Construct(type.TypeArguments.Select(ta => ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)).ToArray());
+                }
+
+                return type;
+            }
+        }
+
         public static string GetDebugString(this ITypeSymbol src, string? eol = null) 
         {
             var fmt = new SymbolDisplayFormat

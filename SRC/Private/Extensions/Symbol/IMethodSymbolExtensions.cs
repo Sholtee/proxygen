@@ -40,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
             INamedTypeSymbol containingType = src.ContainingType;
 
             return containingType
-                .AllInterfaces
+                .GetAllInterfaces()
                 .SelectMany(@interface => @interface
                     .GetMembers()
                     .OfType<IMethodSymbol>())
