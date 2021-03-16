@@ -311,7 +311,15 @@ namespace Solti.Utils.Proxy.Internals
                 if (type.IsGenericType())
                 {
                     INamedTypeSymbol genericDef = type.OriginalDefinition;
-                    type = genericDef.Construct(type.TypeArguments.Select(ta => ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)).ToArray());
+                    type = genericDef.Construct
+                    (
+                        type
+                            .TypeArguments
+                            .Select(ta => !ta.IsValueType // int? -> Nullable<int>, object? -> [Nullable] object
+                                ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+                                : ta)
+                            .ToArray()
+                    );
                 }
 
                 return type;
