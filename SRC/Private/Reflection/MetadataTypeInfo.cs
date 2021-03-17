@@ -125,7 +125,14 @@ namespace Solti.Utils.Proxy.Internals
             m => m.DeclaringType.IsArray && m.Name == "Get", // = array[i]
             m => m.DeclaringType.IsArray && m.Name == "Set", // array[i] =
             m => m.DeclaringType.IsArray && m.Name == "Address", // = ref array[i]
-            m => typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke" // delegate.Invoke(...)
+            m => typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke", // delegate.Invoke(...)
+#if DEBUG
+            //
+            // https://github.com/OpenCover/opencover/blob/master/main/OpenCover.Profiler/CodeCoverage_Cuckoo.cpp
+            //
+
+            m => new[]{ "SafeVisited", "VisitedCritical" }.Contains(m.Name)
+#endif
         };
 
         private IReadOnlyList<IMethodInfo>? FMethods;
