@@ -85,3 +85,9 @@
   - *imporved:* Syntax factory performance
 - 4.0.0:
   - *done:* Some code cosmetics
+- 4.0.1:
+  - *fixed:* Hash code generation issue
+  - *fixed:* Invalid qualified metadata name issue
+  - *fixed:* The system could not find generic methods having non-generic counterpart
+  - *introduced:* Native integer support
+  - *done:* Test against *.NET5.0*
