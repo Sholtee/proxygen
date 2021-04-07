@@ -46,7 +46,7 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ```
 4. Enjoy
 
-Note that the *target* can access its most outer enclosing proxy. To achieve this it just has to implement the `IProxyAccess<IMyInterface>` interface:
+Note that the *target* can access its most outer enclosing proxy. To achieve this, it just has to implement the `IProxyAccess<IMyInterface>` interface:
 ```csharp
 using Solti.Utils.Proxy;
 
@@ -144,6 +144,8 @@ Note that:
     <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
   </PropertyGroup>
   ```
+
+The output should look like (this)[https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/ClsSrcUnit.txt ].
 ## Migrating from version 
 - 2.X
   - Delete all the cached assemblies (if the `[Proxy|Duck]Generator.CacheDirectory` is set somewhere)
