@@ -7,12 +7,9 @@
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
+    <OutputPath>..\..\BIN\</OutputPath>
     <OutputType>Library</OutputType>
     <Configurations>Debug</Configurations>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>..\..\BIN\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
