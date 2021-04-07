@@ -1,5 +1,5 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen/master) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/sholtee/proxygen/master)
-> .NET proxy generator powered by Roslyn
+> .NET proxy generator powered by [Roslyn](https://github.com/dotnet/roslyn )
 
 **This documentation refers the version 4.X of the library**
 ## Purposes
@@ -145,7 +145,7 @@ Note that:
   </PropertyGroup>
   ```
 
-The output should look like (this)[https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/ClsSrcUnit.txt ].
+The output should look like [this](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/ClsSrcUnit.txt ).
 ## Migrating from version 
 - 2.X
   - Delete all the cached assemblies (if the `[Proxy|Duck]Generator.CacheDirectory` is set somewhere)
