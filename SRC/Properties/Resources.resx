@@ -150,9 +150,6 @@
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>
   </data>
-  <data name="NOT_A_CLASS" xml:space="preserve">
-    <value>The type must be a class.</value>
-  </data>
   <data name="NOT_A_GENERATOR" xml:space="preserve">
     <value>The parameter must be a TypeGenerator descendant.</value>
   </data>

@@ -151,15 +151,6 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type must be a class..
-        /// </summary>
-        internal static string NOT_A_CLASS {
-            get {
-                return ResourceManager.GetString("NOT_A_CLASS", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The parameter must be a TypeGenerator descendant..
         /// </summary>
         internal static string NOT_A_GENERATOR {
