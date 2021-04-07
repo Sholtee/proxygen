@@ -6,7 +6,7 @@
     <Version>4.0.1</Version>
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
-    <Configurations>Debug;Release;Perf</Configurations>
+    <Configurations>Debug;Release</Configurations>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>

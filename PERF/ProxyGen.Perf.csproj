@@ -7,7 +7,7 @@
     <!--BenchmarkDotNet requires the exe and csproj name to be equal-->
     <AssemblyName>ProxyGen.Perf</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
-    <Configurations>Debug;Release;Perf</Configurations>
+    <Configurations>Debug;Release</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.12.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.12.*" />
     <PackageReference Include="Solti.Utils.Primitives" Version="2.*" />
     <PackageReference Condition="'$(LibVersion)' != ''" Include="ProxyGen.NET" Version="$(LibVersion)"></PackageReference>
   </ItemGroup>
