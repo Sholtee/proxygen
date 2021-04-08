@@ -1,15 +1,17 @@
-﻿using System;
+﻿/********************************************************************************
+* InterfaceInterceptor.cs                                                       *
+*                                                                               *
+* Author: Denes Solti                                                           *
+********************************************************************************/
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Tests
 {
-    using Internals;
-
     [TestFixture]
     public class InterfaceInterceptorTests
     {
