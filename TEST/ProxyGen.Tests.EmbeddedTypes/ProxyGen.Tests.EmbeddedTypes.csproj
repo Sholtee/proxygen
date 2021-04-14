@@ -9,6 +9,7 @@
     <RootNamespace>Solti.Utils.Proxy.Tests.EmbeddedTypes</RootNamespace>
     <LangVersion>9</LangVersion>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
