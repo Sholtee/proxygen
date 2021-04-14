@@ -13,7 +13,6 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
-    using static SymbolTypeInfo;
 
     internal static class Visibility
     {
