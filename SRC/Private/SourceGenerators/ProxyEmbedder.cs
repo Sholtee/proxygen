@@ -87,8 +87,11 @@ namespace Solti.Utils.Proxy.Internals
         public void Execute(GeneratorExecutionContext context)
         {
             IConfigReader configReader = new AnalyzerConfigReader(context);
+
+            WorkingDirectories.Setup(configReader);
+            SourceGeneratorConfig.Setup(configReader);
 #if DEBUG
-            if (configReader.ReadValue("DebugGenerator")?.Equals(true.ToString(), StringComparison.OrdinalIgnoreCase) == true)
+            if (SourceGeneratorConfig.Instance.DebugGenerator)
             {
                 Debugger.Launch();
             }
@@ -113,8 +116,6 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 return;
             }
-
-            WorkingDirectories.Setup(configReader);
             
             foreach (INamedTypeSymbol generator in aotGenerators)
             {

@@ -5,30 +5,18 @@
 ********************************************************************************/
 using System;
 using System.IO;
-using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class WorkingDirectories
+    internal sealed class WorkingDirectories: ConfigBase<WorkingDirectories>
     {
-        //
-        // Nem talaltam semmilyen dokumentaciot arrol h parhuzamosan futhatnak e 
-        // SourceGenerator-ok, ezert feltetelezem h igen -> ThreadLocal
-        //
+        public string? AssemblyCacheDir { get; private set; }
 
-        private static readonly ThreadLocal<WorkingDirectories> FInstance = new ThreadLocal<WorkingDirectories>(() => new WorkingDirectories(new RuntimeConfigReader()));
+        public string? SourceDump { get; private set; }
 
-        public string? AssemblyCacheDir { get; }
+        public string? LogDump { get; private set; }
 
-        public string? SourceDump { get; }
-
-        public string? LogDump { get; }
-
-        public static WorkingDirectories Instance => FInstance.Value;
-
-        public static void Setup(IConfigReader configReader) => FInstance.Value = new WorkingDirectories(configReader);
-
-        private WorkingDirectories(IConfigReader configReader)
+        protected override void Init(IConfigReader configReader)
         {
             AssemblyCacheDir = GetPath(nameof(AssemblyCacheDir));
             SourceDump       = GetPath(nameof(SourceDump));
@@ -49,5 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                 return result;
             }
         }
+
+        protected override void InitWithDefaults() => Init(new RuntimeConfigReader());
     }
 }
