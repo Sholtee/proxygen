@@ -91,3 +91,6 @@
   - *fixed:* The system could not find generic methods having non-generic counterpart
   - *introduced:* Native integer support
   - *done:* Test against *.NET5.0*
+- 4.0.2:
+  - *done:* Annotate generated classes with `GeneratedCodeAttribute`
+  - *done:* Suppress all compiler warnings in the generated sources 
