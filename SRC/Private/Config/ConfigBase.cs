@@ -31,9 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             instance.Init(configReader);
             FInstance.Value = instance;
         }
-#if DEBUG
-        public static void Fake(TDescendant fake) => FInstance.Value = fake;
-#endif
+
         public static TDescendant Instance => FInstance.Value;
     }
 }
