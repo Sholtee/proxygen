@@ -134,8 +134,9 @@ namespace Solti.Utils.Proxy.Internals
                                 TriviaList
                                 (
                                     //
-                                    // Az osszes fordito figyelmeztetes kikapcsolasa (elvileg ha nincs azonosito lista megadva akkor
-                                    // mindent kikapcsol).
+                                    // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
+                                    // mindent kikapcsol:
+                                    // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
                                     //
 
                                     Trivia(PragmaWarningDirectiveTrivia(Token(SyntaxKind.DisableKeyword), true))
