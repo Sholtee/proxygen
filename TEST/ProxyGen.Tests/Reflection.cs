@@ -349,7 +349,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             IGenericTypeInfo type = (IGenericTypeInfo) t;
 
-            Assert.DoesNotThrow(() => type = (IGenericTypeInfo) type.Close(MetadataTypeInfo.CreateFrom(typeof(string))));
+            Assert.DoesNotThrow(() => type = type.Close(MetadataTypeInfo.CreateFrom(typeof(string))));
             Assert.That(type.QualifiedName, Is.EqualTo("System.Collections.Generic.List`1"));
             Assert.That(type.GenericArguments.Single().QualifiedName, Is.EqualTo("System.String"));
         }

@@ -224,7 +224,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 fact1 = new ProxySyntaxFactory
                 (
                     type1, 
-                    (ITypeInfo) interceptor1.Close(type1), 
+                    interceptor1.Close(type1), 
                     "cica", 
                     (OutputType) outputType, 
                     MetadataTypeInfo.CreateFrom
@@ -239,7 +239,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 fact2 = new ProxySyntaxFactory
                 (
                     type2, 
-                    (ITypeInfo) interceptor2.Close(type2), 
+                    interceptor2.Close(type2), 
                     "cica", 
                     (OutputType) outputType, 
                     SymbolTypeInfo.CreateFrom
@@ -247,7 +247,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                         compilation.GetTypeByMetadataName(typeof(ProxyGenerator<,>).FullName).Construct
                         (
                             type2.ToSymbol(compilation),
-                            ((ITypeInfo) interceptor2.Close(type2)).ToSymbol(compilation)
+                            interceptor2.Close(type2).ToSymbol(compilation)
                         ), 
                         compilation
                     )

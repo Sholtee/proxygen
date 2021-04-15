@@ -80,13 +80,13 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(MetadataTypeInfo.CreateFrom)
                 .ToArray();
 
-            private IGeneric? FGenericDefinition;
-            public IGeneric GenericDefinition => FGenericDefinition ??= new MetadataGenericMethodInfo
+            private IGenericMethodInfo? FGenericDefinition;
+            public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new MetadataGenericMethodInfo
             (
                 UnderlyingMethod.GetGenericMethodDefinition()
             );
 
-            public IGeneric Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException();
+            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }
 
         private sealed class MetadataConstructorInfo : MetadataMethodBase<ConstructorInfo>, IConstructorInfo 

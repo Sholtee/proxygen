@@ -206,13 +206,11 @@ namespace Solti.Utils.Proxy.Internals
 
             public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
-            IGeneric IGeneric.GenericDefinition => GenericDefinition;
-
-            public IGeneric Close(params ITypeInfo[] genericArgs)
+            public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
                 if (UnderlyingType.IsNested) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
 
-                return (IGeneric) CreateFrom
+                return (IGenericTypeInfo) CreateFrom
                 (
                     UnderlyingType.MakeGenericType
                     (

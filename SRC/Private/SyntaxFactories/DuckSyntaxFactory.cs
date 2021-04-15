@@ -35,10 +35,7 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-            BaseType = (ITypeInfo) 
-            (
-                (IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!
-            ).Close(targetType);
+            BaseType = ((IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
 
             MemberSyntaxFactories = new IMemberSyntaxFactory[]

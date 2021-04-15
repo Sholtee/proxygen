@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
         IReadOnlyList<IConstructorInfo> Constructors { get; }
     }
 
-    internal interface IGenericTypeInfo : ITypeInfo, IGeneric { }
+    internal interface IGenericTypeInfo : ITypeInfo, IGeneric<IGenericTypeInfo> { }
 
     internal interface IArrayTypeInfo : ITypeInfo
     {

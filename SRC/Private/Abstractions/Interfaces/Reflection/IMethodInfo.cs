@@ -19,5 +19,5 @@ namespace Solti.Utils.Proxy.Internals
 
     internal interface IConstructorInfo : IMethodInfo { }
 
-    internal interface IGenericMethodInfo : IMethodInfo, IGeneric { }
+    internal interface IGenericMethodInfo : IMethodInfo, IGeneric<IGenericMethodInfo> { }
 }

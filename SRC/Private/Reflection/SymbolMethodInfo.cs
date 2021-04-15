@@ -77,8 +77,8 @@ namespace Solti.Utils.Proxy.Internals
 
             public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericArgument());
 
-            private IGeneric? FGenericDefinition;
-            public IGeneric GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
+            private IGenericMethodInfo? FGenericDefinition;
+            public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
                 .ToArray();
 
-            public IGeneric Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException();
+            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }
     }
 }

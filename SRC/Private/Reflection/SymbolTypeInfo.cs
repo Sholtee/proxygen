@@ -167,8 +167,8 @@ namespace Solti.Utils.Proxy.Internals
 
             public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericParameter()); // "UnderlyingSymbol.IsUnboundGenericType" baszik mukodni
 
-            private IGeneric? FGenericDefinition;
-            public IGeneric GenericDefinition => FGenericDefinition ??= (IGeneric) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
+            private IGenericTypeInfo? FGenericDefinition;
+            public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= (IGenericTypeInfo) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
@@ -176,11 +176,11 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(ti => CreateFrom(ti, Compilation))
                 .ToArray();
 
-            public IGeneric Close(params ITypeInfo[] genericArgs)
+            public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
                 if (UnderlyingSymbol.ContainingType is not null) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
 
-                return (IGeneric) CreateFrom
+                return (IGenericTypeInfo) CreateFrom
                 (
                     UnderlyingSymbol.Construct
                     (

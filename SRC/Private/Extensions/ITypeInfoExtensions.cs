@@ -114,7 +114,7 @@ namespace Solti.Utils.Proxy.Internals
                 _ => 0
             };
 
-            int GetIndex(IGeneric generic) => generic
+            int GetIndex<T>(IGeneric<T> generic) where T: IGeneric<T> => generic
                 .GenericArguments
                 .Select(ga => ga.Name)
                 .IndexOf(src.Name) + 1 ?? 0; // (int?) null + 1 == null 
