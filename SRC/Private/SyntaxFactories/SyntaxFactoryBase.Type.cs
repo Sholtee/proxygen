@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
-        protected internal virtual NameSyntax GetQualifiedName(ITypeInfo type)
+        protected internal NameSyntax GetQualifiedName(ITypeInfo type)
         {
             IReadOnlyList<string> parts = type.Name.Split(Type.Delimiter);
 
@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        protected internal virtual TypeSyntax CreateType(ITypeInfo type) 
+        protected internal TypeSyntax CreateType(ITypeInfo type) 
         {
             //
             // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra

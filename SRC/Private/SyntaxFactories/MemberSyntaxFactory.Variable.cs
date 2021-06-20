@@ -17,14 +17,14 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal virtual LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
+        protected internal LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
                 identifier: Identifier(name)
             );
 
-            if (initializer != null) declarator = declarator.WithInitializer
+            if (initializer is not null) declarator = declarator.WithInitializer
             (
                 initializer: EqualsValueClause
                 (

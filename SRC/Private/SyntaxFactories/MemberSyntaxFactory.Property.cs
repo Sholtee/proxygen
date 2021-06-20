@@ -63,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}             <br/>
         /// }                      <br/>
         /// </summary>
-        protected internal virtual PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        protected internal PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
 
@@ -79,10 +79,10 @@ namespace Solti.Utils.Proxy.Internals
 
             List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
 
-            if (property.GetMethod != null && getBody != null)
+            if (property.GetMethod is not null && getBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
 
-            if (property.SetMethod != null && setBody != null)
+            if (property.SetMethod is not null && setBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
             return !accessors.Any() ? result : result.WithAccessorList
@@ -101,7 +101,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                             <br/>
         /// }                                      <br/>
         /// </summary>
-        protected internal virtual IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        protected internal IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
             Debug.Assert(property.Indices.Any());
@@ -134,10 +134,10 @@ namespace Solti.Utils.Proxy.Internals
 
             List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
 
-            if (property.GetMethod != null && getBody != null)
+            if (property.GetMethod is not null && getBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
 
-            if (property.SetMethod != null && setBody != null)
+            if (property.SetMethod is not null && setBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
             return !accessors.Any() ? result : result.WithAccessorList

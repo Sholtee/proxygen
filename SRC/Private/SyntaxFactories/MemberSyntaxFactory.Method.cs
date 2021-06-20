@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// int IInterface.Foo[T](string a, ref T b)
         /// </summary>
-        protected internal virtual MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
+        protected internal MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
         {
             TypeSyntax returnTypeSytax = CreateType(method.ReturnValue.Type);
 
@@ -154,7 +154,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// int IInterface.Foo[T](string a, ref T b)
         /// </summary>
-        protected internal virtual MethodDeclarationSyntax OverrideMethod(IMethodInfo method, bool forceInlining = false)
+        protected internal MethodDeclarationSyntax OverrideMethod(IMethodInfo method, bool forceInlining = false)
         {
             MethodDeclarationSyntax result = DeclareMethod(method, forceInlining);
             
@@ -173,7 +173,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(..., ref ..., ...)
         /// </summary>
-        protected internal virtual InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
+        protected internal InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
         {
             IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
@@ -218,7 +218,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Foo(ref a, b, c)
         /// </summary>
-        protected internal virtual InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params string[] arguments)
+        protected internal InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, params string[] arguments)
         {
             IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
@@ -241,7 +241,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// TypeName(int a, string b, ...): base(a, b, ...){ }
         /// </summary>
-        protected internal virtual ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor, string className)
+        protected internal ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor, string className)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 

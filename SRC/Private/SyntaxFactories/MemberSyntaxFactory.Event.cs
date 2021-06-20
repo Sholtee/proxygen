@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove{...}                        <br/>
         /// }                                    <br/>
         /// </summary>
-        protected internal virtual EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
+        protected internal EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface);
 
