@@ -73,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.ElementType is not null)
                 //
-                // Tombbel v mutatoval van dolgunk. A FullName property-t itt nem vizsgalhatjuk
+                // Tombbel v mutatoval van dolgunk. A QualifiedName property-t itt nem vizsgalhatjuk
                 // mert mindket esetben NULL lesz.
                 //
 
@@ -171,7 +171,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 //
                 // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
-                // mert a FullName a nyilt generikus tipushoz tartozo nevet adja vissza
+                // mert a QualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
                 //
 
                 symbol = compilation.GetTypeByMetadataName(src.QualifiedName ?? throw new NotSupportedException());
