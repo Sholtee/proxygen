@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -100,5 +101,8 @@ namespace Solti.Utils.Proxy.Internals
                 arguments.ToSyntaxList()
             )
         );
+
+        protected internal MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum =>
+            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, CreateType<T>(), IdentifierName(val.ToString()));
     }
 }

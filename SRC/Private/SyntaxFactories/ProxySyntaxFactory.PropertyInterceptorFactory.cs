@@ -28,8 +28,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         {                                                                                         <br/>
         ///             return Target.Prop;                                                                   <br/>
         ///         };                                                                                        <br/>
-        ///         PropertyInfo prop = ResolveProperty(invokeTarget);                                        <br/>
-        ///         return (TResult) Invoke(new InvocationContext(prop.GetMethod, args, prop, invokeTarget)); <br/>
+        ///         return (TResult) Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Property)); <br/>
         ///     }                                                                                             <br/>
         ///     set                                                                                           <br/>
         ///     {                                                                                             <br/>
@@ -40,16 +39,12 @@ namespace Solti.Utils.Proxy.Internals
         ///           Target.Prop = cb_value;                                                                 <br/>
         ///           return null;                                                                            <br/>
         ///         };                                                                                        <br/>
-        ///         PropertyInfo prop = ResolveProperty(invokeTarget);                                        <br/>
-        ///         Invoke(new InvocationContext(prop.SetMethod, args, prop, invokeTarget));                  <br/>
+        ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Property));                  <br/>
         ///     }                                                                                             <br/>
         /// }
         /// </summary>
         internal sealed class PropertyInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private readonly IMethodInfo
-                RESOLVE_PROPERTY;
-
             private IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
             {
                 if (property.GetMethod is null) yield break;
@@ -81,19 +76,6 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 yield return invokeTarget;
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>
-                (
-                    nameof(prop),
-                    InvokeMethod
-                    (
-                        RESOLVE_PROPERTY,
-                        target: null,
-                        castTargetTo: null,
-                        ToArgument(invokeTarget)
-                    )
-                );
-                yield return prop;
-
                 yield return ReturnResult
                 (
                     property.Type,
@@ -106,17 +88,9 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             CreateObject<InvocationContext>
                             (
-                                Argument
-                                (
-                                    SimpleMemberAccess // prop.GetMethod
-                                    (
-                                        ToIdentifierName(prop),
-                                        nameof(PropertyInfo.GetMethod)
-                                    )
-                                ),
                                 ToArgument(argsArray),
-                                ToArgument(prop),
-                                ToArgument(invokeTarget)
+                                ToArgument(invokeTarget),
+                                Argument(EnumAccess(MemberTypes.Property))
                             )
                         )
                     )
@@ -166,19 +140,6 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 yield return invokeTarget;
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>
-                (
-                    nameof(prop),
-                    InvokeMethod
-                    (
-                        RESOLVE_PROPERTY,
-                        target: null,
-                        castTargetTo: null,
-                        ToArgument(invokeTarget)
-                    )
-                );
-                yield return prop;
-
                 yield return ExpressionStatement
                 (
                     InvokeMethod
@@ -190,17 +151,9 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             CreateObject<InvocationContext>
                             (
-                                Argument
-                                (
-                                    SimpleMemberAccess // prop.SetMethod
-                                    (
-                                        ToIdentifierName(prop),
-                                        nameof(PropertyInfo.SetMethod)
-                                    )
-                                ),
                                 ToArgument(argsArray),
-                                ToArgument(prop),
-                                ToArgument(invokeTarget)
+                                ToArgument(invokeTarget),
+                                Argument(EnumAccess(MemberTypes.Property))
                             )
                         )
                     )
@@ -244,16 +197,6 @@ namespace Solti.Utils.Proxy.Internals
 
             public PropertyInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_PROPERTY = Context.InterceptorType.Methods.Single
-                (
-                    met => met.SignatureEquals
-                    (
-                        MetadataMethodInfo.CreateFrom
-                        (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveProperty(default!))
-                        )
-                    )
-                );
             }
         }
     }

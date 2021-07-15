@@ -47,23 +47,29 @@ namespace Solti.Utils.Proxy.Internals
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
 
-        public static MemberInfo ExtractFrom(MethodInfo method, MemberTypes memberType) // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+        public static MemberInfo ExtractFrom(MethodInfo accessor, MemberTypes memberType, out MethodInfo method) // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         {
-            Instruction? call = method.GetInstructions().SingleOrDefault(instruction => instruction.OpCode == OpCodes.Callvirt);
+            Instruction? call = accessor.GetInstructions().SingleOrDefault(instruction => instruction.OpCode == OpCodes.Callvirt);
 
-            if (call != null)
+            if (call is not null)
             {
                 method = (MethodInfo) call.Operand;
 
                 switch (memberType) 
                 {
                     case MemberTypes.Property:
-                        PropertyInfo? property = method.DeclaringType.GetProperties().SingleOrDefault(prop => prop.SetMethod == method || prop.GetMethod == method);
-                        if (property != null) return property;
+                        foreach (PropertyInfo prop in method.DeclaringType.GetProperties()) // nem hasznalhatunk SingleOrDefault()-ot mert lambdaban nem hivatkozhatunk by ref parametert [CS1628]
+                        {
+                            if (prop.SetMethod == method || prop.GetMethod == method)
+                                return prop;
+                        }
                         break;
                     case MemberTypes.Event:
-                        EventInfo? evt = method.DeclaringType.GetEvents().SingleOrDefault(evt => evt.AddMethod == method || evt.RemoveMethod == method);
-                        if (evt != null) return evt;
+                        foreach (EventInfo evt in method.DeclaringType.GetEvents())
+                        {
+                            if (evt.AddMethod == method || evt.RemoveMethod == method)
+                                return evt;
+                        }
                         break;
                     case MemberTypes.Method:
                         return method;

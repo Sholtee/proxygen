@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Tests
         }
 
         private interface IDescendant2 : IList { }
-
+/*
         [Test]
         public void ResolveProperty_ShouldResolveIndexer() 
         {
@@ -54,5 +54,6 @@ namespace Solti.Utils.Proxy.Tests
             PropertyInfo prop = InterfaceInterceptor<IDescendant>.ResolveProperty(() => i.Prop = default);
             Assert.That(prop.Name, Is.EqualTo("Prop"));
         }
+*/
     }
 }

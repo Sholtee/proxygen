@@ -29,8 +29,7 @@ namespace Solti.Utils.Proxy.Internals
         ///             Target.Event += cb_value;                                             <br/>
         ///             return null;                                                          <br/>
         ///         };                                                                        <br/>
-        ///         EventInfo evt = ResolveEvent(invokeTarget);                               <br/>
-        ///         Invoke(new InvocationContext(evt.AddMethod, args, evt, invokeTarget));    <br/>
+        ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
         ///     }                                                                             <br/>
         ///     remove                                                                        <br/>
         ///     {                                                                             <br/>
@@ -41,16 +40,12 @@ namespace Solti.Utils.Proxy.Internals
         ///             Target.Event -= cb_value;                                             <br/>
         ///             return null;                                                          <br/>
         ///         };                                                                        <br/>
-        ///         EventInfo evt = ResolveEvent(invokeTarget);                               <br/>
-        ///         Invoke(new InvocationContext(evt.RemoveMethod, args, evt, invokeTarget)); <br/>
+        ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
         ///     }                                                                             <br/>
         /// }
         /// </summary>
         internal sealed class EventInterceptorFactory : ProxyMemberSyntaxFactory
         {
-            private readonly IMethodInfo
-                RESOLVE_EVENT;
-
             private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
             {
                 IMethodInfo? targetMethod = add ? member.AddMethod : member.RemoveMethod;
@@ -85,16 +80,6 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 yield return invokeTarget;
 
-                LocalDeclarationStatementSyntax evt = DeclareLocal<EventInfo>(nameof(evt), InvokeMethod
-                (
-                    RESOLVE_EVENT,
-                    target: null,
-                    castTargetTo: null,
-                    ToArgument(invokeTarget)
-                ));
-
-                yield return evt;
-
                 yield return ExpressionStatement
                 (
                     InvokeMethod
@@ -106,17 +91,9 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             CreateObject<InvocationContext>
                             (
-                                Argument
-                                (
-                                    SimpleMemberAccess // evt.[Add|Remove]Method
-                                    (
-                                        ToIdentifierName(evt),
-                                        add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)
-                                    )
-                                ),
                                 ToArgument(argsArray),
-                                ToArgument(evt),
-                                ToArgument(invokeTarget)
+                                ToArgument(invokeTarget),
+                                Argument(EnumAccess(MemberTypes.Event))
                             )
                         )
                     )
@@ -125,16 +102,6 @@ namespace Solti.Utils.Proxy.Internals
 
             public EventInterceptorFactory(IProxyContext context) : base(context)
             {
-                RESOLVE_EVENT = Context.InterceptorType.Methods.Single
-                (
-                    met => met.SignatureEquals
-                    (
-                        MetadataMethodInfo.CreateFrom
-                        (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveEvent(default!))
-                        )
-                    )
-                );
             }
 
             protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context

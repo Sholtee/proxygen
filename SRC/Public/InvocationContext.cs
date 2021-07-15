@@ -9,26 +9,35 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy
 {
+    using Internals;
+
     /// <summary>
     /// Describes the method invocation context.
     /// </summary>
     public class InvocationContext 
     {
+        private readonly MethodInfo FMethod;
+
         /// <summary>
         /// Creates a new <see cref="InvocationContext"/> instance.
         /// </summary>
-        public InvocationContext(MethodInfo method, object?[] args, MemberInfo member, Func<object?> invokeTarget)
+        public InvocationContext(object?[] args, Func<object?> invokeTarget, MemberTypes memberType)
         {
-            Method       = method ?? throw new ArgumentNullException(nameof(method));
-            Args         = args ?? throw new ArgumentNullException(nameof(args));
-            Member       = member ?? throw new ArgumentNullException(nameof(member));
-            InvokeTarget = invokeTarget ?? throw new ArgumentNullException(nameof(invokeTarget));
+            if (args is null)
+                throw new ArgumentNullException(nameof(args));
+
+            if (invokeTarget is null)
+                throw new ArgumentNullException(nameof(invokeTarget));
+
+            Member = MemberInfoExtensions.ExtractFrom(invokeTarget.Method, memberType, out FMethod);
+            Args = args;
+            InvokeTarget = invokeTarget;
         }
 
         /// <summary>
         /// The interface method being invoked.
         /// </summary>
-        public MethodInfo Method { get; }
+        public MethodInfo Method => FMethod;
 
         /// <summary>
         /// The arguments passed by the caller.
