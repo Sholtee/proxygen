@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         /// {                                                                                                    <br/>
         ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
         ///                                                                                                      <br/>
-        ///     InvokeTarget = () =>                                                                             <br/>
+        ///     Func[object] = invokeTarget () =>                                                                <br/>
         ///     {                                                                                                <br/>
         ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
         ///         System.String cb_b;                                                                          <br/>
@@ -38,8 +38,8 @@ namespace Solti.Utils.Proxy.Internals
         ///         return result;                                                                               <br/>
         ///     };                                                                                               <br/>         
         ///                                                                                                      <br/>
-        ///     MethodInfo method = ResolveMethod(InvokeTarget);                                                 <br/>
-        ///     System.Object result = Invoke(method, args, method);                                             <br/>
+        ///     MethodInfo method = ResolveMethod(invokeTarget);                                                 <br/>
+        ///     System.Object result = Invoke(new InvocationContext(method, args, method, invokeTarget));        <br/>
         ///                                                                                                      <br/>
         ///     para2 = (T2) args[1];                                                                            <br/>
         ///     para3 = (T3) args[2];                                                                            <br/>
@@ -166,27 +166,27 @@ namespace Solti.Utils.Proxy.Internals
             {
                 var statements = new List<StatementSyntax>();
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(methodInfo);
+                LocalDeclarationStatementSyntax 
+                    argsArray = CreateArgumentsArray(methodInfo),
+                    invokeTarget = DeclareLocal<Func<object>>
+                    (
+                        EnsureUnused(nameof(invokeTarget), methodInfo),
+                        BuildCallback(methodInfo, argsArray)
+                    ),
+                    method = DeclareLocal<MethodInfo>
+                    (
+                        EnsureUnused(nameof(method), methodInfo),
+                        InvokeMethod
+                        (
+                            RESOLVE_METHOD,
+                            target: null,
+                            castTargetTo: null,
+                            ToArgument(invokeTarget)
+                        )
+                    );
 
                 statements.Add(argsArray);
-                statements.Add
-                (
-                    AssignCallback
-                    (
-                        BuildCallback(methodInfo, argsArray)
-                    )
-                );
-
-                LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(EnsureUnused(nameof(method), methodInfo), InvokeMethod
-                (
-                    RESOLVE_METHOD,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
-                    )
-                ));
+                statements.Add(invokeTarget);
                 statements.Add(method);
 
                 InvocationExpressionSyntax invocation = InvokeMethod
@@ -194,7 +194,10 @@ namespace Solti.Utils.Proxy.Internals
                     INVOKE,
                     target: null,
                     castTargetTo: null,
-                    ToArgument(method), ToArgument(argsArray), ToArgument(method)
+                    Argument
+                    (
+                        CreateObject<InvocationContext>(ToArgument(method), ToArgument(argsArray), ToArgument(method), ToArgument(invokeTarget))
+                    )
                 );
 
                 if (!methodInfo.ReturnValue.Type.IsVoid)

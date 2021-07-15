@@ -19,30 +19,30 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ProxySyntaxFactory
     {
         /// <summary>
-        /// TResult IInterface.Prop                                                          <br/>
-        /// {                                                                                <br/>
-        ///     get                                                                          <br/>
-        ///     {                                                                            <br/>
-        ///         object[] args = new object[] { };                                        <br/>
-        ///         InvokeTarget = () =>                                                     <br/>
-        ///         {                                                                        <br/>
-        ///             return Target.Prop;                                                  <br/>
-        ///         };                                                                       <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
-        ///         return (TResult) Invoke(prop.GetMethod, args, prop);                     <br/>
-        ///     }                                                                            <br/>
-        ///     set                                                                          <br/>
-        ///     {                                                                            <br/>
-        ///         object[] args = new object[] {value};                                    <br/>
-        ///         InvokeTarget = () =>                                                     <br/>
-        ///         {                                                                        <br/>
-        ///           TResult cb_value = (TResult) args[0];                                  <br/>
-        ///           Target.Prop = cb_value;                                                <br/>
-        ///           return null;                                                           <br/>
-        ///         };                                                                       <br/>
-        ///         PropertyInfo prop = ResolveProperty(InvokeTarget);                       <br/>
-        ///         Invoke(prop.SetMethod, args, prop);                                      <br/>
-        ///     }                                                                            <br/>
+        /// TResult IInterface.Prop                                                                           <br/>
+        /// {                                                                                                 <br/>
+        ///     get                                                                                           <br/>
+        ///     {                                                                                             <br/>
+        ///         object[] args = new object[] { };                                                         <br/>
+        ///         Func[object] invokeTarget = () =>                                                         <br/>
+        ///         {                                                                                         <br/>
+        ///             return Target.Prop;                                                                   <br/>
+        ///         };                                                                                        <br/>
+        ///         PropertyInfo prop = ResolveProperty(invokeTarget);                                        <br/>
+        ///         return (TResult) Invoke(new InvocationContext(prop.GetMethod, args, prop, invokeTarget)); <br/>
+        ///     }                                                                                             <br/>
+        ///     set                                                                                           <br/>
+        ///     {                                                                                             <br/>
+        ///         object[] args = new object[] {value};                                                     <br/>
+        ///         Func[object] invokeTarget = () =>                                                         <br/>
+        ///         {                                                                                         <br/>
+        ///           TResult cb_value = (TResult) args[0];                                                   <br/>
+        ///           Target.Prop = cb_value;                                                                 <br/>
+        ///           return null;                                                                            <br/>
+        ///         };                                                                                        <br/>
+        ///         PropertyInfo prop = ResolveProperty(invokeTarget);                                        <br/>
+        ///         Invoke(new InvocationContext(prop.SetMethod, args, prop, invokeTarget));                  <br/>
+        ///     }                                                                                             <br/>
         /// }
         /// </summary>
         internal sealed class PropertyInterceptorFactory : ProxyMemberSyntaxFactory
@@ -57,8 +57,9 @@ namespace Solti.Utils.Proxy.Internals
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
 
-                yield return AssignCallback
+                LocalDeclarationStatementSyntax invokeTarget = DeclareLocal<Func<object>>
                 (
+                    nameof(invokeTarget),
                     DeclareCallback
                     (
                         argsArray,
@@ -78,18 +79,19 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 );
+                yield return invokeTarget;
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.GetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>
                 (
-                    RESOLVE_PROPERTY,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
+                    nameof(prop),
+                    InvokeMethod
                     (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
+                        RESOLVE_PROPERTY,
+                        target: null,
+                        castTargetTo: null,
+                        ToArgument(invokeTarget)
                     )
-                ));
-
+                );
                 yield return prop;
 
                 yield return ReturnResult
@@ -100,16 +102,23 @@ namespace Solti.Utils.Proxy.Internals
                         INVOKE,
                         target: null,
                         castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // prop.GetMethod
+                        Argument
+                        (
+                            CreateObject<InvocationContext>
                             (
-                                ToIdentifierName(prop),  
-                                nameof(PropertyInfo.GetMethod)
-                            ),
-                            ToIdentifierName(argsArray), // new object[0] | new object[] {index1, index2, ...}       
-                            ToIdentifierName(prop) // prop
-                        }.Select(Argument).ToArray()
+                                Argument
+                                (
+                                    SimpleMemberAccess // prop.GetMethod
+                                    (
+                                        ToIdentifierName(prop),
+                                        nameof(PropertyInfo.GetMethod)
+                                    )
+                                ),
+                                ToArgument(argsArray),
+                                ToArgument(prop),
+                                ToArgument(invokeTarget)
+                            )
+                        )
                     )
                 );
             }
@@ -121,8 +130,9 @@ namespace Solti.Utils.Proxy.Internals
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
 
-                yield return AssignCallback
+                LocalDeclarationStatementSyntax invokeTarget = DeclareLocal<Func<object>>
                 (
+                    nameof(invokeTarget),
                     DeclareCallback
                     (
                         argsArray,
@@ -137,10 +147,10 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         kind: SyntaxKind.SimpleAssignmentExpression,
                                         left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
-#if NETSTANDARD2_0
-                                            .Take(locals.Count - 1)
+#if NETSTANDARD2_1_OR_GREATER
+                                            .SkipLast(1)                                          
 #else
-                                            .SkipLast(1)
+                                            .Take(locals.Count - 1)
 #endif
                                             .Select(ToArgument)),
                                         right: ToIdentifierName(locals[locals.Count - 1])
@@ -154,18 +164,19 @@ namespace Solti.Utils.Proxy.Internals
                         }
                     )
                 );
+                yield return invokeTarget;
 
-                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>(EnsureUnused(nameof(prop), property.SetMethod), InvokeMethod
+                LocalDeclarationStatementSyntax prop = DeclareLocal<PropertyInfo>
                 (
-                    RESOLVE_PROPERTY,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
+                    nameof(prop),
+                    InvokeMethod
                     (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
+                        RESOLVE_PROPERTY,
+                        target: null,
+                        castTargetTo: null,
+                        ToArgument(invokeTarget)
                     )
-                ));
-
+                );
                 yield return prop;
 
                 yield return ExpressionStatement
@@ -175,16 +186,23 @@ namespace Solti.Utils.Proxy.Internals
                         INVOKE,
                         target: null,
                         castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // prop.SetMethod
+                        Argument
+                        (
+                            CreateObject<InvocationContext>
                             (
-                                ToIdentifierName(prop),
-                                nameof(PropertyInfo.SetMethod)
-                            ),
-                            ToIdentifierName(argsArray), //  new object[] {value} | new object[] {index1, index2, ..., value}
-                            ToIdentifierName(prop) // prop
-                        }.Select(Argument).ToArray()
+                                Argument
+                                (
+                                    SimpleMemberAccess // prop.SetMethod
+                                    (
+                                        ToIdentifierName(prop),
+                                        nameof(PropertyInfo.SetMethod)
+                                    )
+                                ),
+                                ToArgument(argsArray),
+                                ToArgument(prop),
+                                ToArgument(invokeTarget)
+                            )
+                        )
                     )
                 );
             }

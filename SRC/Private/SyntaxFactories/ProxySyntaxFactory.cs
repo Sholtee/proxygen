@@ -53,7 +53,6 @@ namespace Solti.Utils.Proxy.Internals
             MemberSyntaxFactories = new IMemberSyntaxFactory[] 
             {
                 new ConstructorFactory(this),
-                new InvokeFactory(this),
                 new MethodInterceptorFactory(this),
                 new PropertyInterceptorFactory(this),
                 new EventInterceptorFactory(this)

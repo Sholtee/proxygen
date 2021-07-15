@@ -192,7 +192,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory factory = CreateGenerator((OutputType) outputType);
             factory.Build(default);
-
             Assert.That(factory.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName)));
         }
 
@@ -286,7 +285,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 );
 
                 yield return new ConstructorFactory(fact);
-                yield return new InvokeFactory(fact);
                 yield return new MethodInterceptorFactory(fact);
                 yield return new PropertyInterceptorFactory(fact);
                 yield return new EventInterceptorFactory(fact);

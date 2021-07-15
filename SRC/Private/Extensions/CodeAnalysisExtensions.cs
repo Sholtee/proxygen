@@ -55,10 +55,10 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static NameSyntax Qualify(this IEnumerable<NameSyntax> parts) => parts.Count() <= 1 ? parts.Single() : QualifiedName
         (
-#if NETSTANDARD2_0
-            left: Qualify(parts.Take(parts.Count() - 1)),
+#if NETSTANDARD2_1_OR_GREATER
+            left: Qualify(parts.SkipLast(1)),         
 #else
-            left: Qualify(parts.SkipLast(1)),
+            left: Qualify(parts.Take(parts.Count() - 1)),
 #endif
             right: (SimpleNameSyntax) parts.Last()
         );

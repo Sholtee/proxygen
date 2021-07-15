@@ -16,7 +16,6 @@ namespace Solti.Utils.Proxy
     /// Provides the mechanism for intercepting interface method calls.
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
-    /// <remarks>This class is not thread safe even if the <see cref="InterfaceInterceptor{TInterface}.Target"/> is it.</remarks>
     public class InterfaceInterceptor<TInterface>: IHasTarget<TInterface?>, IProxyAccess<TInterface> where TInterface: class
     {
         /// <summary>
@@ -62,12 +61,6 @@ namespace Solti.Utils.Proxy
         }
 
         /// <summary>
-        /// Invokes the original <see cref="Target"/> method.
-        /// </summary>
-        /// <remarks>Each intercepted method will have its own invocation.</remarks>
-        protected virtual internal Func<object>? InvokeTarget { get; set; }
-
-        /// <summary>
         /// Creates a new <see cref="InterfaceInterceptor{TInterface}"/> instance against the given <paramref name="target"/>.
         /// </summary>
         /// <param name="target">The target of this interceptor.</param>
@@ -76,16 +69,16 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Called on proxy method invocation.
         /// </summary>
-        /// <param name="method">The <typeparamref name="TInterface"/> method that was called</param>
-        /// <param name="args">The arguments passed by the caller to the intercepted method.</param>
-        /// <param name="extra">Extra info about the member from which the <paramref name="method"/> was extracted.</param>
         /// <returns>The object to return to the caller, or null for void methods.</returns>
-        public virtual object? Invoke(MethodInfo method, object?[] args, MemberInfo extra)
+        public virtual object? Invoke(InvocationContext context)
         {
-            if (Target == null) throw new InvalidOperationException(Resources.NULL_TARGET);
-            if (InvokeTarget == null) throw new InvalidOperationException(); // TODO
+            if (context is null)
+                throw new ArgumentNullException(nameof(context));
 
-            return InvokeTarget();
+            if (Target is null)
+                throw new InvalidOperationException(Resources.NULL_TARGET);
+
+            return context.InvokeTarget();
         }
     }
 }

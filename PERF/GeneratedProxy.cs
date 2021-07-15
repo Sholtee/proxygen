@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -44,7 +43,7 @@ namespace Solti.Utils.Proxy.Perf
             public InterfaceProxyWithoutTarget() : base(null)
             {
             }
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => 0;
+            public override object Invoke(InvocationContext context) => 0;
         }
         #endregion
 

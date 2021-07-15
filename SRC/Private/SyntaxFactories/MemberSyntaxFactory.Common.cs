@@ -89,5 +89,16 @@ namespace Solti.Utils.Proxy.Internals
         /// new System.Object[] {..., ..., ...}
         /// </summary>
         protected internal ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
+
+        /// <summary>
+        /// new NameSpace.T(.., ...,)
+        /// </summary>
+        protected internal ObjectCreationExpressionSyntax CreateObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: CreateType<T>()).WithArgumentList
+        (
+            ArgumentList
+            (
+                arguments.ToSyntaxList()
+            )
+        );
     }
 }

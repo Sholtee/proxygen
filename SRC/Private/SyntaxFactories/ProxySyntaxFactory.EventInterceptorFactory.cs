@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,32 +18,32 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ProxySyntaxFactory
     {
         /// <summary>
-        /// event EventType IInterface.Event                                            <br/>
-        /// {                                                                           <br/>
-        ///     add                                                                     <br/>
-        ///     {                                                                       <br/>
-        ///         object[] args = new object[] {value};                               <br/>
-        ///         InvokeTarget = () =>                                                <br/>
-        ///         {                                                                   <br/>
-        ///             EventType cb_value = (EventType) args[a];                       <br/>
-        ///             Target.Event += cb_value;                                       <br/>
-        ///             return null;                                                    <br/>
-        ///         };                                                                  <br/>
-        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
-        ///         Invoke(evt.AddMethod, args, evt);                                   <br/>
-        ///     }                                                                       <br/>
-        ///     remove                                                                  <br/>
-        ///     {                                                                       <br/>
-        ///         object[] args = new object[] {value};                               <br/>
-        ///         InvokeTarget = () =>                                                <br/>
-        ///         {                                                                   <br/>
-        ///             EventType cb_value = (EventType) args[a];                       <br/>
-        ///             Target.Event -= cb_value;                                       <br/>
-        ///             return null;                                                    <br/>
-        ///         };                                                                  <br/>
-        ///         EventInfo evt = ResolveEvent(InvokeTarget);                         <br/>
-        ///         Invoke(evt.RemoveMethod, args, evt);                                <br/>
-        ///     }                                                                       <br/>
+        /// event EventType IInterface.Event                                                  <br/>
+        /// {                                                                                 <br/>
+        ///     add                                                                           <br/>
+        ///     {                                                                             <br/>
+        ///         object[] args = new object[] {value};                                     <br/>
+        ///         Func[object] invokeTarget = () =>                                         <br/>
+        ///         {                                                                         <br/>
+        ///             EventType cb_value = (EventType) args[a];                             <br/>
+        ///             Target.Event += cb_value;                                             <br/>
+        ///             return null;                                                          <br/>
+        ///         };                                                                        <br/>
+        ///         EventInfo evt = ResolveEvent(invokeTarget);                               <br/>
+        ///         Invoke(new InvocationContext(evt.AddMethod, args, evt, invokeTarget));    <br/>
+        ///     }                                                                             <br/>
+        ///     remove                                                                        <br/>
+        ///     {                                                                             <br/>
+        ///         object[] args = new object[] {value};                                     <br/>
+        ///         Func[object] invokeTarget = () =>                                         <br/>
+        ///         {                                                                         <br/>
+        ///             EventType cb_value = (EventType) args[a];                             <br/>
+        ///             Target.Event -= cb_value;                                             <br/>
+        ///             return null;                                                          <br/>
+        ///         };                                                                        <br/>
+        ///         EventInfo evt = ResolveEvent(invokeTarget);                               <br/>
+        ///         Invoke(new InvocationContext(evt.RemoveMethod, args, evt, invokeTarget)); <br/>
+        ///     }                                                                             <br/>
         /// }
         /// </summary>
         internal sealed class EventInterceptorFactory : ProxyMemberSyntaxFactory
@@ -59,8 +60,9 @@ namespace Solti.Utils.Proxy.Internals
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
                 yield return argsArray;
 
-                yield return AssignCallback
+                LocalDeclarationStatementSyntax invokeTarget = DeclareLocal<Func<object>>
                 (
+                    nameof(invokeTarget),
                     DeclareCallback
                     (
                         argsArray,
@@ -81,16 +83,14 @@ namespace Solti.Utils.Proxy.Internals
                         }
                     )
                 );
+                yield return invokeTarget;
 
                 LocalDeclarationStatementSyntax evt = DeclareLocal<EventInfo>(nameof(evt), InvokeMethod
                 (
                     RESOLVE_EVENT,
                     target: null,
                     castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
-                    )
+                    ToArgument(invokeTarget)
                 ));
 
                 yield return evt;
@@ -102,16 +102,23 @@ namespace Solti.Utils.Proxy.Internals
                         INVOKE,
                         target: null,
                         castTargetTo: null,
-                        arguments: new ExpressionSyntax[]
-                        {
-                            SimpleMemberAccess // evt.[Add|Remove]Method
+                        Argument
+                        (
+                            CreateObject<InvocationContext>
                             (
-                                ToIdentifierName(evt),
-                                add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)
-                            ),
-                            ToIdentifierName(argsArray), // args
-                            ToIdentifierName(evt) // evt
-                        }.Select(Argument).ToArray()
+                                Argument
+                                (
+                                    SimpleMemberAccess // evt.[Add|Remove]Method
+                                    (
+                                        ToIdentifierName(evt),
+                                        add ? nameof(EventInfo.AddMethod) : nameof(EventInfo.RemoveMethod)
+                                    )
+                                ),
+                                ToArgument(argsArray),
+                                ToArgument(evt),
+                                ToArgument(invokeTarget)
+                            )
+                        )
                     )
                 );
             }

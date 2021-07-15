@@ -34,10 +34,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class MyInterfaceProxy : InterfaceInterceptor<IMyInterface>
         {
-            public override object Invoke(MethodInfo targetMethod, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                if (targetMethod.Name == nameof(Target.Hooked)) return 1986;
-                return base.Invoke(targetMethod, args, extra);
+                if (context.Method.Name == nameof(Target.Hooked)) return 1986;
+                return base.Invoke(context);
             }
 
             public MyInterfaceProxy(IMyInterface target) : base(target)
@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_MayBeThreadSafe()
         {
-            IMyInterface proxy = await CreateProxy<IMyInterface, ConcurrentInterfaceInterceptor<IMyInterface>>(new MyClass());
+            IMyInterface proxy = await CreateProxy<IMyInterface, InterfaceInterceptor<IMyInterface>>(new MyClass());
 
             Assert.DoesNotThrow(() => Parallel.For(1, 1000, _ => proxy.Hooked(0)));
         }
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class FooProxy : InterfaceInterceptor<IFoo>
         {
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
                 return 1;
             }
@@ -193,7 +193,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InternalInterfaceProxy() : base(null) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => 1;
+            public override object Invoke(InvocationContext context) => 1;
         }
 
         [Test]
@@ -215,29 +215,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>((object)null));
 #endif
-        public class CallContext
-        {
-            public MethodInfo Method;
-            public object[] Args;
-            public MemberInfo Member;
-        }
-
         public class ListProxyWithContext : InterfaceInterceptor<IList<object>>
         {
             public ListProxyWithContext() : base(new List<object>()) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                Contexts.Add(new CallContext
-                {
-                    Method = method,
-                    Args = args,
-                    Member = extra
-                });
-                return base.Invoke(method, args, extra);
+                Contexts.Add(context);
+                return base.Invoke(context);
             }
 
-            public List<CallContext> Contexts { get; } = new List<CallContext>();
+            public List<InvocationContext> Contexts { get; } = new List<InvocationContext>();
         }
 
         [Test]
@@ -252,7 +240,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(interceptor.Contexts.Count, Is.EqualTo(2));
 
-            CallContext context = interceptor.Contexts[0];
+            InvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -277,7 +265,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InterfaceHavingGenericMethodProxy() : base(null) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => args[0];
+            public override object Invoke(InvocationContext context) => context.Args[0];
         }
 
         [Test]
@@ -376,10 +364,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
             {
             }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                args[0] = 2;
-                return base.Invoke(method, args, extra);
+                context.Args[0] = 2;
+                return base.Invoke(context);
             }
         }
 
@@ -387,7 +375,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InterceptorWithSealedInvoke() : base(null) { }
 
-            public sealed override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => base.Invoke(method, args, extra);
+            public sealed override object Invoke(InvocationContext context) => base.Invoke(context);
         }
 
         [Test]
