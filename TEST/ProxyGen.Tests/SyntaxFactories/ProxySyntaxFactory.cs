@@ -192,6 +192,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory factory = CreateGenerator((OutputType) outputType);
             factory.Build(default);
+
             Assert.That(factory.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName)));
         }
 

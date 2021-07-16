@@ -1,11 +1,10 @@
 void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar()
 {
     global::System.Object[] args = new global::System.Object[0];
-    this.InvokeTarget = () =>
+    global::System.Func<global::System.Object> invokeTarget = () =>
     {
         this.Target.Bar();
         return null;
     };
-    global::System.Reflection.MethodInfo method = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveMethod(this.InvokeTarget);
-    this.Invoke(method, args, method);
+    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Method));
 }
