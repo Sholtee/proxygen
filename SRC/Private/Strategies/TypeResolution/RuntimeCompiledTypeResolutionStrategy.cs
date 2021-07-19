@@ -19,8 +19,6 @@ namespace Solti.Utils.Proxy.Internals
         {
             GeneratorType = generatorType;
             SyntaxFactory = syntaxFactory;
-            ClassName = syntaxFactory.ClassName;
-            ContainingAssembly  = syntaxFactory.ContainingAssembly;
         }
 
         public string? CacheDir { get; internal set; } = WorkingDirectories.Instance.AssemblyCacheDir; // tesztek miatt van setter
@@ -29,13 +27,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public Type GeneratorType { get; }
 
-        public Type Resolve(CancellationToken cancellation)
+        public Type? TryResolve(string assemblyName, CancellationToken cancellation)
         {
             string? cacheFile = null;
 
             if (!string.IsNullOrEmpty(CacheDir))
             {
-                cacheFile = Path.Combine(CacheDir, $"{ContainingAssembly}.dll");
+                cacheFile = Path.Combine(CacheDir, $"{assemblyName}.dll");
 
                 if (File.Exists(cacheFile)) return ExtractType
                 (
@@ -52,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
                  Compile.ToAssembly
                  (
                      SyntaxFactory.Unit!,
-                     ContainingAssembly,
+                     assemblyName,
                      cacheFile,
                      SyntaxFactory
                         .References
@@ -65,15 +63,11 @@ namespace Solti.Utils.Proxy.Internals
 
             Type ExtractType(Assembly asm) => asm.GetType
             (
-                ClassName, 
+                SyntaxFactory.ClassName, 
                 throwOnError: true
             );
         }
 
-        public bool ShouldUse => !new EmbeddedTypeResolutionStrategy(GeneratorType).ShouldUse;
-
-        public string ClassName { get; }
-
-        public string ContainingAssembly { get; internal set; } // tesztek miat van setter
+        public Type? TryResolve(CancellationToken cancellation) => TryResolve(SyntaxFactory.ContainingAssembly, cancellation);
     }
 }

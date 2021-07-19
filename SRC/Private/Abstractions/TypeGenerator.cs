@@ -16,9 +16,9 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of the generators.
     /// </summary>
-    /// <remarks>Generators can not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
+    /// <remarks>Generators should not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
-    public abstract class TypeGenerator<TDescendant> : ITypeGenerator where TDescendant : TypeGenerator<TDescendant>, new()
+    public abstract class TypeGenerator<TDescendant> where TDescendant : TypeGenerator<TDescendant>, new()
     {
         #region Private
         private static readonly SemaphoreSlim FLock = new(1, 1);
@@ -29,11 +29,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             try
             {
-                ITypeGenerator self = new TDescendant();
+                TDescendant self = new();
 
                 return self
-                    .TypeResolutionStrategy
-                    .Resolve(cancellation);
+                    .SupportedResolutions
+                    .Select(res => res.TryResolve(cancellation))
+                    .First(t => t is not null)!;
             }
 
             //
@@ -45,21 +46,13 @@ namespace Solti.Utils.Proxy.Internals
                 throw ex.InnerException;
             }
         }
-
-        private readonly ITypeResolution FTypeResolution;
-        ITypeResolution ITypeGenerator.TypeResolutionStrategy => FTypeResolution;
         #endregion
 
         #region Protected
         /// <summary>
-        /// Creates a new <see cref="TypeGenerator{TDescendant}"/> instance.
-        /// </summary>
-        protected TypeGenerator() => FTypeResolution = SupportedResolutions.Single(strat => strat.ShouldUse);
-
-        /// <summary>
         /// Returns the supported type resolution strategies.
         /// </summary>
-        private protected abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
+        internal abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
         #endregion
 
         #region Public
@@ -69,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
         public static async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
         {
-            if (FType != null) return FType;
+            if (FType is not null) return FType;
 
             await FLock.WaitAsync(cancellation).ConfigureAwait(false);
 
@@ -88,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
         public static Type GetGeneratedType() 
         {
-            if (FType != null) return FType;
+            if (FType is not null) return FType;
 
             FLock.Wait();
 

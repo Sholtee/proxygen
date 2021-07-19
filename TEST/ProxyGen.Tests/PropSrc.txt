@@ -3,24 +3,22 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
     get
     {
         global::System.Object[] args = new global::System.Object[0];
-        this.InvokeTarget = () =>
+        global::System.Func<global::System.Object> invokeTarget = () =>
         {
             return (global::System.Object)this.Target.Prop;
         };
-        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
-        return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 
     set
     {
         global::System.Object[] args = new global::System.Object[]{value};
-        this.InvokeTarget = () =>
+        global::System.Func<global::System.Object> invokeTarget = () =>
         {
             global::System.Int32 cb_value = (global::System.Int32)args[0];
             this.Target.Prop = cb_value;
             return null;
         };
-        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
-        this.Invoke(prop.SetMethod, args, prop);
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 }

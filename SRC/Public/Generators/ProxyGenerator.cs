@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TInterceptor">An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.</typeparam>
     public sealed class ProxyGenerator<TInterface, TInterceptor> : TypeGenerator<ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
-        private protected override IEnumerable<ITypeResolution> SupportedResolutions
+        internal override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get
             {

@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         /// {                                                                                                    <br/>
         ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
         ///                                                                                                      <br/>
-        ///     InvokeTarget = () =>                                                                             <br/>
+        ///     Func[object] = invokeTarget () =>                                                                <br/>
         ///     {                                                                                                <br/>
         ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
         ///         System.String cb_b;                                                                          <br/>
@@ -38,8 +38,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         return result;                                                                               <br/>
         ///     };                                                                                               <br/>         
         ///                                                                                                      <br/>
-        ///     MethodInfo method = ResolveMethod(InvokeTarget);                                                 <br/>
-        ///     System.Object result = Invoke(method, args, method);                                             <br/>
+        ///     System.Object result = Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Method));    <br/>
         ///                                                                                                      <br/>
         ///     para2 = (T2) args[1];                                                                            <br/>
         ///     para3 = (T3) args[2];                                                                            <br/>
@@ -50,9 +49,6 @@ namespace Solti.Utils.Proxy.Internals
         internal sealed class MethodInterceptorFactory : ProxyMemberSyntaxFactory
         {
             #region Internals
-            private readonly IMethodInfo
-                RESOLVE_METHOD;
-
             /// <summary>
             /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
             /// {                                                                                        <br/>
@@ -164,37 +160,28 @@ namespace Solti.Utils.Proxy.Internals
 
             internal IEnumerable<StatementSyntax> BuildBody(IMethodInfo methodInfo) 
             {
-                var statements = new List<StatementSyntax>();
+                List<StatementSyntax> statements = new();
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(methodInfo);
+                LocalDeclarationStatementSyntax 
+                    argsArray = CreateArgumentsArray(methodInfo),
+                    invokeTarget = DeclareLocal<Func<object>>
+                    (
+                        EnsureUnused(nameof(invokeTarget), methodInfo),
+                        BuildCallback(methodInfo, argsArray)
+                    );
 
                 statements.Add(argsArray);
-                statements.Add
-                (
-                    AssignCallback
-                    (
-                        BuildCallback(methodInfo, argsArray)
-                    )
-                );
-
-                LocalDeclarationStatementSyntax method = DeclareLocal<MethodInfo>(EnsureUnused(nameof(method), methodInfo), InvokeMethod
-                (
-                    RESOLVE_METHOD,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
-                    (
-                        expression: PropertyAccess(INVOKE_TARGET, null, null)
-                    )
-                ));
-                statements.Add(method);
+                statements.Add(invokeTarget);
 
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
                     INVOKE,
                     target: null,
                     castTargetTo: null,
-                    ToArgument(method), ToArgument(argsArray), ToArgument(method)
+                    Argument
+                    (
+                        CreateObject<InvocationContext>(ToArgument(argsArray), ToArgument(invokeTarget), Argument(EnumAccess(MemberTypes.Method)))
+                    )
                 );
 
                 if (!methodInfo.ReturnValue.Type.IsVoid)
@@ -233,16 +220,6 @@ namespace Solti.Utils.Proxy.Internals
 
             public MethodInterceptorFactory(IProxyContext context) : base(context) 
             {
-                RESOLVE_METHOD = Context.InterceptorType.Methods.Single
-                (
-                    met => met.SignatureEquals
-                    (
-                        MetadataMethodInfo.CreateFrom
-                        (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => InterfaceInterceptor<object>.ResolveMethod(default!))
-                        )
-                    )
-                );
             }
 
             protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context

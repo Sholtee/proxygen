@@ -1,7 +1,7 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen/master) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/sholtee/proxygen/master)
 > .NET proxy generator powered by [Roslyn](https://github.com/dotnet/roslyn )
 
-**This documentation refers the version 4.X of the library**
+**This documentation refers the version 5.X of the library**
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
 ### To hook into interface method calls:
@@ -13,17 +13,17 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   {
     public MyInterceptor(IMyInterface target) : base(target){}  // Nothing to do here
 
-    public override object? Invoke(MethodInfo method, object?[] args, MemberInfo extra) // Invoked on every method call on generated proxy instance
+    public override object? Invoke(InvocationContext context) // Invoking the generated proxy instance will trigger this method
     {
-	  if (needToModifyRetval)
+	  if (suppressOriginalMethod)
 	  {
 	    return something;
-        // ref|out parameters can be assigned by setting the corresponding "args[]" item 
+        // ref|out parameters can be assigned by setting the corresponding "context.Args[]" item 
 	  }
 	  
-	  args[0] = someNewVal; // "someNewVal" will be forwarded to the original method
+	  context.Args[0] = someNewVal; // "someNewVal" will be forwarded to the original method
 	  
-	  return base.Invoke(method, args, extra); // Let the original method do its work
+	  return base.Invoke(context); // Let the original method do its work
     }  
   }
   ```
@@ -153,6 +153,9 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
 - 3.X
   - `[Proxy|Duck]Generator.GeneratedType[Async]` property has been removed. To get the generated proxy type call the `[Proxy|Duck]Generator.GetGeneratedType[Async]()` method.
   - `[Proxy|Duck]Generator.CacheDirectory` property has been removed. To set the cache directory tweak the [runtimeconfig.json](#caching-the-generated-assembly) file.
+- 4.X
+  - The layout of the `InterfaceInterceptor<>.Invoke()` has been changed. Invocation parameters can be grabbed from the `InvocationContext` passed to the `Invoke()` method.
+  - The `ConcurrentInterfaceInterceptor<>` class has been dropped since the `InterfaceInterceptor<>` class was rewritten in a thread manner.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen ) (WIP).
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )

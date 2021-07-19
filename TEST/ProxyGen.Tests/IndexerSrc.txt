@@ -3,26 +3,24 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
     get
     {
         global::System.Object[] args = new global::System.Object[]{index};
-        this.InvokeTarget = () =>
+        global::System.Func<global::System.Object> invokeTarget = () =>
         {
             global::System.Int32 cb_index = (global::System.Int32)args[0];
             return (global::System.Object)this.Target[cb_index];
         };
-        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.Generic.IList<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
-        return (global::System.Int32)this.Invoke(prop.GetMethod, args, prop);
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 
     set
     {
         global::System.Object[] args = new global::System.Object[]{index, value};
-        this.InvokeTarget = () =>
+        global::System.Func<global::System.Object> invokeTarget = () =>
         {
             global::System.Int32 cb_index = (global::System.Int32)args[0];
             global::System.Int32 cb_value = (global::System.Int32)args[1];
             this.Target[cb_index] = cb_value;
             return null;
         };
-        global::System.Reflection.PropertyInfo prop = global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.Generic.IList<global::System.Int32>>.ResolveProperty(this.InvokeTarget);
-        this.Invoke(prop.SetMethod, args, prop);
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 }

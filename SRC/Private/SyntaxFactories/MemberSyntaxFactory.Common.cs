@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Diagnostics;
 using System.Linq;
 
@@ -89,5 +90,19 @@ namespace Solti.Utils.Proxy.Internals
         /// new System.Object[] {..., ..., ...}
         /// </summary>
         protected internal ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
+
+        /// <summary>
+        /// new NameSpace.T(.., ...,)
+        /// </summary>
+        protected internal ObjectCreationExpressionSyntax CreateObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: CreateType<T>()).WithArgumentList
+        (
+            ArgumentList
+            (
+                arguments.ToSyntaxList()
+            )
+        );
+
+        protected internal MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum =>
+            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, CreateType<T>(), IdentifierName(val.ToString()));
     }
 }

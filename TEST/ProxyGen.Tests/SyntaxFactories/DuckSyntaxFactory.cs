@@ -138,7 +138,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             var fact = CreateGenerator<IFoo<int>, GoodFoo<int>>();
             fact.Build(default);
 
-            Assert.That(fact.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt")));
+            Assert.That(fact.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         [Test]

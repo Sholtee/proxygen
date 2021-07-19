@@ -21,12 +21,9 @@ namespace Solti.Utils.Proxy.Internals
         internal abstract class ProxyMemberSyntaxFactory: MemberSyntaxFactory
         {
             #region Protected
-            protected internal readonly IPropertyInfo
-                TARGET,
-                INVOKE_TARGET;
+            protected internal readonly IPropertyInfo TARGET;
 
-            protected internal readonly IMethodInfo 
-                INVOKE;
+            protected internal readonly IMethodInfo INVOKE;
 
             protected internal static string EnsureUnused(string name, IEnumerable<IParameterInfo> parameters) 
             {
@@ -84,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 expression: returnType?.IsVoid == true
                     ? null
-                    : returnType != null
+                    : returnType is not null
                         ? CastExpression
                         (
                             type: CreateType(returnType),
@@ -109,19 +106,6 @@ namespace Solti.Utils.Proxy.Internals
             protected static internal ReturnStatementSyntax ReturnNull() => ReturnStatement
             (
                 LiteralExpression(SyntaxKind.NullLiteralExpression)
-            );
-
-            /// <summary>
-            /// InvokeTarget = ...;
-            /// </summary>
-            protected internal StatementSyntax AssignCallback(ExpressionSyntax expr) => ExpressionStatement
-            (
-                expression: AssignmentExpression
-                (
-                    kind: SyntaxKind.SimpleAssignmentExpression,
-                    left: PropertyAccess(INVOKE_TARGET, null, null),
-                    right: expr
-                )
             );
 
             /// <summary>
@@ -212,18 +196,13 @@ namespace Solti.Utils.Proxy.Internals
                     prop => prop.Name == nameof(InterfaceInterceptor<object>.Target)
                 );
 
-                INVOKE_TARGET = Context.InterceptorType.Properties.Single
-                (
-                    prop => prop.Name == nameof(InterfaceInterceptor<object>.InvokeTarget)
-                );
-
                 INVOKE = Context.InterceptorType.Methods.Single
                 (
                     met => met.SignatureEquals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!, default!, default!))
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!))
                         )
                     )
                 );

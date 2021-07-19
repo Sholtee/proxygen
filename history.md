@@ -93,4 +93,8 @@
   - *done:* Test against *.NET5.0*
 - 4.0.2:
   - *done:* Annotate generated classes with `GeneratedCodeAttribute`
-  - *done:* Suppress all compiler warnings in the generated sources 
+  - *done:* Suppress all compiler warnings in the generated sources
+- 5.0.0:
+  - *breaking:* New `InterfaceInterceptor<>.Invoke()` layout
+  - *breaking:* Dropped `ConcurrentInterfaceInterceptor<>` class
+  - *done:* Simplified generated code

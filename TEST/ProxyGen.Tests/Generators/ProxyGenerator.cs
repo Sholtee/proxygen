@@ -34,10 +34,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class MyInterfaceProxy : InterfaceInterceptor<IMyInterface>
         {
-            public override object Invoke(MethodInfo targetMethod, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                if (targetMethod.Name == nameof(Target.Hooked)) return 1986;
-                return base.Invoke(targetMethod, args, extra);
+                if (context.Method.Name == nameof(Target.Hooked)) return 1986;
+                return base.Invoke(context);
             }
 
             public MyInterfaceProxy(IMyInterface target) : base(target)
@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_MayBeThreadSafe()
         {
-            IMyInterface proxy = await CreateProxy<IMyInterface, ConcurrentInterfaceInterceptor<IMyInterface>>(new MyClass());
+            IMyInterface proxy = await CreateProxy<IMyInterface, InterfaceInterceptor<IMyInterface>>(new MyClass());
 
             Assert.DoesNotThrow(() => Parallel.For(1, 1000, _ => proxy.Hooked(0)));
         }
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class FooProxy : InterfaceInterceptor<IFoo>
         {
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
                 return 1;
             }
@@ -193,7 +193,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InternalInterfaceProxy() : base(null) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => 1;
+            public override object Invoke(InvocationContext context) => 1;
         }
 
         [Test]
@@ -215,29 +215,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
             Assert.DoesNotThrowAsync(() => CreateProxy<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>((object)null));
 #endif
-        public class CallContext
-        {
-            public MethodInfo Method;
-            public object[] Args;
-            public MemberInfo Member;
-        }
-
         public class ListProxyWithContext : InterfaceInterceptor<IList<object>>
         {
             public ListProxyWithContext() : base(new List<object>()) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                Contexts.Add(new CallContext
-                {
-                    Method = method,
-                    Args = args,
-                    Member = extra
-                });
-                return base.Invoke(method, args, extra);
+                Contexts.Add(context);
+                return base.Invoke(context);
             }
 
-            public List<CallContext> Contexts { get; } = new List<CallContext>();
+            public List<InvocationContext> Contexts { get; } = new List<InvocationContext>();
         }
 
         [Test]
@@ -252,7 +240,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(interceptor.Contexts.Count, Is.EqualTo(2));
 
-            CallContext context = interceptor.Contexts[0];
+            InvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -277,7 +265,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InterfaceHavingGenericMethodProxy() : base(null) { }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => args[0];
+            public override object Invoke(InvocationContext context) => context.Args[0];
         }
 
         [Test]
@@ -376,18 +364,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
             {
             }
 
-            public override object Invoke(MethodInfo method, object[] args, MemberInfo extra)
+            public override object Invoke(InvocationContext context)
             {
-                args[0] = 2;
-                return base.Invoke(method, args, extra);
+                context.Args[0] = 2;
+                return base.Invoke(context);
             }
-        }
-
-        public class InterceptorWithSealedInvoke : InterfaceInterceptor<IMyInterface>
-        {
-            public InterceptorWithSealedInvoke() : base(null) { }
-
-            public sealed override object Invoke(MethodInfo method, object[] args, MemberInfo extra) => base.Invoke(method, args, extra);
         }
 
         [Test]
@@ -397,7 +378,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, AbstractInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, SealedInterceptor>());
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithPrivateCtor>());
-            Assert.ThrowsAsync<InvalidOperationException>(() => CreateProxy<IMyInterface, InterceptorWithSealedInvoke>());
             Assert.ThrowsAsync<MemberAccessException>(() => CreateProxy<IMyInterface, PrivateInterceptor>());
         }
 
@@ -470,18 +450,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
-            ITypeGenerator generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
+            var generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
 
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
+
+            string cacheFile = Path.Combine(tmpDir, $"{res.SyntaxFactory.ContainingAssembly}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            ((RuntimeCompiledTypeResolutionStrategy)generator.TypeResolutionStrategy).CacheDir = tmpDir;
-            generator.TypeResolutionStrategy.Resolve();
+            res.CacheDir = tmpDir;
+            res.TryResolve(default);
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -489,16 +471,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            ITypeGenerator generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+            var generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(
                     cacheDir,
-                    $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
+                    $"{res.SyntaxFactory.ContainingAssembly}.dll");
 
-            ((RuntimeCompiledTypeResolutionStrategy)generator.TypeResolutionStrategy).CacheDir = cacheDir;
-            Type gt = generator.TypeResolutionStrategy.Resolve();
+            Assembly.LoadFile(cacheFile);
+
+            res.CacheDir = cacheDir;
+            Type gt = res.TryResolve(default);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
@@ -508,8 +494,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
         {
-            Assert.AreEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>()).TypeResolutionStrategy.ContainingAssembly);
-            Assert.AreNotEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>()).TypeResolutionStrategy.ContainingAssembly);
+            Assert.AreEqual(WIRED_NAME, ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>.GetGeneratedType().Assembly.GetName().Name);
+            Assert.AreNotEqual(WIRED_NAME, ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>.GetGeneratedType().Assembly.GetName().Name);
         }
 
         [Test]
