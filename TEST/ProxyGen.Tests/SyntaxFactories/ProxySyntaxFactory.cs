@@ -193,7 +193,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             ProxySyntaxFactory factory = CreateGenerator((OutputType) outputType);
             factory.Build(default);
 
-            Assert.That(factory.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName)));
+            Assert.That(factory.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName).Replace("{version}", typeof(ProxyGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
