@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
 
-        private readonly HashSet<ITypeInfo> FTypes = new HashSet<ITypeInfo>(ITypeInfoComparer.Instance);
+        private readonly HashSet<ITypeInfo> FTypes = new(ITypeInfoComparer.Instance);
 
         public IReadOnlyCollection<ITypeInfo> Types => FTypes;
 
@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             IGenericTypeInfo? genericType = type as IGenericTypeInfo;
 
-            if (genericType?.IsGenericDefinition == true)
+            if (genericType?.IsGenericDefinition is true)
                 return;
 
             if (!FTypes.Add(type)) // korkoros referencia fix
