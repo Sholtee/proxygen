@@ -450,18 +450,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
-            ITypeGenerator generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
+            var generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
 
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
+
+            string cacheFile = Path.Combine(tmpDir, $"{res.SyntaxFactory.ContainingAssembly}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            ((RuntimeCompiledTypeResolutionStrategy)generator.TypeResolutionStrategy).CacheDir = tmpDir;
-            generator.TypeResolutionStrategy.Resolve();
+            res.CacheDir = tmpDir;
+            res.TryResolve(default);
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -469,16 +471,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            ITypeGenerator generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+            var generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(
                     cacheDir,
-                    $"{generator.TypeResolutionStrategy.ContainingAssembly}.dll");
+                    $"{res.SyntaxFactory.ContainingAssembly}.dll");
 
-            ((RuntimeCompiledTypeResolutionStrategy)generator.TypeResolutionStrategy).CacheDir = cacheDir;
-            Type gt = generator.TypeResolutionStrategy.Resolve();
+            Assembly.LoadFile(cacheFile);
+
+            res.CacheDir = cacheDir;
+            Type gt = res.TryResolve(default);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
@@ -488,8 +494,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
         {
-            Assert.AreEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>()).TypeResolutionStrategy.ContainingAssembly);
-            Assert.AreNotEqual(WIRED_NAME, ((ITypeGenerator) new ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>()).TypeResolutionStrategy.ContainingAssembly);
+            Assert.AreEqual(WIRED_NAME, ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>.GetGeneratedType().Assembly.GetName().Name);
+            Assert.AreNotEqual(WIRED_NAME, ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>.GetGeneratedType().Assembly.GetName().Name);
         }
 
         [Test]

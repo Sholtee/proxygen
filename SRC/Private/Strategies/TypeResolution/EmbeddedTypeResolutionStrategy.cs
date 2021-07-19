@@ -17,9 +17,9 @@ namespace Solti.Utils.Proxy.Internals
     {
         public Type GeneratorType { get; }
 
-        private readonly Type? FResolvedType;
+        public EmbeddedTypeResolutionStrategy(Type generatorType) => GeneratorType = generatorType;
 
-        public EmbeddedTypeResolutionStrategy(Type generatorType)
+        public Type? TryResolve(CancellationToken cancellation)
         {
             StackTrace trace = new();
 
@@ -27,6 +27,8 @@ namespace Solti.Utils.Proxy.Internals
 
             for (int i = 1; i < trace.FrameCount; i++) 
             {
+                cancellation.ThrowIfCancellationRequested();
+
                 Type? containingType = trace
                     .GetFrame(i)
                     .GetMethod()
@@ -38,12 +40,11 @@ namespace Solti.Utils.Proxy.Internals
 
                     if (callingAssembly != inspectedAssembly)
                     {
-                        if (callingAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>().Any(egta => egta.Generator == generatorType))
+                        if (callingAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>().Any(egta => egta.Generator == GeneratorType))
                         {
-                            FResolvedType = callingAssembly
+                            return callingAssembly
                                 .GetTypes()
-                                .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == generatorType);
-                            break;
+                                .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == GeneratorType);
                         }
                     }
 
@@ -51,15 +52,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            GeneratorType = generatorType;
+            return null;
         }
-
-        public Type Resolve(CancellationToken cancellation) => FResolvedType!;
-
-        public bool ShouldUse => FResolvedType is not null;
-
-        public string ClassName => FResolvedType?.FullName!;
-
-        public string ContainingAssembly => FResolvedType?.Assembly.GetName().Name!;
     }
 }

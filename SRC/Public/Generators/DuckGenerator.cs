@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TTarget">The target who implements all the <typeparamref name="TInterface"/> members.</typeparam>
     public sealed class DuckGenerator<TInterface, TTarget>: TypeGenerator<DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
-        private protected override IEnumerable<ITypeResolution> SupportedResolutions
+        internal override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get 
             {

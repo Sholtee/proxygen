@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 
@@ -25,13 +26,12 @@ namespace Solti.Utils.Proxy.Perf
         internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
 
         [GlobalSetup]
-        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) ((ITypeGenerator) new ProxyGenerator<IInterface, InterfaceProxy>()).TypeResolutionStrategy;
+        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) new ProxyGenerator<IInterface, InterfaceProxy>().SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
         [Benchmark]
         public void AssemblingProxyType()
         {
-            TypeResolution.ContainingAssembly = Guid.NewGuid().ToString();
-            TypeResolution.Resolve(default);
+            TypeResolution.TryResolve(Guid.NewGuid().ToString(), default);
         }
     }
 }
