@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 
@@ -15,7 +16,7 @@ namespace Solti.Utils.Proxy.Perf
     [MemoryDiagnoser]
     public class DuckGenerator
     {
-        public class Implementation 
+        public class Implementation
         {
             public int DoSomething(string param) => param.GetHashCode();
         }
@@ -23,13 +24,9 @@ namespace Solti.Utils.Proxy.Perf
         internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
 
         [GlobalSetup]
-        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) ((ITypeGenerator) new DuckGenerator<IInterface, Implementation>()).TypeResolutionStrategy;       
+        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy)new DuckGenerator<IInterface, Implementation>().SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
         [Benchmark]
-        public void AssemblingProxyType()
-        {
-            TypeResolution.ContainingAssembly = Guid.NewGuid().ToString();
-            TypeResolution.Resolve(default);
-        }
+        public void AssemblingProxyType() => TypeResolution.TryResolve(Guid.NewGuid().ToString(), default);
     }
 }

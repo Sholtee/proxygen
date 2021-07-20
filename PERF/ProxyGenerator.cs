@@ -29,9 +29,6 @@ namespace Solti.Utils.Proxy.Perf
         public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) new ProxyGenerator<IInterface, InterfaceProxy>().SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
         [Benchmark]
-        public void AssemblingProxyType()
-        {
-            TypeResolution.TryResolve(Guid.NewGuid().ToString(), default);
-        }
+        public void AssemblingProxyType() => TypeResolution.TryResolve(Guid.NewGuid().ToString(), default);
     }
 }
