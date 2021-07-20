@@ -77,7 +77,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   ...
   // The returned type:
   // 1) is assembled only once
-  // 2) has only one public constructor with the following layout: "GeneratedProxy(TargetClass target)"
+  // 2) has only one public constructor with the following layout: "Ctor(TargetClass target)"
   Type duckType = DuckGenerator<IDuck, TargetClass>.GetGeneratedType(); // or GetGeneratedTypeAsync()
   ```
 3. Quack:
@@ -157,7 +157,7 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
   - The layout of the `InterfaceInterceptor<>.Invoke()` has been changed. Invocation parameters can be grabbed from the `InvocationContext` passed to the `Invoke()` method.
   - The `ConcurrentInterfaceInterceptor<>` class has been dropped since the `InterfaceInterceptor<>` class was rewritten in a thread manner.
 ## Resources
-- [API Docs](https://sholtee.github.io/proxygen ) (WIP).
+- [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
 - [Version History](https://github.com/Sholtee/proxygen/blob/master/history.md )
 
