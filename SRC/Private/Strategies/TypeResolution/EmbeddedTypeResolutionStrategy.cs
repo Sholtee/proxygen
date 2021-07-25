@@ -46,9 +46,9 @@ namespace Solti.Utils.Proxy.Internals
                                 .GetTypes()
                                 .Single(t => t.GetCustomAttribute<RelatedGeneratorAttribute>(inherit: false)?.Generator == GeneratorType);
                         }
-                    }
 
-                    inspectedAssembly = callingAssembly;
+                        inspectedAssembly = callingAssembly;
+                    }
                 }
             }
 
