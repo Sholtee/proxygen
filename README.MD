@@ -155,7 +155,7 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
   - `[Proxy|Duck]Generator.CacheDirectory` property has been removed. To set the cache directory tweak the [runtimeconfig.json](#caching-the-generated-assembly) file.
 - 4.X
   - The layout of the `InterfaceInterceptor<>.Invoke()` has been changed. Invocation parameters can be grabbed from the `InvocationContext` passed to the `Invoke()` method.
-  - The `ConcurrentInterfaceInterceptor<>` class has been dropped since the `InterfaceInterceptor<>` class was rewritten in a thread manner.
+  - The `ConcurrentInterfaceInterceptor<>` class has been dropped since the `InterfaceInterceptor<>` class was rewritten in a thread safe manner.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
