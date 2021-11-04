@@ -57,7 +57,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\icon.png" Pack="true" PackagePath="" />
+    <None Include="..\icon.png" Pack="true" PackagePath="\"/>
+    <None Include="..\README.md" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
   <PropertyGroup>
@@ -69,6 +70,7 @@
     <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
     <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>
