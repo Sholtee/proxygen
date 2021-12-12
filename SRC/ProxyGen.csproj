@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="5.*">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.*">
       <!-- This package is a develpement dependency -->
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -58,7 +58,7 @@
 
   <ItemGroup>
     <None Include="..\icon.png" Pack="true" PackagePath="\"/>
-    <None Include="..\README.md" Pack="true" PackagePath="\"/>
+    <None Include="..\README.MD" Pack="true" PackagePath="\"/>
   </ItemGroup>
   
   <PropertyGroup>
@@ -70,7 +70,7 @@
     <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.MD</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
     <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>

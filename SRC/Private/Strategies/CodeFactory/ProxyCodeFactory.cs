@@ -15,7 +15,9 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class ProxyCodeFactory : ICodeFactory
     {
+        #pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
         [ModuleInitializer]
+        #pragma warning restore CA2255
         public static void Init() => ProxyEmbedder.CodeFactories.Add(new ProxyCodeFactory());
 
         public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(ProxyGenerator<,>).FullName;
