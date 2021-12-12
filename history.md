@@ -98,3 +98,5 @@
   - *breaking:* New `InterfaceInterceptor<>.Invoke()` layout
   - *breaking:* Dropped `ConcurrentInterfaceInterceptor<>` class
   - *done:* Simplified generated code
+- 5.0.1:
+  - *added:* Package "readme"
