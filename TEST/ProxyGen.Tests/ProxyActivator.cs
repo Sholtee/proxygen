@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.DoesNotThrow(() => ProxyActivator.Create(typeof(List<string>)));
 
 
-        public static IEnumerable<object> Paramz
+        public static IEnumerable<ITuple> Paramz
         {
             get
             {
@@ -29,24 +30,22 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void Factory_ShouldCreateANewInstance([ValueSource(nameof(Paramz))] object paramz)
+        public void Factory_ShouldCreateANewInstance([ValueSource(nameof(Paramz))] ITuple paramz)
         {
             List<string> instance = (List<string>) ProxyActivator.Create(typeof(List<string>)).Invoke(paramz);
             Assert.IsNotNull(instance);
         }
 
-        public static IEnumerable<object> BadParamz
+        public static IEnumerable<ITuple> BadParamz
         {
             get
             {
-                yield return new object();
-                yield return 1;
                 yield return Tuple.Create("cica");
             }
         }
 
         [Test]
-        public void Factory_ShouldThrowOnInvalidParam([ValueSource(nameof(BadParamz))] object paramz) =>
+        public void Factory_ShouldThrowOnInvalidParam([ValueSource(nameof(BadParamz))] ITuple paramz) =>
             Assert.Throws<MissingMemberException>(() => ProxyActivator.Create(typeof(List<string>)).Invoke(paramz));
     }
 }

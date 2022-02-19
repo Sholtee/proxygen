@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Linq;
 
 namespace Solti.Utils.Proxy.Attributes
 {
@@ -17,7 +18,7 @@ namespace Solti.Utils.Proxy.Attributes
     public sealed class EmbedGeneratedTypeAttribute: Attribute
     {
         /// <summary>
-        /// The related <see cref="TypeGenerator{TDescendant}"/>.
+        /// The related <see cref="Generator{TInterface, TDescendant}"/>.
         /// </summary>
         public Type Generator { get; }
 
@@ -30,7 +31,7 @@ namespace Solti.Utils.Proxy.Attributes
             if (generator is null)
                 throw new ArgumentNullException(nameof(generator));
 
-            if (!typeof(TypeGenerator<>).MakeGenericType(generator).IsAssignableFrom(generator))
+            if (!generator.GetBaseTypes().Any(@base => @base.IsGenericType && @base.GetGenericTypeDefinition().FullName == typeof(Generator<,>).FullName))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(generator));
 
             Generator = generator;

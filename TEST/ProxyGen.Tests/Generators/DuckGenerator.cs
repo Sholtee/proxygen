@@ -24,8 +24,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
     [TestFixture]
     public sealed class DuckGeneratorTests
     {
-        private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            (TInterface) Activator.CreateInstance(await DuckGenerator<TInterface, TTarget>.GetGeneratedTypeAsync(), target);
+        private static Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
+            DuckGenerator<TInterface, TTarget>.ActivateAsync(Tuple.Create(target));
 
         [Test]
         public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()

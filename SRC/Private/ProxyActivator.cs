@@ -9,11 +9,21 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
+#if NETSTANDARD2_1_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
+
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class ProxyActivator
     {
-        public static Func<object, object> Create(Type proxyType)
+        #if NETSTANDARD2_1_OR_GREATER
+        public delegate object Activator(ITuple? tuple);
+        #else
+        public delegate object Activator(object? tuple);
+        #endif
+
+        public static Activator Create(Type proxyType)
         {
             ParameterExpression paramzTuple = Expression.Parameter(typeof(object), nameof(paramzTuple));
 
@@ -40,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
             );
             block.Add(Expression.Label(ret, Expression.Default(typeof(object))));
 
-            Expression<Func<object, object>> lambda = Expression.Lambda<Func<object, object>>(Expression.Block(locals, block), paramzTuple);
+            Expression<Activator> lambda = Expression.Lambda<Activator>(Expression.Block(locals, block), paramzTuple);
 
             return lambda.Compile();
 
