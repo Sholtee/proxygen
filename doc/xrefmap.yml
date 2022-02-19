@@ -195,6 +195,64 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
+- uid: Solti.Utils.Proxy.Internals.Generator
+  name: Generator
+  href: Solti.Utils.Proxy.Internals.Generator.html
+  commentId: T:Solti.Utils.Proxy.Internals.Generator
+  fullName: Solti.Utils.Proxy.Internals.Generator
+  nameWithType: Generator
+- uid: Solti.Utils.Proxy.Internals.Generator.Activate(System.Object)
+  name: Activate(Object)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_System_Object_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.Activate(System.Object)
+  fullName: Solti.Utils.Proxy.Internals.Generator.Activate(System.Object)
+  nameWithType: Generator.Activate(Object)
+- uid: Solti.Utils.Proxy.Internals.Generator.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.Activate
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.Activate
+  nameWithType: Generator.Activate
+- uid: Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  name: ActivateAsync(Object, CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Object_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Object, System.Threading.CancellationToken)
+  nameWithType: Generator.ActivateAsync(Object, CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.ActivateAsync
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.ActivateAsync
+  nameWithType: Generator.ActivateAsync
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
+  name: GetGeneratedType()
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType()
+  nameWithType: Generator.GetGeneratedType()
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType*
+  name: GetGeneratedType
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
+  nameWithType: Generator.GetGeneratedType
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  name: GetGeneratedTypeAsync(CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  nameWithType: Generator.GetGeneratedTypeAsync(CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync*
+  name: GetGeneratedTypeAsync
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync
+  nameWithType: Generator.GetGeneratedTypeAsync
 - uid: Solti.Utils.Proxy.Internals.Generator`2
   name: Generator<TInterface, TDescendant>
   href: Solti.Utils.Proxy.Internals.Generator-2.html
