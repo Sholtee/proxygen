@@ -195,6 +195,83 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
+- uid: Solti.Utils.Proxy.Internals.Generator`2
+  name: Generator<TInterface, TDescendant>
+  href: Solti.Utils.Proxy.Internals.Generator-2.html
+  commentId: T:Solti.Utils.Proxy.Internals.Generator`2
+  name.vb: Generator(Of TInterface, TDescendant)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant)
+  nameWithType: Generator<TInterface, TDescendant>
+  nameWithType.vb: Generator(Of TInterface, TDescendant)
+- uid: Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Object)
+  name: Activate(Object)
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Object_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Object)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate(System.Object)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Activate(System.Object)
+  nameWithType: Generator<TInterface, TDescendant>.Activate(Object)
+  nameWithType.vb: Generator(Of TInterface, TDescendant).Activate(Object)
+- uid: Solti.Utils.Proxy.Internals.Generator`2.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.Activate
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Activate
+  nameWithType: Generator<TInterface, TDescendant>.Activate
+  nameWithType.vb: Generator(Of TInterface, TDescendant).Activate
+- uid: Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  name: ActivateAsync(Object, CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Object_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAsync(System.Object, System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).ActivateAsync(System.Object, System.Threading.CancellationToken)
+  nameWithType: Generator<TInterface, TDescendant>.ActivateAsync(Object, CancellationToken)
+  nameWithType.vb: Generator(Of TInterface, TDescendant).ActivateAsync(Object, CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAsync
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).ActivateAsync
+  nameWithType: Generator<TInterface, TDescendant>.ActivateAsync
+  nameWithType.vb: Generator(Of TInterface, TDescendant).ActivateAsync
+- uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
+  name: GetGeneratedType()
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType
+  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType()
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedType()
+  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedType()
+  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedType()
+- uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType*
+  name: GetGeneratedType
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedType
+  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedType
+  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedType
+- uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  name: GetGeneratedTypeAsync(CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedTypeAsync(CancellationToken)
+  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync(CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync*
+  name: GetGeneratedTypeAsync
+  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedTypeAsync
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
+  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedTypeAsync
+  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
 - uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
   name: RelatedGeneratorAttribute
   href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html
@@ -227,49 +304,6 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
   nameWithType: RelatedGeneratorAttribute.Generator
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1
-  name: TypeGenerator<TDescendant>
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html
-  commentId: T:Solti.Utils.Proxy.Internals.TypeGenerator`1
-  name.vb: TypeGenerator(Of TDescendant)
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant)
-  nameWithType: TypeGenerator<TDescendant>
-  nameWithType.vb: TypeGenerator(Of TDescendant)
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType
-  name: GetGeneratedType()
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType
-  commentId: M:Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.GetGeneratedType()
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).GetGeneratedType()
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedType()
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedType()
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType*
-  name: GetGeneratedType
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.GetGeneratedType
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).GetGeneratedType
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedType
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedType
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  name: GetGeneratedTypeAsync(CancellationToken)
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedTypeAsync(CancellationToken)
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedTypeAsync(CancellationToken)
-- uid: Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync*
-  name: GetGeneratedTypeAsync
-  href: Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.TypeGenerator<TDescendant>.GetGeneratedTypeAsync
-  fullName.vb: Solti.Utils.Proxy.Internals.TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
-  nameWithType: TypeGenerator<TDescendant>.GetGeneratedTypeAsync
-  nameWithType.vb: TypeGenerator(Of TDescendant).GetGeneratedTypeAsync
 - uid: Solti.Utils.Proxy.InvocationContext
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html

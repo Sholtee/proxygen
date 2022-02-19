@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class TypeGenerator&lt;TDescendant&gt;
+    <title>Class Generator&lt;TInterface, TDescendant&gt;
    | ProxyGen </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class TypeGenerator&lt;TDescendant&gt;
+    <meta name="title" content="Class Generator&lt;TInterface, TDescendant&gt;
    | ProxyGen ">
     <meta name="generator" content="docfx 2.58.0.0">
     
@@ -37,10 +37,10 @@
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.Generator`2">
   
   
-  <h1 id="Solti_Utils_Proxy_Internals_TypeGenerator_1" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1" class="text-break">Class TypeGenerator&lt;TDescendant&gt;
+  <h1 id="Solti_Utils_Proxy_Internals_Generator_2" data-uid="Solti.Utils.Proxy.Internals.Generator`2" class="text-break">Class Generator&lt;TInterface, TDescendant&gt;
   </h1>
   <div class="markdown level0 summary"><p>Base of the generators.</p>
 </div>
@@ -48,7 +48,7 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">TypeGenerator&lt;TDescendant&gt;</span></div>
+    <div class="level1"><span class="xref">Generator&lt;TInterface, TDescendant&gt;</span></div>
       <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator-2.html">DuckGenerator&lt;TInterface, TTarget&gt;</a></div>
       <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator&lt;TInterface, TInterceptor&gt;</a></div>
   </div>
@@ -78,10 +78,10 @@
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
-  <h5 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_syntax">Syntax</h5>
+  <h5 id="Solti_Utils_Proxy_Internals_Generator_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class TypeGenerator&lt;TDescendant&gt;
-    where TDescendant : TypeGenerator&lt;TDescendant&gt;, new()</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Generator&lt;TInterface, TDescendant&gt;
+    where TDescendant : Generator&lt;TInterface, TDescendant&gt;, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -93,18 +93,114 @@
     </thead>
     <tbody>
       <tr>
+        <td><span class="parametername">TInterface</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><span class="parametername">TDescendant</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_remarks"><strong>Remarks</strong></h5>
-  <div class="markdown level0 remarks"><p>Generators should not be instantiated. To access the created <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> use the <a class="xref" href="Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType">GetGeneratedType()</a> or <a class="xref" href="Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_">GetGeneratedTypeAsync(CancellationToken)</a> method.</p>
+  <h5 id="Solti_Utils_Proxy_Internals_Generator_2_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>Generators should not be instantiated. To access the created <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> use the <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType">GetGeneratedType()</a> or <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_">GetGeneratedTypeAsync(CancellationToken)</a> method.</p>
 </div>
   <h3 id="methods">Methods
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType_" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedType">GetGeneratedType()</h4>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Object_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Object)">Activate(Object)</h4>
+  <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TInterface Activate(object tuple)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><span class="parametername">tuple</span></td>
+        <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TInterface</span></td>
+        <td><p>The just activated instance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Object_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Object,System.Threading.CancellationToken)">ActivateAsync(Object, CancellationToken)</h4>
+  <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static async Task&lt;TInterface&gt; ActivateAsync(object tuple, CancellationToken cancellation = default(CancellationToken))</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><span class="parametername">tuple</span></td>
+        <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.cancellationtoken">CancellationToken</a></td>
+        <td><span class="parametername">cancellation</span></td>
+        <td><p>Token to cancel the operation.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;TInterface&gt;</td>
+        <td><p>The just activated instance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType">GetGeneratedType()</h4>
   <div class="markdown level1 summary"><p>Gets the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -127,11 +223,11 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType_remarks">Remarks</h5>
+  <h5 id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is generated only once.</p>
 </div>
-  <a id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.TypeGenerator`1.GetGeneratedTypeAsync(System.Threading.CancellationToken)">GetGeneratedTypeAsync(CancellationToken)</h4>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync(System.Threading.CancellationToken)">GetGeneratedTypeAsync(CancellationToken)</h4>
   <div class="markdown level1 summary"><p>Gets the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> asynchronously .</p>
 </div>
   <div class="markdown level1 conceptual"></div>
@@ -171,7 +267,7 @@
       </tr>
     </tbody>
   </table>
-  <h5 id="Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken__remarks">Remarks</h5>
+  <h5 id="Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken__remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is generated only once.</p>
 </div>
 </article>

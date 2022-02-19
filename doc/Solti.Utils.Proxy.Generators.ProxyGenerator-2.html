@@ -48,16 +48,22 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.TypeGenerator-1.html">TypeGenerator</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator</a>&lt;TInterface, TInterceptor&gt;&gt;</div>
+    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html">Generator</a>&lt;TInterface, <a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator</a>&lt;TInterface, TInterceptor&gt;&gt;</div>
     <div class="level2"><span class="xref">ProxyGenerator&lt;TInterface, TInterceptor&gt;</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedTypeAsync_System_Threading_CancellationToken_">TypeGenerator&lt;ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetGeneratedTypeAsync(CancellationToken)</a>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetGeneratedTypeAsync(CancellationToken)</a>
     </div>
     <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.TypeGenerator-1.html#Solti_Utils_Proxy_Internals_TypeGenerator_1_GetGeneratedType">TypeGenerator&lt;ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetGeneratedType()</a>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetGeneratedType()</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Object_System_Threading_CancellationToken_">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.ActivateAsync(Object, CancellationToken)</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Object_">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.Activate(Object)</a>
     </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
@@ -85,7 +91,7 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator&lt;TInterface, TInterceptor&gt; : TypeGenerator&lt;ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt; where TInterface : class where TInterceptor : InterfaceInterceptor&lt;TInterface&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator&lt;TInterface, TInterceptor&gt; : Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt; where TInterface : class where TInterceptor : InterfaceInterceptor&lt;TInterface&gt;</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
