@@ -135,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
 
             _ when src.IsGenericParameter() => src.GetGenericParameterIndex()!.Value,
 
-            _ => src.GetHashCode()
+            _ => SymbolEqualityComparer.Default.GetHashCode(src)
         };
 
         public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IPropertySymbol>
