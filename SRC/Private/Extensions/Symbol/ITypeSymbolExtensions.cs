@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals
 
             m =>
             {
-                var hk = new HashCode();
+                HashCode hk = new();
 
                 foreach (var descr in m.Parameters.Select(p => new { TypeHash = p.Type.GetUniqueHashCode(), ParameterKind = p.GetParameterKind() }))
                 {
@@ -103,6 +103,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     m.Name,
                     m.TypeArguments.Length,
+                    m.IsStatic, // ugyanolyan nevvel es parameterekkel lehet statikus es nem statikus is
                     ParamzHash = hk.ToHashCode()
                 };
             },
