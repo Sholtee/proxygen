@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly ThreadLocal<TDescendant> FInstance = new(() => 
         {
-            var instance = new TDescendant();
+            TDescendant instance = new();
             instance.InitWithDefaults();
             return instance;
         });
@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Setup(IConfigReader configReader) 
         {
-            var instance = new TDescendant();
+            TDescendant instance = new();
             instance.Init(configReader);
             FInstance.Value = instance;
         }
