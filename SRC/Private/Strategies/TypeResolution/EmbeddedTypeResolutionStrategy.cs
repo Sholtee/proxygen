@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             StackTrace trace = new();
 
-            Assembly inspectedAssembly = typeof(EmbeddedTypeResolutionStrategy).Assembly;
+            Assembly? inspectedAssembly = null;
 
             for (int i = 1; i < trace.FrameCount; i++) 
             {
