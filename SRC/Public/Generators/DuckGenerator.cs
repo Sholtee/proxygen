@@ -11,28 +11,47 @@ namespace Solti.Utils.Proxy.Generators
     using Internals;
 
     /// <summary>
-    /// Type generator for creating proxies that let <typeparamref name="TTarget"/> behaves like a <typeparamref name="TInterface"/>.
+    /// Type generator for creating proxies that let target behaves like an interface.
     /// </summary>
-    /// <typeparam name="TInterface">The interface to which the proxy will be created.</typeparam>
-    /// <typeparam name="TTarget">The target who implements all the <typeparamref name="TInterface"/> members.</typeparam>
-    public sealed class DuckGenerator<TInterface, TTarget>: Generator<TInterface, DuckGenerator<TInterface, TTarget>> where TInterface: class
+    public sealed class DuckGenerator: Generator
     {
+        /// <summary>
+        /// The target who implements all the <see cref="Interface"/> members.
+        /// </summary>
+        public Type Target { get; }
+
+        /// <summary>
+        /// The interface to which the proxy will be created.
+        /// </summary>
+        public Type Interface { get; }
+
+        /// <summary>
+        /// Creates a new <see cref="DuckGenerator"/> instance.
+        /// </summary>
+        public DuckGenerator(Type iface, Type target)
+        {
+            //
+            // Nem kell itt tulzasba vinni a validalast, generalaskor ugy is elhasal majd a rendszer ha vmi gond van
+            //
+
+            Target = target ?? throw new ArgumentNullException(nameof(target));
+            Interface = iface ?? throw new ArgumentNullException(nameof(iface));
+        }
+
         internal override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get 
             {
                 Type generatorType = GetType();
-                yield return new EmbeddedTypeResolutionStrategy(generatorType);
-
                 ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
                 yield return new RuntimeCompiledTypeResolutionStrategy
                 (
                     generatorType,
                     new DuckSyntaxFactory
                     (
-                        MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                        MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-                        $"Generated_{generatorTypeMeta.GetMD5HashCode()}",
+                        MetadataTypeInfo.CreateFrom(Interface),
+                        MetadataTypeInfo.CreateFrom(Target),
+                        $"Generated_{MetadataTypeInfo.CreateFrom(typeof(Tuple<,,>).MakeGenericType(generatorType, Interface, Target)).GetMD5HashCode()}",
                         OutputType.Module,
                         generatorTypeMeta
                     )

@@ -271,10 +271,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
-        public void DuckGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
-            typeof(DuckGenerator<,>)
-                .MakeGenericType(iface, iface)
-                .InvokeMember(nameof(DuckGenerator<object, object>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
+        public void DuckGenerator_ShouldWorkWith(Type iface) =>
+            Assert.DoesNotThrow(() => new DuckGenerator(iface, iface).GetGeneratedType());
 
         [Test]
         public void DuckGenerator_ShouldAssembleTheProxyOnce() =>

@@ -420,14 +420,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>.Values;
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
-        public void ProxyGenerator_ShouldWorkWith(Type iface) => Assert.DoesNotThrow(() =>
-            typeof(ProxyGenerator<,>)
-                .MakeGenericType
-                (
-                    iface,
-                    typeof(InterfaceInterceptor<>).MakeGenericType(iface)
-                )
-                .InvokeMember(nameof(ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType), BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, Array.Empty<object>()));
+        public void ProxyGenerator_ShouldWorkWith(Type iface) =>
+            Assert.DoesNotThrow(() => new ProxyGenerator(iface, typeof(InterfaceInterceptor<>).MakeGenericType(iface)).GetGeneratedType());
 
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()

@@ -13,45 +13,26 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating proxies that intercept interface method calls.
     /// </summary>
-    public sealed class ProxyGenerator : Generator
+    /// <typeparam name="TInterface">The interface to which the proxy will be created.</typeparam>
+    /// <typeparam name="TInterceptor">An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.</typeparam>
+    public sealed class ProxyGenerator<TInterface, TInterceptor> : Generator<TInterface, ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
-        /// <summary>
-        /// The interface to which the proxy will be created.
-        /// </summary>
-        public Type Interface { get; }
-
-        /// <summary>
-        /// An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.
-        /// </summary>
-        public Type Interceptor { get; }
-
-        /// <summary>
-        /// Creates a new <see cref="ProxyGenerator"/> instance.
-        /// </summary>
-        public ProxyGenerator(Type iface, Type interceptor)
-        {
-            //
-            // Nem kell itt tulzasba vinni a validalast, generalaskor ugy is elhasal majd a rendszer ha vmi gond van
-            //
-
-            Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
-            Interface = iface ?? throw new ArgumentNullException(nameof(iface));
-        }
-
         internal override IEnumerable<ITypeResolution> SupportedResolutions
         {
             get
             {
                 Type generatorType = GetType();
+                yield return new EmbeddedTypeResolutionStrategy(generatorType);
+
                 ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
                 yield return new RuntimeCompiledTypeResolutionStrategy
                 (
                     generatorType,
                     new ProxySyntaxFactory
                     (
-                        MetadataTypeInfo.CreateFrom(Interface),
-                        MetadataTypeInfo.CreateFrom(Interceptor),
-                        $"Generated_{MetadataTypeInfo.CreateFrom(typeof(Tuple<,,>).MakeGenericType(generatorType, Interface, Interceptor)).GetMD5HashCode()}",
+                        MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                        MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
+                        $"Generated_{generatorTypeMeta.GetMD5HashCode()}",
                         OutputType.Module,
                         generatorTypeMeta
                     )
