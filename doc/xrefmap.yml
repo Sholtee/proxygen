@@ -51,6 +51,51 @@ references:
   commentId: N:Solti.Utils.Proxy.Generators
   fullName: Solti.Utils.Proxy.Generators
   nameWithType: Solti.Utils.Proxy.Generators
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator
+  name: DuckGenerator
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html
+  commentId: T:Solti.Utils.Proxy.Generators.DuckGenerator
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator
+  nameWithType: DuckGenerator
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.#ctor(System.Type,System.Type)
+  name: DuckGenerator(Type, Type)
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator__ctor_System_Type_System_Type_
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.#ctor(System.Type,System.Type)
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator(System.Type, System.Type)
+  nameWithType: DuckGenerator.DuckGenerator(Type, Type)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.#ctor*
+  name: DuckGenerator
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator
+  nameWithType: DuckGenerator.DuckGenerator
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
+  name: Interface
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Interface
+  commentId: P:Solti.Utils.Proxy.Generators.DuckGenerator.Interface
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
+  nameWithType: DuckGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Interface*
+  name: Interface
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Interface_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Interface
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
+  nameWithType: DuckGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Target
+  name: Target
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Target
+  commentId: P:Solti.Utils.Proxy.Generators.DuckGenerator.Target
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Target
+  nameWithType: DuckGenerator.Target
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Target*
+  name: Target
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Target_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Target
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Target
+  nameWithType: DuckGenerator.Target
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator`2
   name: DuckGenerator<TInterface, TTarget>
   href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html
@@ -60,6 +105,51 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget)
   nameWithType: DuckGenerator<TInterface, TTarget>
   nameWithType.vb: DuckGenerator(Of TInterface, TTarget)
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator
+  name: ProxyGenerator
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html
+  commentId: T:Solti.Utils.Proxy.Generators.ProxyGenerator
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator
+  nameWithType: ProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor(System.Type,System.Type)
+  name: ProxyGenerator(Type, Type)
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__ctor_System_Type_System_Type_
+  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor(System.Type,System.Type)
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator(System.Type, System.Type)
+  nameWithType: ProxyGenerator.ProxyGenerator(Type, Type)
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor*
+  name: ProxyGenerator
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator
+  nameWithType: ProxyGenerator.ProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
+  name: Interceptor
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor
+  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
+  nameWithType: ProxyGenerator.Interceptor
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor*
+  name: Interceptor
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
+  nameWithType: ProxyGenerator.Interceptor
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+  name: Interface
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interface
+  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+  nameWithType: ProxyGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface*
+  name: Interface
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interface_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+  nameWithType: ProxyGenerator.Interface
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2
   name: ProxyGenerator<TInterface, TInterceptor>
   href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html
