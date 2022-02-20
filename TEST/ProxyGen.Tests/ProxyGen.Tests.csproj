@@ -23,7 +23,7 @@
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.8.*" />
-    <PackageReference Include="Solti.Utils.Primitives" Version="2.*" />
+    <PackageReference Include="Solti.Utils.Primitives" Version="6.*" />
   </ItemGroup>
 
   <ItemGroup>
