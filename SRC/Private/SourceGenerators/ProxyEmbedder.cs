@@ -23,12 +23,18 @@ namespace Solti.Utils.Proxy.Internals
     [Generator]
     internal sealed class ProxyEmbedder: ISourceGenerator
     {
-        internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation) => compilation
-            .Assembly
-            .GetAttributes()
-            .Where(attr => SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
-            .Select(attr => attr.ConstructorArguments.Single().Value)
-            .Cast<INamedTypeSymbol>();
+        internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation)
+        {
+            foreach (AttributeData attr in compilation.Assembly.GetAttributes())
+            {
+                if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
+                {
+                    Debug.Assert(attr.ConstructorArguments.Length is 1, "EmbedGeneratedTypeAttribute must have only 1 ctor argument");
+
+                    yield return (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
+                }
+            }
+        }
 
         //
         // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
