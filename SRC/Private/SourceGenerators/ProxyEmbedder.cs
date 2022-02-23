@@ -29,9 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
                 {
-                    Debug.Assert(attr.ConstructorArguments.Length is 1, "EmbedGeneratedTypeAttribute must have only 1 ctor argument");
-
-                    yield return (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
+                    yield return (INamedTypeSymbol) attr.ConstructorArguments.Single().Value!;
                 }
             }
         }
