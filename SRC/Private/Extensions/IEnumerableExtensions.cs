@@ -4,21 +4,23 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class IEnumerableExtensions
     {
-        public static int? IndexOf<T>(this IEnumerable<T> src, T item, IEqualityComparer<T> comparer) => src
-            .Select((it, i) => new
+        public static int? IndexOf<T>(this IEnumerable<T> src, T item, IEqualityComparer<T> comparer)
+        {
+            int index = 0;
+
+            foreach (T i in src)
             {
-                Item = it,
-                Index = i
-            })
-            .Where(x => comparer.Equals(x.Item, item))
-            .Select(x => (int?) x.Index)
-            .SingleOrDefault();
+                if (comparer.Equals(item, i))
+                    return index;
+                index++;
+            }
+            return null;
+        }
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
     }
