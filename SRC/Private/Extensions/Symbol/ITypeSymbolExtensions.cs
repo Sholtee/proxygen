@@ -94,9 +94,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 HashCode hk = new();
 
-                foreach (var descr in m.Parameters.Select(p => new { TypeHash = p.Type.GetUniqueHashCode(), ParameterKind = p.GetParameterKind() }))
+                foreach (IParameterSymbol p in m.Parameters)
                 {
-                    hk.Add(descr);
+                    hk.Add(new 
+                    { 
+                        TypeHash = p.Type.GetUniqueHashCode(), 
+                        ParameterKind = p.GetParameterKind() 
+                    });
                 }
 
                 return new

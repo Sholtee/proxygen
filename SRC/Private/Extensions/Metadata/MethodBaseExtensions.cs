@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -21,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsFamilyOrAssembly => AccessModifiers.Protected | AccessModifiers.Internal,
             _ when src.IsFamilyAndAssembly => AccessModifiers.Protected | AccessModifiers.Private,
             _ when src.IsPublic => AccessModifiers.Public,
-            _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
+            _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Some() => AccessModifiers.Explicit,
             _ when src.IsPrivate => AccessModifiers.Private,
             #pragma warning disable CA2201 // In theory we should never reach here.
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
@@ -32,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<Type>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Select(m => m.ReflectedType);
+                .Convert(m => m.ReflectedType);
 
         public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
         {

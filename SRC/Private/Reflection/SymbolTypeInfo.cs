@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -29,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
             return typeSymbol switch
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-                INamedTypeSymbol named when named.TypeArguments.Any() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
+                INamedTypeSymbol named when named.TypeArguments.Some() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
                 _ => new SymbolTypeInfo(typeSymbol, compilation)
             };
         }
@@ -92,8 +91,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .GetAllInterfaces()
-            .Select(ti => CreateFrom(ti, Compilation))
-            .ToArray();
+            .Convert(ti => CreateFrom(ti, Compilation));
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
@@ -103,21 +101,17 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
-            .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
-            .ToArray();
+            .Convert(p => SymbolPropertyInfo.CreateFrom(p, Compilation));
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
-            .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
-            .ToArray();
+            .Convert(evt => SymbolEventInfo.CreateFrom(evt, Compilation));
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
-            .Where(m => m.IsClassMethod())
-            .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
-            .ToArray();
+            .Convert(m => SymbolMethodInfo.CreateFrom(m, Compilation), m => !m.IsClassMethod());
 
         private static readonly IReadOnlyList<MethodKind> Ctors = new[] 
         {
@@ -127,15 +121,18 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             //
-            // Ne ListMembers()-t hasznaljunk mert az osok konstruktoraira nincs
-            // szukseg (kiveve parameter nelkuli amennyiben az osben nincs felulirva)
+            // Ne ListMembers()-t hasznaljunk mert az osok konstruktoraira nincs szukseg (kiveve parameter nelkuli amennyiben az osben nincs felulirva)
             //
 
             .GetMembers()
-            .OfType<IMethodSymbol>()
-            .Where(m => Ctors.Contains(m.MethodKind) && m.GetAccessModifiers() != AccessModifiers.Private && !m.IsImplicitlyDeclared)
-            .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
-            .ToArray();
+            .Convert
+            (
+                m => (IConstructorInfo) SymbolMethodInfo.CreateFrom((IMethodSymbol) m, Compilation),
+                m => m is not IMethodSymbol ctor || 
+                    Ctors.IndexOf(ctor.MethodKind) is null ||
+                    ctor.GetAccessModifiers() is AccessModifiers.Private || 
+                    ctor.IsImplicitlyDeclared
+            );
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
@@ -165,27 +162,41 @@ namespace Solti.Utils.Proxy.Internals
 
             public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
-            public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericParameter()); // "UnderlyingSymbol.IsUnboundGenericType" baszik mukodni
+            public bool IsGenericDefinition
+            {
+                get
+                {
+                    foreach (ITypeSymbol ta in UnderlyingSymbol.TypeArguments)
+                    {
+                        if (!ta.IsGenericParameter()) // "UnderlyingSymbol.IsUnboundGenericType" baszik mukodni
+                            return false;
+                    }
 
+                    return true;
+                }
+            }
             private IGenericTypeInfo? FGenericDefinition;
             public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= (IGenericTypeInfo) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
-                .Select(ti => CreateFrom(ti, Compilation))
-                .ToArray();
+                .Convert(ti => CreateFrom(ti, Compilation));
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
                 if (UnderlyingSymbol.ContainingType is not null) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
 
+                ITypeSymbol[] gas = new ITypeSymbol[genericArgs.Length];
+
+                for (int i = 0; i < genericArgs.Length; i++)
+                {
+                    gas[i] = genericArgs[i].ToSymbol(Compilation);
+                }
+
                 return (IGenericTypeInfo) CreateFrom
                 (
-                    UnderlyingSymbol.Construct
-                    (
-                        genericArgs.Select(ga => ga.ToSymbol(Compilation)).ToArray()
-                    ),
+                    UnderlyingSymbol.Construct(gas),
                     Compilation
                 );
             }

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -26,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
             return underlyingType switch
             {
                 _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
-                _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
+                _ when underlyingType.GetOwnGenericArguments().Some() => new MetadataGenericTypeInfo(underlyingType),
                 _ => new MetadataTypeInfo(underlyingType)
             };
         }
@@ -45,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
         private ITypeInfo? FEnclosingType;
         public ITypeInfo? EnclosingType
         {
-            get 
+            get
             {
                 if (FEnclosingType is null)
                 {
@@ -59,10 +58,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
-        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
-            .GetInterfaces()
-            .Select(CreateFrom)
-            .ToArray();
+        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType.GetInterfaces().Convert(CreateFrom);
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingType.BaseType is not null
@@ -106,62 +102,55 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
-            .Select(MetadataPropertyInfo.CreateFrom)
-            .ToArray();
+            .Convert(MetadataPropertyInfo.CreateFrom);
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
-            .Select(MetadataEventInfo.CreateFrom)
-            .ToArray();
+            .Convert(MetadataEventInfo.CreateFrom);
 
         //
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
         //
 
-        private static readonly IReadOnlyList<Func<MethodInfo, bool>> MethodsToSkip = new Func<MethodInfo, bool>[]
-        {
-            m => m.Name == "Finalize", // destructor
-            m => m.DeclaringType.IsArray && m.Name == "Get", // = array[i]
-            m => m.DeclaringType.IsArray && m.Name == "Set", // array[i] =
-            m => m.DeclaringType.IsArray && m.Name == "Address", // = ref array[i]
-            m => typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke", // delegate.Invoke(...)
+        private static bool ShouldSkip(MethodInfo m) =>
+            m.Name == "Finalize" || // destructor
+            (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
+            (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
+            (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
+            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke") || // delegate.Invoke(...)
 #if DEBUG
             //
             // https://github.com/OpenCover/opencover/blob/master/main/OpenCover.Profiler/CodeCoverage_Cuckoo.cpp
             //
 
-            m => new[]{ "SafeVisited", "VisitedCritical" }.Contains(m.Name)
+            new[] { "SafeVisited", "VisitedCritical" }.IndexOf(m.Name) >= 0
 #endif
-        };
+        ;
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
-            .Where(m => !MethodsToSkip.Any(skip => skip(m)))
-            .Select(MetadataMethodInfo.CreateFrom)
-            .ToArray();
+            .Convert(MetadataMethodInfo.CreateFrom, ShouldSkip);
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
-        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??=
-            UnderlyingType.IsArray
-                ? Array.Empty<IConstructorInfo>() // tomb egy geci specialis allatfaj: fordito generalja hozza a konstruktorokat -> futas idoben mar leteznek forditaskor meg nem
-                : UnderlyingType
-                    .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                    .Where(ctor => ctor.GetAccessModifiers() != AccessModifiers.Private)
-                    .Select(MetadataMethodInfo.CreateFrom)
-                    .Cast<IConstructorInfo>()
-                    .ToArray();
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType.IsArray
+            //
+            // A tomb egy geci specialis allatfaj: fordito generalja hozza a konstruktorokat -> futas idoben mar leteznek forditaskor meg nem
+            //
+
+            ? Array.Empty<IConstructorInfo>()
+            : UnderlyingType
+                .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+                .Convert(ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{QualifiedName}, {UnderlyingType.Assembly}"
             : null;
 
-        public bool IsGenericParameter => (UnderlyingType.GetElementType(recurse: true) ?? UnderlyingType).IsGenericParameter;
+        public bool IsGenericParameter => (UnderlyingType.GetInnermostElementType() ?? UnderlyingType).IsGenericParameter;
 
-        public string? QualifiedName => UnderlyingType
-            .GetQualifiedName()
-            ?.TrimEnd('&'); // FIXME: ez nem kene de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban
+        public string? QualifiedName => UnderlyingType.GetQualifiedName();
 
         public bool IsClass => UnderlyingType.IsClass();
 
@@ -176,7 +165,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (FContainingMember is null)
                 {
-                    Type concreteType = UnderlyingType.GetElementType(recurse: true) ?? UnderlyingType;
+                    Type concreteType = UnderlyingType.GetInnermostElementType() ?? UnderlyingType;
 
                     FContainingMember = concreteType switch
                     {
@@ -193,12 +182,23 @@ namespace Solti.Utils.Proxy.Internals
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
 
-            public bool IsGenericDefinition => UnderlyingType.GetGenericArguments().All(ga => ga.IsGenericParameter);
-
-            public IReadOnlyList<ITypeInfo> GenericArguments => UnderlyingType
+            public bool IsGenericDefinition
+            {
+                get
+                {
+                    foreach (Type ga in UnderlyingType.GetGenericArguments())
+                    {
+                        if (!ga.IsGenericParameter)
+                            return false;
+                    }
+                    return true;
+                }
+            
+            }
+            private IReadOnlyList<ITypeInfo>? FGenericArguments;
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()
-                .Select(CreateFrom)
-                .ToArray();
+                .Convert(CreateFrom);
 
             public override string Name => !UnderlyingType.IsGenericType || UnderlyingType.IsGenericTypeDefinition // FIXME: Type.GetFriendlyName() lezart generikusokat nem eszi meg (igaz elvileg nem is kell hivjuk lezart generikusra)
                 ? base.Name
@@ -210,15 +210,14 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (UnderlyingType.IsNested) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
 
-                return (IGenericTypeInfo) CreateFrom
-                (
-                    UnderlyingType.MakeGenericType
-                    (
-                        genericArgs
-                            .Select(arg => arg.ToMetadata())
-                            .ToArray()
-                    )
-                );
+                Type[] gas = new Type[genericArgs.Length];
+
+                for (int i = 0; i < genericArgs.Length; i++)
+                {
+                    gas[i] = genericArgs[i].ToMetadata();
+                }
+
+                return (IGenericTypeInfo) CreateFrom(UnderlyingType.MakeGenericType(gas));
             }
         }
 

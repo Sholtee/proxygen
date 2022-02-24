@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -29,16 +28,13 @@ namespace Solti.Utils.Proxy.Internals
 
             return method switch
             {
-                _ when method.TypeArguments.Any() => new SymbolGenericMethodInfo(method, compilation),
+                _ when method.TypeArguments.Length > 0 => new SymbolGenericMethodInfo(method, compilation),
                 _ => new SymbolMethodInfo(method, compilation)
             };
         }
 
         private IReadOnlyList<IParameterInfo>? FParameters;
-        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol
-            .Parameters
-            .Select(p => SymbolParameterInfo.CreateFrom(p, Compilation))
-            .ToArray();
+        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol.Parameters.Convert(p => SymbolParameterInfo.CreateFrom(p, Compilation));
 
         private IParameterInfo? FReturnValue;
         public IParameterInfo ReturnValue => FReturnValue ??= UnderlyingSymbol.MethodKind != MethodKind.Constructor
@@ -54,10 +50,7 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
         private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
-        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol
-            .GetDeclaringInterfaces()
-            .Select(di => SymbolTypeInfo.CreateFrom(di, Compilation))
-            .ToArray();
+        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol.GetDeclaringInterfaces().Convert(di => SymbolTypeInfo.CreateFrom(di, Compilation));
 
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
@@ -75,16 +68,24 @@ namespace Solti.Utils.Proxy.Internals
         {
             public SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : base(method, compilation) { }
 
-            public bool IsGenericDefinition => UnderlyingSymbol.TypeArguments.All(ta => ta.IsGenericArgument());
+            public bool IsGenericDefinition
+            {
+                get
+                {
+                    foreach (ITypeSymbol ta in UnderlyingSymbol.TypeArguments)
+                    {
+                        if (!ta.IsGenericArgument())
+                            return false;
+                    }
+                    return true;
+                }
+            }
 
             private IGenericMethodInfo? FGenericDefinition;
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
-                .TypeArguments
-                .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
-                .ToArray();
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.Convert(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -18,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
             // mindig false (netcore3.0)
             //
 
-            if (src.Position == -1) return src switch
+            if (src.Position is -1) return src switch
             {
                 _ when src.ParameterType.IsByRef && IsReadOnly() => ParameterKind.RefReadonly,
                 _ when src.ParameterType.IsByRef => ParameterKind.Ref,
@@ -58,9 +57,9 @@ namespace Solti.Utils.Proxy.Internals
                 //
                 // "IsReadOnlyAttribute" csak netstandard2.1-tol kezdve publikus.
                 //
-                src.GetCustomAttributes().Any(attr => attr.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute")
+                src.GetCustomAttributes().Some(attr => attr.GetType().FullName == "System.Runtime.CompilerServices.IsReadOnlyAttribute")
 #else
-                src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() != null
+                src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() is not null
 #endif          
                 ;
         }
