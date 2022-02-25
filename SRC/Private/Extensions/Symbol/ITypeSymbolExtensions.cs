@@ -336,7 +336,9 @@ namespace Solti.Utils.Proxy.Internals
             // interface IA: IB, IC<string> {}, interface IB: IC<string?> -> ekkor IC<string> ketszer fog szerepelni
             //
 
+            #pragma warning disable RS1024 // Compare symbols correctly
             HashSet<INamedTypeSymbol> returnedSymbols = new(SymbolEqualityComparer.Default);
+            #pragma warning restore RS1024
 
             foreach (INamedTypeSymbol t in src.AllInterfaces)
             {
