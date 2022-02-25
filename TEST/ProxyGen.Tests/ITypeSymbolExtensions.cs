@@ -279,7 +279,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 intAr = compilation.CreateArrayTypeSymbol(int32),
                 intPtr = compilation.CreatePointerTypeSymbol(int32);
 
+            #pragma warning disable RS1024 // Compare symbols correctly
             Assert.AreEqual(intAr.GetHashCode(), intPtr.GetHashCode());
+            #pragma warning restore RS1024
             Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(intAr), SymbolEqualityComparer.Default.GetHashCode(intPtr));
             Assert.False(SymbolEqualityComparer.Default.Equals(intAr, intPtr));
         }
@@ -315,7 +317,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 a = visitor.AllTypeSymbols.Single(t => t.Name == "IGeneric").ListMethods().Single(m => m.Name == "Foo").Parameters[0].Type,
                 b = visitor.AllTypeSymbols.Single(t => t.Name == "IGeneric").ListMethods().Single(m => m.Name == "Foo").Parameters[1].Type;
 
+            #pragma warning disable RS1024 // Compare symbols correctly
             Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
+            #pragma warning restore RS1024
             Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(a), SymbolEqualityComparer.Default.GetHashCode(b));
         }
 
