@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -22,22 +21,25 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static SeparatedSyntaxList<TNode> ToSyntaxList<T, TNode>(this IEnumerable<T> src, Func<T, int, TNode> factory) where TNode : SyntaxNode
         {
-            //
-            // Ha "src" implementalja ICollection<T>-t akkor nem lesz felsorolas
-            //
+            List<SyntaxNodeOrToken> nodesAndTokens = new();
 
-            int count = src.Count();
+            int i = 0;
 
-            return SeparatedList<TNode>
-            (
-                nodesAndTokens: src.SelectMany(Node)
-            );
-
-            IEnumerable<SyntaxNodeOrToken> Node(T p, int i) 
+            foreach (T item in src)
             {
-                yield return factory(p, i);
-                if (i < count - 1) yield return Token(SyntaxKind.CommaToken);
+                if (nodesAndTokens.Count > 0)
+                    nodesAndTokens.Add
+                    (
+                        Token(SyntaxKind.CommaToken)
+                    );
+
+                nodesAndTokens.Add
+                (
+                    factory(item, i++)
+                );
             }
+
+            return SeparatedList<TNode>(nodesAndTokens);
         }
 
         /// <summary>
@@ -53,14 +55,21 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Name1.Name2.Name3.....
         /// </summary>
-        public static NameSyntax Qualify(this IEnumerable<NameSyntax> parts) => parts.Count() <= 1 ? parts.Single() : QualifiedName
-        (
-#if NETSTANDARD2_1_OR_GREATER
-            left: Qualify(parts.SkipLast(1)),         
-#else
-            left: Qualify(parts.Take(parts.Count() - 1)),
-#endif
-            right: (SimpleNameSyntax) parts.Last()
-        );
+        public static NameSyntax Qualify(this IEnumerable<NameSyntax> parts)
+        {
+            List<NameSyntax> coll = parts as List<NameSyntax> ?? new List<NameSyntax>(parts);
+
+            if (coll.Count is 0)
+                throw new InvalidOperationException();
+
+            if (coll.Count is 1)
+                return coll[0];
+
+            return QualifiedName
+            (
+                left: Qualify(coll.GetRange(0, coll.Count - 1)),
+                right: (SimpleNameSyntax) coll[coll.Count - 1]
+            );
+        }
     }
 }
