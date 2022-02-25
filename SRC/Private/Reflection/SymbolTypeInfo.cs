@@ -72,11 +72,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             get
             {
-                if (FElementType == null)
+                if (FElementType is null)
                 {
                     ITypeSymbol? realType = UnderlyingSymbol.GetElementType();
 
-                    if (realType != null)
+                    if (realType is not null)
                         FElementType = CreateFrom(realType, Compilation);
                 }
                 return FElementType;

@@ -47,5 +47,20 @@ namespace Solti.Utils.Proxy.Internals
             }
             return false;
         }
+
+        public static T Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null) where T: class
+        {
+            T? found = null;
+            foreach (T item in src)
+            {
+                if (predicate?.Invoke(item) is not false)
+                {
+                    if (found is not null)
+                        throw new InvalidOperationException();
+                    found = item;
+                }
+            }
+            return found ?? throw new InvalidOperationException();
+        }
     }
 }

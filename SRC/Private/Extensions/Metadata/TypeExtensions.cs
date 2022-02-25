@@ -103,25 +103,21 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetMethods(f),
+            static (t, f) => t.GetMethods(f),
             MethodBaseExtensions.GetAccessModifiers,
 
             //
-            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa, valamint a generikus argumentumok
+            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa, valamint a generikus argumentumok
             // szama a lenyeges.
             //
 
-            m =>
+            static m =>
             {
                 HashCode hk = new();
 
                 foreach (ParameterInfo p in m.GetParameters())
                 {
-                    hk.Add(new 
-                    { 
-                        p.ParameterType, 
-                        ParameterKind = p.GetParameterKind() 
-                    });
+                    hk.Add(p.ParameterType);
                 }
 
                 hk.Add(new
@@ -138,22 +134,22 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetProperties(f),
+            static (t, f) => t.GetProperties(f),
 
             //
             // A nagyobb lathatosagut tekintjuk mervadonak
             //
 
-            p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
-            p => new { p.Name, (p.GetMethod ?? p.SetMethod).IsStatic }.GetHashCode(),
+            static p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
+            static p => new { p.Name, (p.GetMethod ?? p.SetMethod).IsStatic }.GetHashCode(),
             includeStatic
         );
 
         public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetEvents(f),
-            e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
-            e => new { e.Name, (e.AddMethod ?? e.RemoveMethod).IsStatic }.GetHashCode(),
+            static (t, f) => t.GetEvents(f),
+            static e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
+            static e => new { e.Name, (e.AddMethod ?? e.RemoveMethod).IsStatic }.GetHashCode(),
             includeStatic
         );
 
@@ -175,36 +171,37 @@ namespace Solti.Utils.Proxy.Internals
                         yield return member;
                     }
                 }
-                yield break;
             }
-
-            //
-            // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
-            // privatot nem, viszont az explicit implementaciok privat tagok... 
-            //
-
-            //flags |= BindingFlags.FlattenHierarchy;
-            flags |= BindingFlags.NonPublic;
-            if (includeStatic)
-                flags |= BindingFlags.Static;
-
-            HashSet<int> returnedMembers = new();
-
-            //
-            // Sorrend fontos, a leszarmazottol haladunk az os fele
-            //
-
-            foreach (Type t in src.GetHierarchy())
+            else
             {
-                foreach (TMember member in getter(t, flags))
-                {
-                    //
-                    // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
-                    // jok vagyunk.
-                    //
+                //
+                // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
+                // privatot nem, viszont az explicit implementaciok privat tagok... 
+                //
 
-                    if (getVisibility(member) is not AccessModifiers.Private && returnedMembers.Add(getHashCode(member)))
-                        yield return member;
+                //flags |= BindingFlags.FlattenHierarchy;
+                flags |= BindingFlags.NonPublic;
+                if (includeStatic)
+                    flags |= BindingFlags.Static;
+
+                HashSet<int> returnedMembers = new();
+
+                //
+                // Sorrend fontos, a leszarmazottol haladunk az os fele
+                //
+
+                foreach (Type t in src.GetHierarchy())
+                {
+                    foreach (TMember member in getter(t, flags))
+                    {
+                        //
+                        // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
+                        // jok vagyunk.
+                        //
+
+                        if (getVisibility(member) is not AccessModifiers.Private && returnedMembers.Add(getHashCode(member)))
+                            yield return member;
+                    }
                 }
             }
         }
