@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -25,9 +24,10 @@ namespace Solti.Utils.Proxy.Internals
                 bool grantedByAttr = method
                     .DeclaringType
                     .DeclaringAssembly
-                    ?.IsFriend(assemblyName) == true;
+                    ?.IsFriend(assemblyName) is true;
 
-                if (grantedByAttr) return;
+                if (grantedByAttr)
+                    return;
 
                 if (!am.HasFlag(AccessModifiers.Protected) /*protected-internal*/)
                 {
@@ -37,7 +37,8 @@ namespace Solti.Utils.Proxy.Internals
 
             if (am.HasFlag(AccessModifiers.Protected)) 
             {
-                if (allowProtected) return;
+                if (allowProtected)
+                    return;
                 throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
             }
 
@@ -45,12 +46,13 @@ namespace Solti.Utils.Proxy.Internals
             // "Private", "Explicit" mellett mas nem szerepelhet -> nem kell HasFlag()
             //
 
-            if (am == AccessModifiers.Explicit) return; // meg ha cast-olni is kell hozza de lathato
+            if (am is AccessModifiers.Explicit)
+                return; // meg ha cast-olni is kell hozza de lathato
 
-            if (am == AccessModifiers.Private)
+            if (am is AccessModifiers.Private)
                 throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
 
-            Debug.Assert(am == AccessModifiers.Public, $"Unknown AccessModifier: {am}");
+            Debug.Assert(am is AccessModifiers.Public, $"Unknown AccessModifier: {am}");
         }
 
         public static void Check(IPropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
@@ -58,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkGet) 
             {
                 IMethodInfo? get = property.GetMethod;
-                Debug.Assert(get != null, "property.GetMethod == NULL");
+                Debug.Assert(get is not null, "property.GetMethod == NULL");
 
                 Check(get!, assemblyName, allowProtected);
             }
@@ -66,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkSet)
             {
                 IMethodInfo? set = property.SetMethod;
-                Debug.Assert(set != null, "property.SetMethod == NULL");
+                Debug.Assert(set is not null, "property.SetMethod == NULL");
 
                 Check(set!, assemblyName, allowProtected);
             }
@@ -77,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkAdd)
             {
                 IMethodInfo? add = @event.AddMethod;
-                Debug.Assert(add != null, "event.AddMethod == NULL");
+                Debug.Assert(add is not null, "event.AddMethod == NULL");
 
                 Check(add!, assemblyName, allowProtected);
             }
@@ -85,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkRemove)
             {
                 IMethodInfo? remove = @event.RemoveMethod;
-                Debug.Assert(remove != null, "event.RemoveMethod == NULL");
+                Debug.Assert(remove is not null, "event.RemoveMethod == NULL");
 
                 Check(remove!, assemblyName, allowProtected);
             }
@@ -114,7 +116,7 @@ namespace Solti.Utils.Proxy.Internals
             // teljes ujraforditas van
             //
 
-            if (collector.References.Any(@ref => @ref.Location is null))
+            if (collector.References.Some(@ref => @ref.Location is null))
                 return;
 
             //
@@ -128,7 +130,7 @@ namespace Solti.Utils.Proxy.Internals
                 null,
                 references: collector
                     .References
-                    .Select(@ref => MetadataReference.CreateFromFile(@ref.Location!))
+                    .Convert(@ref => MetadataReference.CreateFromFile(@ref.Location!))
             );
 
             switch (type.ToSymbol(comp).DeclaredAccessibility) 

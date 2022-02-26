@@ -8,14 +8,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading;
-
-#if IGNORE_VISIBILITY
-using System.Runtime.CompilerServices;
-#endif
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -30,13 +25,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
         {
-            string
-                separator = $",{Environment.NewLine}",
-                src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
-                refs = string.Join(separator, references.Select(r => r.Display));
-
-            Debug.WriteLine(src);
-            Debug.WriteLine(refs);
+            string separator = $",{Environment.NewLine}";
 
             Compilation compilation = CSharpCompilation.Create
             (
@@ -55,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
             if (customConfig is not null)
                 compilation = customConfig(compilation);
 
-            using Stream stm = outputFile != null ? File.Create(outputFile) : (Stream) new MemoryStream();
+            using Stream stm = outputFile is not null ? File.Create(outputFile) : (Stream) new MemoryStream();
 
             EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
@@ -63,13 +52,15 @@ namespace Solti.Utils.Proxy.Internals
 
             if (!result.Success)
             {
-                string failures = string.Join(separator, result
-                    .Diagnostics
-                    .Where(d => d.Severity == DiagnosticSeverity.Error));
+                string src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString();
 
-                #pragma warning disable CA2201 // To preserve backward compatibility, don't throw specific exception here
-                var ex = new Exception(Resources.COMPILATION_FAILED);
-                #pragma warning restore CA2201
+                string[] 
+                    failures = result
+                        .Diagnostics
+                        .Convert(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
+                    refs = references.Convert(r => r.Display!);
+
+                InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 
                 IDictionary extra = ex.Data;
 

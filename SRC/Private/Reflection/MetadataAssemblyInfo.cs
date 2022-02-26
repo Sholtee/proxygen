@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -23,10 +22,24 @@ namespace Solti.Utils.Proxy.Internals
         public override string ToString() => UnderlyingAssembly.ToString();
 
         public static IAssemblyInfo CreateFrom(Assembly assembly) => new MetadataAssemblyInfo(assembly);
+        
+        public bool IsFriend(string asmName)
+        {
+            //
+            // TODO: strong name support
+            //
 
-        public bool IsFriend(string asmName) => asmName == UnderlyingAssembly.GetName().Name || UnderlyingAssembly // TODO: strong name support
-            .GetCustomAttributes<InternalsVisibleToAttribute>()
-            .Any(ivt => ivt.AssemblyName == asmName);
+            if (StringComparer.OrdinalIgnoreCase.Equals(asmName, UnderlyingAssembly.GetName().Name))
+                return true;
+
+            foreach (InternalsVisibleToAttribute ivt in UnderlyingAssembly.GetCustomAttributes<InternalsVisibleToAttribute>())
+            {
+                if (StringComparer.OrdinalIgnoreCase.Equals(asmName, ivt.AssemblyName))
+                    return true;
+            }
+
+            return false;
+        }
 
         public ITypeInfo? GetType(string fullName)
         {

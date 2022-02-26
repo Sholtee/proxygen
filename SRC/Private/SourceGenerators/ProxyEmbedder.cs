@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -29,7 +28,9 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
                 {
-                    yield return (INamedTypeSymbol) attr.ConstructorArguments.Single().Value!;
+                    Debug.Assert(attr.ConstructorArguments.Length is 1);
+
+                    yield return (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
                 }
             }
         }
@@ -114,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
                 // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
                 //
 
-                if (aotGenerators.Any()) context.ReportDiagnostic
+                if (aotGenerators.Some()) context.ReportDiagnostic
                 (
                     Diagnostics.PGE00(Location.None)
                 );
@@ -127,7 +128,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     generator.EnsureNotError();
 
-                    ICodeFactory codeFactory = CodeFactories.SingleOrDefault(cf => cf.ShouldUse(generator)) ?? throw new InvalidOperationException
+                    ICodeFactory codeFactory = CodeFactories.Single(cf => cf.ShouldUse(generator), throwOnEmpty: false) ?? throw new InvalidOperationException
                     (
                         string.Format
                         (
@@ -147,7 +148,7 @@ namespace Solti.Utils.Proxy.Internals
 
                         context.ReportDiagnostic
                         (
-                            Diagnostics.PGI00(generator.Locations.Single(), source.Hint)
+                            Diagnostics.PGI00(generator.Locations.Single()!, source.Hint)
                         );
                     }
                 }
@@ -165,7 +166,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         context, 
                         e, 
-                        generator.Locations.Single()
+                        generator.Locations.Single()!
                     );
                 }
             }

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,9 +26,16 @@ namespace Solti.Utils.Proxy.Internals
 
         private ProxyActivator.Activator? FActivator;
 
-        private Type GetGeneratedType(CancellationToken cancellation) => SupportedResolutions
-            .Select(res => res.TryResolve(cancellation))
-            .First(t => t is not null)!;
+        private Type GetGeneratedType(CancellationToken cancellation)
+        {
+            foreach (ITypeResolution resolution in SupportedResolutions)
+            {
+                Type? resolved = resolution.TryResolve(cancellation);
+                if (resolved is not null)
+                    return resolved;
+            }
+            throw new NotSupportedException();
+        }
 
         /// <summary>
         /// Returns the supported type resolution strategies.

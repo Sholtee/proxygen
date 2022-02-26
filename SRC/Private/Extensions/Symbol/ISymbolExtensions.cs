@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
         // Explicit implementacional a nev "Interface.Tag" formaban van
         //
 
-        private static readonly Regex FStripper = new Regex("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
+        private static readonly Regex FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static string StrippedName(this ISymbol self) => FStripper.Match(self.MetadataName).Value;
 

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -54,8 +53,7 @@ namespace Solti.Utils.Proxy.Internals
                      cacheFile,
                      SyntaxFactory
                         .References
-                        .Select(asm => MetadataReference.CreateFromFile(asm.Location!))
-                        .ToArray(),
+                        .Convert(asm => MetadataReference.CreateFromFile(asm.Location!)),
                      customConfig: null,
                      cancellation
                  )

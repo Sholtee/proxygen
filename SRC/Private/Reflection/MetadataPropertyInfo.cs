@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -17,13 +16,16 @@ namespace Solti.Utils.Proxy.Internals
         // Privat property metodusok leszarmazott tipusban nem lathatok
         //
 
-        private PropertyInfo Declaration => UnderlyingProperty.DeclaringType.GetProperty(UnderlyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        private PropertyInfo? FUnderlyingOriginalProperty;
+        private PropertyInfo UnderlyingOriginalProperty => FUnderlyingOriginalProperty ??= UnderlyingProperty
+            .DeclaringType
+            .GetProperty(UnderlyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
 
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= Declaration.GetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.GetMethod) : null;
+        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingOriginalProperty.GetMethod is not null ? MetadataMethodInfo.CreateFrom(UnderlyingOriginalProperty.GetMethod) : null;
 
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= Declaration.SetMethod is not null ? MetadataMethodInfo.CreateFrom(Declaration.SetMethod) : null;
+        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingOriginalProperty.SetMethod is not null ? MetadataMethodInfo.CreateFrom(UnderlyingOriginalProperty.SetMethod) : null;
 
         public string Name => UnderlyingProperty.StrippedName();
 
@@ -34,10 +36,7 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
         private IReadOnlyList<IParameterInfo>? FIndices;
-        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty
-            .GetIndexParameters()
-            .Select(MetadataParameterInfo.CreateFrom)
-            .ToArray();
+        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty.GetIndexParameters().Convert(MetadataParameterInfo.CreateFrom);
 
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 

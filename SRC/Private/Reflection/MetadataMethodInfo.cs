@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -27,10 +26,7 @@ namespace Solti.Utils.Proxy.Internals
             protected MetadataMethodBase(T method) => UnderlyingMethod = method;
 
             private IReadOnlyList<IParameterInfo>? FParameters;
-            public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingMethod
-                .GetParameters()
-                .Select(MetadataParameterInfo.CreateFrom)
-                .ToArray();
+            public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingMethod.GetParameters().Convert(MetadataParameterInfo.CreateFrom);
 
             public abstract IParameterInfo ReturnValue { get; }
 
@@ -40,10 +36,7 @@ namespace Solti.Utils.Proxy.Internals
             public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderlyingMethod.DeclaringType);
 
             private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
-            public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingMethod
-                .GetDeclaringInterfaces()
-                .Select(MetadataTypeInfo.CreateFrom)
-                .ToArray();
+            public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingMethod.GetDeclaringInterfaces().Convert(MetadataTypeInfo.CreateFrom);
 
             public bool IsStatic => UnderlyingMethod.IsStatic;
 
@@ -75,10 +68,7 @@ namespace Solti.Utils.Proxy.Internals
             public bool IsGenericDefinition => UnderlyingMethod.IsGenericMethodDefinition;
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingMethod
-                .GetGenericArguments()
-                .Select(MetadataTypeInfo.CreateFrom)
-                .ToArray();
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingMethod.GetGenericArguments().Convert(MetadataTypeInfo.CreateFrom);
 
             private IGenericMethodInfo? FGenericDefinition;
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new MetadataGenericMethodInfo

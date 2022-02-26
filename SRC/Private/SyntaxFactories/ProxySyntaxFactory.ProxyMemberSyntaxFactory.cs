@@ -194,7 +194,7 @@ namespace Solti.Utils.Proxy.Internals
                 TARGET = Context.InterceptorType.Properties.Single
                 (
                     prop => prop.Name == nameof(InterfaceInterceptor<object>.Target)
-                );
+                )!;
 
                 INVOKE = Context.InterceptorType.Methods.Single
                 (
@@ -205,7 +205,7 @@ namespace Solti.Utils.Proxy.Internals
                             (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!))
                         )
                     )
-                );
+                )!;
             }
         }
     }

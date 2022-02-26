@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -22,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
             Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
             Accessibility.Public => AccessModifiers.Public,
-            Accessibility.Private when src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
+            Accessibility.Private when src.GetImplementedInterfaceMethods().Some() => AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
             #pragma warning disable CA2201 // In theory we should never reach here.
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
@@ -33,30 +32,29 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<INamedTypeSymbol>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Select(m => m.ContainingType);
+                .Convert(m => m.ContainingType);
 
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
             INamedTypeSymbol containingType = src.ContainingType;
 
-            return containingType
-                .GetAllInterfaces()
-                .SelectMany(@interface => @interface
-                    .GetMembers()
-                    .OfType<IMethodSymbol>())
-                .Where(interfaceMethod =>
+            foreach (ITypeSymbol iface in containingType.GetAllInterfaces())
+            {
+                foreach (ISymbol member in iface.GetMembers())
                 {
+                    if (member is not IMethodSymbol ifaceMethod)
+                        continue;
+
                     for (IMethodSymbol? met = src; met is not null; met = met.OverriddenMethod)
                     {
-                        if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(interfaceMethod), met))
-                            return true;
+                        if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(ifaceMethod), met))
+                            yield return ifaceMethod;
 
                         if (!inspectOverrides)
                             break;
                     }
-
-                    return false;
-                });
+                }
+            }
         }
 
         private static readonly IReadOnlyList<MethodKind> SpecialMethods = new[]
@@ -71,12 +69,12 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
-                src = src.GetImplementedInterfaceMethods().Single();
+                src = src.GetImplementedInterfaceMethods().Single()!;
 
-            return SpecialMethods.Contains(src.MethodKind);
+            return SpecialMethods.Some(mk => mk == src.MethodKind);
         }
 
-        private static readonly IReadOnlyList<MethodKind> ClassMethods = new[]
+        private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
         {
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
@@ -86,10 +84,14 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Conversion // explicit, implicit
         };
 
-        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
+        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Some(mk => mk == src.MethodKind);
 
         public static bool IsFinal(this IMethodSymbol src) => 
-            src.IsSealed || 
-            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Any()); // a fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol
+            src.IsSealed ||
+            //
+            // A fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol
+            //
+
+            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
     }
 }

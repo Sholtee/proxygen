@@ -68,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ExpressionStatement
                                 (
-                                    RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()))
+                                    RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()!))
                                 )
                             );
                             body.Add

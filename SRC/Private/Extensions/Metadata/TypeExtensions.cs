@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -50,16 +49,15 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericType)
                 src = src.GetGenericTypeDefinition();
 
-            return src.FullName;
+            return src.FullName?.TrimEnd('&');
         }
 
-        public static Type? GetElementType(this Type src, bool recurse) 
+        public static Type? GetInnermostElementType(this Type src) 
         {
             Type? prev = null;
 
-            for (Type? current = src; (current = current.GetElementType()) != null;)
+            for (Type? current = src; (current = current!.GetElementType()) is not null;)
             {
-                if (!recurse) return current;
                 prev = current;
             }
 
@@ -85,10 +83,10 @@ namespace Solti.Utils.Proxy.Internals
             if (gaCount is 0)
                 return enclosingType;
 
-            return enclosingType.MakeGenericType
-            (
-                src.GetGenericArguments().Take(gaCount).ToArray()
-            );
+            Type[] gas = new Type[gaCount];
+            Array.Copy(src.GetGenericArguments(), 0, gas, 0, gaCount);
+
+            return enclosingType.MakeGenericType(gas);
         }
 
         public static bool IsNested(this Type src) =>
@@ -97,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
             // mar nem beagyazott tipus.
             //
 
-            src.GetElementType(recurse: true)?.IsNested ?? src.IsNested;
+            src.GetInnermostElementType()?.IsNested ?? src.IsNested;
 
         public static bool IsClass(this Type src) => !src.IsGenericParameter && src.IsClass;
 
@@ -105,52 +103,53 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetMethods(f),
-            m => m.GetAccessModifiers(),
+            static (t, f) => t.GetMethods(f),
+            MethodBaseExtensions.GetAccessModifiers,
 
             //
-            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa, valamint a generikus argumentumok
+            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa, valamint a generikus argumentumok
             // szama a lenyeges.
             //
 
-            m =>
+            static m =>
             {
                 HashCode hk = new();
 
-                foreach (var descr in m.GetParameters().Select(p => new { p.ParameterType, ParameterKind = p.GetParameterKind() }))
+                foreach (ParameterInfo p in m.GetParameters())
                 {
-                    hk.Add(descr);
+                    hk.Add(p.ParameterType);
                 }
 
-                return new
+                hk.Add(new
                 {
                     m.Name,
                     m.GetGenericArguments().Length,
                     m.IsStatic, // ugyanolyan nevvel es parameterekkel lehet statikus es nem statikus is
-                    ParamzHash = hk.ToHashCode()
-                };
+                });
+
+                return hk.ToHashCode();
             },
             includeStatic
         );
 
         public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetProperties(f),
+            static (t, f) => t.GetProperties(f),
 
             //
             // A nagyobb lathatosagut tekintjuk mervadonak
             //
 
-            p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
-            p => p.Name, // tipus lenyegtelen, tulajdonsagbol adott nevvel csak egy db lehet adott tipusban
+            static p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
+            static p => new { p.Name, (p.GetMethod ?? p.SetMethod).IsStatic }.GetHashCode(),
             includeStatic
         );
 
         public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
-            (t, f) => t.GetEvents(f),
-            e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
-            e => e.Name, // tipus lenyegtelen, esemeny adott nevvel csak egy db lehet adott tipusban
+            static (t, f) => t.GetEvents(f),
+            static e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
+            static e => new { e.Name, (e.AddMethod ?? e.RemoveMethod).IsStatic }.GetHashCode(),
             includeStatic
         );
 
@@ -158,62 +157,75 @@ namespace Solti.Utils.Proxy.Internals
             this Type src, 
             Func<Type, BindingFlags, TMember[]> getter, 
             Func<TMember, AccessModifiers> getVisibility, 
-            Func<TMember, object> getDescriptor, 
-            bool includeStatic)
+            Func<TMember, int> getHashCode, 
+            bool includeStatic) where TMember: MemberInfo
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
             if (src.IsInterface)
+            {
+                foreach (Type t in src.GetHierarchy())
+                {
+                    foreach (TMember member in getter(t, flags))
+                    {
+                        yield return member;
+                    }
+                }
+            }
+            else
+            {
                 //
-                // - A "BindingFlags.NonPublic" es "BindingFlags.FlattenHierarchy" nem
-                //   ertelmezett interface-ekre.
-                // - Ez a megoldas a "new" kulcsszo altal elrejtett tagokat is visszaadja 
-                //   (ami szukseges interface-ek eseteben).
-                //
-
-                return src.GetInterfaces().Append(src).SelectMany(GetMembers);
-
-            //
-            // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza
-            // az os osztalyokbol, privatot nem, viszont az explicit implementaciok privat
-            // tagok... 
-            //
-
-            //flags |= BindingFlags.FlattenHierarchy;
-            flags |= BindingFlags.NonPublic;
-            if (includeStatic) flags |= BindingFlags.Static;
-
-            var returnedMembers = new HashSet<object>();
-
-            //
-            // Sorrend fontos, a leszarmazottol haladunk az os fele
-            //
-
-            return new[] { src }.Concat(src.GetBaseTypes()).SelectMany(GetMembers).Where
-            (
-                //
-                // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
-                // jok vagyunk.
+                // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
+                // privatot nem, viszont az explicit implementaciok privat tagok... 
                 //
 
-                m => getVisibility(m) is not AccessModifiers.Private && returnedMembers.Add
-                (
-                    getDescriptor(m)
-                )
-            );
+                //flags |= BindingFlags.FlattenHierarchy;
+                flags |= BindingFlags.NonPublic;
+                if (includeStatic)
+                    flags |= BindingFlags.Static;
 
-            IEnumerable<TMember> GetMembers(Type t) => getter(t, flags);
+                HashSet<int> returnedMembers = new();
+
+                //
+                // Sorrend fontos, a leszarmazottol haladunk az os fele
+                //
+
+                foreach (Type t in src.GetHierarchy())
+                {
+                    foreach (TMember member in getter(t, flags))
+                    {
+                        //
+                        // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
+                        // jok vagyunk.
+                        //
+
+                        if (getVisibility(member) is not AccessModifiers.Private && returnedMembers.Add(getHashCode(member)))
+                            yield return member;
+                    }
+                }
+            }
         }
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
-            for (Type? baseType = type.BaseType; baseType != null; baseType = baseType.BaseType)
+            for (Type? baseType = type.BaseType; baseType is not null; baseType = baseType.BaseType)
                 yield return baseType;
+        }
+
+        public static IEnumerable<Type> GetHierarchy(this Type src)
+        {
+            yield return src;
+
+            foreach (Type t in src.IsInterface ? src.GetInterfaces() : src.GetBaseTypes())
+            {
+                yield return t;
+            }
         }
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
-            if (!src.IsGenericType) yield break;
+            if (!src.IsGenericType)
+                yield break;
 
             //
             // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
@@ -228,17 +240,20 @@ namespace Solti.Utils.Proxy.Internals
             for(int i = 0; i < openArgs.Count; i++)
             {
                 bool own = true;
-                for (Type? parent = src; (parent = parent.DeclaringType) != null;)
+                for (Type? parent = src; (parent = parent!.DeclaringType) is not null;)
+                {
                     //
                     // Ha "parent" nem generikus akkor a GetGenericArguments() ures tombot ad vissza
                     //
 
-                    if (parent.GetGenericArguments().Contains(openArgs[i], ArgumentComparer.Instance))
+                    if (parent.GetGenericArguments().Some(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))
                     {
                         own = false;
                         break;
                     }
-                if (own) yield return closedArgs[i];
+                }
+                if (own) 
+                    yield return closedArgs[i];
             } 
         }
     }

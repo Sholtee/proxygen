@@ -3,8 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.IO;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -41,19 +41,22 @@ namespace Solti.Utils.Proxy.Internals
 
                     return null;
 
-                string? nameOrPath = Compilation
-                    .References
-                    .First(reference => SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
-                    .Display;
+                foreach (MetadataReference reference in Compilation.References)
+                {
+                    if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
+                    {
+                        //
+                        // Ha a Compilation GeneratorExecutionContext-bol jon es nem teljes ujraforditas
+                        // van akkor a MetadataReference.Display nem biztos h eleresi utvonal
+                        //
 
-                //
-                // Ha a Compilation GeneratorExecutionContext-bol jon es nem teljes ujraforditas
-                // van akkor a MetadataReference.Display nem biztos h eleresi utvonal
-                //
+                        return !string.IsNullOrEmpty(reference.Display) && File.Exists(reference.Display)
+                            ? reference.Display
+                            : null;
+                    }
+                }
 
-                return nameOrPath is not null && File.Exists(nameOrPath)
-                    ? nameOrPath
-                    : null;
+                return null;
             }
         }
 
@@ -61,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.Identity.ToString();
 
-        public bool IsFriend(string asmName) => UnderlyingSymbol.Name == asmName || UnderlyingSymbol.GivesAccessTo // TODO: strong name support
+        public bool IsFriend(string asmName) => StringComparer.OrdinalIgnoreCase.Equals(UnderlyingSymbol.Name, asmName) || UnderlyingSymbol.GivesAccessTo // TODO: strong name support
         (
             CSharpCompilation.Create(asmName).Assembly
         );

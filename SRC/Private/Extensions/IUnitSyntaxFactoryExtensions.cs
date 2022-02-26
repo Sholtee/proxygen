@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -59,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
                                 Environment.NewLine,
                                 src
                                     .References
-                                    .Select(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
+                                    .Convert(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
                             ),
                             cancellation: cancellation
                         );

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -40,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
 
                     if (callingAssembly != inspectedAssembly)
                     {
-                        if (callingAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>().Any(egta => egta.Generator == GeneratorType))
+                        if (callingAssembly.GetCustomAttributes<EmbedGeneratedTypeAttribute>().Some(egta => egta.Generator == GeneratorType))
                         {
                             return callingAssembly
                                 .GetTypes()

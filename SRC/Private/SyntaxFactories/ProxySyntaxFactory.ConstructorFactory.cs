@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
                 Proxy = Context.InterceptorType.Properties.Single
                 (
                     prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
-                );
+                )!;
             }
 
             public override bool Build(CancellationToken cancellation)

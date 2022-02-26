@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -31,10 +30,15 @@ namespace Solti.Utils.Proxy.Internals
 
             List<ParameterExpression> locals = new();
 
-            List<Expression> block = proxyType
-                .GetConstructors()
-                .SelectMany(CreateIf)
-                .ToList();
+            List<Expression> block = new();
+
+            foreach (ConstructorInfo ctor in proxyType.GetConstructors())
+            {
+                block.AddRange
+                (
+                    CreateIf(ctor)
+                );
+            }
 
             block.Add
             (
@@ -58,8 +62,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Type[] itemTypes = ctor
                     .GetParameters()
-                    .Select(p => p.ParameterType)
-                    .ToArray();
+                    .Convert(p => p.ParameterType);
 
                 if (itemTypes.Length is 0)
                 {
@@ -93,15 +96,15 @@ namespace Solti.Utils.Proxy.Internals
                         Expression.NotEqual
                         (
                             target,
-                            Expression.Default(tupleType)),
-                            Expression.Return
+                            Expression.Default(tupleType)
+                        ),
+                        Expression.Return
+                        (
+                            ret,
+                            Expression.New
                             (
-                                ret,
-                                Expression.New
-                                (
-                                    ctor,
-                                    itemTypes.Select((_, i) => GetItem(i)
-                                )
+                                ctor,
+                                itemTypes.Length.Times(GetItem)
                             )
                         )
                     );
