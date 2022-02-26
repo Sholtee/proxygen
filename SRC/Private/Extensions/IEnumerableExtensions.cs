@@ -49,24 +49,16 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool Some<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null)
         {
+            if (predicate is null && src is ICollection<T> coll)
+                return coll.Count > 0;
+
             foreach (T item in src)
             {
                 if (predicate?.Invoke(item) is not false)
                     return true;
             }
-            return false;
-        }
 
-        public static T? First<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T: class
-        {
-            foreach (T item in src)
-            {
-                if (predicate?.Invoke(item) is not false)
-                {
-                    return item;
-                }
-            }
-            return throwOnEmpty ? throw new InvalidOperationException() : null;
+            return false;
         }
 
         public static T? Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T: class
