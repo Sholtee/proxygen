@@ -1,10 +1,10 @@
 #pragma warning disable
 namespace Proxies
 {
-    [global::Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute(typeof(global::Solti.Utils.Proxy.Generators.ProxyGenerator<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTests.FooInterceptor>)), global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+    [global::Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute(typeof(global::Solti.Utils.Proxy.Generators.ProxyGenerator<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTests.FooInterceptor>)), global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "5.0.1.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
     internal sealed class GeneratedClass_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTests.FooInterceptor, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
     {
-        public GeneratedClass_10FC5DBDBA8C97EBE529724F5CB55A8A(global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32> target): base(target)
+        public GeneratedClass_10FC5DBDBA8C97EBE529724F5CB55A8A(global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32> target) : base(target)
         {
             this.Proxy = this;
         }

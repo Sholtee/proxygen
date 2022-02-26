@@ -1,7 +1,7 @@
-[global::Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute(typeof(global::Solti.Utils.Proxy.Generators.DuckGenerator<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>)), global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+﻿[global::Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute(typeof(global::Solti.Utils.Proxy.Generators.DuckGenerator<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>)), global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "5.0.1.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal sealed class GeneratedClass_CD3994C6BC4EA88E0F4185AD25263187 : global::Solti.Utils.Proxy.Internals.DuckBase<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
-    public GeneratedClass_CD3994C6BC4EA88E0F4185AD25263187(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target): base(target)
+    public GeneratedClass_CD3994C6BC4EA88E0F4185AD25263187(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target) : base(target)
     {
     }
 
@@ -9,19 +9,11 @@ internal sealed class GeneratedClass_CD3994C6BC4EA88E0F4185AD25263187 : global::
     global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);
     [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar() => this.Target.Bar();
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop
-    {
-        [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        get => this.Target.Prop;
-        [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        set => this.Target.Prop = value;
-    }
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        set => this.Target.Prop = value; }
 
-    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event
-    {
-        [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        add => this.Target.Event += value;
-        [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        remove => this.Target.Event -= value;
-    }
+    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+        remove => this.Target.Event -= value; }
 }
