@@ -1,5 +1,8 @@
 ﻿System.Collections.Generic.IList<T>: System.Collections.Generic.ICollection<T>, System.Collections.Generic.IEnumerable<T>, System.Collections.IEnumerable
 {
+  IndexOf(T item);
+  Insert(int index, T item);
+  RemoveAt(int index);
   Add(T item);
   Clear();
   Contains(T item);
@@ -7,10 +10,7 @@
   Remove(T item);
   GetEnumerator();
   GetEnumerator();
-  IndexOf(T item);
-  Insert(int index, T item);
-  RemoveAt(int index);
+  this[int index] { get; set; }
   Count { get; }
   IsReadOnly { get; }
-  this[int index] { get; set; }
 }

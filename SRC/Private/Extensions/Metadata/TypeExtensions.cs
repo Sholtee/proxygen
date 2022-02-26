@@ -224,7 +224,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
-            if (!src.IsGenericType) yield break;
+            if (!src.IsGenericType)
+                yield break;
 
             //
             // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>

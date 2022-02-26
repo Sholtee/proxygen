@@ -6,14 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class Runtime
     {
-        public static IReadOnlyList<Assembly> Assemblies { get; } = GetRuntimeAssemblies().ToArray();
+        public static IReadOnlyList<Assembly> Assemblies { get; } = GetRuntimeAssemblies().Convert(asm => asm);
 
         private static IEnumerable<Assembly> GetRuntimeAssemblies()
         {
@@ -31,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (string assemblyPath in asms.Split(Path.PathSeparator))
             {
                 string fileName = Path.GetFileNameWithoutExtension(assemblyPath);
-                if (mandatoryAssemblies.Contains(fileName))
+                if (mandatoryAssemblies.Some(asm => asm.Equals(fileName, StringComparison.OrdinalIgnoreCase)))
                     yield return Assembly.LoadFile(assemblyPath);
             }
 #endif

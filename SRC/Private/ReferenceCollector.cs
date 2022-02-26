@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -16,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
         public ReferenceCollector(bool includeRuntimeReferences = true) => FReferences = new HashSet<IAssemblyInfo>
         (
             includeRuntimeReferences
-                ? Runtime.Assemblies.Select(MetadataAssemblyInfo.CreateFrom)
+                ? Runtime.Assemblies.Convert(MetadataAssemblyInfo.CreateFrom)
                 : Array.Empty<IAssemblyInfo>(),
             IAssemblyInfoComparer.Instance
         );

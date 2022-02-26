@@ -227,25 +227,25 @@ namespace Solti.Utils.Proxy.Internals
 
             if (queried.IsGenericType)
             {
-                Stack<Type> gas = new();
+                List<Type> gas = new(); 
 
-                ToMetadataInternal(src);
-
-                foreach (ITypeInfo enclosingType in src.GetEnclosingTypes())
+                foreach (ITypeInfo parent in src.GetParentTypes())
                 {
-                    ToMetadataInternal(enclosingType);
+                    ReadGenericArguments(parent);
                 }
+
+                ReadGenericArguments(src);
 
                 return queried.MakeGenericType(gas.Convert(ga => ga));
 
-                void ToMetadataInternal(ITypeInfo src)
+                void ReadGenericArguments(ITypeInfo src)
                 {
                     if (src is not IGenericTypeInfo generic)
                         return;
 
                     foreach (ITypeInfo ga in generic.GenericArguments)
                     {
-                        gas.Push(ga.ToMetadata());
+                         gas.Add(ga.ToMetadata());
                     }
                 }
             }

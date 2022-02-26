@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Generated_E1708635A996578B71D363AEBE96EC5D")]
+[assembly: InternalsVisibleTo("Generated_D00C7F1F863ABF786ECB394C18ACB95A")]
 [assembly: InternalsVisibleTo("Generated_47E0638B5E722B54A6BB4A771313B021")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
@@ -203,9 +203,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             };
 
             // anonim objektumok mindig internal-ok
-            Assert.DoesNotThrow(() => typeof(DuckGenerator<,>)
-                .MakeGenericType(typeof(IProps), anon.GetType())
-                .InvokeMember(nameof(DuckGenerator<object, object>.GetGeneratedType), BindingFlags.Static | BindingFlags.Public | BindingFlags.FlattenHierarchy | BindingFlags.InvokeMethod, null, null, new object[0]));
+            Assert.DoesNotThrow(() => new DuckGenerator(typeof(IProps), anon.GetType()).GetGeneratedType());
         }
 
         public interface IProps 
