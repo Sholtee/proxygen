@@ -10,7 +10,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class DuckSyntaxFactory
     {
-        internal sealed class ConstructorFactory : MemberSyntaxFactory
+        internal sealed class ConstructorFactory : ClassSyntaxFactoryBase
         {
             public IDuckContext Context { get; }
 

@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
-        internal sealed class ConstructorFactory : MemberSyntaxFactory
+        internal sealed class ConstructorFactory : ClassSyntaxFactoryBase
         {
             public IProxyContext Context { get; }
 

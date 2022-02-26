@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* MemberSyntaxFactory.Method.cs.cs                                              *
+* ClassSyntaxFactoryBase.Method.cs.cs                                           *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -15,7 +15,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class MemberSyntaxFactory
+    internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)

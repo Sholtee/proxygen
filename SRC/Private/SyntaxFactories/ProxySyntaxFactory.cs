@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
-        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
+        public override IReadOnlyCollection<IClassSyntaxFactory> MemberSyntaxFactories { get; }
 
         public override string ClassName { get; }
 
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
             InterceptorType = interceptorType;
             ClassName = $"GeneratedClass_{InterceptorType.GetMD5HashCode()}";
 
-            MemberSyntaxFactories = new IMemberSyntaxFactory[] 
+            MemberSyntaxFactories = new IClassSyntaxFactory[] 
             {
                 new ConstructorFactory(this),
                 new MethodInterceptorFactory(this),

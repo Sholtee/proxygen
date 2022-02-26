@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
 
         protected virtual IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
         {
-            foreach (IMemberSyntaxFactory syntaxFactory in MemberSyntaxFactories)
+            foreach (IClassSyntaxFactory syntaxFactory in MemberSyntaxFactories)
             {
                 syntaxFactory.Build(cancellation);
 
@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo RelatedGenerator { get; }
 
-        public abstract IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
+        public abstract IReadOnlyCollection<IClassSyntaxFactory> MemberSyntaxFactories { get; }
 
         public abstract string ClassName { get; }
 

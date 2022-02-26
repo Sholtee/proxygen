@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* MemberSyntaxFactory.cs                                                        *
+* IClassSyntaxFactory.cs                                                        *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -9,12 +9,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class MemberSyntaxFactory: SyntaxFactoryBase, IMemberSyntaxFactory
+    internal interface IClassSyntaxFactory : ISyntaxFactory // TODO: torolni
     {
-        public ITypeInfo SourceType { get; }
-
-        public MemberSyntaxFactory(ITypeInfo sourceType) => SourceType = sourceType;
-
-        public IReadOnlyCollection<MemberDeclarationSyntax>? Members { get; protected set; }
+        IReadOnlyCollection<MemberDeclarationSyntax>? Members { get; }
     }
 }

@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ClassName { get; }
 
-        public override IReadOnlyCollection<IMemberSyntaxFactory> MemberSyntaxFactories { get; }
+        public override IReadOnlyCollection<IClassSyntaxFactory> MemberSyntaxFactories { get; }
 
         public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, containingAssembly, relatedGenerator) 
         {
@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             BaseType = ((IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
 
-            MemberSyntaxFactories = new IMemberSyntaxFactory[]
+            MemberSyntaxFactories = new IClassSyntaxFactory[]
             {
                 new ConstructorFactory(this),
                 new MethodInterceptorFactory(this),

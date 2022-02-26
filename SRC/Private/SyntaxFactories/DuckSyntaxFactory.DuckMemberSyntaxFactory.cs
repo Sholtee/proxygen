@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal partial class DuckSyntaxFactory
     {
-        internal abstract class DuckMemberSyntaxFactory : MemberSyntaxFactory
+        internal abstract class DuckMemberSyntaxFactory : ClassSyntaxFactoryBase
         {
             protected internal readonly IPropertyInfo TARGET;
 

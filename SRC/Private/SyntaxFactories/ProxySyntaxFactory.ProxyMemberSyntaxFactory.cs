@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
-        internal abstract class ProxyMemberSyntaxFactory: MemberSyntaxFactory
+        internal abstract class ProxyMemberSyntaxFactory: ClassSyntaxFactoryBase
         {
             #region Protected
             protected internal readonly IPropertyInfo TARGET;

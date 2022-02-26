@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* IMemberSyntaxFactory.cs                                                       *
+* ClassSyntaxFactoryBase.cs                                                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -9,8 +9,12 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IMemberSyntaxFactory : ISyntaxFactory 
+    internal partial class ClassSyntaxFactoryBase: SyntaxFactoryBase, IClassSyntaxFactory
     {
-        IReadOnlyCollection<MemberDeclarationSyntax>? Members { get; }
+        public ITypeInfo SourceType { get; }
+
+        public ClassSyntaxFactoryBase(ITypeInfo sourceType) => SourceType = sourceType;
+
+        public IReadOnlyCollection<MemberDeclarationSyntax>? Members { get; protected set; }
     }
 }
