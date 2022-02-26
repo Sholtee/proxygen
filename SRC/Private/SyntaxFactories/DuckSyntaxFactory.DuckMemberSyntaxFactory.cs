@@ -63,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
                 TARGET = Context
                     .BaseType
                     .Properties
-                    .Single(prop => prop.Name == nameof(DuckBase<object>.Target));
+                    .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
             }
         }
     }

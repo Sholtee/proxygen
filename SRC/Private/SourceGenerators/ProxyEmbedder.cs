@@ -147,7 +147,7 @@ namespace Solti.Utils.Proxy.Internals
 
                         context.ReportDiagnostic
                         (
-                            Diagnostics.PGI00(generator.Locations.Single(), source.Hint)
+                            Diagnostics.PGI00(generator.Locations.Single()!, source.Hint)
                         );
                     }
                 }
@@ -165,7 +165,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         context, 
                         e, 
-                        generator.Locations.Single()
+                        generator.Locations.Single()!
                     );
                 }
             }

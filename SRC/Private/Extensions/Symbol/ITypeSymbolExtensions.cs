@@ -277,11 +277,9 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(Type.Delimiter);
             }
 
-            List<ITypeSymbol> parents = new(src.GetParents());
-
-            for (int i = parents.Count - 1; i >= 0; i--)
+            foreach (ITypeSymbol parent in new Stack<ITypeSymbol>(src.GetParents()))
             {
-                sb.Append($"{GetName(parents[i])}+");
+                sb.Append($"{GetName(parent)}+");
             }
 
             sb.Append($"{GetName(elementType ?? src)}");
@@ -346,19 +344,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (iface.IsGenericType())
                 {
-                    ITypeSymbol[] tas = new ITypeSymbol[iface.TypeArguments.Length];
+                    ITypeSymbol[] tas = iface.TypeArguments.Convert(ta => !ta.IsValueType
+                        //
+                        // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
+                        //
 
-                    for (int i = 0; i < tas.Length; i++)
-                    {
-                        ITypeSymbol ta = iface.TypeArguments[i];
-                        tas[i] = !ta.IsValueType
-                            //
-                            // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
-                            //
-
-                            ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
-                            : ta;
-                    }
+                        ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+                        : ta);
 
                     iface = iface.OriginalDefinition.Construct(tas);
                 }

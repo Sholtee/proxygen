@@ -25,17 +25,26 @@ namespace Solti.Utils.Proxy.Internals
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
 
-        public static IReadOnlyList<TMeta> Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TMeta> convert, Func<TConcrete, bool>? drop = null)
+        public static TMeta[] Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TMeta> convert, Func<TConcrete, bool>? drop = null)
         {
-            List<TMeta> lst = new();
+            TMeta[] ar = new TMeta[5];
+
+            int i = 0;
+
             foreach (TConcrete concrete in original)
             {
                 if (drop?.Invoke(concrete) is true)
                     continue;
 
-                lst.Add(convert(concrete));
+                if (i == ar.Length)
+                    Array.Resize(ref ar, ar.Length * 2);
+
+                ar[i++] = convert(concrete);
             }
-            return lst;
+
+            Array.Resize(ref ar, i);
+
+            return ar;
         }
 
         public static bool Some<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null)
@@ -48,19 +57,36 @@ namespace Solti.Utils.Proxy.Internals
             return false;
         }
 
-        public static T Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null) where T: class
+        public static T? First<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T: class
         {
-            T? found = null;
             foreach (T item in src)
             {
                 if (predicate?.Invoke(item) is not false)
                 {
-                    if (found is not null)
-                        throw new InvalidOperationException();
-                    found = item;
+                    return item;
                 }
             }
-            return found ?? throw new InvalidOperationException();
+            return throwOnEmpty ? throw new InvalidOperationException() : null;
+        }
+
+        public static T? Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T: class
+        {
+            T? result = null;
+
+            foreach (T item in src)
+            {
+                if (predicate?.Invoke(item) is not false)
+                {
+                    if (result is not null)
+                        throw new InvalidOperationException();
+                    result = item;
+                }
+            }
+
+            if (result is null && throwOnEmpty)
+                throw new InvalidOperationException();
+
+            return result;
         }
     }
 }

@@ -69,12 +69,12 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
-                src = src.GetImplementedInterfaceMethods().Single();
+                src = src.GetImplementedInterfaceMethods().Single()!;
 
             return SpecialMethods.Some(mk => mk == src.MethodKind);
         }
 
-        private static readonly IReadOnlyList<MethodKind> ClassMethods = new[]
+        private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
         {
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
