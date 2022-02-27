@@ -5,9 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
-using System.Linq;
 
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -32,7 +30,10 @@ namespace Solti.Utils.Proxy.Internals
                 case ArrowExpressionClauseSyntax arrow:
                     declaration = declaration
                         .WithExpressionBody(arrow)
-                        .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
+                        .WithSemicolonToken
+                        (
+                            Token(SyntaxKind.SemicolonToken)
+                        );
                     break;
                 default:
                     Debug.Fail("Unknown node type");
@@ -47,20 +48,13 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        protected internal string GetSafeTypeName(ITypeInfo type) => CreateType(type)
-            .ToFullString()
-            //
-            // Csak karaktert es ne karakterlancot csereljunk h az eredmenyt ne befolyasolja a
-            // felhasznalo teruleti beallitasa.
-            //
-            .Replace(',', '_');
-
-        protected internal string GetSafeTypeName<T>() => GetSafeTypeName(MetadataTypeInfo.CreateFrom(typeof(T)));
-
         /// <summary>
         /// new System.Object[] {..., ..., ...}
         /// </summary>
-        protected internal ArrayCreationExpressionSyntax CreateArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
+        #if DEBUG
+        internal
+        #endif
+        protected ArrayCreationExpressionSyntax CreateArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
         (
             type: ArrayType
             (
@@ -72,7 +66,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ArrayRankSpecifier(SingletonSeparatedList
                     (
-                        elements.Any() ? OmittedArraySizeExpression() : (ExpressionSyntax)LiteralExpression
+                        elements.Some() ? OmittedArraySizeExpression() : (ExpressionSyntax)LiteralExpression
                         (
                             SyntaxKind.NumericLiteralExpression,
                             Literal(0)
@@ -80,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals
                     ))
                 )
             ),
-            initializer: !elements.Any() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
+            initializer: !elements.Some() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
             (
                 expressions: elements.ToSyntaxList()
             )
@@ -89,12 +83,18 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// new System.Object[] {..., ..., ...}
         /// </summary>
-        protected internal ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
+        #if DEBUG
+        internal
+        #endif
+        protected ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
 
         /// <summary>
         /// new NameSpace.T(.., ...,)
         /// </summary>
-        protected internal ObjectCreationExpressionSyntax CreateObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: CreateType<T>()).WithArgumentList
+        #if DEBUG
+        internal
+        #endif
+        protected ObjectCreationExpressionSyntax CreateObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: CreateType<T>()).WithArgumentList
         (
             ArgumentList
             (
@@ -102,7 +102,13 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        protected internal MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum =>
+        /// <summary>
+        /// Enum.Member
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum =>
             MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, CreateType<T>(), IdentifierName(val.ToString()));
     }
 }

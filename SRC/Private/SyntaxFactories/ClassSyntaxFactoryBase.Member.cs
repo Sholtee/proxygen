@@ -3,9 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Diagnostics;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             target ??= member.IsStatic ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
 
-            if (castTargetTo != null)
+            if (castTargetTo is not null)
             {
                 Debug.Assert(!member.IsStatic);
 
@@ -33,13 +31,19 @@ namespace Solti.Utils.Proxy.Internals
             return target;
         }
 
-        protected internal static MemberAccessExpressionSyntax SimpleMemberAccess(ExpressionSyntax target, string member) => SimpleMemberAccess
+        #if DEBUG
+        internal
+        #endif
+        protected static MemberAccessExpressionSyntax SimpleMemberAccess(ExpressionSyntax target, string member) => SimpleMemberAccess
         (
             target,
             IdentifierName(member)
         );
 
-        protected internal static MemberAccessExpressionSyntax SimpleMemberAccess(ExpressionSyntax target, SimpleNameSyntax member) => MemberAccessExpression
+        #if DEBUG
+        internal
+        #endif
+        protected static MemberAccessExpressionSyntax SimpleMemberAccess(ExpressionSyntax target, SimpleNameSyntax member) => MemberAccessExpression
         (
             SyntaxKind.SimpleMemberAccessExpression,
             target,
@@ -49,7 +53,10 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
         /// </summary>
-        protected internal MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo = null) => SimpleMemberAccess
+        #if DEBUG
+        internal
+        #endif
+        protected MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo = null) => SimpleMemberAccess
         (
             AmendTarget(target, member, castTargetTo),
             member.Name

@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -20,7 +19,10 @@ namespace Solti.Utils.Proxy.Internals
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
-        protected internal NameSyntax GetQualifiedName(ITypeInfo type)
+        #if DEBUG
+        internal
+        #endif
+        protected NameSyntax GetQualifiedName(ITypeInfo type)
         {
             string[] parts = type.Name.Split(Type.Delimiter);
 
@@ -28,9 +30,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type.IsNested)
             {
-                Debug.Assert(parts.Length == 1);
-
-                names[0] = CreateTypeName(parts[0]);
+                names[0] = CreateTypeName(parts.Single()!);
             }
             else
             {
@@ -63,7 +63,10 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        protected internal TypeSyntax CreateType(ITypeInfo type) 
+        #if DEBUG
+        internal
+        #endif
+        protected TypeSyntax CreateType(ITypeInfo type) 
         {
             //
             // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
@@ -130,9 +133,15 @@ namespace Solti.Utils.Proxy.Internals
             return GetQualifiedName(type);
         }
 
-        protected internal TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
+        #if DEBUG
+        internal
+        #endif
+        protected TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
 
-        protected internal TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
+        #if DEBUG
+        internal
+        #endif
+        protected TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
         (
             CreateType(type)
         );

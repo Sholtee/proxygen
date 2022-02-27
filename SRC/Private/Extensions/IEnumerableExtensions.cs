@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
 
-        public static TMeta[] Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TMeta> convert, Func<TConcrete, bool>? drop = null)
+        public static TMeta[] Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, int, TMeta> convert, Func<TConcrete, int, bool>? drop = null)
         {
             TMeta[] ar = new TMeta[5];
 
@@ -33,19 +33,23 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (TConcrete concrete in original)
             {
-                if (drop?.Invoke(concrete) is true)
+                if (drop?.Invoke(concrete, i) is true)
                     continue;
 
                 if (i == ar.Length)
                     Array.Resize(ref ar, ar.Length * 2);
 
-                ar[i++] = convert(concrete);
+                ar[i] = convert(concrete, i);
+                i++;
             }
 
             Array.Resize(ref ar, i);
 
             return ar;
         }
+
+        public static TMeta[] Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TMeta> convert, Func<TConcrete, bool>? drop = null) =>
+            original.Convert((element, _) => convert(element), drop is not null ? (element, _) => drop(element) : null);
 
         public static bool Some<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null)
         {
