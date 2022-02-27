@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Linq;
 
 using BenchmarkDotNet.Attributes;
 

@@ -21,8 +21,8 @@ namespace Solti.Utils.Proxy.Perf
 
         private IInterface FInstance;
 
-        private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(params object[] paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            (TInterface) Activator.CreateInstance(await ProxyGenerator<TInterface, TInterceptor>.GetGeneratedTypeAsync(), paramz);
+        private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(ITuple paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
+            await ProxyGenerator<TInterface, TInterceptor>.ActivateAsync(paramz);
 
         #region Helper classes
         public class Implementation : IInterface
@@ -51,10 +51,10 @@ namespace Solti.Utils.Proxy.Perf
         public void SetupNoProxy() => FInstance = new Implementation();
 
         [GlobalSetup(Target = nameof(ProxyWithTarget))]
-        public async Task SetupProxy() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithTarget>(new Implementation());
+        public async Task SetupProxy() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithTarget>(Tuple.Create((IInterface) new Implementation()));
 
         [GlobalSetup(Target = nameof(ProxyWithoutTarget))]
-        public async Task SetupProxyWithoutTarget() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithoutTarget>();
+        public async Task SetupProxyWithoutTarget() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithoutTarget>(null);
 
         [Benchmark(Baseline = true, OperationsPerInvoke = OperationsPerInvoke)]
         public void NoProxy()
