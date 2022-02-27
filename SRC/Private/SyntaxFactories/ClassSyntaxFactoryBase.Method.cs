@@ -286,5 +286,25 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithBody(Block());
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor);
     }
 }

@@ -14,15 +14,21 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolution
     {
-        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ClassSyntaxFactory syntaxFactory)
+        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, UnitSyntaxFactory syntaxFactory)
         {
             GeneratorType = generatorType;
             SyntaxFactory = syntaxFactory;
         }
 
-        public string? CacheDir { get; internal set; } = WorkingDirectories.Instance.AssemblyCacheDir; // tesztek miatt van setter
+        public string? CacheDir 
+        { 
+            get;
+#if DEBUG
+            internal set;
+#endif
+        } = WorkingDirectories.Instance.AssemblyCacheDir;
 
-        public ClassSyntaxFactory SyntaxFactory { get; }
+        public UnitSyntaxFactory SyntaxFactory { get; }
 
         public Type GeneratorType { get; }
 

@@ -76,5 +76,15 @@ namespace Solti.Utils.Proxy.Internals
             ),
             right: right
         );
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IEnumerable<EventDeclarationSyntax> ResolveEvents(object context);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt);
     }
 }

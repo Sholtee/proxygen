@@ -13,7 +13,10 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class SyntaxFactoryBase
     {
-        protected internal AttributeSyntax CreateAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute
+        #if DEBUG
+        internal
+        #endif
+        protected AttributeSyntax CreateAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute
         {
             AttributeSyntax attr = Attribute
             (

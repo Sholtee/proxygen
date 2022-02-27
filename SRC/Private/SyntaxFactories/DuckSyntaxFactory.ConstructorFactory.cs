@@ -3,37 +3,28 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Linq;
-using System.Threading;
+using System.Collections.Generic;
+
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal partial class DuckSyntaxFactory
     {
-        internal sealed class ConstructorFactory : ClassSyntaxFactoryBase
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(DuckSyntaxFactory self)
         {
-            public IDuckContext Context { get; }
-
-            public ConstructorFactory(IDuckContext context) : base(context.InterfaceType) =>
-                Context = context;
-
-            public override bool Build(CancellationToken cancellation)
+            foreach (IConstructorInfo ctor in self.BaseType.GetPublicConstructors())
             {
-                if (Members is not null) return false;
-
-                Members = Context
-                    .BaseType
-                    .GetPublicConstructors()
-                    .Select(ctor => 
-                    {
-                        cancellation.ThrowIfCancellationRequested();
-
-                        return DeclareCtor(ctor, Context.ClassName);
-                    })
-                    .ToArray();
-
-                return true;
+                yield return ResolveConstructor(self, ctor);
             }
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected override ConstructorDeclarationSyntax ResolveConstructor(DuckSyntaxFactory self, IConstructorInfo ctor) => DeclareCtor(ctor, ResolveClassName(self));
     }
 }

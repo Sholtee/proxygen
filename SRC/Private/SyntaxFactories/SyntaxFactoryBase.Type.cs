@@ -19,11 +19,10 @@ namespace Solti.Utils.Proxy.Internals
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
-        #if DEBUG
-        internal
-        #endif
-        protected NameSyntax GetQualifiedName(ITypeInfo type)
+        private NameSyntax GetQualifiedName(ITypeInfo type)
         {
+            ReferenceCollector?.AddType(type);
+
             string[] parts = type.Name.Split(Type.Delimiter);
 
             NameSyntax[] names = new NameSyntax[parts.Length];
@@ -83,8 +82,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 return result;
             }
-
-            AddType(type);
 
             if (type.IsVoid)
             {

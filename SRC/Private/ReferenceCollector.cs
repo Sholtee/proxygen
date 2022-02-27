@@ -28,15 +28,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public IReadOnlyCollection<ITypeInfo> Types => FTypes;
 
-        protected internal void AddTypesFrom(ISyntaxFactory syntax) 
-        {
-            foreach (ITypeInfo type in syntax.Types)
-                FTypes.Add(type);
-
-            foreach (IAssemblyInfo asm in syntax.References)
-                FReferences.Add(asm);
-        }
-
         protected internal void AddType(ITypeInfo type) 
         {
             IGenericTypeInfo? genericType = type as IGenericTypeInfo;

@@ -24,7 +24,10 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         SimpleMemberAccess
                         (
-                            CreateType(MetadataTypeInfo.CreateFrom(typeof(MethodImplOptions))),
+                            CreateType
+                            (
+                                MetadataTypeInfo.CreateFrom(typeof(MethodImplOptions))
+                            ),
                             nameof(MethodImplOptions.AggressiveInlining)
                         )
                     )                 

@@ -3,13 +3,12 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-using System.Threading;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class SyntaxFactoryBase : ReferenceCollector, ISyntaxFactory
+    internal abstract partial class SyntaxFactoryBase
     {
-        public virtual bool Build(CancellationToken cancellation) => throw new NotImplementedException();
+        protected ReferenceCollector? ReferenceCollector { get; }
+
+        public SyntaxFactoryBase(ReferenceCollector? referenceCollector) => ReferenceCollector = referenceCollector;
     }
 }

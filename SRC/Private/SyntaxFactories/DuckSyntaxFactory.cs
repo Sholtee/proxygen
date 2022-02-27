@@ -5,18 +5,16 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class DuckSyntaxFactory : ClassSyntaxFactory, IDuckContext
+    internal partial class DuckSyntaxFactory : ProxyUnitSyntaxFactory
     {
         public ITypeInfo InterfaceType { get; }
 
@@ -24,70 +22,85 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseType { get; }
 
-        public override string ClassName { get; }
+        #if DEBUG
+        internal
+        #endif
+        protected readonly IPropertyInfo TARGET;
 
-        public override IReadOnlyCollection<IClassSyntaxFactory> MemberSyntaxFactories { get; }
-
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator): base(outputType, containingAssembly, relatedGenerator) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator, ReferenceCollector? referenceCollector): base(outputType, containingAssembly, relatedGenerator, referenceCollector) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
-            TargetType = targetType;
-            BaseType = ((IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
-            ClassName = $"GeneratedClass_{BaseType.GetMD5HashCode()}";
+            TargetType    = targetType;
+            BaseType      = ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
 
-            MemberSyntaxFactories = new IClassSyntaxFactory[]
-            {
-                new ConstructorFactory(this),
-                new MethodInterceptorFactory(this),
-                new PropertyInterceptorFactory(this),
-                new EventInterceptorFactory(this)
-            };
+            TARGET  = BaseType
+                .Properties
+                .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
         }
 
-        protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
+        //
+        // Proxy egyseg mindig csak egy osztalyt definial
+        //
+
+        public override IReadOnlyCollection<string> DefinedClasses => new string[]
+        {
+            OutputType switch
+            {
+                OutputType.Unit => ContainingNameSpace + Type.Delimiter + ResolveClassName(this),
+                OutputType.Module => ResolveClassName(this),
+                _ => throw new NotSupportedException()
+            }
+        };
+
+        public override CompilationUnitSyntax ResolveUnit(CancellationToken cancellation)
         {
             Visibility.Check(InterfaceType, ContainingAssembly);
             Visibility.Check(TargetType, ContainingAssembly);
 
-            return base.BuildMembers(cancellation);
+            return base.ResolveUnit(cancellation);
         }
 
-        protected override ClassDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context)
         {
-            ClassDeclarationSyntax cls = ClassDeclaration
-            (
-                identifier: ClassName
-            )
-            .WithModifiers
-            (
-                modifiers: TokenList
-                (
-                    //
-                    // Az osztaly ne publikus legyen h "internal" lathatosagu tipusokat is hasznalhassunk
-                    //
+            return new[] { BaseType, InterfaceType };
+        }
 
-                    Token(SyntaxKind.InternalKeyword),
-                    Token(SyntaxKind.SealedKeyword)
-                )
-            )
-            .WithBaseList
-            (
-                baseList: BaseList
-                (
-                    new[] { BaseType, InterfaceType }.ToSyntaxList(t => (BaseTypeSyntax) SimpleBaseType
-                    (
-                        CreateType(t)
-                    ))
-                )
-            );
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ClassDeclarationSyntax> ResolveClasses(CancellationToken cancellation)
+        {
+            yield return ResolveClass(this, cancellation);
+        }
 
-            return cls.WithMembers
-            (
-                List(members)
-            );
+        #if DEBUG
+        internal
+        #endif
+        protected override string ResolveClassName(object context) => ContainingAssembly;
+
+        protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
+        {
+            TMember[] possibleTargets = targetMembers
+              .Convert(targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
+
+            if (!possibleTargets.Some())
+                throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
+
+            //
+            // Lehet tobb implementacio is pl.:
+            // "List<T>: ICollection<T>, IList" ahol IList nem ICollection<T> ose es mindkettonek van ReadOnly tulajdonsaga.
+            //
+
+            if (possibleTargets.Length > 1)
+                throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.Name));
+
+            return possibleTargets[0];
         }
     }
 }

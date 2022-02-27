@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory: ClassSyntaxFactory, IProxyContext
+    internal partial class ProxySyntaxFactory: UnitSyntaxFactory, IProxyContext
     {
         public ITypeInfo InterfaceType { get; }
 
@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
 
         protected override ClassDeclarationSyntax GenerateClass(IEnumerable<MemberDeclarationSyntax> members)
         {
-            ClassDeclarationSyntax cls = ClassDeclaration
+            return ClassDeclaration
             (
                 identifier: ClassName
             )
@@ -103,9 +103,7 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 )
-            );
-
-            return cls.WithMembers
+            ).WithMembers
             (
                 List(members)
             );

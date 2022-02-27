@@ -3,10 +3,11 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
@@ -14,6 +15,21 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context)
+        {
+        }
+
+        #if DEBUG
+        internal
+        #endif
+        protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor)
+        {
+        }
+
         internal sealed class ConstructorFactory : ClassSyntaxFactoryBase
         {
             public IProxyContext Context { get; }
