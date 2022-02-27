@@ -9,15 +9,16 @@ using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolution
     {
-        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, UnitSyntaxFactory syntaxFactory)
+        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ProxyUnitSyntaxFactory syntaxFactory)
         {
             GeneratorType = generatorType;
-            SyntaxFactory = syntaxFactory;
+            ProxyUnitSyntaxFactory = syntaxFactory;
         }
 
         public string? CacheDir 
@@ -28,9 +29,9 @@ namespace Solti.Utils.Proxy.Internals
 #endif
         } = WorkingDirectories.Instance.AssemblyCacheDir;
 
-        public UnitSyntaxFactory SyntaxFactory { get; }
-
         public Type GeneratorType { get; }
+
+        public ProxyUnitSyntaxFactory ProxyUnitSyntaxFactory { get; }
 
         public Type? TryResolve(string assemblyName, CancellationToken cancellation)
         {
@@ -48,16 +49,17 @@ namespace Solti.Utils.Proxy.Internals
                 Directory.CreateDirectory(CacheDir);
             }
 
-            SyntaxFactory.BuildAndDump(cancellation);
+            CompilationUnitSyntax unit = ProxyUnitSyntaxFactory.ResolveUnitAndDump(cancellation);
 
             return ExtractType
             (
                  Compile.ToAssembly
                  (
-                     SyntaxFactory.Unit!,
+                     unit,
                      assemblyName,
                      cacheFile,
-                     SyntaxFactory
+                     ProxyUnitSyntaxFactory
+                        .ReferenceCollector!
                         .References
                         .Convert(asm => MetadataReference.CreateFromFile(asm.Location!)),
                      customConfig: null,
@@ -67,11 +69,11 @@ namespace Solti.Utils.Proxy.Internals
 
             Type ExtractType(Assembly asm) => asm.GetType
             (
-                SyntaxFactory.ClassName, 
+                ProxyUnitSyntaxFactory.DefinedClasses.Single(), 
                 throwOnError: true
             );
         }
 
-        public Type? TryResolve(CancellationToken cancellation) => TryResolve(SyntaxFactory.ContainingAssembly, cancellation);
+        public Type? TryResolve(CancellationToken cancellation) => TryResolve(ProxyUnitSyntaxFactory.ContainingAssembly, cancellation);
     }
 }

@@ -67,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals
                     : null,
                 arguments: ifaceMethod
                     .Parameters
-                    .Convert(para => para.Name)
+                    .ConvertAr(para => para.Name)
             );
 
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)

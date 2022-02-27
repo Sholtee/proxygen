@@ -34,7 +34,8 @@ namespace Solti.Utils.Proxy.Generators
                         MetadataTypeInfo.CreateFrom(typeof(TInterceptor)),
                         $"Generated_{generatorTypeMeta.GetMD5HashCode()}",
                         OutputType.Module,
-                        generatorTypeMeta
+                        generatorTypeMeta,
+                        new ReferenceCollector()
                     )
                 );
             }

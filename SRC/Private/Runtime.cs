@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class Runtime
     {
-        public static IReadOnlyList<Assembly> Assemblies { get; } = GetRuntimeAssemblies().Convert(asm => asm);
+        public static IReadOnlyList<Assembly> Assemblies { get; } = GetRuntimeAssemblies().ConvertAr(asm => asm);
 
         private static IEnumerable<Assembly> GetRuntimeAssemblies()
         {

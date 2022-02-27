@@ -31,11 +31,8 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (TConcrete concrete in original)
             {
-                if (drop?.Invoke(concrete, i) is true)
-                    continue;
-
-                yield return convert(concrete, i);
-                i++;
+                if (drop?.Invoke(concrete, i) is not true)
+                    yield return convert(concrete, i++);
             }
         }
 

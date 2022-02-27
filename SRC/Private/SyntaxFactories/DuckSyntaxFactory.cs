@@ -80,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
         protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
             TMember[] possibleTargets = targetMembers
-              .Convert(targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
+              .ConvertAr(targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
 
             if (!possibleTargets.Some())
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));

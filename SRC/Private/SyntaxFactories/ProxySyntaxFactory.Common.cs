@@ -70,7 +70,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 EnsureUnused("args", paramz), CreateArray<object>
                 (
-                    paramz.Convert
+                    paramz.ConvertAr
                     (
                         param => param.Kind is ParameterKind.Out
                             ? DefaultExpression(CreateType(param.Type))
@@ -142,7 +142,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<IParameterInfo> paramz) => paramz.Convert
+        LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<IParameterInfo> paramz) => paramz.ConvertAr
         (
             //
             // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno

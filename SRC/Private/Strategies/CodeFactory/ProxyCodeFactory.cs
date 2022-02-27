@@ -34,16 +34,20 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                IUnitSyntaxFactory unitSyntaxFactory = new ProxySyntaxFactory
+                result = new ProxySyntaxFactory
                 (
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(interceptor, compilation),
                     compilation.AssemblyName!,
                     OutputType.Unit,
-                    SymbolTypeInfo.CreateFrom(generator, compilation)
-                );
+                    SymbolTypeInfo.CreateFrom(generator, compilation),
+                    
+                    //
+                    // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
+                    //
 
-                result = unitSyntaxFactory.GetSourceCode(context.CancellationToken);
+                    !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null
+                ).GetSourceCode(context.CancellationToken);
             }
             catch (Exception e) 
             {

@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IReadOnlyCollection<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
+        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IEnumerable<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
         {
             string separator = $",{Environment.NewLine}";
 
@@ -57,8 +57,8 @@ namespace Solti.Utils.Proxy.Internals
                 string[] 
                     failures = result
                         .Diagnostics
-                        .Convert(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
-                    refs = references.Convert(r => r.Display!);
+                        .ConvertAr(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
+                    refs = references.ConvertAr(r => r.Display!);
 
                 InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 

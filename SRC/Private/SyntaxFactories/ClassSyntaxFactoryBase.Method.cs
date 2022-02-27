@@ -219,7 +219,7 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target,
                 castTargetTo,
-                arguments: paramz.Convert
+                arguments: paramz.ConvertAr
                 (
                     (param, i) => Argument
                     (

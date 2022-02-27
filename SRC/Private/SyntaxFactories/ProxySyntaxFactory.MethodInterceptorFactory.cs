@@ -265,7 +265,7 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 MemberAccess(null, Target),
                 castTargetTo: null,
-                arguments: locals.Convert(ToArgument)
+                arguments: locals.ConvertAr(ToArgument)
             );
 
             IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method.Parameters, argsArray, locals);

@@ -206,7 +206,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 ITypeSymbol[] gaSymbols = generic
                     .GenericArguments
-                    .Convert(ga => ToSymbol(ga, compilation));
+                    .ConvertAr(ga => ToSymbol(ga, compilation));
 
                 return symbol.Construct(gaSymbols);
             }
@@ -236,7 +236,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 ReadGenericArguments(src);
 
-                return queried.MakeGenericType(gas.Convert(ga => ga));
+                return queried.MakeGenericType(gas.ConvertAr(ga => ga));
 
                 void ReadGenericArguments(ITypeInfo src)
                 {
