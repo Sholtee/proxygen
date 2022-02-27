@@ -14,17 +14,17 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(DuckSyntaxFactory self)
+        protected override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context)
         {
-            foreach (IConstructorInfo ctor in self.BaseType.GetPublicConstructors())
+            foreach (IConstructorInfo ctor in BaseType.GetPublicConstructors())
             {
-                yield return ResolveConstructor(self, ctor);
+                yield return ResolveConstructor(null!, ctor);
             }
         }
 
         #if DEBUG
         internal
         #endif
-        protected override ConstructorDeclarationSyntax ResolveConstructor(DuckSyntaxFactory self, IConstructorInfo ctor) => DeclareCtor(ctor, ResolveClassName(self));
+        protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) => DeclareCtor(ctor, ResolveClassName(null!));
     }
 }

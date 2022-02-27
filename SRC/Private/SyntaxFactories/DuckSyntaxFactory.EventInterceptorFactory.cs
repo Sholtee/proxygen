@@ -95,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
                 expression: RegisterEvent
                 (
                     targetEvt,
-                    MemberAccess(null, TARGET),
+                    MemberAccess(null, Target),
                     register,
                     IdentifierName(Value),
                     castTargetTo

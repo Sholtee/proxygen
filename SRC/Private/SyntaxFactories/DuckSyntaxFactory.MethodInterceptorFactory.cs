@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
             ExpressionSyntax invocation = InvokeMethod
             (
                 ifaceMethod,
-                MemberAccess(null, TARGET),
+                MemberAccess(null, Target),
                 castTargetTo: targetMethod.AccessModifiers is AccessModifiers.Explicit
                     ? targetMethod.DeclaringInterfaces.Single() // explicit metodushoz biztosan csak egy deklaralo interface tartozik
                     : null,

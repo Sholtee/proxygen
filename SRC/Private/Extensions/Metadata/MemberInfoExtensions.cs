@@ -15,8 +15,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class MemberInfoExtensions
     {
-        public static string GetFullName(this MemberInfo src) => $"{new SyntaxFactoryBase().CreateType(MetadataTypeInfo.CreateFrom(src.DeclaringType)).ToFullString()}.{src.Name}";
-
         private static MemberInfo DoExtractFrom(LambdaExpression expr) 
         {
             Expression body = expr.Body;

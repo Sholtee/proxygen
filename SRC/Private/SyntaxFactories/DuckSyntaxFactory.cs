@@ -22,10 +22,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo BaseType { get; }
 
-        #if DEBUG
-        internal
-        #endif
-        protected readonly IPropertyInfo TARGET;
+        public IPropertyInfo Target { get; }
 
         public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator, ReferenceCollector? referenceCollector): base(outputType, containingAssembly, relatedGenerator, referenceCollector) 
         {
@@ -33,10 +30,9 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;
-            TargetType    = targetType;
-            BaseType      = ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
-
-            TARGET  = BaseType
+            TargetType = targetType;
+            BaseType = ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
+            Target = BaseType
                 .Properties
                 .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
         }
@@ -49,8 +45,8 @@ namespace Solti.Utils.Proxy.Internals
         {
             OutputType switch
             {
-                OutputType.Unit => ContainingNameSpace + Type.Delimiter + ResolveClassName(this),
-                OutputType.Module => ResolveClassName(this),
+                OutputType.Unit => ContainingNameSpace + Type.Delimiter + ResolveClassName(null!),
+                OutputType.Module => ResolveClassName(null!),
                 _ => throw new NotSupportedException()
             }
         };
@@ -66,17 +62,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context)
-        {
-            return new[] { BaseType, InterfaceType };
-        }
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => new[] { BaseType, InterfaceType };
 
         #if DEBUG
         internal
         #endif
         protected override IEnumerable<ClassDeclarationSyntax> ResolveClasses(CancellationToken cancellation)
         {
-            yield return ResolveClass(this, cancellation);
+            yield return ResolveClass(null!, cancellation);
         }
 
         #if DEBUG

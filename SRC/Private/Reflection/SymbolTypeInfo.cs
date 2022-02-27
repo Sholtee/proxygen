@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .GetAllInterfaces()
-            .Convert(ti => CreateFrom(ti, Compilation));
+            .ConvertAr(ti => CreateFrom(ti, Compilation));
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
@@ -101,17 +101,17 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
-            .Convert(p => SymbolPropertyInfo.CreateFrom(p, Compilation));
+            .ConvertAr(p => SymbolPropertyInfo.CreateFrom(p, Compilation));
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
-            .Convert(evt => SymbolEventInfo.CreateFrom(evt, Compilation));
+            .ConvertAr(evt => SymbolEventInfo.CreateFrom(evt, Compilation));
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
-            .Convert(m => SymbolMethodInfo.CreateFrom(m, Compilation), m => !m.IsClassMethod());
+            .ConvertAr(m => SymbolMethodInfo.CreateFrom(m, Compilation), m => !m.IsClassMethod());
 
         private static readonly IReadOnlyList<MethodKind> Ctors = new[] 
         {
@@ -125,7 +125,7 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             .GetMembers()
-            .Convert
+            .ConvertAr
             (
                 m => (IConstructorInfo) SymbolMethodInfo.CreateFrom((IMethodSymbol) m, Compilation),
                 m => m is not IMethodSymbol ctor || 
@@ -181,7 +181,7 @@ namespace Solti.Utils.Proxy.Internals
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
-                .Convert(ti => CreateFrom(ti, Compilation));
+                .ConvertAr(ti => CreateFrom(ti, Compilation));
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ClassSyntaxFactoryBase.Method.cs.cs                                           *
+* ClassSyntaxFactoryBase.Method.cs                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -228,65 +228,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
         }
-
-        /// <summary>
-        /// TypeName(int a, string b, ...): base(a, b, ...){ }
-        /// </summary>
-        #if DEBUG
-        internal
-        #endif
-        protected ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor, string className)
-        {
-            IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
-
-            return ConstructorDeclaration
-            (
-                identifier: Identifier(className)
-            )
-            .WithModifiers
-            (
-                modifiers: TokenList
-                (
-                    Token(SyntaxKind.PublicKeyword)
-                )
-            )
-            .WithParameterList
-            (
-                parameterList: ParameterList
-                (
-                    paramz.ToSyntaxList
-                    (
-                        param => Parameter
-                        (
-                            identifier: Identifier(param.Name)
-                        )
-                        .WithType
-                        (
-                            type: CreateType(param.Type)
-                        )
-                    )
-                )
-            )
-            .WithInitializer
-            (
-                initializer: ConstructorInitializer
-                (
-                    SyntaxKind.BaseConstructorInitializer,
-                    ArgumentList
-                    (
-                        paramz.ToSyntaxList
-                        (
-                            param => Argument
-                            (
-                                expression: IdentifierName(param.Name)
-                            )
-                        )
-                    )
-                )
-            )
-            .WithBody(Block());
-        }
-
+    
         #if DEBUG
         internal
         #endif
@@ -296,15 +238,5 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected abstract MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method);
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context);
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor);
     }
 }

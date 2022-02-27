@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals
             ExpressionSyntax propertyAccess = PropertyAccess
             (
                 ifaceProperty,
-                MemberAccess(null, TARGET),
+                MemberAccess(null, Target),
                 castTargetTo: accessor.AccessModifiers is AccessModifiers.Explicit
                     ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
                     : null
