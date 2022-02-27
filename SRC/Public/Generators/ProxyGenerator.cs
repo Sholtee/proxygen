@@ -43,17 +43,17 @@ namespace Solti.Utils.Proxy.Generators
             get
             {
                 Type generatorType = GetType();
-                ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
+                ITypeInfo interceptor = MetadataTypeInfo.CreateFrom(Interceptor);
                 yield return new RuntimeCompiledTypeResolutionStrategy
                 (
                     generatorType,
                     new ProxySyntaxFactory
                     (
                         MetadataTypeInfo.CreateFrom(Interface),
-                        MetadataTypeInfo.CreateFrom(Interceptor),
-                        $"Generated_{MetadataTypeInfo.CreateFrom(typeof(Tuple<,,>).MakeGenericType(generatorType, Interface, Interceptor)).GetMD5HashCode()}",
+                        interceptor,
+                        $"Proxy_{interceptor.GetMD5HashCode()}",
                         OutputType.Module,
-                        generatorTypeMeta,
+                        MetadataTypeInfo.CreateFrom(generatorType),
                         new ReferenceCollector()
                     )
                 );

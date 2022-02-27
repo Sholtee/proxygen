@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) => ContainingAssembly;
+        protected override string ResolveClassName(object context) => $"Proxy_{InterceptorType.GetMD5HashCode()}";
 
         public ProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator, ReferenceCollector? referenceCollector): base(outputType, containingAssembly, relatedGenerator, referenceCollector) 
         {
