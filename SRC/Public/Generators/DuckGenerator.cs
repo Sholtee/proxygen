@@ -42,24 +42,18 @@ namespace Solti.Utils.Proxy.Generators
         {
             get 
             {
-                Type generator = GetType();
-                ITypeInfo
-                    iface = MetadataTypeInfo.CreateFrom(Interface),
-                    target = MetadataTypeInfo.CreateFrom(Target);
-
-                yield return new RuntimeCompiledTypeResolutionStrategy
+                DuckSyntaxFactory syntaxFactory = new
                 (
-                    generator,
-                    new DuckSyntaxFactory
-                    (
-                        iface,
-                        target,
-                        $"Duck_{ITypeInfoExtensions.GetMD5HashCode(iface, target)}",
-                        OutputType.Module,
-                        MetadataTypeInfo.CreateFrom(generator),
-                        new ReferenceCollector()
-                    )
+                    MetadataTypeInfo.CreateFrom(Interface),
+                    MetadataTypeInfo.CreateFrom(Target),
+                    null,
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(GetType()),
+                    new ReferenceCollector()
                 );
+
+                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
     }

@@ -35,9 +35,6 @@
     <None Update="ClsSrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Generated_58FE2F468ED7922B66B7373FBC0D23A1.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="BarSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -50,10 +47,10 @@
     <None Update="DuckClsSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="EventSrc.txt">
+    <None Update="Duck_BDC3F352D7006029026A47DF190814B3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Generated_C338C18DE50CD6EC9CD281D1C349E681.dll">
+    <None Update="EventSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="FooSrc.txt">
@@ -66,6 +63,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PropSrc.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Proxy_EC92C59252CD801169A8506A0EF1E4F4.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

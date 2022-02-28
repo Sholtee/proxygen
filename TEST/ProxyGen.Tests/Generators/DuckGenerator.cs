@@ -14,8 +14,8 @@ using System.Threading.Tasks;
 
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Generated_D00C7F1F863ABF786ECB394C18ACB95A")]
-[assembly: InternalsVisibleTo("Generated_47E0638B5E722B54A6BB4A771313B021")]
+[assembly: InternalsVisibleTo("Duck_6191D0BB1603D9ADCE5DC9C7263A20D7")]
+[assembly: InternalsVisibleTo("Duck_D794BCF6F9BF1A73E2F1353F68AD23BB")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -250,7 +250,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             var generator = new DuckGenerator<IGeneric<object>, Generic<object>>();
-
+            
             var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
             string
@@ -275,5 +275,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldAssembleTheProxyOnce() =>
             Assert.AreSame(DuckGenerator<ICloneable, ICloneable>.GetGeneratedType(), DuckGenerator<ICloneable, ICloneable>.GetGeneratedType());
+
+        [Test]
+        public void DuckGenerator_ShouldAssembleTheProxyOnce2() =>
+            Assert.AreSame(DuckGenerator<IQueryable, IQueryable>.GetGeneratedType(), new DuckGenerator(typeof(IQueryable), typeof(IQueryable)).GetGeneratedType());
     }
 }

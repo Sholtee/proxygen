@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void GenerateDuckMethod_ShouldThrowIfTheMethodNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveMethods(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveMethods(default).ToList(),
                 Resources.MISSING_IMPLEMENTATION
             );
 
@@ -96,7 +96,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void GenerateDuckProperty_ShouldThrowIfThePropertyNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveProperties(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveProperties(default).ToList(),
                 Resources.MISSING_IMPLEMENTATION
             );
 
@@ -110,7 +110,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void GenerateDuckProperty_ShouldThrowIfTheEventNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveEvents(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveEvents(default).ToList(),
                 Resources.MISSING_IMPLEMENTATION
             );
 
@@ -123,12 +123,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckClass_ShouldGenerateTheDesiredClass()
         {
+            var s = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString();
+
             Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.Throws<AmbiguousMatchException>(() => CreateGenerator<IList<int>, List<int>>().ResolveProperties(default));
+            Assert.Throws<AmbiguousMatchException>(() => CreateGenerator<IList<int>, List<int>>().ResolveProperties(default).ToList());
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 

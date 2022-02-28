@@ -175,7 +175,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(OutputType.Unit, "ClsSrcUnit.txt")]
         public void GenerateProxyClass_Test(int outputType, string fileName)
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator((OutputType) outputType);
 
             Assert.That(gen.ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName).Replace("{version}", typeof(ProxyGenerator<,>).Assembly.GetName().Version.ToString())));
         }

@@ -36,6 +36,11 @@ namespace Solti.Utils.Proxy.Internals
 
             }
 
+            foreach (MethodDeclarationSyntax extra in base.ResolveMethods(context))
+            {
+                yield return extra;
+            }
+
             static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
                 targetMember is IMethodInfo targetMethod &&
                 ifaceMember is IMethodInfo ifaceMethod &&

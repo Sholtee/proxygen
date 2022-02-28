@@ -24,7 +24,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public IPropertyInfo Target { get; }
 
-        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, string containingAssembly, OutputType outputType, ITypeInfo relatedGenerator, ReferenceCollector? referenceCollector): base(outputType, containingAssembly, relatedGenerator, referenceCollector) 
+        public DuckSyntaxFactory(
+            ITypeInfo interfaceType,
+            ITypeInfo targetType, 
+            string? containingAssembly,
+            OutputType outputType,
+            ITypeInfo relatedGenerator,
+            ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}", relatedGenerator, referenceCollector) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));

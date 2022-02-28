@@ -4,6 +4,14 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -25,5 +33,74 @@ namespace Solti.Utils.Proxy.Internals
         public override string ContainingAssembly { get; }
 
         public override string ContainingNameSpace { get; } = "Proxies";
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
+        {
+            ClassDeclarationSyntax currentCls = (ClassDeclarationSyntax) context;
+
+            //
+            // [ModuleInitializerAttribute]
+            // public static void Initialize() => RegisterInstance(typeof(CurrentClass));
+            //
+
+            yield return MethodDeclaration
+            (
+                CreateType
+                (
+                    MetadataTypeInfo.CreateFrom(typeof(void))
+                ),
+                Identifier("Initialize")
+            )
+            .WithModifiers
+            (
+                TokenList
+                (
+                    Token(SyntaxKind.PublicKeyword),
+                    Token(SyntaxKind.StaticKeyword)
+                )
+            )
+            .WithAttributeLists
+            (
+                SingletonList
+                (
+                    AttributeList
+                    (
+                        SingletonSeparatedList
+                        (
+                            CreateAttribute<ModuleInitializerAttribute>()
+                        )
+                    )
+                )
+            )
+            .WithExpressionBody
+            (
+                ArrowExpressionClause
+                (
+                    InvokeMethod
+                    (
+                        MetadataMethodInfo.CreateFrom
+                        (
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GeneratedClass.RegisterInstance(null!))
+                        ),
+                        target: null,
+                        castTargetTo: null,
+                        Argument
+                        (
+                            TypeOfExpression
+                            (
+                                IdentifierName(currentCls.Identifier)
+                            )
+                        )
+                    )
+                )
+            )
+            .WithSemicolonToken
+            (
+                Token(SyntaxKind.SemicolonToken)
+            );
+        }
     }
 }

@@ -37,6 +37,11 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ResolveMethod(null!, met);
             }
+
+            foreach (MethodDeclarationSyntax extra in base.ResolveMethods(context))
+            {
+                yield return extra;
+            }
         }
 
         /// <summary>

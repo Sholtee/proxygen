@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Generators
@@ -21,26 +20,18 @@ namespace Solti.Utils.Proxy.Generators
         {
             get 
             {
-                Type generator = GetType();
-                yield return new EmbeddedTypeResolutionStrategy(generator);
-
-                ITypeInfo 
-                    iface  = MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                    target = MetadataTypeInfo.CreateFrom(typeof(TTarget));
-
-                yield return new RuntimeCompiledTypeResolutionStrategy
+                DuckSyntaxFactory syntaxFactory = new
                 (
-                    generator,
-                    new DuckSyntaxFactory
-                    (
-                        iface,
-                        target,
-                        $"Duck_{ITypeInfoExtensions.GetMD5HashCode(iface, target)}",
-                        OutputType.Module,
-                        MetadataTypeInfo.CreateFrom(generator),
-                        new ReferenceCollector()
-                    )
+                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                    MetadataTypeInfo.CreateFrom(typeof(TTarget)),
+                    null,
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(GetType()),
+                    new ReferenceCollector()
                 );
+
+                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
     }
