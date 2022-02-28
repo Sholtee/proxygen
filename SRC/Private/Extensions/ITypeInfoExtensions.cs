@@ -21,12 +21,17 @@ namespace Solti.Utils.Proxy.Internals
         // A "GUID" property generikus tipus lezart es nyitott valtozatanal ugyanaz
         //
 
+        public static string GetMD5HashCode(this ITypeInfo src) => GetMD5HashCode(types: src);
+
         [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms")]
-        public static string GetMD5HashCode(this ITypeInfo src)
+        public static string GetMD5HashCode(params ITypeInfo[] types)
         {
             using MD5 md5 = MD5.Create();
 
-            Hash(src, md5);
+            for (int i = 0; i < types.Length; i++)
+            {
+                Hash(types[i], md5);
+            }
 
             md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
@@ -57,11 +62,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
 
-                if (t is IGenericTypeInfo generic)
-                    foreach (ITypeInfo ga in generic.GenericArguments)
-                    {
-                        Hash(ga, transform);
-                    }
+                if (t is not IGenericTypeInfo generic)
+                    return;
+
+                for (int i = 0; i < generic.GenericArguments.Count; i++)
+                {
+                    Hash(generic.GenericArguments[i], transform);
+                }
             }
         }
 

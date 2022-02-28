@@ -21,20 +21,23 @@ namespace Solti.Utils.Proxy.Generators
         {
             get 
             {
-                Type generatorType = GetType();
-                yield return new EmbeddedTypeResolutionStrategy(generatorType);
+                Type generator = GetType();
+                yield return new EmbeddedTypeResolutionStrategy(generator);
 
-                ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
+                ITypeInfo 
+                    iface  = MetadataTypeInfo.CreateFrom(typeof(TInterface)),
+                    target = MetadataTypeInfo.CreateFrom(typeof(TTarget));
+
                 yield return new RuntimeCompiledTypeResolutionStrategy
                 (
-                    generatorType,
+                    generator,
                     new DuckSyntaxFactory
                     (
-                        MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                        MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-                        $"Duck_{MetadataTypeInfo.CreateFrom(typeof(Tuple<TInterface, TTarget>)).GetMD5HashCode()}",
+                        iface,
+                        target,
+                        $"Duck_{ITypeInfoExtensions.GetMD5HashCode(iface, target)}",
                         OutputType.Module,
-                        generatorTypeMeta,
+                        MetadataTypeInfo.CreateFrom(generator),
                         new ReferenceCollector()
                     )
                 );

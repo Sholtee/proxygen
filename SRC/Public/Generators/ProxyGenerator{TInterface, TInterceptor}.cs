@@ -21,20 +21,20 @@ namespace Solti.Utils.Proxy.Generators
         {
             get
             {
-                Type generatorType = GetType();
-                yield return new EmbeddedTypeResolutionStrategy(generatorType);
+                Type generator = GetType();
+                yield return new EmbeddedTypeResolutionStrategy(generator);
 
                 ITypeInfo interceptor = MetadataTypeInfo.CreateFrom(typeof(TInterceptor));
                 yield return new RuntimeCompiledTypeResolutionStrategy
                 (
-                    generatorType,
+                    generator,
                     new ProxySyntaxFactory
                     (
                         MetadataTypeInfo.CreateFrom(typeof(TInterface)),
                         interceptor,
                         $"Proxy_{interceptor.GetMD5HashCode()}",
                         OutputType.Module,
-                        MetadataTypeInfo.CreateFrom(generatorType),
+                        MetadataTypeInfo.CreateFrom(generator),
                         new ReferenceCollector()
                     )
                 );

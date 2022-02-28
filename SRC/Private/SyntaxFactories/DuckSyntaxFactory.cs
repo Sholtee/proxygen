@@ -72,24 +72,15 @@ namespace Solti.Utils.Proxy.Internals
             yield return ResolveClass(null!, cancellation);
         }
 
-        private string? FName;
-
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context)
-        {
-            if (FName is null)
-            {
-                //
-                // Az uj tipust egyertelmuen az interface es cel tipus hatarozza meg
-                //
+        protected override string ResolveClassName(object context) =>
+            //
+            // Az uj tipust egyertelmuen az interface es cel tipus hatarozza meg
+            //
 
-                IGenericTypeInfo typeInfo = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(Tuple<,>));
-                FName = $"Duck_{typeInfo.Close(InterfaceType, TargetType).GetMD5HashCode()}";
-            }
-            return FName;
-        }
+            $"Duck_{ITypeInfoExtensions.GetMD5HashCode(InterfaceType, TargetType)}";
 
         protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
