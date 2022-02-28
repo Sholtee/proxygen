@@ -31,8 +31,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             get 
             {
-                yield return MetadataAssemblyInfo.CreateFrom(typeof(ISyntaxFactory).Assembly);
-                yield return CreateTI(typeof(ISyntaxFactory).Assembly);
+                yield return MetadataAssemblyInfo.CreateFrom(typeof(ClassSyntaxFactoryBase).Assembly);
+                yield return CreateTI(typeof(ClassSyntaxFactoryBase).Assembly);
                 yield return MetadataAssemblyInfo.CreateFrom(typeof(ReflectionTests).Assembly);
                 yield return CreateTI(typeof(ReflectionTests).Assembly);
             }

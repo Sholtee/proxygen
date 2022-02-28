@@ -20,7 +20,6 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Attributes;
-    using Primitives;
     using Properties;
     using Proxy.Tests.EmbeddedTypes;
 

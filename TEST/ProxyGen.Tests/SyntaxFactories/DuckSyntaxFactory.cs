@@ -21,7 +21,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Properties;
 
     using static Internals.Tests.CodeAnalysisTestsBase;
-    using static Internals.DuckSyntaxFactory;
 
     [TestFixture]
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
@@ -57,24 +56,22 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
             asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name,
             OutputType.Module, 
-            MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>))
+            MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>)),
+            null
         );
 
         [Test]
         public void GenerateDuckMethod_ShouldThrowIfTheMethodNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => new MethodInterceptorFactory(CreateGenerator<IFoo<int>, BadFoo>()).Build(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveMethods(default),
                 Resources.MISSING_IMPLEMENTATION
             );
 
         [Test]
         public void GenerateDuckMethod_ShouldGenerateTheDesiredMethodIfSupported()
         {
-            var fact = new MethodInterceptorFactory(CreateGenerator<IFoo<int>, GoodFoo<int>>());
-            fact.Build(default);
-
-            Assert.That(fact.Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);")));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(null).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);")));
         }
 
         public class ExplicitFoo : IFoo<int>
@@ -92,58 +89,46 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckMethod_ShouldHandleExplicitImplementations()
         {
-            var fact = new MethodInterceptorFactory(CreateGenerator<IFoo<int>, ExplicitFoo>());
-            fact.Build(default);
-
-            Assert.That(fact.Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
+            Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(null!).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
         }
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowIfThePropertyNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => new PropertyInterceptorFactory(CreateGenerator<IFoo<int>, BadFoo>()).Build(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveProperties(default),
                 Resources.MISSING_IMPLEMENTATION
             );
 
         [Test]
         public void GenerateDuckProperty_ShouldGenerateTheDesiredPropertyIfSupported()
         {
-            var fact = new PropertyInterceptorFactory(CreateGenerator<IFoo<int>, GoodFoo<int>>());
-            fact.Build(default);
-
-            Assert.That(fact.Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     set => this.Target.Prop = value; }")));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(default).Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     set => this.Target.Prop = value; }")));
         }
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowIfTheEventNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
-                () => new EventInterceptorFactory(CreateGenerator<IFoo<int>, BadFoo>()).Build(default),
+                () => CreateGenerator<IFoo<int>, BadFoo>().ResolveEvents(default),
                 Resources.MISSING_IMPLEMENTATION
             );
 
         [Test]
         public void GenerateDuckEvent_ShouldGenerateTheDesiredEventIfSupported()
         {
-            var fact = new EventInterceptorFactory(CreateGenerator<IFoo<int>, GoodFoo<int>>());
-            fact.Build(default);
-
-            Assert.That(fact.Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     remove => this.Target.Event -= value; }")));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(null).Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     remove => this.Target.Event -= value; }")));
         }
 
         [Test]
         public void GenerateDuckClass_ShouldGenerateTheDesiredClass()
         {
-            var fact = CreateGenerator<IFoo<int>, GoodFoo<int>>();
-            fact.Build(default);
-
-            Assert.That(fact.Unit.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         [Test]
         public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
-            Assert.Throws<AmbiguousMatchException>(() => new PropertyInterceptorFactory(CreateGenerator<IList<int>, List<int>>()).Build(default));
+            Assert.Throws<AmbiguousMatchException>(() => CreateGenerator<IList<int>, List<int>>().ResolveProperties(default));
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
@@ -165,14 +150,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
-            IUnitSyntaxFactory
+            DuckSyntaxFactory
                 fact1 = new DuckSyntaxFactory
                 (
                     type1, 
                     type1, 
                     "cica", 
                     (OutputType) outputType, 
-                    MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<,>).MakeGenericType(type, type))
+                    MetadataTypeInfo.CreateFrom(typeof(DuckGenerator<,>).MakeGenericType(type, type)),
+                    new ReferenceCollector()
                 ),
                 fact2 = new DuckSyntaxFactory
                 (
@@ -189,56 +175,27 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                                 type2.ToSymbol(compilation)
                             ), 
                         compilation
-                    )
+                    ),
+                    new ReferenceCollector()
                 );
-
-            Assert.DoesNotThrow(() => fact1.Build());
-            Assert.DoesNotThrow(() => fact2.Build());
 
             string
-                src1 = fact1.Unit.NormalizeWhitespace().ToFullString(),
-                src2 = fact2.Unit.NormalizeWhitespace().ToFullString();
+                src1 = fact1.ResolveUnit(default).NormalizeWhitespace().ToFullString(),
+                src2 = fact2.ResolveUnit(default).NormalizeWhitespace().ToFullString();
 
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
-            Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.References.Select(asm => asm.Location)));
-            Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.References.Select(asm => asm.Location)));
+            Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.ReferenceCollector.References.Select(asm => asm.Location)));
+            Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.ReferenceCollector.References.Select(asm => asm.Location)));
         }
 
-        public static IEnumerable<object> Factories
+        [Test]
+        public void Factory_CanBeCancelled()
         {
-            get
-            {
-                ITypeInfo iface = MetadataTypeInfo.CreateFrom(typeof(IComplex));
-
-                var fact = new DuckSyntaxFactory
-                (
-                    iface, 
-                    iface, 
-                    "cica", 
-                    OutputType.Module, 
-                    MetadataTypeInfo.CreateFrom
-                    (
-                        typeof(DuckGenerator<,>).MakeGenericType(typeof(IComplex), typeof(IComplex))
-                    )
-                );
-
-                yield return new ConstructorFactory(fact);
-                yield return new MethodInterceptorFactory(fact);
-                yield return new PropertyInterceptorFactory(fact);
-                yield return new EventInterceptorFactory(fact);
-            }
-        }
-
-        [TestCaseSource(nameof(Factories))]
-        public void Factory_CanBeCancelled(object f)
-        {
-            ISyntaxFactory fact = (ISyntaxFactory) f;
-
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {
                 cancellation.Cancel();
 
-                Assert.Throws<OperationCanceledException>(() => fact.Build(cancellation.Token));
+                Assert.Throws<OperationCanceledException>(() => CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(cancellation.Token));
             }
         }
     }

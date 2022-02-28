@@ -31,7 +31,12 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-            BaseType = ((IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType);
+
+            //
+            // Ne metadatabol generaljunk [MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType)] mert a "targetType" meg nem biztos h letezik
+            //
+
+            BaseType = ((IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
                 .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;

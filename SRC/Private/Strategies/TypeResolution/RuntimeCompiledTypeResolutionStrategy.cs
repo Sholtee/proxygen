@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ProxyUnitSyntaxFactory syntaxFactory)
         {
             GeneratorType = generatorType;
-            ProxyUnitSyntaxFactory = syntaxFactory;
+            SyntaxFactory = syntaxFactory;
         }
 
         public string? CacheDir 
@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public Type GeneratorType { get; }
 
-        public ProxyUnitSyntaxFactory ProxyUnitSyntaxFactory { get; }
+        public ProxyUnitSyntaxFactory SyntaxFactory { get; }
 
         public Type? TryResolve(string assemblyName, CancellationToken cancellation)
         {
@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                 Directory.CreateDirectory(CacheDir);
             }
 
-            CompilationUnitSyntax unit = ProxyUnitSyntaxFactory.ResolveUnitAndDump(cancellation);
+            CompilationUnitSyntax unit = SyntaxFactory.ResolveUnitAndDump(cancellation);
 
             return ExtractType
             (
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
                      unit,
                      assemblyName,
                      cacheFile,
-                     ProxyUnitSyntaxFactory
+                     SyntaxFactory
                         .ReferenceCollector!
                         .References
                         .Convert(asm => MetadataReference.CreateFromFile(asm.Location!)),
@@ -69,11 +69,11 @@ namespace Solti.Utils.Proxy.Internals
 
             Type ExtractType(Assembly asm) => asm.GetType
             (
-                ProxyUnitSyntaxFactory.DefinedClasses.Single(), 
+                SyntaxFactory.DefinedClasses.Single(), 
                 throwOnError: true
             );
         }
 
-        public Type? TryResolve(CancellationToken cancellation) => TryResolve(ProxyUnitSyntaxFactory.ContainingAssembly, cancellation);
+        public Type? TryResolve(CancellationToken cancellation) => TryResolve(SyntaxFactory.ContainingAssembly, cancellation);
     }
 }
