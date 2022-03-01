@@ -87,9 +87,9 @@ namespace Solti.Utils.Proxy.Internals
         // xXxCodeFactory-k toltik fel...
         //
 
-        public static ICollection<ICodeFactory> CodeFactories { get; } = new HashSet<ICodeFactory>();
+        public static ICollection<ICodeFactory> CodeFactories { get; } = new HashSet<ICodeFactory>(); // TODO: legyen szal biztos
 
-        public static ICollection<SourceCode> Chunks { get; } = new HashSet<SourceCode>();
+        public static ICollection<SourceCode> Chunks { get; } = new HashSet<SourceCode>(); // TODO: legyen szal biztos
 
         public void Execute(GeneratorExecutionContext context)
         {
