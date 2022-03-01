@@ -1,0 +1,9 @@
+﻿#pragma warning disable
+#if NETSTANDARD
+namespace System.Runtime.CompilerServices
+{
+    internal sealed class ModuleInitializerAttribute : global::System.Attribute
+    {
+    }
+}
+#endif

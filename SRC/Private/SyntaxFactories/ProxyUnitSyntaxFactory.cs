@@ -32,15 +32,20 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ContainingAssembly { get; }
 
-        public override string ContainingNameSpace { get; } = "Proxies";
+        //
+        // Proxy egyseg mindig csak egy osztalyt definial
+        //
+
+        public override IReadOnlyCollection<string> DefinedClasses => new string[]
+        {
+            ResolveClassName(null!)
+        };
 
         #if DEBUG
         internal
         #endif
         protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
         {
-            ClassDeclarationSyntax currentCls = (ClassDeclarationSyntax) context;
-
             //
             // [ModuleInitializerAttribute]
             // public static void Initialize() => RegisterInstance(typeof(CurrentClass));
@@ -95,7 +100,17 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             TypeOfExpression
                             (
-                                IdentifierName(currentCls.Identifier)
+                                AliasQualifiedName
+                                (
+                                    IdentifierName
+                                    (
+                                        Token(SyntaxKind.GlobalKeyword)
+                                    ),
+                                    IdentifierName
+                                    (
+                                        ResolveClassName(context)
+                                    )
+                                )
                             )
                         )
                     )

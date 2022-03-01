@@ -123,9 +123,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckClass_ShouldGenerateTheDesiredClass()
         {
-            var s = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString();
-
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         [Test]
@@ -182,8 +180,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 );
 
             string
-                src1 = fact1.ResolveUnit(default).NormalizeWhitespace().ToFullString(),
-                src2 = fact2.ResolveUnit(default).NormalizeWhitespace().ToFullString();
+                src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
+                src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
 
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
             Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.ReferenceCollector.References.Select(asm => asm.Location)));
@@ -197,7 +195,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             {
                 cancellation.Cancel();
 
-                Assert.Throws<OperationCanceledException>(() => CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(cancellation.Token));
+                Assert.Throws<OperationCanceledException>(() => CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(null, cancellation.Token));
             }
         }
     }

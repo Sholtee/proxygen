@@ -14,11 +14,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public LoadedTypeResolutionStrategy(IUnitDefinition unit) => Unit = unit;
 
-        public Type? TryResolve(CancellationToken cancellation) =>
-            //
-            // TODO: FIXME: A verzionak nem kene bedrotozva lennie.
-            //
-
-            Type.GetType($"{Unit.DefinedClasses.Single()}, {Unit.ContainingAssembly}, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null", throwOnError: false);
+        public Type? TryResolve(CancellationToken cancellation) => GeneratedClass.Instances.TryGetValue(Unit.DefinedClasses.Single()!, out Type result)
+            ? result
+            : null;
     }
 }

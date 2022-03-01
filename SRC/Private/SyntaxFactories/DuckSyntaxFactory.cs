@@ -48,26 +48,12 @@ namespace Solti.Utils.Proxy.Internals
                 .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
         }
 
-        //
-        // Proxy egyseg mindig csak egy osztalyt definial
-        //
-
-        public override IReadOnlyCollection<string> DefinedClasses => new string[]
-        {
-            OutputType switch
-            {
-                OutputType.Unit => ContainingNameSpace + Type.Delimiter + ResolveClassName(null!),
-                OutputType.Module => ResolveClassName(null!),
-                _ => throw new NotSupportedException()
-            }
-        };
-
-        public override CompilationUnitSyntax ResolveUnit(CancellationToken cancellation)
+        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
             Visibility.Check(InterfaceType, ContainingAssembly);
             Visibility.Check(TargetType, ContainingAssembly);
 
-            return base.ResolveUnit(cancellation);
+            return base.ResolveUnit(context, cancellation);
         }
 
         #if DEBUG
@@ -78,9 +64,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ClassDeclarationSyntax> ResolveClasses(CancellationToken cancellation)
+        protected override IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation)
         {
-            yield return ResolveClass(null!, cancellation);
+            yield return ResolveClass(context, cancellation);
         }
 
         #if DEBUG

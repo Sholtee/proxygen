@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(CancellationToken cancellation);
+        protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
         public OutputType OutputType { get; }
 
@@ -34,98 +34,87 @@ namespace Solti.Utils.Proxy.Internals
 
         public abstract string ContainingAssembly { get; }
 
-        public abstract string ContainingNameSpace { get; }
-
-        public virtual CompilationUnitSyntax ResolveUnit(CancellationToken cancellation)
+        public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            SyntaxList<MemberDeclarationSyntax> classes = List<MemberDeclarationSyntax>
+            return CompilationUnit().WithMembers
             (
-                ResolveClasses(cancellation).Convert
+                List<MemberDeclarationSyntax>
                 (
-                    cls => cls.WithAttributeLists
+                    ResolveClasses(context, cancellation).Convert
                     (
-                        SingletonList
-                        (
-                            Attributes
-                            (
-                                CreateAttribute<RelatedGeneratorAttribute>
+                        (cls, i) => 
+                        {
+                            if (OutputType is OutputType.Unit && i is 0)
+                            {
+                                cls = cls.WithKeyword
                                 (
-                                    TypeOf(RelatedGenerator)
-                                ),
-                            
-                                //
-                                // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
-                                // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
-                                //
-
-                                CreateAttribute<GeneratedCodeAttribute>
-                                (
-                                    AsLiteral("ProxyGen.NET"),
-                                    AsLiteral
+                                    Token
                                     (
-                                        GetType()
-                                            .Assembly
-                                            .GetName()
-                                            .Version
-                                            .ToString()
+                                        leading: TriviaList
+                                        (
+                                            //
+                                            // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
+                                            // mindent kikapcsol:
+                                            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
+                                            //
+
+                                            Trivia
+                                            (
+                                                PragmaWarningDirectiveTrivia
+                                                (
+                                                    Token(SyntaxKind.DisableKeyword),
+                                                    true
+                                                )
+                                            )
+                                        ),
+                                        kind: SyntaxKind.ClassKeyword,
+                                        trailing: TriviaList()
                                     )
-                                ),
+                                );
+                            }
 
-                                //
-                                // Ezek pedig szerepelnek az xXx.Designer.cs-ben
-                                //
+                            return cls.WithAttributeLists
+                            (
+                                SingletonList
+                                (
+                                    Attributes
+                                    (
+                                        CreateAttribute<RelatedGeneratorAttribute>
+                                        (
+                                            TypeOf(RelatedGenerator)
+                                        ),
 
-                                CreateAttribute<DebuggerNonUserCodeAttribute>(),
-                                CreateAttribute<CompilerGeneratedAttribute>()
-                            )                
-                        )
+                                        //
+                                        // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
+                                        // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
+                                        //
+
+                                        CreateAttribute<GeneratedCodeAttribute>
+                                        (
+                                            AsLiteral("ProxyGen.NET"),
+                                            AsLiteral
+                                            (
+                                                GetType()
+                                                    .Assembly
+                                                    .GetName()
+                                                    .Version
+                                                    .ToString()
+                                            )
+                                        ),
+
+                                        //
+                                        // Ezek pedig szerepelnek az xXx.Designer.cs-ben
+                                        //
+
+                                        CreateAttribute<DebuggerNonUserCodeAttribute>(),
+                                        CreateAttribute<CompilerGeneratedAttribute>()
+                                    )
+                                )
+                            );
+                        }
                     )
                 )
             );
-
-            return OutputType switch
-            {
-                OutputType.Unit => CompilationUnit().WithMembers
-                (
-                    members: SingletonList<MemberDeclarationSyntax>
-                    (
-                        NamespaceDeclaration
-                        (
-                            IdentifierName(ContainingNameSpace)
-                        )
-                        .WithNamespaceKeyword
-                        (
-                            Token
-                            (
-                                TriviaList
-                                (
-                                    //
-                                    // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
-                                    // mindent kikapcsol:
-                                    // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
-                                    //
-
-                                    Trivia
-                                    (
-                                        PragmaWarningDirectiveTrivia
-                                        (
-                                            Token(SyntaxKind.DisableKeyword),
-                                            true
-                                        )
-                                    )
-                                ),
-                                SyntaxKind.NamespaceKeyword,
-                                TriviaList()
-                            )
-                        )
-                        .WithMembers(classes)
-                    )
-                ),
-
-                OutputType.Module => CompilationUnit().WithMembers(classes),
-
-                _ => throw new NotSupportedException()
-            };
 
             static LiteralExpressionSyntax AsLiteral(string param) => LiteralExpression
             (

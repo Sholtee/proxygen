@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static CompilationUnitSyntax ResolveUnitAndDump(this UnitSyntaxFactoryBase src, CancellationToken cancellation) 
         {
-            CompilationUnitSyntax unit = src.ResolveUnit(cancellation);
+            CompilationUnitSyntax unit = src.ResolveUnit(null!, cancellation);
 
             string? sourceDump = WorkingDirectories.Instance.SourceDump;
 

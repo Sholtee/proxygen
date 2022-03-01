@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     Token
                     (
-                        TriviaList
+                        leading: TriviaList
                         (
                             Trivia
                             (
@@ -40,10 +40,20 @@ namespace Solti.Utils.Proxy.Internals
                                     Token(SyntaxKind.DisableKeyword),
                                     true
                                 )
+                            ),
+                            Trivia
+                            (
+                                IfDirectiveTrivia
+                                (
+                                    IdentifierName("NETSTANDARD"),
+                                    isActive: true,
+                                    branchTaken: false,
+                                    conditionValue: false
+                                )
                             )
                         ),
-                        SyntaxKind.NamespaceKeyword,
-                        TriviaList()
+                        kind: SyntaxKind.NamespaceKeyword,
+                        trailing: TriviaList()
                     )
                 )
                 .WithMembers
@@ -56,7 +66,14 @@ namespace Solti.Utils.Proxy.Internals
                         )
                         .WithModifiers
                         (
-                            TokenList(new[]{ Token(SyntaxKind.InternalKeyword), Token(SyntaxKind.SealedKeyword) })
+                            TokenList
+                            (
+                                new[]
+                                {
+                                    Token(SyntaxKind.InternalKeyword),
+                                    Token(SyntaxKind.SealedKeyword)
+                                }
+                            )
                         )
                         .WithBaseList
                         (
@@ -69,6 +86,22 @@ namespace Solti.Utils.Proxy.Internals
                                         CreateType<Attribute>()
                                     )
                                 )
+                            )
+                        )
+                        
+                    )
+                )
+                .WithCloseBraceToken
+                (
+                    Token
+                    (
+                        leading: TriviaList(),
+                        kind: SyntaxKind.CloseBraceToken,
+                        trailing: TriviaList
+                        (
+                            Trivia
+                            (
+                                EndIfDirectiveTrivia(isActive: true)
                             )
                         )
                     )

@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             if (instance is null)
                 throw new ArgumentNullException(nameof(instance));
 
-            FInstances[instance.FullName] = instance;
+            FInstances[instance.Name] = instance;
         }
 
         /// <summary>

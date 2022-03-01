@@ -177,7 +177,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory gen = CreateGenerator((OutputType) outputType);
 
-            Assert.That(gen.ResolveUnit(default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName).Replace("{version}", typeof(ProxyGenerator<,>).Assembly.GetName().Version.ToString())));
+            Assert.That(gen.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName).Replace("{version}", typeof(ProxyGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
@@ -240,8 +240,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 );
 
             string
-                src1 = fact1.ResolveUnit(default).NormalizeWhitespace().ToFullString(),
-                src2 = fact2.ResolveUnit(default).NormalizeWhitespace().ToFullString();
+                src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
+                src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
 
             // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
             Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.ReferenceCollector.References.Select(asm => asm.Location)));
@@ -257,7 +257,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             {
                 cancellation.Cancel();
 
-                Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(cancellation.Token));
+                Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(null, cancellation.Token));
             }
         }
     }
