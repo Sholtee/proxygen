@@ -6,6 +6,8 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -37,7 +39,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (File.Exists(cacheFile)) return ExtractType
                 (
-                    Assembly.LoadFile(cacheFile)
+                    //
+                    // Kivetelt dob ha mar egyszer be lett toltve
+                    //
+
+                    AssemblyLoadContext
+                        .Default
+                        .LoadFromAssemblyPath(cacheFile)
                 );
 
                 Directory.CreateDirectory(CacheDir);
@@ -61,11 +69,24 @@ namespace Solti.Utils.Proxy.Internals
                  )
             );
 
-            Type ExtractType(Assembly asm) => asm.GetType
-            (
-                SyntaxFactory.DefinedClasses.Single(), 
-                throwOnError: true
-            );
+            Type ExtractType(Assembly asm)
+            {
+                //
+                // Fasz se tudja miert de ha dinamikusan toltunk be egy szerelvenyt akkor annak a module-inicializaloja
+                // nem fog lefutni... Ezert jol meghivjuk kezzel
+                //
+
+                foreach (Module module in asm.GetModules())
+                {
+                    RuntimeHelpers.RunModuleConstructor(module.ModuleHandle);
+                }
+
+                return asm.GetType
+                (
+                    SyntaxFactory.DefinedClasses.Single(),
+                    throwOnError: true
+                );
+            }
         }
 
         public Type? TryResolve(CancellationToken cancellation) => TryResolve(SyntaxFactory.ContainingAssembly, cancellation);
