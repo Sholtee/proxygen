@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default) =>
         #endif
-            ActivateInternal(await GetGeneratedTypeAsync(cancellation).ConfigureAwait(true), tuple);
+            ActivateInternal(await GetGeneratedTypeAsync(cancellation).ConfigureAwait(false), tuple);
 
         /// <summary>
         /// Creates an instance of the generated type.
