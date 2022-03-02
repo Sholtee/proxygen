@@ -34,8 +34,13 @@ namespace Solti.Utils.Proxy.Internals
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal() => FGeneratedTypes.GetOrAdd
+        private Task<Type> GetGeneratedTypeAsyncInternal() => FGeneratedTypes.GetOrAdd
         (
+            //
+            // Ha ket generatornak azonos a hash-e [lasd leszarmazottakban a GetHashCode() implementaciot] akkor
+            // ugyanazt a tipus is kell generaljak
+            //
+
             this,
             new Lazy<Task<Type>>
             (
@@ -60,6 +65,15 @@ namespace Solti.Utils.Proxy.Internals
                 LazyThreadSafetyMode.ExecutionAndPublication
             )
         ).Value;
+
+        #if NETSTANDARD2_1_OR_GREATER
+        private static object ActivateInternal(Type t, ITuple? tuple) => 
+        #else
+        private static object ActivateInternal(Type t, object? tuple) =>
+        #endif
+            FActivators
+                .GetOrAdd(t, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(t)))
+                .Value(tuple);
 
         /// <summary>
         /// Returns the supported type resolution strategies.
@@ -96,18 +110,12 @@ namespace Solti.Utils.Proxy.Internals
         /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
         /// <param name="cancellation">Token to cancel the operation.</param>
         /// <returns>The just activated instance.</returns>
-#if NETSTANDARD2_1_OR_GREATER
-        public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default)
-#else
-        public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default)
+        #if NETSTANDARD2_1_OR_GREATER
+        public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default) =>
+        #else
+        public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default) =>
         #endif
-        {
-            Type generated = await GetGeneratedTypeAsync(cancellation).ConfigureAwait(true);
-
-            return FActivators
-                .GetOrAdd(generated, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(generated)))
-                .Value(tuple);
-        }
+            ActivateInternal(await GetGeneratedTypeAsync(cancellation).ConfigureAwait(true), tuple);
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -115,17 +123,11 @@ namespace Solti.Utils.Proxy.Internals
         /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
         /// <returns>The just activated instance.</returns>
         #if NETSTANDARD2_1_OR_GREATER
-        public object Activate(ITuple? tuple)
+        public object Activate(ITuple? tuple) =>
         #else
-        public object Activate(object? tuple)
+        public object Activate(object? tuple) =>
         #endif
-        {
-            Type generated = GetGeneratedType();
-
-            return FActivators
-                .GetOrAdd(generated, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(generated)))
-                .Value(tuple);
-        }
+            ActivateInternal(GetGeneratedType(), tuple);
         #endregion
     }
 }
