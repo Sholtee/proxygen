@@ -70,6 +70,19 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator
   nameWithType: DuckGenerator.DuckGenerator
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode()
+  nameWithType: DuckGenerator.GetHashCode()
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
+  nameWithType: DuckGenerator.GetHashCode
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
   name: Interface
   href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Interface
@@ -105,6 +118,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget)
   nameWithType: DuckGenerator<TInterface, TTarget>
   nameWithType.vb: DuckGenerator(Of TInterface, TTarget)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator`2.GetHashCode
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.GetHashCode()
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).GetHashCode()
+  nameWithType: DuckGenerator<TInterface, TTarget>.GetHashCode()
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).GetHashCode()
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator`2.GetHashCode
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.GetHashCode
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).GetHashCode
+  nameWithType: DuckGenerator<TInterface, TTarget>.GetHashCode
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).GetHashCode
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator
   name: ProxyGenerator
   href: Solti.Utils.Proxy.Generators.ProxyGenerator.html
@@ -124,6 +154,19 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator
   nameWithType: ProxyGenerator.ProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode()
+  nameWithType: ProxyGenerator.GetHashCode()
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
+  nameWithType: ProxyGenerator.GetHashCode
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
   name: Interceptor
   href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor
@@ -159,6 +202,23 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor)
   nameWithType: ProxyGenerator<TInterface, TInterceptor>
   nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor)
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.GetHashCode()
+  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).GetHashCode()
+  nameWithType: ProxyGenerator<TInterface, TInterceptor>.GetHashCode()
+  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).GetHashCode()
+- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.GetHashCode
+  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).GetHashCode
+  nameWithType: ProxyGenerator<TInterface, TInterceptor>.GetHashCode
+  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).GetHashCode
 - uid: Solti.Utils.Proxy.InterfaceInterceptor`1
   name: InterfaceInterceptor<TInterface>
   href: Solti.Utils.Proxy.InterfaceInterceptor-1.html
@@ -285,6 +345,38 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
+- uid: Solti.Utils.Proxy.Internals.GeneratedClass
+  name: GeneratedClass
+  href: Solti.Utils.Proxy.Internals.GeneratedClass.html
+  commentId: T:Solti.Utils.Proxy.Internals.GeneratedClass
+  fullName: Solti.Utils.Proxy.Internals.GeneratedClass
+  nameWithType: GeneratedClass
+- uid: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
+  name: Instances
+  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_Instances
+  commentId: P:Solti.Utils.Proxy.Internals.GeneratedClass.Instances
+  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
+  nameWithType: GeneratedClass.Instances
+- uid: Solti.Utils.Proxy.Internals.GeneratedClass.Instances*
+  name: Instances
+  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_Instances_
+  commentId: Overload:Solti.Utils.Proxy.Internals.GeneratedClass.Instances
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
+  nameWithType: GeneratedClass.Instances
+- uid: Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(System.Type)
+  name: RegisterInstance(Type)
+  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_RegisterInstance_System_Type_
+  commentId: M:Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(System.Type)
+  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(System.Type)
+  nameWithType: GeneratedClass.RegisterInstance(Type)
+- uid: Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance*
+  name: RegisterInstance
+  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_RegisterInstance_
+  commentId: Overload:Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance
+  nameWithType: GeneratedClass.RegisterInstance
 - uid: Solti.Utils.Proxy.Internals.Generator
   name: Generator
   href: Solti.Utils.Proxy.Internals.Generator.html
@@ -420,38 +512,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
   nameWithType: Generator<TInterface, TDescendant>.GetGeneratedTypeAsync
   nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
-- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
-  name: RelatedGeneratorAttribute
-  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html
-  commentId: T:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
-  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute
-  nameWithType: RelatedGeneratorAttribute
-- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor(System.Type)
-  name: RelatedGeneratorAttribute(Type)
-  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute__ctor_System_Type_
-  commentId: M:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor(System.Type)
-  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.RelatedGeneratorAttribute(System.Type)
-  nameWithType: RelatedGeneratorAttribute.RelatedGeneratorAttribute(Type)
-- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor*
-  name: RelatedGeneratorAttribute
-  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.#ctor
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.RelatedGeneratorAttribute
-  nameWithType: RelatedGeneratorAttribute.RelatedGeneratorAttribute
-- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
-  name: Generator
-  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute_Generator
-  commentId: P:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
-  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
-  nameWithType: RelatedGeneratorAttribute.Generator
-- uid: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator*
-  name: Generator
-  href: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.html#Solti_Utils_Proxy_Internals_RelatedGeneratorAttribute_Generator_
-  commentId: Overload:Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute.Generator
-  nameWithType: RelatedGeneratorAttribute.Generator
 - uid: Solti.Utils.Proxy.InvocationContext
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html
