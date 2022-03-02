@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -38,24 +39,51 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ResolveClasses(context, cancellation).Convert
                     (
-                        (cls, i) => 
-                        {
-                            if (OutputType is OutputType.Unit && i is 0)
-                            {
-                                cls = cls.WithKeyword
+                        (cls, i) => cls.WithAttributeLists
+                        (
+                            SingletonList
+                            (
+                                Attributes
+                                (
+                                    //
+                                    // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
+                                    // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
+                                    //
+
+                                    CreateAttribute<GeneratedCodeAttribute>
+                                    (
+                                        AsLiteral("ProxyGen.NET"),
+                                        AsLiteral
+                                        (
+                                            GetType()
+                                                .Assembly
+                                                .GetName()
+                                                .Version
+                                                .ToString()
+                                        )
+                                    ),
+
+                                    //
+                                    // Ezek pedig szerepelnek az xXx.Designer.cs-ben
+                                    //
+
+                                    CreateAttribute<DebuggerNonUserCodeAttribute>(),
+                                    CreateAttribute<CompilerGeneratedAttribute>()
+                                )
+                                .WithOpenBracketToken
                                 (
                                     Token
                                     (
-                                        leading: TriviaList
+                                        OutputType is not OutputType.Unit ? TriviaList() : TriviaList
                                         (
-                                            //
-                                            // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
-                                            // mindent kikapcsol:
-                                            // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
-                                            //
-
                                             Trivia
                                             (
+                                                //
+                                                // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
+                                                // mindent kikapcsol:
+                                                // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
+                                                //
+
                                                 PragmaWarningDirectiveTrivia
                                                 (
                                                     Token(SyntaxKind.DisableKeyword),
@@ -63,46 +91,12 @@ namespace Solti.Utils.Proxy.Internals
                                                 )
                                             )
                                         ),
-                                        kind: SyntaxKind.ClassKeyword,
-                                        trailing: TriviaList()
-                                    )
-                                );
-                            }
-
-                            return cls.WithAttributeLists
-                            (
-                                SingletonList
-                                (
-                                    Attributes
-                                    (
-                                        //
-                                        // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
-                                        // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
-                                        //
-
-                                        CreateAttribute<GeneratedCodeAttribute>
-                                        (
-                                            AsLiteral("ProxyGen.NET"),
-                                            AsLiteral
-                                            (
-                                                GetType()
-                                                    .Assembly
-                                                    .GetName()
-                                                    .Version
-                                                    .ToString()
-                                            )
-                                        ),
-
-                                        //
-                                        // Ezek pedig szerepelnek az xXx.Designer.cs-ben
-                                        //
-
-                                        CreateAttribute<DebuggerNonUserCodeAttribute>(),
-                                        CreateAttribute<CompilerGeneratedAttribute>()
+                                        SyntaxKind.OpenBracketToken,
+                                        TriviaList()
                                     )
                                 )
-                            );
-                        }
+                            )
+                        )
                     )
                 )
             );

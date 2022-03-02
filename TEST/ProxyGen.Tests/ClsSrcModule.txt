@@ -1,4 +1,4 @@
-[global::Solti.Utils.Proxy.Internals.RelatedGeneratorAttribute(typeof(global::Solti.Utils.Proxy.Generators.ProxyGenerator<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTests.FooInterceptor>)), global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "5.0.1.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "5.0.1.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Utils.Proxy.SyntaxFactories.Tests.ProxySyntaxFactoryTests.FooInterceptor, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
     public Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A(global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32> target) : base(target)
@@ -36,6 +36,8 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Method));
     }
 
+    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A));
     global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop
     {
         get

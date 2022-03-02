@@ -132,7 +132,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             MethodDeclarationSyntax[] methods = CreateGenerator(OutputType.Module).ResolveMethods(null).ToArray();
 
-            Assert.That(methods.Count, Is.EqualTo(2));
+            Assert.That(methods.Count, Is.EqualTo(3));
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
         }
 
