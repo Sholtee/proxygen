@@ -77,11 +77,6 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     Attributes
                                     (
-                                        CreateAttribute<RelatedGeneratorAttribute>
-                                        (
-                                            TypeOf(RelatedGenerator)
-                                        ),
-
                                         //
                                         // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
                                         // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
