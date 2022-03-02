@@ -14,11 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         #pragma warning restore CA2255
         public static void Init() => ProxyEmbedder.Chunks.Add
         (
-            new 
-            (
-                "ModuleInitializerAttribute.cs",
-                new ModuleInitializerSyntaxFactory().ResolveUnit() // TODO: Dump
-            )
+            new ModuleInitializerSyntaxFactory(OutputType.Unit, null).GetSourceCode(default)
         );
     }
 }

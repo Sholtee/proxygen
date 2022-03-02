@@ -18,8 +18,6 @@ namespace Solti.Utils.Proxy.Internals
     {
         public ClassSyntaxFactoryBase(ReferenceCollector? referenceCollector) : base(referenceCollector) { }
 
-        public abstract ITypeInfo RelatedGenerator { get; }
-
         #if DEBUG
         internal
         #endif

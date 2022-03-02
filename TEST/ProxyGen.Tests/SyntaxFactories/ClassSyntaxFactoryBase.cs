@@ -26,8 +26,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(referenceCollector) {}
 
-            public override ITypeInfo RelatedGenerator => throw new NotImplementedException();
-
             protected internal override IEnumerable<ITypeInfo> ResolveBases(object context) => throw new NotImplementedException();
 
             protected internal override string ResolveClassName(object context) => throw new NotImplementedException();

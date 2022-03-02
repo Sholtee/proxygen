@@ -28,9 +28,9 @@ namespace Solti.Utils.Proxy.Internals
             ContainingAssembly = containingAssembly;
         }
 
-        public override ITypeInfo RelatedGenerator { get; }
+        public ITypeInfo RelatedGenerator { get; }
 
-        public override string ContainingAssembly { get; }
+        public string ContainingAssembly { get; }
 
         //
         // Proxy egyseg mindig csak egy osztalyt definial

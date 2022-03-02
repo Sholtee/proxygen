@@ -7,10 +7,8 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IUnitDefinition
+    internal interface IUnitDefinition // TODO: torolni
     {
-        string ContainingAssembly { get; }
-
         IReadOnlyCollection<string> DefinedClasses { get; }
     }
 }

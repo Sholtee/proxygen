@@ -18,3 +18,4 @@ using Solti.Utils.Proxy.Tests.EmbeddedTypes;
     EmbedGeneratedType(typeof(ProxyGenerator<IInternalInterface, InterfaceInterceptor<IInternalInterface>>)),
     EmbedGeneratedType(typeof(DuckGenerator<IInternalInterface, IInternalInterface>)),
     EmbedGeneratedType(typeof(DuckGenerator<IReadOnlyCollection<string>, List<string>>))]
+

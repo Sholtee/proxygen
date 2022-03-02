@@ -30,8 +30,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public abstract IReadOnlyCollection<string> DefinedClasses { get; }
 
-        public abstract string ContainingAssembly { get; }
-
         public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
             return CompilationUnit().WithMembers
