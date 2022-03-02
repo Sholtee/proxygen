@@ -34,5 +34,8 @@ namespace Solti.Utils.Proxy.Generators
                 yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => new { Interface = typeof(TInterface), Target = typeof(TTarget) }.GetHashCode();
     }
 }

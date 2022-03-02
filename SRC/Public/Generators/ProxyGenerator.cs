@@ -56,5 +56,8 @@ namespace Solti.Utils.Proxy.Generators
                 yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Interceptor.GetHashCode();
     }
 }

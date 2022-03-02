@@ -21,20 +21,20 @@ namespace Solti.Utils.Proxy.Internals
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class Generator<TInterface, TDescendant>: Generator where TDescendant : Generator<TInterface, TDescendant>, new()
     {
-        private static readonly Lazy<Generator> FInstance = new(() => new TDescendant(), LazyThreadSafetyMode.ExecutionAndPublication);
+        private static readonly Generator FInstance = new TDescendant();
 
         #region Public
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public static new Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => FInstance.Value.GetGeneratedTypeAsync(cancellation);
+        public static new Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => FInstance.GetGeneratedTypeAsync(cancellation);
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public static new Type GetGeneratedType() => FInstance.Value.GetGeneratedType();
+        public static new Type GetGeneratedType() => FInstance.GetGeneratedType();
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public static async new Task<TInterface> ActivateAsync(object? tuple, CancellationToken cancellation = default)
         #endif
-            => (TInterface) await FInstance.Value.ActivateAsync(tuple, cancellation).ConfigureAwait(false);
+            => (TInterface) await FInstance.ActivateAsync(tuple, cancellation).ConfigureAwait(false);
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public static new TInterface Activate(object? tuple)
         #endif
-            => (TInterface) FInstance.Value.Activate(tuple);
+            => (TInterface) FInstance.Activate(tuple);
         #endregion
     }
 }
