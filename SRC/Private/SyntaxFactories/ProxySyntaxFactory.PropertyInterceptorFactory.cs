@@ -5,9 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -18,6 +16,20 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context)
+        {
+            foreach (IPropertyInfo prop in InterfaceType.Properties)
+            {
+                if (AlreadyImplemented(prop))
+                    continue;
+
+                yield return ResolveProperty(null!, prop);
+            }
+        }
+
         /// <summary>
         /// TResult IInterface.Prop                                                                           <br/>
         /// {                                                                                                 <br/>
@@ -43,11 +55,20 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                                             <br/>
         /// }
         /// </summary>
-        internal sealed class PropertyInterceptorFactory : ProxyMemberSyntaxFactory
+        #if DEBUG
+        internal
+        #endif
+        protected override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property)
         {
-            private IEnumerable<StatementSyntax> BuildGet(IPropertyInfo property) 
+            return BuildProperty
+            (
+                property.Indices.Some() ? DeclareIndexer : DeclareProperty
+            );
+
+            IEnumerable<StatementSyntax> BuildGet()
             {
-                if (property.GetMethod is null) yield break;
+                if (property.GetMethod is null)
+                    yield break;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.GetMethod);
                 yield return argsArray;
@@ -67,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals
                                 CastExpression
                                 (
                                     CreateType<object>(),
-                                    PropertyAccess(property, MemberAccess(null, TARGET), null, locals.Select(ToArgument))
+                                    PropertyAccess(property, MemberAccess(null, Target), null, locals.Convert(ToArgument))
                                 )
                             )
 
@@ -81,7 +102,7 @@ namespace Solti.Utils.Proxy.Internals
                     property.Type,
                     InvokeMethod
                     (
-                        INVOKE,
+                        Invoke,
                         target: null,
                         castTargetTo: null,
                         Argument
@@ -90,16 +111,20 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ToArgument(argsArray),
                                 ToArgument(invokeTarget),
-                                Argument(EnumAccess(MemberTypes.Property))
+                                Argument
+                                (
+                                    EnumAccess(MemberTypes.Property)
+                                )
                             )
                         )
                     )
                 );
             }
 
-            private IEnumerable<StatementSyntax> BuildSet(IPropertyInfo property)
+            IEnumerable<StatementSyntax> BuildSet()
             {
-                if (property.SetMethod is null) yield break;
+                if (property.SetMethod is null)
+                    yield break;
 
                 LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(property.SetMethod);
                 yield return argsArray;
@@ -120,13 +145,17 @@ namespace Solti.Utils.Proxy.Internals
                                     expression: AssignmentExpression
                                     (
                                         kind: SyntaxKind.SimpleAssignmentExpression,
-                                        left: PropertyAccess(property, MemberAccess(null, TARGET), null, locals
-#if NETSTANDARD2_1_OR_GREATER
-                                            .SkipLast(1)                                          
-#else
-                                            .Take(locals.Count - 1)
-#endif
-                                            .Select(ToArgument)),
+                                        left: PropertyAccess
+                                        (
+                                            property,
+                                            MemberAccess(null, Target),
+                                            null,
+                                            locals.Convert
+                                            (
+                                                (local, _) => ToArgument(local),
+                                                (_, i) => i == locals.Count - 1
+                                            )
+                                        ),
                                         right: ToIdentifierName(locals[locals.Count - 1])
                                     )
                                 )
@@ -144,7 +173,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     InvokeMethod
                     (
-                        INVOKE,
+                        Invoke,
                         target: null,
                         castTargetTo: null,
                         Argument
@@ -153,7 +182,10 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ToArgument(argsArray),
                                 ToArgument(invokeTarget),
-                                Argument(EnumAccess(MemberTypes.Property))
+                                Argument
+                                (
+                                    EnumAccess(MemberTypes.Property)
+                                )
                             )
                         )
                     )
@@ -165,39 +197,19 @@ namespace Solti.Utils.Proxy.Internals
             // figyelmen kivul lesz hagyva.
             //
 
-            private MemberDeclarationSyntax BuildProperty(IPropertyInfo property, Func<IPropertyInfo, CSharpSyntaxNode?, CSharpSyntaxNode?, bool, MemberDeclarationSyntax> fact) => fact
+            BasePropertyDeclarationSyntax BuildProperty(Func<IPropertyInfo, CSharpSyntaxNode?, CSharpSyntaxNode?, bool, BasePropertyDeclarationSyntax> fact) => fact
             (
                 property,
                 Block
                 (
-                    BuildGet(property)
+                    BuildGet()
                 ),
                 Block
                 (
-                    BuildSet(property)
+                    BuildSet()
                 ),
                 false
             );
-
-            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context.InterfaceType
-                .Properties
-                .Where(prop => !AlreadyImplemented(prop))
-                .Select(prop => 
-                {
-                    cancellation.ThrowIfCancellationRequested();
-
-                    return BuildProperty
-                    (
-                        prop,
-                        prop.Indices.Any()
-                            ? DeclareIndexer
-                            : DeclareProperty
-                    );
-                });
-
-            public PropertyInterceptorFactory(IProxyContext context) : base(context) 
-            {
-            }
         }
     }
 }

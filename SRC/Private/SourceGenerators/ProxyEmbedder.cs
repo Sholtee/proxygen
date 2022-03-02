@@ -87,7 +87,9 @@ namespace Solti.Utils.Proxy.Internals
         // xXxCodeFactory-k toltik fel...
         //
 
-        public static ICollection<ICodeFactory> CodeFactories { get; } = new HashSet<ICodeFactory>();
+        public static ICollection<ICodeFactory> CodeFactories { get; } = new ConcurrentHashSet<ICodeFactory>();
+
+        public static ICollection<SourceCode> Chunks { get; } = new ConcurrentHashSet<SourceCode>();
 
         public void Execute(GeneratorExecutionContext context)
         {
@@ -121,7 +123,31 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 return;
             }
-            
+
+            try
+            {
+                foreach (SourceCode chunk in Chunks)
+                {
+                    context.AddSource
+                    (
+                        chunk.Hint,
+                        chunk.Value
+                    );
+                }
+            }
+            #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
+            catch (Exception e)
+            #pragma warning restore CA1031
+            {
+                ReportError
+                (
+                    context,
+                    e,
+                    Location.None
+                );
+                return;
+            }
+
             foreach (INamedTypeSymbol generator in aotGenerators)
             {
                 try
@@ -164,8 +190,8 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     ReportError
                     (
-                        context, 
-                        e, 
+                        context,
+                        e,
                         generator.Locations.Single()!
                     );
                 }

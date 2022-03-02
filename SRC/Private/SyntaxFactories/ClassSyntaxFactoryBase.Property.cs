@@ -1,11 +1,10 @@
 ﻿/********************************************************************************
-* MemberSyntaxFactory.Property.cs                                               *
+* ClassSyntaxFactoryBase.Property.cs                                            *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +13,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class MemberSyntaxFactory
+    internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
         /// target.Property           <br/>
@@ -23,14 +22,15 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null) => PropertyAccess
+        #if DEBUG
+        internal
+        #endif
+        protected ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null) => PropertyAccess
         (
             property, 
             target, 
             castTargetTo, 
-            property
-                .Indices
-                .Select(param => Argument(IdentifierName(param.Name)))
+            property.Indices.Convert(param => Argument(IdentifierName(param.Name)))
         );
 
         /// <summary>
@@ -40,7 +40,10 @@ namespace Solti.Utils.Proxy.Internals
         ///                           <br/>
         /// target.Propery[index]
         /// </summary>
-        protected internal ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.Indices.Any()
+        #if DEBUG
+        internal
+        #endif
+        protected ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.Indices.Some()
             ? MemberAccess
             (
                 target,
@@ -63,7 +66,10 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}             <br/>
         /// }                      <br/>
         /// </summary>
-        protected internal PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        #if DEBUG
+        internal
+        #endif
+        protected PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
 
@@ -77,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
                 explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(property.DeclaringType))
             );
 
-            List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
+            List<AccessorDeclarationSyntax> accessors = new(2);
 
             if (property.GetMethod is not null && getBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
@@ -85,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
             if (property.SetMethod is not null && setBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
-            return !accessors.Any() ? result : result.WithAccessorList
+            return !accessors.Some() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (
@@ -101,10 +107,13 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                             <br/>
         /// }                                      <br/>
         /// </summary>
-        protected internal IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody = null, CSharpSyntaxNode? setBody = null, bool forceInlining = false)
+        #if DEBUG
+        internal
+        #endif
+        protected IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
-            Debug.Assert(property.Indices.Any());
+            Debug.Assert(property.Indices.Some());
 
             IndexerDeclarationSyntax result = IndexerDeclaration
             (
@@ -132,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
+            List<AccessorDeclarationSyntax> accessors = new(2);
 
             if (property.GetMethod is not null && getBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
@@ -140,7 +149,7 @@ namespace Solti.Utils.Proxy.Internals
             if (property.SetMethod is not null && setBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
 
-            return !accessors.Any() ? result : result.WithAccessorList
+            return !accessors.Some() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (
@@ -148,5 +157,15 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property);
     }
 }

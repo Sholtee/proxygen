@@ -344,7 +344,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (iface.IsGenericType())
                 {
-                    ITypeSymbol[] tas = iface.TypeArguments.Convert(ta => !ta.IsValueType
+                    ITypeSymbol[] tas = iface.TypeArguments.ConvertAr(ta => !ta.IsValueType
                         //
                         // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
                         //

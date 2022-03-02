@@ -34,16 +34,20 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                IUnitSyntaxFactory unitSyntaxFactory = new DuckSyntaxFactory
+                result = new DuckSyntaxFactory
                 (
                     SymbolTypeInfo.CreateFrom(iface, compilation),
                     SymbolTypeInfo.CreateFrom(target, compilation),
                     compilation.AssemblyName!,
                     OutputType.Unit,
-                    SymbolTypeInfo.CreateFrom(generator, compilation)
-                );
+                    SymbolTypeInfo.CreateFrom(generator, compilation),
 
-                result = unitSyntaxFactory.GetSourceCode(context.CancellationToken);
+                    //
+                    // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
+                    //
+
+                    !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null
+                ).GetSourceCode(context.CancellationToken);
             }
             catch (Exception e) 
             {

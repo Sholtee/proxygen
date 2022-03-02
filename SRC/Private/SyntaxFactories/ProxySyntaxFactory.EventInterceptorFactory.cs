@@ -5,9 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,6 +15,20 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ProxySyntaxFactory
     {
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<EventDeclarationSyntax> ResolveEvents(object context)
+        {
+            foreach (IEventInfo evt in InterfaceType.Events)
+            {
+                if (AlreadyImplemented(evt))
+                    continue;
+
+                yield return ResolveEvent(null!, evt);
+            }
+        }
+
         /// <summary>
         /// event EventType IInterface.Event                                                  <br/>
         /// {                                                                                 <br/>
@@ -44,15 +56,31 @@ namespace Solti.Utils.Proxy.Internals
         ///     }                                                                             <br/>
         /// }
         /// </summary>
-        internal sealed class EventInterceptorFactory : ProxyMemberSyntaxFactory
+        #if DEBUG
+        internal
+        #endif
+        protected override EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt)
         {
-            private IEnumerable<StatementSyntax> Build(IEventInfo member, bool add) 
+            return DeclareEvent
+            (
+                @event: evt,
+                addBody: Block
+                (
+                    BuildBody(add: true)
+                ),
+                removeBody: Block
+                (
+                    BuildBody(add: false)
+                )
+            );
+
+            IEnumerable<StatementSyntax> BuildBody(bool add)
             {
-                IMethodInfo? targetMethod = add ? member.AddMethod : member.RemoveMethod;
-                if (targetMethod is null)
+                IMethodInfo? method = add ? evt.AddMethod : evt.RemoveMethod;
+                if (method is null)
                     yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(targetMethod);
+                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(method);
                 yield return argsArray;
 
                 LocalDeclarationStatementSyntax invokeTarget = DeclareLocal<Func<object>>
@@ -61,14 +89,23 @@ namespace Solti.Utils.Proxy.Internals
                     DeclareCallback
                     (
                         argsArray,
-                        targetMethod,
+                        method,
                         (locals, body) =>
                         {
                             body.Add
                             (
                                 ExpressionStatement
                                 (
-                                    RegisterEvent(member, MemberAccess(null, TARGET), add, ToIdentifierName(locals.Single()!))
+                                    RegisterEvent
+                                    (
+                                        evt,
+                                        MemberAccess(null, Target),
+                                        add,
+                                        ToIdentifierName
+                                        (
+                                            locals.Single()!
+                                        )
+                                    )
                                 )
                             );
                             body.Add
@@ -84,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     InvokeMethod
                     (
-                        INVOKE,
+                        Invoke,
                         target: null,
                         castTargetTo: null,
                         Argument
@@ -93,38 +130,15 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ToArgument(argsArray),
                                 ToArgument(invokeTarget),
-                                Argument(EnumAccess(MemberTypes.Event))
+                                Argument
+                                (
+                                    EnumAccess(MemberTypes.Event)
+                                )
                             )
                         )
                     )
                 );
             }
-
-            public EventInterceptorFactory(IProxyContext context) : base(context)
-            {
-            }
-
-            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation) => Context
-                .InterfaceType
-                .Events
-                .Where(evt => !AlreadyImplemented(evt))
-                .Select(evt =>
-                {
-                    cancellation.ThrowIfCancellationRequested();
-
-                    return DeclareEvent
-                    (
-                        @event: evt,
-                        addBody: Block
-                        (
-                            Build(evt, add: true)
-                        ),
-                        removeBody: Block
-                        (
-                            Build(evt, add: false)
-                        )
-                    );
-                });
         }
     }
 }

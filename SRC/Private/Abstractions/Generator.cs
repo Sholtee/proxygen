@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,68 +20,51 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     public abstract class Generator
     {
-        #region Private
-        private readonly SemaphoreSlim FLock = new(1, 1);
+        //
+        // Ha ugyanazzal a kulccsal hivjuk parhuzamosan a GetOrAdd()-et akkor a factory tobbszor is
+        // meghivasra kerulhet (MSDN) -> Lazy
+        //
 
-        private Type? FType;
+        private static readonly ConcurrentDictionary<Generator, Lazy<Type>> FGeneratedTypes = new(GeneratorComparer.Instance);
 
-        private ProxyActivator.Activator? FActivator;
-
-        private Type GetGeneratedType(CancellationToken cancellation)
-        {
-            foreach (ITypeResolution resolution in SupportedResolutions)
-            {
-                Type? resolved = resolution.TryResolve(cancellation);
-                if (resolved is not null)
-                    return resolved;
-            }
-            throw new NotSupportedException();
-        }
+        private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.Activator>> FActivators = new();
 
         /// <summary>
         /// Returns the supported type resolution strategies.
         /// </summary>
         internal abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
-        #endregion
 
         #region Public
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
-        {
-            if (FType is not null) return FType;
-
-            await FLock.WaitAsync(cancellation).ConfigureAwait(false);
-
-            try
-            {
-                #pragma warning disable CA1508 // This method can be called parallelly so there is no dead code
-                return FType ??= GetGeneratedType(cancellation);
-                #pragma warning restore CA1508
-            }
-            finally { FLock.Release(); }
-        }
+        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => Task.FromResult(GetGeneratedType()); // TODO
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() 
-        {
-            if (FType is not null) return FType;
-
-            FLock.Wait();
-
-            try
+        public Type GetGeneratedType() => FGeneratedTypes.GetOrAdd
+        (
+            this,
+            new Lazy<Type>(() =>
             {
-                #pragma warning disable CA1508 // This method can be called parallelly so there is no dead code
-                return FType ??= GetGeneratedType(default);
-                #pragma warning restore CA1508
-            }
-            finally { FLock.Release(); }
-        }
+                foreach (ITypeResolution resolution in SupportedResolutions)
+                {
+                    //
+                    // TODO: FIXME:
+                    //     Megszakitast itt nem adhatunk at mivel az a Lazy factoryaba agyazodna -> Ha egyszer
+                    //     megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
+                    //
+
+                    Type? resolved = resolution.TryResolve(default);
+                    if (resolved is not null)
+                        return resolved;
+                }
+                throw new NotSupportedException();
+            })
+        ).Value;
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -88,25 +72,17 @@ namespace Solti.Utils.Proxy.Internals
         /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
         /// <param name="cancellation">Token to cancel the operation.</param>
         /// <returns>The just activated instance.</returns>
-        #if NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER
         public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default)
-        #else
+#else
         public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default)
         #endif
         {
-            if (FActivator is null)
-            {
-                Type type = await GetGeneratedTypeAsync(cancellation).ConfigureAwait(false);
+            Type generated = await GetGeneratedTypeAsync(cancellation).ConfigureAwait(true);
 
-                await FLock.WaitAsync(cancellation).ConfigureAwait(false);
-
-                try
-                {
-                    FActivator ??= ProxyActivator.Create(type);
-                }
-                finally { FLock.Release(); }
-            }
-            return FActivator(tuple);
+            return FActivators
+                .GetOrAdd(generated, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(generated)))
+                .Value(tuple);
         }
 
         /// <summary>
@@ -120,19 +96,11 @@ namespace Solti.Utils.Proxy.Internals
         public object Activate(object? tuple)
         #endif
         {
-            if (FActivator is null)
-            {
-                Type type = GetGeneratedType();
+            Type generated = GetGeneratedType();
 
-                FLock.Wait();
-
-                try
-                {
-                    FActivator ??= ProxyActivator.Create(type);
-                }
-                finally { FLock.Release(); }
-            }
-            return FActivator(tuple);
+            return FActivators
+                .GetOrAdd(generated, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(generated)))
+                .Value(tuple);
         }
         #endregion
     }

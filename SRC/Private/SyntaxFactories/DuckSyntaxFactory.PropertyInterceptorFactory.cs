@@ -5,8 +5,6 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,93 +15,32 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class DuckSyntaxFactory
     {
-        /// <summary>
-        /// System.Int32 IFoo[System.Int32].Prop         <br/>
-        /// {                                            <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   get => Target.Prop;                        <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   set => Target.Prop = value;                <br/>
-        /// }
-        /// </summary>
-        internal sealed class PropertyInterceptorFactory : DuckMemberSyntaxFactory
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context)
         {
-            protected override IEnumerable<MemberDeclarationSyntax> BuildMembers(CancellationToken cancellation)
+            foreach (IPropertyInfo ifaceProperty in InterfaceType.Properties)
             {
-                foreach(IPropertyInfo ifaceProperty in Context.InterfaceType.Properties)
-                {
-                    cancellation.ThrowIfCancellationRequested();
+                IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType.Properties, SignatureEquals);
 
-                    IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, Context.TargetType.Properties);
+                //
+                // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
+                //
 
-                    //
-                    // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
-                    //
+                Visibility.Check
+                (
+                    targetProperty,
+                    ContainingAssembly,
+                    checkGet: ifaceProperty.GetMethod is not null,
+                    checkSet: ifaceProperty.SetMethod is not null
+                );
 
-                    Visibility.Check
-                    (
-                        targetProperty, 
-                        Context.ContainingAssembly, 
-                        checkGet: ifaceProperty.GetMethod is not null, 
-                        checkSet: ifaceProperty.SetMethod is not null
-                    );
-
-                    IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
-
-                    //
-                    // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
-                    // maskepp vannak elnvezve a parameterei.
-                    //
-
-                    ExpressionSyntax propertyAccess = PropertyAccess
-                    (
-                        ifaceProperty,
-                        MemberAccess(null, TARGET),
-                        castTargetTo: accessor.AccessModifiers == AccessModifiers.Explicit
-                            ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
-                            : null
-                    );
-
-                    //
-                    // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-                    // figyelmen kivul lesz hagyva.
-                    //
-
-                    ArrowExpressionClauseSyntax
-                        getBody = ArrowExpressionClause
-                        (
-                            expression: propertyAccess
-                        ),
-                        setBody = ArrowExpressionClause
-                        (
-                            expression: AssignmentExpression
-                            (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: propertyAccess,
-                                right: IdentifierName(Value)
-                            )
-                        );
-
-                    yield return ifaceProperty.Indices.Any()
-                        ? DeclareIndexer
-                        (
-                            property: ifaceProperty,
-                            getBody: getBody,
-                            setBody: setBody,
-                            forceInlining: true
-                        )
-                        : (MemberDeclarationSyntax) DeclareProperty
-                        (
-                            property: ifaceProperty,
-                            getBody: getBody,
-                            setBody: setBody,
-                            forceInlining: true
-                        );
-                }
+                yield return ResolveProperty(ifaceProperty, targetProperty);
             }
 
             [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
-            protected override bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
+            static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
             {
                 if (targetMember is not IPropertyInfo targetProp || ifaceMember is not IPropertyInfo ifaceProp)
                     return false;
@@ -113,13 +50,13 @@ namespace Solti.Utils.Proxy.Internals
                 // az olvasast is.
                 //
 
-                if (ifaceProp.GetMethod is not null) 
+                if (ifaceProp.GetMethod is not null)
                 {
                     if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true) is not true)
                         return false;
                 }
 
-                if (ifaceProp.SetMethod is not null) 
+                if (ifaceProp.SetMethod is not null)
                 {
                     if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true) is not true)
                         return false;
@@ -127,8 +64,75 @@ namespace Solti.Utils.Proxy.Internals
 
                 return true;
             }
+        }
 
-            public PropertyInterceptorFactory(IDuckContext context) : base(context) { }
+        /// <summary>
+        /// System.Int32 IFoo[System.Int32].Prop         <br/>
+        /// {                                            <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   get => Target.Prop;                        <br/>
+        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
+        ///   set => Target.Prop = value;                <br/>
+        /// }
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo targetProperty)
+        {
+            IPropertyInfo ifaceProperty = (IPropertyInfo) context;
+
+            IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
+
+            //
+            // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
+            // maskepp vannak elnvezve a parameterei.
+            //
+
+            ExpressionSyntax propertyAccess = PropertyAccess
+            (
+                ifaceProperty,
+                MemberAccess(null, Target),
+                castTargetTo: accessor.AccessModifiers is AccessModifiers.Explicit
+                    ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
+                    : null
+            );
+
+            //
+            // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
+            // figyelmen kivul lesz hagyva.
+            //
+
+            ArrowExpressionClauseSyntax
+                getBody = ArrowExpressionClause
+                (
+                    expression: propertyAccess
+                ),
+                setBody = ArrowExpressionClause
+                (
+                    expression: AssignmentExpression
+                    (
+                        kind: SyntaxKind.SimpleAssignmentExpression,
+                        left: propertyAccess,
+                        right: IdentifierName(Value)
+                    )
+                );
+
+            return ifaceProperty.Indices.Some()
+                ? DeclareIndexer
+                (
+                    property: ifaceProperty,
+                    getBody: getBody,
+                    setBody: setBody,
+                    forceInlining: true
+                )
+                : DeclareProperty
+                (
+                    property: ifaceProperty,
+                    getBody: getBody,
+                    setBody: setBody,
+                    forceInlining: true
+                );
         }
     }
 }

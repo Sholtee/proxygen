@@ -42,21 +42,22 @@ namespace Solti.Utils.Proxy.Generators
         {
             get 
             {
-                Type generatorType = GetType();
-                ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
-                yield return new RuntimeCompiledTypeResolutionStrategy
+                DuckSyntaxFactory syntaxFactory = new
                 (
-                    generatorType,
-                    new DuckSyntaxFactory
-                    (
-                        MetadataTypeInfo.CreateFrom(Interface),
-                        MetadataTypeInfo.CreateFrom(Target),
-                        $"Generated_{MetadataTypeInfo.CreateFrom(typeof(Tuple<,,>).MakeGenericType(generatorType, Interface, Target)).GetMD5HashCode()}",
-                        OutputType.Module,
-                        generatorTypeMeta
-                    )
+                    MetadataTypeInfo.CreateFrom(Interface),
+                    MetadataTypeInfo.CreateFrom(Target),
+                    null,
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(GetType()),
+                    new ReferenceCollector()
                 );
+
+                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => new { Target, Interface }.GetHashCode();
     }
 }

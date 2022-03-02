@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
         private IReadOnlyList<IParameterInfo>? FIndices;
-        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty.GetIndexParameters().Convert(MetadataParameterInfo.CreateFrom);
+        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty.GetIndexParameters().ConvertAr(MetadataParameterInfo.CreateFrom);
 
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 

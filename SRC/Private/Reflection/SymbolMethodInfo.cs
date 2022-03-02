@@ -34,7 +34,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<IParameterInfo>? FParameters;
-        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol.Parameters.Convert(p => SymbolParameterInfo.CreateFrom(p, Compilation));
+        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol.Parameters.ConvertAr(p => SymbolParameterInfo.CreateFrom(p, Compilation));
 
         private IParameterInfo? FReturnValue;
         public IParameterInfo ReturnValue => FReturnValue ??= UnderlyingSymbol.MethodKind != MethodKind.Constructor
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
         private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
-        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol.GetDeclaringInterfaces().Convert(di => SymbolTypeInfo.CreateFrom(di, Compilation));
+        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol.GetDeclaringInterfaces().ConvertAr(di => SymbolTypeInfo.CreateFrom(di, Compilation));
 
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.Convert(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.ConvertAr(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

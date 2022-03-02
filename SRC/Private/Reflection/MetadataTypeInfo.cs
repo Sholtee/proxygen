@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
-        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType.GetInterfaces().Convert(CreateFrom);
+        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType.GetInterfaces().ConvertAr(CreateFrom);
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingType.BaseType is not null
@@ -102,12 +102,12 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
-            .Convert(MetadataPropertyInfo.CreateFrom);
+            .ConvertAr(MetadataPropertyInfo.CreateFrom);
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
-            .Convert(MetadataEventInfo.CreateFrom);
+            .ConvertAr(MetadataEventInfo.CreateFrom);
 
         //
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
@@ -131,7 +131,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
-            .Convert(MetadataMethodInfo.CreateFrom, ShouldSkip);
+            .ConvertAr(MetadataMethodInfo.CreateFrom, ShouldSkip);
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType.IsArray
@@ -142,7 +142,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<IConstructorInfo>()
             : UnderlyingType
                 .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .Convert(ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
+                .ConvertAr(ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{QualifiedName}, {UnderlyingType.Assembly}"
@@ -198,7 +198,7 @@ namespace Solti.Utils.Proxy.Internals
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()
-                .Convert(CreateFrom);
+                .ConvertAr(CreateFrom);
 
             public override string Name => !UnderlyingType.IsGenericType || UnderlyingType.IsGenericTypeDefinition // FIXME: Type.GetFriendlyName() lezart generikusokat nem eszi meg (igaz elvileg nem is kell hivjuk lezart generikusra)
                 ? base.Name

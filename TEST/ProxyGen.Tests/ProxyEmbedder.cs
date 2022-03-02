@@ -20,7 +20,6 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Attributes;
-    using Primitives;
     using Properties;
     using Proxy.Tests.EmbeddedTypes;
 
@@ -164,7 +163,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(3));
         }
 
         [Test]
@@ -191,7 +190,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags, Is.Empty);
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
         }
 
         [Test]
@@ -219,7 +218,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))));
             Assert.That(diags.Length, Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
         }
 
         [Test]

@@ -1,11 +1,10 @@
 ﻿/********************************************************************************
-* MemberSyntaxFactory.Event.cs                                                  *
+* ClassSyntaxFactoryBase.Event.cs                                               *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -14,7 +13,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class MemberSyntaxFactory
+    internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
         /// event TDelegate IInterface.EventName <br/>
@@ -23,7 +22,10 @@ namespace Solti.Utils.Proxy.Internals
         ///   remove{...}                        <br/>
         /// }                                    <br/>
         /// </summary>
-        protected internal EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody = null, CSharpSyntaxNode? removeBody = null, bool forceInlining = false)
+        #if DEBUG
+        internal
+        #endif
+        protected EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody, CSharpSyntaxNode? removeBody, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface);
 
@@ -34,18 +36,21 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax)CreateType(@event.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+                (
+                    (NameSyntax) CreateType(@event.DeclaringType)
+                )
             );
 
-            List<AccessorDeclarationSyntax> accessors = new List<AccessorDeclarationSyntax>();
+            List<AccessorDeclarationSyntax> accessors = new(2);
 
-            if (@event.AddMethod != null && addBody != null)
+            if (@event.AddMethod is not null && addBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.AddAccessorDeclaration, addBody, forceInlining));
 
-            if (@event.RemoveMethod != null && removeBody != null)
+            if (@event.RemoveMethod is not null && removeBody is not null)
                 accessors.Add(DeclareAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining));
 
-            return !accessors.Any() ? result : result.WithAccessorList
+            return !accessors.Some() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (
@@ -57,7 +62,10 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// target.Event [+|-]= ...;
         /// </summary>
-        protected internal AssignmentExpressionSyntax RegisterEvent(IEventInfo @event, ExpressionSyntax? target, bool add, ExpressionSyntax right, ITypeInfo? castTargetTo = null) => AssignmentExpression
+        #if DEBUG
+        internal
+        #endif
+        protected AssignmentExpressionSyntax RegisterEvent(IEventInfo @event, ExpressionSyntax? target, bool add, ExpressionSyntax right, ITypeInfo? castTargetTo = null) => AssignmentExpression
         (
             kind: add ? SyntaxKind.AddAssignmentExpression : SyntaxKind.SubtractAssignmentExpression,
             left: MemberAccess
@@ -68,5 +76,15 @@ namespace Solti.Utils.Proxy.Internals
             ),
             right: right
         );
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IEnumerable<EventDeclarationSyntax> ResolveEvents(object context);
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt);
     }
 }

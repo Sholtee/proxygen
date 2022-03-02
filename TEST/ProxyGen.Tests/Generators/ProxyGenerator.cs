@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Generated_3414F45DAAE29C6B1A60FC2BB1653B46")]
+[assembly: InternalsVisibleTo("Proxy_5C3FC6431B4D81D670187842F42EDDDE")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -465,7 +465,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        private const string WIRED_NAME = "Generated_D21B2B2F800C1FCEA906362887907084"; // amig a tipus nem valtozik addig ez sem valtozhat
+        private const string WIRED_NAME = "Proxy_C0A8B48E74900773E53774AC260C0EF7"; // amig a tipus nem valtozik addig ez sem valtozhat
 
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
@@ -477,6 +477,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldAssembleTheProxyOnce() =>
             Assert.AreSame(ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType(), ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType());
+
+        [Test]
+        public void ProxyGenerator_ShouldAssembleTheProxyOnce2() =>
+            Assert.AreSame(ProxyGenerator<IQueryable, InterfaceInterceptor<IQueryable>>.GetGeneratedType(), new ProxyGenerator(typeof(IQueryable), typeof(InterfaceInterceptor<IQueryable>)).GetGeneratedType());
 
         [Test]
         public async Task Target_MayAccessTheMostOuterEnclosingProxyInstance()

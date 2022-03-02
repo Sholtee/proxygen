@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void EnsureNotError(this ISymbol self)
         {
-            if (self.Kind == SymbolKind.ErrorType) throw new InvalidSymbolException
+            if (self.Kind is SymbolKind.ErrorType) throw new InvalidSymbolException
             {
                 Symbol = self
             };

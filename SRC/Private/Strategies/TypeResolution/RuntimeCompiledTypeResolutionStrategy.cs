@@ -6,25 +6,28 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class RuntimeCompiledTypeResolutionStrategy : ITypeResolution
     {
-        public RuntimeCompiledTypeResolutionStrategy(Type generatorType, ClassSyntaxFactory syntaxFactory)
-        {
-            GeneratorType = generatorType;
-            SyntaxFactory = syntaxFactory;
-        }
+        public RuntimeCompiledTypeResolutionStrategy(ProxyUnitSyntaxFactory syntaxFactory) => SyntaxFactory = syntaxFactory;
 
-        public string? CacheDir { get; internal set; } = WorkingDirectories.Instance.AssemblyCacheDir; // tesztek miatt van setter
+        public string? CacheDir 
+        { 
+            get;
+#if DEBUG
+            internal set;
+#endif
+        } = WorkingDirectories.Instance.AssemblyCacheDir;
 
-        public ClassSyntaxFactory SyntaxFactory { get; }
-
-        public Type GeneratorType { get; }
+        public ProxyUnitSyntaxFactory SyntaxFactory { get; }
 
         public Type? TryResolve(string assemblyName, CancellationToken cancellation)
         {
@@ -36,22 +39,29 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (File.Exists(cacheFile)) return ExtractType
                 (
-                    Assembly.LoadFile(cacheFile)
+                    //
+                    // Kivetelt dob ha mar egyszer be lett toltve
+                    //
+
+                    AssemblyLoadContext
+                        .Default
+                        .LoadFromAssemblyPath(cacheFile)
                 );
 
                 Directory.CreateDirectory(CacheDir);
             }
 
-            SyntaxFactory.BuildAndDump(cancellation);
+            CompilationUnitSyntax unit = SyntaxFactory.ResolveUnitAndDump(cancellation);
 
             return ExtractType
             (
                  Compile.ToAssembly
                  (
-                     SyntaxFactory.Unit!,
+                     unit,
                      assemblyName,
                      cacheFile,
                      SyntaxFactory
+                        .ReferenceCollector!
                         .References
                         .Convert(asm => MetadataReference.CreateFromFile(asm.Location!)),
                      customConfig: null,
@@ -59,11 +69,24 @@ namespace Solti.Utils.Proxy.Internals
                  )
             );
 
-            Type ExtractType(Assembly asm) => asm.GetType
-            (
-                SyntaxFactory.ClassName, 
-                throwOnError: true
-            );
+            Type ExtractType(Assembly asm)
+            {
+                //
+                // Fasz se tudja miert de ha dinamikusan toltunk be egy szerelvenyt akkor annak a module-inicializaloja
+                // nem fog lefutni... Ezert jol meghivjuk kezzel
+                //
+
+                foreach (Module module in asm.GetModules())
+                {
+                    RuntimeHelpers.RunModuleConstructor(module.ModuleHandle);
+                }
+
+                return asm.GetType
+                (
+                    SyntaxFactory.DefinedClasses.Single(),
+                    throwOnError: true
+                );
+            }
         }
 
         public Type? TryResolve(CancellationToken cancellation) => TryResolve(SyntaxFactory.ContainingAssembly, cancellation);

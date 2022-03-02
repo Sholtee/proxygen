@@ -1,23 +1,23 @@
 ﻿/********************************************************************************
-* MemberSyntaxFactory.Variable.cs                                               *
+* ClassSyntaxFactoryBase.Variable.cs                                            *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
-using System.Linq;
-
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class MemberSyntaxFactory
+    internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
+        #if DEBUG
+        internal
+        #endif
+        protected LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -37,10 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                 declaration: VariableDeclaration
                 (
                     type: CreateType(type),
-                    variables: SeparatedList(new List<VariableDeclaratorSyntax>
-                    {
-                        declarator
-                    })
+                    variables: SingletonSeparatedList(declarator)
                 )
             );
         }
@@ -48,10 +45,19 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// System.Object paramName [= ...];
         /// </summary>
-        protected internal LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
+        #if DEBUG
+        internal
+        #endif
+        protected LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
 
-        protected internal static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single()!.Identifier);
+        #if DEBUG
+        internal
+        #endif
+        protected static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single()!.Identifier);
 
-        protected internal static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument(ToIdentifierName(variable));
+        #if DEBUG
+        internal
+        #endif
+        protected static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument(ToIdentifierName(variable));
     }
 }

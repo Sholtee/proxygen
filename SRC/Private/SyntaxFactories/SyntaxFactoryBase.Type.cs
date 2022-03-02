@@ -5,8 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,52 +19,37 @@ namespace Solti.Utils.Proxy.Internals
         /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
         /// </summary>
-        protected internal NameSyntax GetQualifiedName(ITypeInfo type)
+        private NameSyntax GetQualifiedName(ITypeInfo type)
         {
-            IReadOnlyList<string> parts = type.Name.Split(Type.Delimiter);
+            ReferenceCollector?.AddType(type);
 
-            if (type.IsNested) 
+            string[] parts = type.Name.Split(Type.Delimiter);
+
+            NameSyntax[] names = new NameSyntax[parts.Length];
+
+            if (type.IsNested)
             {
-                Debug.Assert(parts.Count == 1);
-
-                return parts
-                    .Select(CreateTypeName)
-                    .Qualify();
+                names[0] = CreateTypeName(parts.Single()!);
             }
+            else
+            {
+                for (int i = 0; i < parts.Length - 1; i++)
+                {
+                    names[i] = IdentifierName(parts[i]);
+                }
 
-            NameSyntax[] names = parts
-                //
-                // Nevter
-                //
-#if NETSTANDARD2_0
-                .Take(parts.Count - 1)
-#else
-                .SkipLast(1)
-#endif
-                .Select(IdentifierName)
+                names[names.Length - 1] = CreateTypeName(parts[parts.Length - 1]);
 
                 //
-                // Tipus neve
+                // Ez jol kezeli azt az esetet is ha a tipus nincs nevter alatt
                 //
 
-                .Append
+                if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
                 (
-                    CreateTypeName
-                    (
-                        parts[parts.Count - 1]
-                    )
-                )
-                .ToArray();
-
-            //
-            // Ez jol kezeli azt az esetet is ha a tipus nincs nevter alatt
-            //
-
-            if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
-            (
-                IdentifierName(Token(SyntaxKind.GlobalKeyword)), 
-                (SimpleNameSyntax) names[0]
-            );
+                    IdentifierName(Token(SyntaxKind.GlobalKeyword)),
+                    (SimpleNameSyntax) names[0]
+                );
+            }
 
             return names.Qualify();
 
@@ -79,7 +62,10 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        protected internal TypeSyntax CreateType(ITypeInfo type) 
+        #if DEBUG
+        internal
+        #endif
+        protected TypeSyntax CreateType(ITypeInfo type) 
         {
             //
             // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
@@ -89,30 +75,40 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type.ElementType is not null && type is not IArrayTypeInfo)
             {
-                TypeSyntax result = CreateType(type.ElementType!);
+                TypeSyntax result = CreateType(type.ElementType);
 
-                if (type.RefType == RefType.Pointer) 
+                if (type.RefType is RefType.Pointer) 
                     result = PointerType(result);
 
                 return result;
             }
 
-            AddType(type);
-
-            return type switch
+            if (type.IsVoid)
             {
-                _ when type.IsVoid => PredefinedType
+                return PredefinedType
                 (
                     Token(SyntaxKind.VoidKeyword)
-                ),
+                );
+            }
 
-                _ when type.IsNested => type
-                    .GetParentTypes()
-                    .Append(type)
-                    .Select(GetQualifiedName)
-                    .Qualify(),
+            if (type.IsNested)
+            {
+                return GetParts().Qualify();
 
-                _ when type is IArrayTypeInfo array => ArrayType
+                IEnumerable<NameSyntax> GetParts()
+                {
+                    foreach (ITypeInfo parent in type.GetParentTypes())
+                    {
+                        yield return GetQualifiedName(parent);
+                    }
+
+                    yield return GetQualifiedName(type);
+                }
+            }
+
+            if (type is IArrayTypeInfo array)
+            {
+                return ArrayType
                 (
                     elementType: CreateType(array.ElementType!)
                 )
@@ -128,15 +124,21 @@ namespace Solti.Utils.Proxy.Internals
                                 .ToSyntaxList(arSize => (ExpressionSyntax) arSize)
                         )
                     )
-                ),
+                );
+            }
 
-                _ => GetQualifiedName(type)
-            };
+            return GetQualifiedName(type);
         }
 
-        protected internal TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
+        #if DEBUG
+        internal
+        #endif
+        protected TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
 
-        protected internal TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
+        #if DEBUG
+        internal
+        #endif
+        protected TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
         (
             CreateType(type)
         );

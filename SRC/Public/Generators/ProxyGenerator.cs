@@ -42,21 +42,22 @@ namespace Solti.Utils.Proxy.Generators
         {
             get
             {
-                Type generatorType = GetType();
-                ITypeInfo generatorTypeMeta = MetadataTypeInfo.CreateFrom(generatorType);
-                yield return new RuntimeCompiledTypeResolutionStrategy
+                ProxySyntaxFactory syntaxFactory = new
                 (
-                    generatorType,
-                    new ProxySyntaxFactory
-                    (
-                        MetadataTypeInfo.CreateFrom(Interface),
-                        MetadataTypeInfo.CreateFrom(Interceptor),
-                        $"Generated_{MetadataTypeInfo.CreateFrom(typeof(Tuple<,,>).MakeGenericType(generatorType, Interface, Interceptor)).GetMD5HashCode()}",
-                        OutputType.Module,
-                        generatorTypeMeta
-                    )
+                    MetadataTypeInfo.CreateFrom(Interface),
+                    MetadataTypeInfo.CreateFrom(Interceptor),
+                    null,
+                    OutputType.Module,
+                    MetadataTypeInfo.CreateFrom(GetType()),
+                    new ReferenceCollector()
                 );
+
+                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
             }
         }
+
+        /// <inheritdoc/>
+        public override int GetHashCode() => Interceptor.GetHashCode();
     }
 }

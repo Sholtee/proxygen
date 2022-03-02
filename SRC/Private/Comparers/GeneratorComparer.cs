@@ -1,20 +1,13 @@
 ﻿/********************************************************************************
-* IDuckContext.cs                                                               *
+* GeneratorComparer.cs                                                          *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IDuckContext
+    internal sealed class GeneratorComparer : ComparerBase<GeneratorComparer, Generator>
     {
-        ITypeInfo InterfaceType { get; }
-
-        ITypeInfo TargetType { get; }
-
-        ITypeInfo BaseType { get; }
-
-        string ClassName { get; }
-
-        string ContainingAssembly { get; }
+        public override int GetHashCode(Generator obj) => obj.GetHashCode();
     }
 }

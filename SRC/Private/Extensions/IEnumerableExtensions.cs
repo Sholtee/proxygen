@@ -25,27 +25,41 @@ namespace Solti.Utils.Proxy.Internals
 
         public static int? IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
 
-        public static TMeta[] Convert<TMeta, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TMeta> convert, Func<TConcrete, bool>? drop = null)
+        public static IEnumerable<TConverted> Convert<TConverted, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, int, TConverted> convert, Func<TConcrete, int, bool>? drop = null)
         {
-            TMeta[] ar = new TMeta[5];
-
             int i = 0;
 
             foreach (TConcrete concrete in original)
             {
-                if (drop?.Invoke(concrete) is true)
-                    continue;
+                if (drop?.Invoke(concrete, i) is not true)
+                    yield return convert(concrete, i++);
+            }
+        }
 
+        public static IEnumerable<TConverted> Convert<TConverted, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TConverted> convert, Func<TConcrete, bool>? drop = null) =>
+            original.Convert((element, _) => convert(element), drop is not null ? (element, _) => drop(element) : null);
+
+        public static TConverted[] ConvertAr<TConverted, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, int, TConverted> convert, Func<TConcrete, int, bool>? drop = null)
+        {
+            TConverted[] ar = new TConverted[5];
+
+            int i = 0;
+
+            foreach (TConverted converted in original.Convert(convert, drop))
+            {
                 if (i == ar.Length)
                     Array.Resize(ref ar, ar.Length * 2);
 
-                ar[i++] = convert(concrete);
+                ar[i++] = converted;
             }
 
             Array.Resize(ref ar, i);
 
             return ar;
         }
+
+        public static TConverted[] ConvertAr<TConverted, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TConverted> convert, Func<TConcrete, bool>? drop = null) =>
+            original.ConvertAr((element, _) => convert(element), drop is not null ? (element, _) => drop(element) : null);
 
         public static bool Some<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null)
         {

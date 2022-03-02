@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,11 +14,16 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class SyntaxFactoryBase
     {
-        protected internal AttributeSyntax CreateAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute
+        #if DEBUG
+        internal
+        #endif
+        protected AttributeSyntax CreateAttribute(Type attribute, params ExpressionSyntax[] paramz)
         {
+            Debug.Assert(typeof(Attribute).IsAssignableFrom(attribute));
+
             AttributeSyntax attr = Attribute
             (
-                (NameSyntax) CreateType(MetadataTypeInfo.CreateFrom(typeof(TAttribute)))
+                (NameSyntax) CreateType(MetadataTypeInfo.CreateFrom(attribute))
             );
 
             if (paramz.Length > 0) attr = attr.WithArgumentList
@@ -30,5 +36,10 @@ namespace Solti.Utils.Proxy.Internals
 
             return attr;
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected AttributeSyntax CreateAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute => CreateAttribute(typeof(TAttribute), paramz);
     }
 }
