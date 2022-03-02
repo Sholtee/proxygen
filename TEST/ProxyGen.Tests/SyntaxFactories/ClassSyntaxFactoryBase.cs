@@ -105,7 +105,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void DeclareMethod_ShouldHandleParamsModifier() =>
-            Assert.That(new ClassSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default)))).NormalizeWhitespace().ToString(), Is.EqualTo("void global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.IParams.Foo(params global::System.Int32[] paramz)"));
+            Assert.That(new ClassSyntaxFactory(default).DeclareMethod(MetadataMethodInfo.CreateFrom((MethodInfo) MemberInfoExtensions.ExtractFrom<IParams>(i => i.Foo(default)))).NormalizeWhitespace().ToString(), Is.EqualTo("void global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.IParams.Foo(params global::System.Int32[] paramz)"));
 
         private interface IParams
         {
@@ -125,8 +125,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, string Expected)[] GenericMethods = new[] 
         {
-           (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.GenericMethod<T>(a)"),
-           ( (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.GenericMethod<global::System.Int32>(a)")
+           (((MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0))).GetGenericMethodDefinition(), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.GenericMethod<T>(a)"),
+           ( (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GenericMethod(0)), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.GenericMethod<global::System.Int32>(a)")
         };
 
         [TestCaseSource(nameof(GenericMethods))]
@@ -140,8 +140,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (MethodInfo Method, string Expected)[] MethodsHavingNullableRetVal = new[]
         {
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Nullable()), "global::System.Nullable<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.INullable.Nullable()"),
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Object()), "global::System.Object global::Solti.Utils.Proxy.SyntaxFactories.Tests.MemberSyntaxFactoryTests.INullable.Object()")
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Nullable()), "global::System.Nullable<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.INullable.Nullable()"),
+            ((MethodInfo) MemberInfoExtensions.ExtractFrom<INullable>(i => i.Object()), "global::System.Object global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.INullable.Object()")
         };
 
         [TestCaseSource(nameof(MethodsHavingNullableRetVal))]
