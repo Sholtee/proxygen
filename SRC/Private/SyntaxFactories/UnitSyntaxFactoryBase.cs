@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -39,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ResolveClasses(context, cancellation).Convert
                     (
-                        (cls, i) => cls.WithAttributeLists
+                        cls => cls.WithAttributeLists
                         (
                             SingletonList
                             (
