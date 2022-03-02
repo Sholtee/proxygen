@@ -102,7 +102,7 @@ namespace Solti.Utils.Proxy.Internals
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal().Result;
+        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal().GetAwaiter().GetResult();
 
         /// <summary>
         /// Creates an instance of the generated type.
