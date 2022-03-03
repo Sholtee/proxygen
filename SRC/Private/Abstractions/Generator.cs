@@ -27,28 +27,28 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly ConcurrentDictionary<Generator, Lazy<Task<Type>>> FGeneratedTypes = new(GeneratorComparer.Instance);
 
-        private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.Activator>> FActivators = new();
+        private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.ActivatorDelegate>> FActivators = new();
 
         //
         // Mivel a Task minden metodusa szal biztos (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety) ezert nem
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        private Task<Type> GetGeneratedTypeAsyncInternal() => FGeneratedTypes.GetOrAdd
+        private static Task<Type> GetGeneratedTypeAsyncInternal(Generator generator) => FGeneratedTypes.GetOrAdd
         (
             //
             // Ha ket generatornak azonos a hash-e [lasd leszarmazottakban a GetHashCode() implementaciot] akkor
             // ugyanazt a tipus is kell generaljak
             //
 
-            this,
+            generator,
             new Lazy<Task<Type>>
             (
                 () => Task<Type>.Factory.StartNew
                 (
                     () => 
                     {
-                        foreach (ITypeResolution resolution in SupportedResolutions)
+                        foreach (ITypeResolution resolution in generator.SupportedResolutions)
                         {
                             //
                             // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
@@ -72,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals
         private static object ActivateInternal(Type t, object? tuple) =>
         #endif
             FActivators
-                .GetOrAdd(t, new Lazy<ProxyActivator.Activator>(() => ProxyActivator.Create(t)))
+                .GetOrAdd(t, new Lazy<ProxyActivator.ActivatorDelegate>(() => ProxyActivator.Create(t)))
                 .Value(tuple);
 
         /// <summary>
@@ -95,14 +95,14 @@ namespace Solti.Utils.Proxy.Internals
 
             cancellation.Register(tcs.SetCanceled);
 
-            return Task.WhenAny(GetGeneratedTypeAsyncInternal(), tcs.Task).Unwrap();
+            return Task.WhenAny(GetGeneratedTypeAsyncInternal(this), tcs.Task).Unwrap();
         }
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal().GetAwaiter().GetResult();
+        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal(this).GetAwaiter().GetResult();
 
         /// <summary>
         /// Creates an instance of the generated type.

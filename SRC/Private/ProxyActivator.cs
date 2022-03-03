@@ -17,12 +17,12 @@ namespace Solti.Utils.Proxy.Internals
     internal static class ProxyActivator
     {
         #if NETSTANDARD2_1_OR_GREATER
-        public delegate object Activator(ITuple? tuple);
+        public delegate object ActivatorDelegate(ITuple? tuple);
         #else
-        public delegate object Activator(object? tuple);
+        public delegate object ActivatorDelegate(object? tuple);
         #endif
 
-        public static Activator Create(Type proxyType)
+        public static ActivatorDelegate Create(Type proxyType)
         {
             ParameterExpression paramzTuple = Expression.Parameter(typeof(object), nameof(paramzTuple));
 
@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
             );
             block.Add(Expression.Label(ret, Expression.Default(typeof(object))));
 
-            Expression<Activator> lambda = Expression.Lambda<Activator>(Expression.Block(locals, block), paramzTuple);
+            Expression<ActivatorDelegate> lambda = Expression.Lambda<ActivatorDelegate>(Expression.Block(locals, block), paramzTuple);
 
             return lambda.Compile();
 
