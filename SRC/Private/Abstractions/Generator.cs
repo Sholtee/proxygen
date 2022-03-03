@@ -18,14 +18,14 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of the generators.
     /// </summary>
-    public abstract class Generator
+    public abstract record Generator
     {
         //
         // Ha ugyanazzal a kulccsal hivjuk parhuzamosan a GetOrAdd()-et akkor a factory tobbszor is
         // meghivasra kerulhet (MSDN) -> Lazy
         //
 
-        private static readonly ConcurrentDictionary<Generator, Lazy<Task<Type>>> FGeneratedTypes = new(GeneratorComparer.Instance);
+        private static readonly ConcurrentDictionary<Generator, Lazy<Task<Type>>> FGeneratedTypes = new();
 
         private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.ActivatorDelegate>> FActivators = new();
 
@@ -37,8 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         private static Task<Type> GetGeneratedTypeAsyncInternal(Generator generator) => FGeneratedTypes.GetOrAdd
         (
             //
-            // Ha ket generatornak azonos a hash-e [lasd leszarmazottakban a GetHashCode() implementaciot] akkor
-            // ugyanazt a tipus is kell generaljak
+            // Ha ket generatornak azonos a hash-e (ezert hasznalunk record tipust) akkor ugyanazt a tipust is generaljak.
             //
 
             generator,
@@ -48,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     () => 
                     {
-                        foreach (ITypeResolution resolution in generator.SupportedResolutions)
+                        foreach (ITypeResolution resolution in generator.GetSupportedResolutions())
                         {
                             //
                             // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
@@ -78,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Returns the supported type resolution strategies.
         /// </summary>
-        internal abstract IEnumerable<ITypeResolution> SupportedResolutions { get; }
+        internal abstract IEnumerable<ITypeResolution> GetSupportedResolutions();
 
         #region Public
         /// <summary>

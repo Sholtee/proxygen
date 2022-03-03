@@ -45,7 +45,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)),
             typeof(ProxySyntaxFactoryTests).Assembly.GetName().Name,
             outputType,
-            MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<IFoo<int>, FooInterceptor>)),
             null
         );
 
@@ -153,8 +152,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
                 "cica", 
-                OutputType.Module, 
-                MetadataTypeInfo.CreateFrom(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>)),
+                OutputType.Module,
                 null
             ).ResolveProperties(null).ToArray();
 
@@ -210,15 +208,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     type1, 
                     interceptor1.Close(type1), 
                     "cica", 
-                    (OutputType) outputType, 
-                    MetadataTypeInfo.CreateFrom
-                    (
-                        typeof(ProxyGenerator<,>).MakeGenericType
-                        (
-                            type, 
-                            typeof(InterfaceInterceptor<>).MakeGenericType(type)
-                        )
-                    ),
+                    (OutputType) outputType,
                     new ReferenceCollector()
                 ),
                 fact2 = new ProxySyntaxFactory
@@ -226,16 +216,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     type2, 
                     interceptor2.Close(type2), 
                     "cica", 
-                    (OutputType) outputType, 
-                    SymbolTypeInfo.CreateFrom
-                    (
-                        compilation.GetTypeByMetadataName(typeof(ProxyGenerator<,>).FullName).Construct
-                        (
-                            type2.ToSymbol(compilation),
-                            interceptor2.Close(type2).ToSymbol(compilation)
-                        ), 
-                        compilation
-                    ),
+                    (OutputType) outputType,
                     new ReferenceCollector()
                 );
 

@@ -426,12 +426,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
-            var generator = new ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>();
+            var generator = ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.Instance;
 
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.GetSupportedResolutions().Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
             string cacheFile = Path.Combine(tmpDir, $"{res.SyntaxFactory.ContainingAssembly}.dll");
 
@@ -447,9 +447,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            var generator = new ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>();
+            var generator = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.Instance;
 
-            var res = (RuntimeCompiledTypeResolutionStrategy) generator.SupportedResolutions.Single(res => res is RuntimeCompiledTypeResolutionStrategy);
+            var res = (RuntimeCompiledTypeResolutionStrategy) generator.GetSupportedResolutions().Single(res => res is RuntimeCompiledTypeResolutionStrategy);
 
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),

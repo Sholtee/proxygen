@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating proxies that intercept interface method calls.
     /// </summary>
-    public sealed class ProxyGenerator : Generator
+    public sealed record ProxyGenerator : Generator
     {
         /// <summary>
         /// The interface to which the proxy will be created.
@@ -38,26 +38,19 @@ namespace Solti.Utils.Proxy.Generators
             Interface = iface ?? throw new ArgumentNullException(nameof(iface));
         }
 
-        internal override IEnumerable<ITypeResolution> SupportedResolutions
+        internal override IEnumerable<ITypeResolution> GetSupportedResolutions()
         {
-            get
-            {
-                ProxySyntaxFactory syntaxFactory = new
-                (
-                    MetadataTypeInfo.CreateFrom(Interface),
-                    MetadataTypeInfo.CreateFrom(Interceptor),
-                    null,
-                    OutputType.Module,
-                    MetadataTypeInfo.CreateFrom(GetType()),
-                    new ReferenceCollector()
-                );
+            ProxySyntaxFactory syntaxFactory = new
+            (
+                MetadataTypeInfo.CreateFrom(Interface),
+                MetadataTypeInfo.CreateFrom(Interceptor),
+                null,
+                OutputType.Module,
+                new ReferenceCollector()
+            );
 
-                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
-                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
-            }
+            yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+            yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
         }
-
-        /// <inheritdoc/>
-        public override int GetHashCode() => Interceptor.GetHashCode();
     }
 }

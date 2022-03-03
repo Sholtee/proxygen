@@ -3,8 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
-
 namespace Solti.Utils.Proxy.Generators
 {
     using Internals;
@@ -16,26 +14,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TTarget">The target who implements all the <typeparamref name="TInterface"/> members.</typeparam>
     public sealed class DuckGenerator<TInterface, TTarget>: Generator<TInterface, DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
-        internal override IEnumerable<ITypeResolution> SupportedResolutions
-        {
-            get 
-            {
-                DuckSyntaxFactory syntaxFactory = new
-                (
-                    MetadataTypeInfo.CreateFrom(typeof(TInterface)),
-                    MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-                    null,
-                    OutputType.Module,
-                    MetadataTypeInfo.CreateFrom(GetType()),
-                    new ReferenceCollector()
-                );
-
-                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
-                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
-            }
-        }
-
         /// <inheritdoc/>
-        public override int GetHashCode() => new { Interface = typeof(TInterface), Target = typeof(TTarget) }.GetHashCode();
+        protected override Generator GetConcreteGenerator() => new DuckGenerator(typeof(TInterface), typeof(TTarget));
     }
 }

@@ -49,8 +49,7 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo interceptorType,
             string? containingAssembly,
             OutputType outputType,
-            ITypeInfo relatedGenerator,
-            ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}", relatedGenerator, referenceCollector) 
+            ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}", referenceCollector) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));

@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating proxies that let target behaves like an interface.
     /// </summary>
-    public sealed class DuckGenerator: Generator
+    public sealed record DuckGenerator: Generator
     {
         /// <summary>
         /// The target who implements all the <see cref="Interface"/> members.
@@ -38,26 +38,20 @@ namespace Solti.Utils.Proxy.Generators
             Interface = iface ?? throw new ArgumentNullException(nameof(iface));
         }
 
-        internal override IEnumerable<ITypeResolution> SupportedResolutions
+        internal override IEnumerable<ITypeResolution> GetSupportedResolutions()
         {
-            get 
-            {
-                DuckSyntaxFactory syntaxFactory = new
-                (
-                    MetadataTypeInfo.CreateFrom(Interface),
-                    MetadataTypeInfo.CreateFrom(Target),
-                    null,
-                    OutputType.Module,
-                    MetadataTypeInfo.CreateFrom(GetType()),
-                    new ReferenceCollector()
-                );
+            DuckSyntaxFactory syntaxFactory = new
+            (
+                MetadataTypeInfo.CreateFrom(Interface),
+                MetadataTypeInfo.CreateFrom(Target),
+                null,
+                OutputType.Module,
+                MetadataTypeInfo.CreateFrom(GetType()),
+                new ReferenceCollector()
+            );
 
-                yield return new LoadedTypeResolutionStrategy(syntaxFactory);
-                yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
-            }
+            yield return new LoadedTypeResolutionStrategy(syntaxFactory);
+            yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
         }
-
-        /// <inheritdoc/>
-        public override int GetHashCode() => new { Target, Interface }.GetHashCode();
     }
 }

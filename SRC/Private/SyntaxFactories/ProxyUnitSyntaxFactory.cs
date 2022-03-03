@@ -15,20 +15,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal abstract class ProxyUnitSyntaxFactory : UnitSyntaxFactoryBase
     {
-        protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ITypeInfo relatedGenerator, ReferenceCollector? referenceCollector): base(outputType, referenceCollector)
-        {
-            if (!relatedGenerator.GetBaseTypes().Some(@base => @base.QualifiedName == typeof(Generator).FullName))
-                throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(relatedGenerator));
-
-            RelatedGenerator = relatedGenerator;
+        protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector): base(outputType, referenceCollector) =>
             ContainingAssembly = containingAssembly;
-        }
-
-        public ITypeInfo RelatedGenerator { get; }
 
         public string ContainingAssembly { get; }
 
