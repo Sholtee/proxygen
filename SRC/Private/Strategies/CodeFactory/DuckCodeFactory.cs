@@ -40,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
                     SymbolTypeInfo.CreateFrom(target, compilation),
                     compilation.AssemblyName!,
                     OutputType.Unit,
-                    SymbolTypeInfo.CreateFrom(generator, compilation),
+                    SymbolAssemblyInfo.CreateFrom(generator.ContainingAssembly, compilation),
 
                     //
                     // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni

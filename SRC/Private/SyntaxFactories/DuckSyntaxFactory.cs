@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo targetType, 
             string? containingAssembly,
             OutputType outputType,
-            ITypeInfo relatedGenerator,
+            IAssemblyInfo thisAssembly,
             ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}", referenceCollector) 
         {
             if (!interfaceType.IsInterface)
@@ -39,10 +39,11 @@ namespace Solti.Utils.Proxy.Internals
             TargetType = targetType;
 
             //
-            // Ne metadatabol generaljunk [MetadataTypeInfo.CreateFrom(typeof(DuckBase<>))).Close(targetType)] mert a "targetType" meg nem biztos h letezik
+            // BaseType beszerzeset nem tudjuk szebben megoldani mivel nem tudjuk h "targetType" mogott meta-adat vagy
+            // szimbolum van.
             //
 
-            BaseType = ((IGenericTypeInfo) relatedGenerator.DeclaringAssembly!.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
+            BaseType = ((IGenericTypeInfo) thisAssembly.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
                 .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
