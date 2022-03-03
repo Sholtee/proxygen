@@ -325,19 +325,6 @@ references:
   commentId: T:Solti.Utils.Proxy.Internals.GeneratedClass
   fullName: Solti.Utils.Proxy.Internals.GeneratedClass
   nameWithType: GeneratedClass
-- uid: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
-  name: Instances
-  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_Instances
-  commentId: P:Solti.Utils.Proxy.Internals.GeneratedClass.Instances
-  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
-  nameWithType: GeneratedClass.Instances
-- uid: Solti.Utils.Proxy.Internals.GeneratedClass.Instances*
-  name: Instances
-  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_Instances_
-  commentId: Overload:Solti.Utils.Proxy.Internals.GeneratedClass.Instances
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.Instances
-  nameWithType: GeneratedClass.Instances
 - uid: Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(System.Type)
   name: RegisterInstance(Type)
   href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_RegisterInstance_System_Type_
