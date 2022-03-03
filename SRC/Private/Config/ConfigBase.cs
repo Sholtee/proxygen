@@ -14,12 +14,16 @@ namespace Solti.Utils.Proxy.Internals
         // SourceGenerator-ok, ezert feltetelezem h igen -> ThreadLocal
         //
 
-        private static readonly ThreadLocal<TDescendant> FInstance = new(() => 
-        {
-            TDescendant instance = new();
-            instance.InitWithDefaults();
-            return instance;
-        });
+        private static readonly ThreadLocal<TDescendant> FInstance = new
+        (
+            () => 
+            {
+                TDescendant instance = new();
+                instance.InitWithDefaults();
+                return instance;
+            },
+            trackAllValues: false
+        );
 
         protected abstract void Init(IConfigReader configReader);
 

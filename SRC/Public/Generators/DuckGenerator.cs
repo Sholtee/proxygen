@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -38,20 +37,14 @@ namespace Solti.Utils.Proxy.Generators
             Interface = iface ?? throw new ArgumentNullException(nameof(iface));
         }
 
-        internal override IEnumerable<ITypeResolution> GetSupportedResolutions()
-        {
-            DuckSyntaxFactory syntaxFactory = new
-            (
-                MetadataTypeInfo.CreateFrom(Interface),
-                MetadataTypeInfo.CreateFrom(Target),
-                null,
-                OutputType.Module,
-                MetadataAssemblyInfo.CreateFrom(GetType().Assembly),
-                new ReferenceCollector()
-            );
-
-            yield return new LoadedTypeResolutionStrategy(syntaxFactory);
-            yield return new RuntimeCompiledTypeResolutionStrategy(syntaxFactory);
-        }
+        internal override ProxyUnitSyntaxFactory GetSyntaxFactory() => new DuckSyntaxFactory
+        (
+            MetadataTypeInfo.CreateFrom(Interface),
+            MetadataTypeInfo.CreateFrom(Target),
+            null,
+            OutputType.Module,
+            MetadataAssemblyInfo.CreateFrom(GetType().Assembly),
+            new ReferenceCollector()
+        );
     }
 }

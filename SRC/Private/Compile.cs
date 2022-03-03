@@ -8,8 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -23,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Assembly ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IEnumerable<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
+        public static Stream ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IEnumerable<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
         {
             string separator = $",{Environment.NewLine}";
 
@@ -44,38 +42,42 @@ namespace Solti.Utils.Proxy.Internals
             if (customConfig is not null)
                 compilation = customConfig(compilation);
 
-            using Stream stm = outputFile is not null ? File.Create(outputFile) : (Stream) new MemoryStream();
-
-            EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
-
-            Debug.WriteLine(string.Join(separator, result.Diagnostics));
-
-            if (!result.Success)
+            Stream stm = outputFile is not null ? File.Create(outputFile) : (Stream) new MemoryStream();
+            try
             {
-                string src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString();
+                EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
-                string[] 
-                    failures = result
-                        .Diagnostics
-                        .ConvertAr(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
-                    refs = references.ConvertAr(r => r.Display!);
+                Debug.WriteLine(string.Join(separator, result.Diagnostics));
 
-                InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
+                if (!result.Success)
+                {
+                    string src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString();
 
-                IDictionary extra = ex.Data;
+                    string[]
+                        failures = result
+                            .Diagnostics
+                            .ConvertAr(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
+                        refs = references.ConvertAr(r => r.Display!);
 
-                extra.Add(nameof(failures), failures);
-                extra.Add(nameof(src), src);
-                extra.Add(nameof(references), refs);
+                    InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 
-                throw ex;
+                    IDictionary extra = ex.Data;
+
+                    extra.Add(nameof(failures), failures);
+                    extra.Add(nameof(src), src);
+                    extra.Add(nameof(references), refs);
+
+                    throw ex;
+                }
+
+                stm.Seek(0, SeekOrigin.Begin);
+                return stm;
             }
-
-            stm.Seek(0, SeekOrigin.Begin);
-
-            return AssemblyLoadContext
-                .Default
-                .LoadFromStream(stm);
+            catch
+            {
+                stm.Dispose();
+                throw;
+            }
         }
     }
 }

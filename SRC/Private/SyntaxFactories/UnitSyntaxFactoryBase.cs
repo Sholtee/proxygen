@@ -16,7 +16,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase, IUnitDefinition
+    internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase
     {
         protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector): base(referenceCollector) =>
             OutputType = outputType;

@@ -5,8 +5,10 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,18 +47,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
             return result;
         }
 
-        public static Assembly Compile(string src, Func<Compilation, Compilation> customConfig = null, params Assembly[] additionalReferences) => Internals.Compile.ToAssembly
-        (
-            CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
-            Guid.NewGuid().ToString(),
-            null,
-            Runtime
-                .Assemblies
-                .Concat(additionalReferences)
-                .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
-                .ToArray(),
-            customConfig
-        );
+        public static Assembly Compile(string src, Func<Compilation, Compilation> customConfig = null, params Assembly[] additionalReferences)
+        {
+            using Stream asm = Internals.Compile.ToAssembly
+            (
+                CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
+                Guid.NewGuid().ToString(),
+                null,
+                Runtime
+                    .Assemblies
+                    .Concat(additionalReferences)
+                    .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
+                    .ToArray(),
+                customConfig
+            );
+
+            return AssemblyLoadContext.Default.LoadFromStream(asm);
+        }
 
         public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
 

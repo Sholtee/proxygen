@@ -10,11 +10,35 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class WorkingDirectories: ConfigBase<WorkingDirectories>
     {
-        public string? AssemblyCacheDir { get; private set; }
+        public string? AssemblyCacheDir 
+        {
+            get;
+            #if DEBUG
+            internal set;
+            #else
+            private set;
+            #endif
+        }
 
-        public string? SourceDump { get; private set; }
+        public string? SourceDump
+        {
+            get;
+            #if DEBUG
+            internal set;
+            #else
+            private set;
+            #endif
+        }
 
-        public string? LogDump { get; private set; }
+        public string? LogDump
+        {
+            get;
+            #if DEBUG
+            internal set;
+            #else
+            private set;
+            #endif
+        }
 
         protected override void Init(IConfigReader configReader)
         {

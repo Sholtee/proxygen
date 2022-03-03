@@ -72,6 +72,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
             public ref readonly object Bar() => ref FObject;
         }
 
+        [SetUp]
+        public void Setup() => WorkingDirectories.Setup(new RuntimeConfigReader());
+
         [Test]
         public async Task GeneratedProxy_ShouldHandleRefs()
         {
@@ -226,21 +229,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
-            var generator = DuckGenerator<IGeneric<Guid>, Generic<Guid>>.Instance;
+            Generator generator = DuckGenerator<IGeneric<Guid>, Generic<Guid>>.Instance;
 
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            var res = (RuntimeCompiledTypeResolutionStrategy) generator.GetSupportedResolutions().Single(res => res is RuntimeCompiledTypeResolutionStrategy);
-
-            string cacheFile = Path.Combine(tmpDir, $"{res.SyntaxFactory.ContainingAssembly}.dll");
+            string cacheFile = Path.Combine(tmpDir, $"{generator.GetSyntaxFactory().ContainingAssembly}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            res.CacheDir = tmpDir;
+            WorkingDirectories.Instance.AssemblyCacheDir = tmpDir;
 
-            res.TryResolve(default);
+            generator.GetGeneratedType();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -248,20 +249,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            var generator = DuckGenerator<IGeneric<object>, Generic<object>>.Instance;
+            Generator generator = DuckGenerator<IGeneric<object>, Generic<object>>.Instance;
             
-            var res = (RuntimeCompiledTypeResolutionStrategy) generator.GetSupportedResolutions().Single(res => res is RuntimeCompiledTypeResolutionStrategy);
-
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-                cacheFile = Path.Combine(cacheDir, $"{res.SyntaxFactory.ContainingAssembly}.dll");
+                cacheFile = Path.Combine(cacheDir, $"{generator.GetSyntaxFactory().ContainingAssembly}.dll");
 
             Assembly.LoadFile(cacheFile);
 
-            res.CacheDir = cacheDir;
+            WorkingDirectories.Instance.AssemblyCacheDir = cacheDir;
 
-            Type gt = res.TryResolve(default);
-
+            Type gt = generator.GetGeneratedType();
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 

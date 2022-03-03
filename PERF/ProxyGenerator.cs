@@ -22,12 +22,9 @@ namespace Solti.Utils.Proxy.Perf
             }
         }
 
-        internal RuntimeCompiledTypeResolutionStrategy TypeResolution { get; set; }
-
-        [GlobalSetup]
-        public void Setup() => TypeResolution = (RuntimeCompiledTypeResolutionStrategy) ProxyGenerator<IInterface, InterfaceProxy>.Instance.GetSupportedResolutions().Single(res => res is RuntimeCompiledTypeResolutionStrategy);
+        private static ProxyUnitSyntaxFactory SyntaxFactory { get; } = ProxyGenerator<IInterface, InterfaceProxy>.Instance.GetSyntaxFactory();
 
         [Benchmark]
-        public void AssemblingProxyType() => TypeResolution.TryResolve(Guid.NewGuid().ToString(), default);
+        public void AssemblingProxyType() => TypeEmitter.Emit(SyntaxFactory, Guid.NewGuid().ToString(), default);
     }
 }

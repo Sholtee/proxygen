@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -45,21 +44,12 @@ namespace Solti.Utils.Proxy.Internals
             (
                 () => Task<Type>.Factory.StartNew
                 (
-                    () => 
-                    {
-                        foreach (ITypeResolution resolution in generator.GetSupportedResolutions())
-                        {
-                            //
-                            // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
-                            // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
-                            //
+                    //
+                    // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
+                    // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
+                    //
 
-                            Type? resolved = resolution.TryResolve(default);
-                            if (resolved is not null)
-                                return resolved;
-                        }
-                        throw new NotSupportedException();
-                    }
+                    () => TypeEmitter.Emit(generator.GetSyntaxFactory(), default)
                 ),
                 LazyThreadSafetyMode.ExecutionAndPublication
             )
@@ -75,9 +65,9 @@ namespace Solti.Utils.Proxy.Internals
                 .Value(tuple);
 
         /// <summary>
-        /// Returns the supported type resolution strategies.
+        /// Returns the associated syntax factory
         /// </summary>
-        internal abstract IEnumerable<ITypeResolution> GetSupportedResolutions();
+        internal abstract ProxyUnitSyntaxFactory GetSyntaxFactory();
 
         #region Public
         /// <summary>
