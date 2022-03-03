@@ -34,7 +34,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
-            _ when src.IsTupleType || src.IsNativeIntegerType => $"{src.ContainingNamespace}.{src.Name}", // ne "(T Item1, TT item2)" formaban legyen
+            _ when src.IsTupleType || src.IsNativeIntegerType => src.ContainingNamespace.ToString() + Type.Delimiter + src.Name, // ne "(T Item1, TT item2)" formaban legyen
             _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
             _ when src is IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
             _ when src.IsNested() => src.ToDisplayString
