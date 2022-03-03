@@ -48,10 +48,9 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></div>
-    <div class="level2"><span class="xref">Generator&lt;TInterface, TDescendant&gt;</span></div>
-      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator-2.html">DuckGenerator&lt;TInterface, TTarget&gt;</a></div>
-      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator&lt;TInterface, TInterceptor&gt;</a></div>
+    <div class="level1"><span class="xref">Generator&lt;TInterface, TDescendant&gt;</span></div>
+      <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator-2.html">DuckGenerator&lt;TInterface, TTarget&gt;</a></div>
+      <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator&lt;TInterface, TInterceptor&gt;</a></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
@@ -81,7 +80,8 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Internals_Generator_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class Generator&lt;TInterface, TDescendant&gt; : Generator where TDescendant : Generator&lt;TInterface, TDescendant&gt;, new()</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Generator&lt;TInterface, TDescendant&gt;
+    where TDescendant : Generator&lt;TInterface, TDescendant&gt;, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -105,6 +105,32 @@
   <h5 id="Solti_Utils_Proxy_Internals_Generator_2_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>Generators should not be instantiated. To access the created <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> use the <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType">GetGeneratedType()</a> or <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_">GetGeneratedTypeAsync(CancellationToken)</a> method.</p>
 </div>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_Instance_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Instance*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_Instance" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Instance">Instance</h4>
+  <div class="markdown level1 summary"><p>The singleton generator instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Generator Instance { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="methods">Methods
   </h3>
   <a id="Solti_Utils_Proxy_Internals_Generator_2_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate*"></a>
@@ -196,6 +222,30 @@
         <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;TInterface&gt;</td>
         <td><p>The just activated instance.</p>
 </td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2_GetConcreteGenerator_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_GetConcreteGenerator" data-uid="Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator">GetConcreteGenerator()</h4>
+  <div class="markdown level1 summary"><p>Gets the concrete generator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected abstract Generator GetConcreteGenerator()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

@@ -48,12 +48,17 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></div>
-    <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html">Generator</a>&lt;TInterface, <a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator</a>&lt;TInterface, TInterceptor&gt;&gt;</div>
-    <div class="level3"><span class="xref">ProxyGenerator&lt;TInterface, TInterceptor&gt;</span></div>
+    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html">Generator</a>&lt;TInterface, <a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator</a>&lt;TInterface, TInterceptor&gt;&gt;</div>
+    <div class="level2"><span class="xref">ProxyGenerator&lt;TInterface, TInterceptor&gt;</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetConcreteGenerator">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetConcreteGenerator()</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Instance">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.Instance</a>
+    </div>
     <div>
       <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetGeneratedTypeAsync(CancellationToken)</a>
     </div>
@@ -67,22 +72,13 @@
       <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Object_">Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.Activate(Object)</a>
     </div>
     <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken_">Generator.GetGeneratedTypeAsync(CancellationToken)</a>
-    </div>
-    <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType">Generator.GetGeneratedType()</a>
-    </div>
-    <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Object_System_Threading_CancellationToken_">Generator.ActivateAsync(Object, CancellationToken)</a>
-    </div>
-    <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_System_Object_">Generator.Activate(Object)</a>
-    </div>
-    <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
     </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">Object.Equals(Object, Object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a>
     </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype">Object.GetType()</a>
@@ -126,13 +122,14 @@
   </table>
   <h3 id="methods">Methods
   </h3>
-  <a id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetHashCode_" data-uid="Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode*"></a>
-  <h4 id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetHashCode" data-uid="Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetHashCode">GetHashCode()</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetConcreteGenerator_" data-uid="Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator*"></a>
+  <h4 id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetConcreteGenerator" data-uid="Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator">GetConcreteGenerator()</h4>
+  <div class="markdown level1 summary"><p>Gets the concrete generator.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+    <pre><code class="lang-csharp hljs">protected override Generator GetConcreteGenerator()</code></pre>
   </div>
   <h5 class="returns">Returns</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -144,13 +141,13 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
         <td></td>
       </tr>
     </tbody>
   </table>
   <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a></div>
+  <div><span class="xref">Solti.Utils.Proxy.Internals.Generator&lt;TInterface, Solti.Utils.Proxy.Generators.ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt;.GetConcreteGenerator()</span></div>
 </article>
           </div>
           

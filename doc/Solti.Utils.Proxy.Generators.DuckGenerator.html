@@ -51,6 +51,11 @@
     <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></div>
     <div class="level2"><span class="xref">DuckGenerator</span></div>
   </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a>&gt;</div>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator.html">DuckGenerator</a>&gt;</div>
+  </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
@@ -72,6 +77,9 @@
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">Object.Equals(Object, Object)</a>
     </div>
     <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a>
+    </div>
+    <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype">Object.GetType()</a>
     </div>
     <div>
@@ -88,7 +96,7 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Generators_DuckGenerator_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class DuckGenerator : Generator</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class DuckGenerator : Generator, IEquatable&lt;Generator&gt;, IEquatable&lt;DuckGenerator&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -173,33 +181,13 @@
       </tr>
     </tbody>
   </table>
-  <h3 id="methods">Methods
-  </h3>
-  <a id="Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode_" data-uid="Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode*"></a>
-  <h4 id="Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode" data-uid="Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode">GetHashCode()</h4>
-  <div class="markdown level1 summary"></div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
   </div>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="overrides">Overrides</h5>
-  <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a></div>
+  <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
+  </div>
 </article>
           </div>
           
