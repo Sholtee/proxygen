@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                string tpa = (string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
+                string tpa = (string) AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
 
                 return GetFilteredPlatformAssemblies
                 (
@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
             if (customConfig is not null)
                 compilation = customConfig(compilation);
 
-            Stream stm = outputFile is not null ? File.Create(outputFile) : (Stream) new MemoryStream();
+            Stream stm = outputFile is not null ? File.Create(outputFile) : new MemoryStream();
             try
             {
                 EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
