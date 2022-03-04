@@ -95,9 +95,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
-            .Repeat(0, 100)
-            .Select(_ => CreateDuck<IRef, Ref>(new Ref()))));
+        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => CreateDuck<IRef, Ref>(new Ref()))));
 
         [Test]
         public async Task GeneratedProxy_ShouldHandleEvents()
@@ -236,7 +234,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.GetGeneratedTypeAsyncInternal(tmpDir).Wait();
+            _ = generator.GetGeneratedTypeAsyncInternal(tmpDir).Result;
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -249,8 +247,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetSyntaxFactory(null).ContainingAssembly}.dll");
-
-            Assembly.LoadFile(cacheFile);
 
             Type gt = generator.GetGeneratedTypeAsyncInternal(cacheDir).Result;
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));

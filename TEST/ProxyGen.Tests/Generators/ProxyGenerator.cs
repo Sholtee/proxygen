@@ -67,9 +67,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(Enumerable
-            .Repeat(0, 100)
-            .Select(_ => ProxyGenerator<IMyInterface, MyInterfaceProxy>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass())))));
+        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => ProxyGenerator<IMyInterface, MyInterfaceProxy>.ActivateAsync(Tuple.Create((IMyInterface) new MyClass())))));
 
         [Test]
         public async Task GeneratedProxy_MayBeThreadSafe()
@@ -436,7 +434,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.GetGeneratedTypeAsyncInternal(tmpDir).Wait();
+            _ = generator.GetGeneratedTypeAsyncInternal(tmpDir).Result;
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -451,8 +449,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheFile = Path.Combine(
                     cacheDir,
                     $"{generator.GetSyntaxFactory(null).ContainingAssembly}.dll");
-
-            Assembly.LoadFile(cacheFile);
 
             Type gt = generator.GetGeneratedTypeAsyncInternal(cacheDir).Result;
 
