@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 },
                 Internals.Compile.PlatformAssemblies.Concat
                 (
-                    additionalReferences.Select
+                    additionalReferences.Append(typeof(object).Assembly.Location).Select
                     (
                         location => MetadataReference.CreateFromFile(location)
                     )
