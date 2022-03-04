@@ -22,9 +22,14 @@ namespace Solti.Utils.Proxy.Perf
             }
         }
 
-        private static ProxyUnitSyntaxFactory SyntaxFactory { get; } = ProxyGenerator<IInterface, InterfaceProxy>.Instance.GetSyntaxFactory();
-
         [Benchmark]
-        public void AssemblingProxyType() => TypeEmitter.Emit(SyntaxFactory, Guid.NewGuid().ToString(), default);
+        public void AssemblingProxyType() => TypeEmitter.Emit
+        (
+            ProxyGenerator<IInterface, InterfaceProxy>
+                .Instance
+                .GetSyntaxFactory(Guid.NewGuid().ToString()),
+            null, 
+            default
+        );
     }
 }

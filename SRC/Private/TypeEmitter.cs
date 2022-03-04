@@ -97,7 +97,5 @@ namespace Solti.Utils.Proxy.Internals
                 return asm.GetType(className, throwOnError: true);
             }
         }
-
-        public static Type Emit(ProxyUnitSyntaxFactory syntaxFactory, in CancellationToken cancellation) => Emit(syntaxFactory, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
     }
 }

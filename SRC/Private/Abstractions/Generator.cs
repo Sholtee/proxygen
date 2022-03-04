@@ -33,13 +33,13 @@ namespace Solti.Utils.Proxy.Internals
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        private static Task<Type> GetGeneratedTypeAsyncInternal(Generator generator) => FGeneratedTypes.GetOrAdd
+        internal Task<Type> GetGeneratedTypeAsyncInternal(string? assemblyCacheDir) => FGeneratedTypes.GetOrAdd
         (
             //
             // Ha ket generatornak azonos a hash-e (ezert hasznalunk record tipust) akkor ugyanazt a tipust is generaljak.
             //
 
-            generator,
+            this,
             new Lazy<Task<Type>>
             (
                 () => Task<Type>.Factory.StartNew
@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                     // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
                     //
 
-                    () => TypeEmitter.Emit(generator.GetSyntaxFactory(), default)
+                    () => TypeEmitter.Emit(GetSyntaxFactory(null), assemblyCacheDir, default)
                 ),
                 LazyThreadSafetyMode.ExecutionAndPublication
             )
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
         #if NETSTANDARD2_1_OR_GREATER
         private static object ActivateInternal(Type t, ITuple? tuple) => 
         #else
-        private static object ActivateInternal(Type t, object? tuple) =>
+        internal static object ActivateInternal(Type t, object? tuple) =>
         #endif
             FActivators
                 .GetOrAdd(t, new Lazy<ProxyActivator.ActivatorDelegate>(() => ProxyActivator.Create(t)))
@@ -67,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Returns the associated syntax factory
         /// </summary>
-        internal abstract ProxyUnitSyntaxFactory GetSyntaxFactory();
+        internal abstract ProxyUnitSyntaxFactory GetSyntaxFactory(string? asmName);
 
         #region Public
         /// <summary>
@@ -84,14 +84,20 @@ namespace Solti.Utils.Proxy.Internals
 
             cancellation.Register(tcs.SetCanceled);
 
-            return Task.WhenAny(GetGeneratedTypeAsyncInternal(this), tcs.Task).Unwrap();
+            return Task.WhenAny
+            (
+                GetGeneratedTypeAsyncInternal(WorkingDirectories.Instance.AssemblyCacheDir),
+                tcs.Task
+            ).Unwrap();
         }
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal(this).GetAwaiter().GetResult();
+        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal(WorkingDirectories.Instance.AssemblyCacheDir)
+            .GetAwaiter()
+            .GetResult();
 
         /// <summary>
         /// Creates an instance of the generated type.

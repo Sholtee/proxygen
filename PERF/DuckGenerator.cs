@@ -20,9 +20,14 @@ namespace Solti.Utils.Proxy.Perf
             public int DoSomething(string param) => param.GetHashCode();
         }
 
-        private static ProxyUnitSyntaxFactory SyntaxFactory { get; } = DuckGenerator<IInterface, Implementation>.Instance.GetSyntaxFactory();
-
         [Benchmark]
-        public void AssemblingProxyType() => TypeEmitter.Emit(SyntaxFactory, Guid.NewGuid().ToString(), default);
+        public void AssemblingProxyType() => TypeEmitter.Emit
+        (
+            DuckGenerator<IInterface, Implementation>
+                .Instance
+                .GetSyntaxFactory(Guid.NewGuid().ToString()),
+            null, 
+            default
+        );
     }
 }

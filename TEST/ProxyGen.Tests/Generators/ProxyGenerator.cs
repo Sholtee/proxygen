@@ -57,9 +57,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
-        [SetUp]
-        public void Setup() => WorkingDirectories.Setup(new RuntimeConfigReader());
-
         [Test]
         public async Task GeneratedProxy_ShouldHook()
         {
@@ -434,14 +431,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
 
-            string cacheFile = Path.Combine(tmpDir, $"{generator.GetSyntaxFactory().ContainingAssembly}.dll");
+            string cacheFile = Path.Combine(tmpDir, $"{generator.GetSyntaxFactory(null).ContainingAssembly}.dll");
 
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            WorkingDirectories.Instance.AssemblyCacheDir = tmpDir;
-
-            generator.GetGeneratedType();
+            generator.GetGeneratedTypeAsyncInternal(tmpDir).Wait();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -455,12 +450,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(
                     cacheDir,
-                    $"{generator.GetSyntaxFactory().ContainingAssembly}.dll");
+                    $"{generator.GetSyntaxFactory(null).ContainingAssembly}.dll");
 
             Assembly.LoadFile(cacheFile);
 
-            WorkingDirectories.Instance.AssemblyCacheDir = cacheDir;
-            Type gt = generator.GetGeneratedType();
+            Type gt = generator.GetGeneratedTypeAsyncInternal(cacheDir).Result;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

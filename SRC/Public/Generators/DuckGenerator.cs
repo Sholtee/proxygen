@@ -37,11 +37,11 @@ namespace Solti.Utils.Proxy.Generators
             Interface = iface ?? throw new ArgumentNullException(nameof(iface));
         }
 
-        internal override ProxyUnitSyntaxFactory GetSyntaxFactory() => new DuckSyntaxFactory
+        internal override ProxyUnitSyntaxFactory GetSyntaxFactory(string? asmName) => new DuckSyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(Interface),
             MetadataTypeInfo.CreateFrom(Target),
-            null,
+            asmName,
             OutputType.Module,
             MetadataAssemblyInfo.CreateFrom(GetType().Assembly),
             new ReferenceCollector()
