@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            ReferenceCollector collector = new(includeRuntimeReferences: false);
+            ReferenceCollector collector = new();
             collector.AddType(type);
 
             //
