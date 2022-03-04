@@ -242,12 +242,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                         "
                     )
                 },
-                Runtime
-                    .Assemblies
-                    .Select(asm => asm.Location)
-                    .Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
-                    .Distinct()
-                    .Select(location => MetadataReference.CreateFromFile(location)),
+                Internals.Compile.PlatformAssemblies.Append
+                (
+                    MetadataReference.CreateFromFile(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
+                ),
                 new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
@@ -272,11 +270,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, IEnumerable>))]
                 ",
-                Runtime
-                    .Assemblies
-                    .Select(asm => asm.Location)
-                    .Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
-                    .Distinct(),
+                new string[] { typeof(EmbedGeneratedTypeAttribute).Assembly.Location },
                 Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6
             );
 

@@ -26,12 +26,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                     CSharpSyntaxTree.ParseText(src, new CSharpParseOptions(languageVersion))
                 },
-                Runtime
-                    .Assemblies
-                    .Select(asm => asm.Location)
-                    .Concat(additionalReferences)
-                    .Distinct()
-                    .Select(location => MetadataReference.CreateFromFile(location)),
+                Internals.Compile.PlatformAssemblies.Concat
+                (
+                    additionalReferences.Select
+                    (
+                        location => MetadataReference.CreateFromFile(location)
+                    )
+                ),
                 CompilationOptionsFactory.Create().WithAllowUnsafe(true)
             );
 
@@ -54,11 +55,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
                 Guid.NewGuid().ToString(),
                 null,
-                Runtime
-                    .Assemblies
-                    .Concat(additionalReferences)
-                    .Select(@ref => MetadataReference.CreateFromFile(@ref.Location))
-                    .ToArray(),
+                Internals.Compile.PlatformAssemblies.Concat
+                (
+                    additionalReferences.Select
+                    (
+                        @ref => MetadataReference.CreateFromFile(@ref.Location)
+                    )
+                ),
                 customConfig
             );
 

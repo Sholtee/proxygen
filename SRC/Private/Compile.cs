@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -21,16 +22,69 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Stream ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IEnumerable<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
+        internal static IEnumerable<MetadataReference> GetPlatformAssemblies(string? platformAsmsDir, IEnumerable<string> platformAsms)
+        {
+            if (!string.IsNullOrEmpty(platformAsmsDir) && Directory.Exists(platformAsmsDir))
+            {
+                return GetFilteredPlatformAssemblies
+                (
+                    Directory.EnumerateFiles(platformAsmsDir, "*.dll", SearchOption.TopDirectoryOnly)
+                );
+            }
+            else
+            {
+                string tpa = (string)AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
+
+                return GetFilteredPlatformAssemblies
+                (
+                    tpa.Split(Path.PathSeparator)
+                );
+            }
+
+            IEnumerable<MetadataReference> GetFilteredPlatformAssemblies(IEnumerable<string> allAssemblies)
+            {
+                foreach (string asm in allAssemblies)
+                {
+                    foreach (string platformAsm in platformAsms)
+                    {
+                        if (Path.GetFileName(asm).Equals(platformAsm, StringComparison.OrdinalIgnoreCase))
+                            yield return MetadataReference.CreateFromFile(asm);
+                    }
+                }
+            }
+        }
+
+        private static readonly Lazy<ImmutableHashSet<MetadataReference>> FPlatformAssemblies = new
+        (
+            () => ImmutableHashSet.CreateRange
+            (
+                GetPlatformAssemblies
+                (
+                    TargetFramework.Instance.PlatformAssembliesDir,
+                    TargetFramework.Instance.PlatformAssemblies
+                )
+            ),
+            LazyThreadSafetyMode.ExecutionAndPublication
+        );
+
+        public static ImmutableHashSet<MetadataReference> PlatformAssemblies => FPlatformAssemblies.Value;
+
+        public static Stream ToAssembly(
+            CompilationUnitSyntax root,
+            string asmName,
+            string? outputFile,
+            IEnumerable<MetadataReference> references,
+            Func<Compilation, Compilation>? customConfig = null,
+            in CancellationToken cancellation = default) 
         {
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: new []
+                syntaxTrees: new SyntaxTree[]
                 {
-                    CSharpSyntaxTree.Create(root: root)
+                    CSharpSyntaxTree.Create(root)
                 },
-                references: references,
+                references: PlatformAssemblies.Union(references),
                 options: CompilationOptionsFactory.Create()
             );
 

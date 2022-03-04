@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.IO;
 using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
@@ -24,6 +26,21 @@ namespace Solti.Utils.Proxy.Internals
             },
             trackAllValues: false
         );
+
+        protected static string? GetPath(IConfigReader configReader, string name)
+        {
+            string? result = configReader.ReadValue(name);
+
+            if (result is not null)
+            {
+                result = Environment.ExpandEnvironmentVariables(result);
+
+                if (!Path.IsPathRooted(result))
+                    result = Path.Combine(configReader.BasePath, result);
+            }
+
+            return result;
+        }
 
         protected abstract void Init(IConfigReader configReader);
 

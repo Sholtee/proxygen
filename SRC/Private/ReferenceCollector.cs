@@ -12,15 +12,16 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class ReferenceCollector
     {
-        public ReferenceCollector(bool includeRuntimeReferences = true) => FReferences = new HashSet<IAssemblyInfo>
-        (
-            includeRuntimeReferences
-                ? Runtime.Assemblies.Convert(MetadataAssemblyInfo.CreateFrom)
-                : Array.Empty<IAssemblyInfo>(),
-            IAssemblyInfoComparer.Instance
-        );
+        public ReferenceCollector(bool includeRuntimeReferences = true)
+        {
+            if (includeRuntimeReferences)
+                FReferences.Add
+                (
+                    MetadataAssemblyInfo.CreateFrom(typeof(object).Assembly)
+                );
+        }
 
-        private readonly HashSet<IAssemblyInfo> FReferences;
+        private readonly HashSet<IAssemblyInfo> FReferences = new(IAssemblyInfoComparer.Instance);
 
         public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
 
@@ -78,7 +79,9 @@ namespace Solti.Utils.Proxy.Internals
             void AddTypesFrom(IEnumerable<ITypeInfo> types) 
             {
                 foreach (ITypeInfo type in types)
+                {
                     AddType(type);
+                }
             }
         }
     }
