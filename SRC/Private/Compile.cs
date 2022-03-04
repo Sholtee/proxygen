@@ -23,17 +23,12 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static Stream ToAssembly(CompilationUnitSyntax root, string asmName, string? outputFile, IEnumerable<MetadataReference> references, Func<Compilation, Compilation>? customConfig = null, CancellationToken cancellation = default)
         {
-            string separator = $",{Environment.NewLine}";
-
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
                 syntaxTrees: new []
                 {
-                    CSharpSyntaxTree.Create
-                    (
-                        root: root
-                    )
+                    CSharpSyntaxTree.Create(root: root)
                 },
                 references: references,
                 options: CompilationOptionsFactory.Create()
@@ -47,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
-                Debug.WriteLine(string.Join(separator, result.Diagnostics));
+                Debug.WriteLine(string.Join($",{Environment.NewLine}", result.Diagnostics));
 
                 if (!result.Success)
                 {
