@@ -168,7 +168,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     (OutputType) outputType, 
                     SymbolAssemblyInfo.CreateFrom
                     (
-                        (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(MetadataReference.CreateFromFile(typeof(DuckGenerator<,>).Assembly.Location)), 
+                        (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == typeof(DuckGenerator<,>).Assembly.Location)), 
                         compilation
                     ),
                     new ReferenceCollector()
