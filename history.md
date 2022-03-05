@@ -101,5 +101,7 @@
 - 5.0.1:
   - *added:* Package "readme"
 - 6.0.0-preview1:
-  - *breaking:* Renamed `TypeGenerator` -> `Generator` (considered internal so should not affect your code)
-  - *introduced:* `Generator.Activate()` and `ActivateAsync` methods
+  - *breaking:* Updated Roslyn to v4 (so the source generator feature may not work properly in older VS2019 versions)
+  - *done:* Generator logic has been overhauled
+  - *introduced:* Proxy activator (`Generator.Activate()`) feature
+  - *introduced:* Untyped API

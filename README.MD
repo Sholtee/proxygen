@@ -1,7 +1,7 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen/master) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/sholtee/proxygen/master)
 > .NET proxy generator powered by [Roslyn](https://github.com/dotnet/roslyn )
 
-**This documentation refers the version 5.X of the library**
+**This documentation refers the version 6.X of the library**
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
 ### To hook into interface method calls:
@@ -11,7 +11,9 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ...
   public class MyInterceptor: InterfaceInterceptor<IMyInterface>
   {
-    public MyInterceptor(IMyInterface target) : base(target){}  // Nothing to do here
+    public MyInterceptor(IMyInterface target) : base(target) {}
+
+    public MyInterceptor(IMyInterface target, MyParam myParam) : base(target) {}  // overloaded constructor
 
     public override object? Invoke(InvocationContext context) // Invoking the generated proxy instance will trigger this method
     {
@@ -27,26 +29,21 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
     }  
   }
   ```
-2. Generate the proxy type:
-  ```csharp
-  using Solti.Utils.Proxy.Generators;
-  ...  
-  // The returned type 
-  // 1) is assembled only once
-  // 2) "inherits" all the public constructors from "MyInterceptor"
-  Type proxyType = ProxyGenerator<IMyInterface, MyInterceptor>.GetGeneratedType(); // or GetGeneratedTypeAsync()
   ```
-3. Activate the proxy:
+2. Generate a proxy instance invoking the desired constructor:
   ```csharp
   using System;
   ...
   IMyInterface target = new MyClass();
   ...
-  IMyInterface proxy = (IMyInterface) Activator.CreateInstance(proxyType, new object[]{target});
+  IMyInterface proxy;
+  
+  proxy = ProxyGenerator<IMyInterface, MyInterceptor>.Activate(Tuple.Create(target)); // or ActivateAsync()
+  proxy = ProxyGenerator<IMyInterface, MyInterceptor>.Activate(Tuple.Create(target, new MyParam()));
   ```
-4. Enjoy
+3. Enjoy
 
-Note that the *target* can access its most outer enclosing proxy. To achieve this, it just has to implement the `IProxyAccess<IMyInterface>` interface:
+Note that the *target* can access its most outer enclosing proxy. To achieve this it just has to implement the `IProxyAccess<IMyInterface>` interface:
 ```csharp
 using Solti.Utils.Proxy;
 
@@ -71,23 +68,14 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
     void Foo();
   }
   ```
-2. Generate the duck type:
+2. Generate the duck instance:
   ```csharp
   using Solti.Utils.Proxy.Generators;
   ...
-  // The returned type:
-  // 1) is assembled only once
-  // 2) has only one public constructor with the following layout: "Ctor(TargetClass target)"
-  Type duckType = DuckGenerator<IDuck, TargetClass>.GetGeneratedType(); // or GetGeneratedTypeAsync()
-  ```
-3. Quack:
-  ```csharp
-  using System;
-  ...
   TargetClass target = ...;
-  ...
-  IDuck duck = (IDuck) Activator.CreateInstance(duckType, new object[]{target});
+  IDuck duck = DuckGenerator<IDuck, TargetClass>.Activate(Tuple.Create(target)); // or ActivateAsync()
   ```
+3. Quack
   
 Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/DuckGenerator.cs ).
 ## Caching the generated assembly
@@ -156,6 +144,8 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
 - 4.X
   - The layout of the `InterfaceInterceptor<>.Invoke()` has been changed. Invocation parameters can be grabbed from the `InvocationContext` passed to the `Invoke()` method.
   - The `ConcurrentInterfaceInterceptor<>` class has been dropped since the `InterfaceInterceptor<>` class was rewritten in a thread safe manner.
+- 5.X
+  - You don't need to manually activate the generated proxy type, instead you may use the built-in `Generator.Activate()` method.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
