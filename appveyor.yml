@@ -18,8 +18,8 @@ environment:
     secure: KMbjGu17OVu+cir5b7wkAzNNMQXzxb3Yuohs1YzdnfXsy5wP50EkBOAEM7FvDLUI
   GITHUB_EMAIL:
     secure: Z6F+xZzdZzc5DMYB/4J0KUhyoTzTlXH75ciGl7hFH9s= 
-# APPVEYOR_RDP_PASSWORD:
-#   secure: xXx
+  APPVEYOR_RDP_PASSWORD:
+    secure: IvxSZoWD+DpqNjUP7mFjPA==
 
 branches:
   # blacklist
@@ -30,8 +30,8 @@ branches:
 build: off
 
 # enable RDP
-#init:
-#  - ps: IEX ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
+init:
+  - ps: IEX ((New-Object System.Net.WebClient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # clone repo & submodules
 clone_script:
@@ -60,7 +60,8 @@ deploy_script:
 on_finish:
   - ps: |
       Push-Artifact "*.txt"
-      Push-Artifact "BenchmarkDotNet.Artifacts\BenchmarkRun-*.log"    
+      Push-Artifact "BenchmarkDotNet.Artifacts\BenchmarkRun-*.log"
+      $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 # override settings for `master` branch
 for:
