@@ -58,6 +58,7 @@ namespace Solti.Utils.Proxy.Internals
         (
             () => ImmutableHashSet.CreateRange
             (
+                MetadataReferenceComparer.Instance,
                 GetPlatformAssemblies
                 (
                     TargetFramework.Instance.PlatformAssembliesDir,
