@@ -118,13 +118,13 @@ namespace Solti.Utils.Proxy.Internals
             (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
             (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
             (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
-            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke") || // delegate.Invoke(...)
+            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke") // delegate.Invoke(...)
 #if DEBUG
             //
             // https://github.com/OpenCover/opencover/blob/master/main/OpenCover.Profiler/CodeCoverage_Cuckoo.cpp
             //
 
-            new[] { "SafeVisited", "VisitedCritical" }.IndexOf(m.Name) >= 0
+            || new string[] { "SafeVisited", "VisitedCritical" }.IndexOf(m.Name) >= 0
 #endif
         ;
 
