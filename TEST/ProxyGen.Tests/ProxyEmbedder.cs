@@ -242,9 +242,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                         "
                     )
                 },
-                Internals.Compile.PlatformAssemblies.Append
+                Internals.Compile.PlatformAssemblies.Concat
                 (
-                    MetadataReference.CreateFromFile(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
+                    new[]
+                    {
+                        MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                        MetadataReference.CreateFromFile(typeof(EmbedGeneratedTypeAttribute).Assembly.Location)
+                    }
                 ),
                 new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );

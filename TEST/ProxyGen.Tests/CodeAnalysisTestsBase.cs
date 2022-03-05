@@ -28,10 +28,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 },
                 Internals.Compile.PlatformAssemblies.Concat
                 (
-                    additionalReferences.Append(typeof(object).Assembly.Location).Select
-                    (
-                        location => MetadataReference.CreateFromFile(location)
-                    )
+                    additionalReferences
+                        .Append(typeof(object).Assembly.Location)
+                        .Distinct()
+                        .Select
+                        (
+                            location => MetadataReference.CreateFromFile(location)
+                        )
                 ),
                 CompilationOptionsFactory.Create().WithAllowUnsafe(true)
             );
