@@ -105,11 +105,7 @@ namespace Solti.Utils.Proxy.Internals
 #endif
             Compilation compilation = context.Compilation;
 
-            IReadOnlyCollection<INamedTypeSymbol> aotGenerators = new List<INamedTypeSymbol>
-            (
-                GetAOTGenerators(compilation)
-            );
-
+            IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
             if (!aotGenerators.Some())
                 return;
 
