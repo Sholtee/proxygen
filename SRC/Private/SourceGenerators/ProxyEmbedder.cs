@@ -105,7 +105,13 @@ namespace Solti.Utils.Proxy.Internals
 #endif
             Compilation compilation = context.Compilation;
 
-            IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
+            IReadOnlyCollection<INamedTypeSymbol> aotGenerators = new List<INamedTypeSymbol>
+            (
+                GetAOTGenerators(compilation)
+            );
+
+            if (!aotGenerators.Some())
+                return;
 
             //
             // Csak C# 7.0+ tamogatjuk
@@ -113,11 +119,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (compilation.Language != CSharpParseOptions.Default.Language /*context.ParseOptions is not CSharpParseOptions parseOptions*/ || ((CSharpParseOptions) context.ParseOptions).LanguageVersion < LanguageVersion.CSharp7)
             {
-                //
-                // Viszont visszajelzes csak akkor kell ha a kod hasznalna is a generatort
-                //
-
-                if (aotGenerators.Some()) context.ReportDiagnostic
+                context.ReportDiagnostic
                 (
                     Diagnostics.PGE00(Location.None)
                 );
