@@ -45,7 +45,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .GetDiagnostics()
                     .Where(d => d.Severity == DiagnosticSeverity.Error)
                     .ToArray();
-                if (errors.Any()) throw new Exception("Bad source");
+                if (errors.Any())
+                    throw new Exception("Bad source");
             }
 
             return result;

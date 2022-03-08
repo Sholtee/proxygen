@@ -89,7 +89,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static ICollection<ICodeFactory> CodeFactories { get; } = new ConcurrentHashSet<ICodeFactory>();
 
-        public static ICollection<SourceCode> Chunks { get; } = new ConcurrentHashSet<SourceCode>();
+        public static ICollection<IChunkFactory> ChunkFactories { get; } = new ConcurrentHashSet<IChunkFactory>();
 
         public void Execute(GeneratorExecutionContext context)
         {
@@ -124,13 +124,18 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                foreach (SourceCode chunk in Chunks)
+                foreach (IChunkFactory chunkFactory in ChunkFactories)
                 {
-                    context.AddSource
-                    (
-                        chunk.Hint,
-                        chunk.Value
-                    );
+                    if (chunkFactory.ShouldUse(compilation))
+                    {
+                        SourceCode source = chunkFactory.GetSourceCode(context.CancellationToken);
+
+                        context.AddSource
+                        (
+                            source.Hint,
+                            source.Value
+                        );
+                    }
                 }
             }
             #pragma warning disable CA1031 // We want to report all non symbol related exceptions.

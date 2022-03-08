@@ -163,7 +163,110 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(3));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+        }
+
+        [TestCase
+        (
+            @"
+            using System.Collections.Generic;
+
+            using Solti.Utils.Proxy;
+            using Solti.Utils.Proxy.Attributes;
+            using Solti.Utils.Proxy.Generators;
+
+            [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyImpl>))]
+
+            public interface IMyInterface
+            {
+            }
+
+            public class MyImpl 
+            {
+            } 
+            "
+        )]
+        [TestCase
+        (
+            @"
+            [assembly: Solti.Utils.Proxy.Attributes.EmbedGeneratedType(typeof(Solti.Utils.Proxy.Generators.DuckGenerator<Foo.IMyInterface, Foo.MyImpl>))]
+
+            namespace System.Runtime.CompilerServices
+            {
+                using System;
+
+                internal sealed class ModuleInitializerAttribute : Attribute { }
+            }
+
+            namespace Foo
+            {
+                using System.Collections.Generic;
+
+                public interface IMyInterface
+                {
+                }
+
+                public class MyImpl 
+                {
+                }
+            }
+            "
+        )]
+        public void Execute_ShouldDefineTheModuleInitializerAttributeIfRequired(string src)
+        {
+            //
+            // Ne a CreateCompilation()-t hasznaljuk mert az regisztralja a System.Private.CoreLib-et is
+            //
+
+            string[] fw = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet\\packs\\NETStandard.Library.Ref\\2.1.0\\ref\\netstandard2.1"), "*.dll");
+
+            Compilation compilation = CSharpCompilation.Create
+            (
+                "cica",
+                new[]
+                {
+                    CSharpSyntaxTree.ParseText(src, new CSharpParseOptions())
+                },
+                fw.Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location).Select(asm => MetadataReference.CreateFromFile(asm)),
+                CompilationOptionsFactory.Create()
+            );
+
+            Diagnostic[] errors = compilation
+                .GetDiagnostics()
+                .Where(d => d.Severity == DiagnosticSeverity.Error)
+                .ToArray();
+            if (errors.Any())
+                throw new Exception("Bad source");
+
+            bool miaRequired = new ModuleInitializerChunkFactory().ShouldUse(compilation);
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(miaRequired ? 3 : 2));
+        }
+
+        [Test]
+        public void Execute_ShouldRunOnlyIfRequired()
+        {
+            Compilation compilation = CreateCompilation
+            (
+                "namespace cica { class mica {} }",
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(0));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -190,7 +293,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags, Is.Empty);
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
         [Test]
@@ -218,7 +321,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))));
             Assert.That(diags.Length, Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
         [Test]
