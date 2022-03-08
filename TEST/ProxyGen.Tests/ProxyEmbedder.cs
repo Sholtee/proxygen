@@ -184,7 +184,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public class MyImpl 
             {
             } 
-            "
+            ",
+            3
         )]
         [TestCase
         (
@@ -210,12 +211,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                 }
             }
-            "
+            ",
+            2
         )]
-        public void Execute_ShouldDefineTheModuleInitializerAttributeIfRequired(string src)
+        public void Execute_ShouldDefineTheModuleInitializerAttributeIfRequired(string src, int expectedTreeCount)
         {
             //
-            // Ne a CreateCompilation()-t hasznaljuk mert az regisztralja a System.Private.CoreLib-et is
+            // Ne a CreateCompilation()-t hasznaljuk mert az regisztralja a System.Private.CoreLib-et is (ami definialja a ModuleInitializerAttribute-t)
             //
 
             string[] fw = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "dotnet\\packs\\NETStandard.Library.Ref\\2.1.0\\ref\\netstandard2.1"), "*.dll");
@@ -238,8 +240,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             if (errors.Any())
                 throw new Exception("Bad source");
 
-            bool miaRequired = new ModuleInitializerChunkFactory().ShouldUse(compilation);
-
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
 
             GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
@@ -247,7 +247,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(miaRequired ? 3 : 2));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(expectedTreeCount));
         }
 
         [Test]
