@@ -63,7 +63,7 @@
     <None Update="ListDbg.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ModuleInvocation.txt">
+    <None Update="ModuleInitializerAttribute.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PropSrc.txt">

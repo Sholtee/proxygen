@@ -49,10 +49,14 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 IfDirectiveTrivia
                                 (
-                                    IdentifierName("NETSTANDARD"),
+                                    PrefixUnaryExpression
+                                    (
+                                        SyntaxKind.LogicalNotExpression,
+                                        IdentifierName("NET5_0_OR_GREATER")
+                                    ),
                                     isActive: true,
-                                    branchTaken: false,
-                                    conditionValue: false
+                                    branchTaken: true,
+                                    conditionValue: true
                                 )
                             )
                         ),

@@ -5,7 +5,7 @@
 ********************************************************************************/
 namespace System.Runtime.CompilerServices
 {
-#if NETSTANDARD
+#if !NET5_0_OR_GREATER
     /// <summary>
     /// https://www.cazzulino.com/module-initializers.html
     /// </summary>
