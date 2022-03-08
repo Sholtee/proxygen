@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class UnitSyntaxFactoryBaseExtensions
     {
-        public static SourceCode GetSourceCode(this UnitSyntaxFactoryBase src, CancellationToken cancellation) => new
+        public static SourceCode GetSourceCode(this UnitSyntaxFactoryBase src, in CancellationToken cancellation) => new
         (
             src.GetHint(),
             src.ResolveUnitAndDump(cancellation)
