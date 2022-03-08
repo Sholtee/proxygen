@@ -11,6 +11,11 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal interface ICodeFactory
     {
+        public static class Registered
+        {
+            public static ICollection<ICodeFactory> Entries { get; } = new ConcurrentHashSet<ICodeFactory>();
+        }
+
         bool ShouldUse(INamedTypeSymbol generator);
         IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);
 

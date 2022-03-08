@@ -83,14 +83,6 @@ namespace Solti.Utils.Proxy.Internals
         {
         }
 
-        //
-        // xXxCodeFactory-k toltik fel...
-        //
-
-        public static ICollection<ICodeFactory> CodeFactories { get; } = new ConcurrentHashSet<ICodeFactory>();
-
-        public static ICollection<IChunkFactory> ChunkFactories { get; } = new ConcurrentHashSet<IChunkFactory>();
-
         public void Execute(GeneratorExecutionContext context)
         {
             IConfigReader configReader = new AnalyzerConfigReader(context);
@@ -124,7 +116,7 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                foreach (IChunkFactory chunkFactory in ChunkFactories)
+                foreach (IChunkFactory chunkFactory in IChunkFactory.Registered.Entries)
                 {
                     if (chunkFactory.ShouldUse(compilation))
                     {
@@ -157,7 +149,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     generator.EnsureNotError();
 
-                    ICodeFactory codeFactory = CodeFactories.Single(cf => cf.ShouldUse(generator), throwOnEmpty: false) ?? throw new InvalidOperationException
+                    ICodeFactory codeFactory = ICodeFactory.Registered.Entries.Single(cf => cf.ShouldUse(generator), throwOnEmpty: false) ?? throw new InvalidOperationException
                     (
                         string.Format
                         (

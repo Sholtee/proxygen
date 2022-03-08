@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
         #pragma warning disable CA2255 // The 'ModuleInitializer' attribute should not be used in libraries
         [ModuleInitializer]
         #pragma warning restore CA2255
-        public static void Init() => ProxyEmbedder.ChunkFactories.Add(new ModuleInitializerChunkFactory());
+        public static void Init() => IChunkFactory.Registered.Entries.Add(new ModuleInitializerChunkFactory());
 
         public bool ShouldUse(Compilation compilation)
         {
