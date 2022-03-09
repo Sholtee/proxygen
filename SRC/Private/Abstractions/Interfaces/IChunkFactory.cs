@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
             public static ICollection<IChunkFactory> Entries { get; } = new ConcurrentHashSet<IChunkFactory>();
         }
 
-        bool ShouldUse(IRuntimeContext context, string? assmebly);
+        bool ShouldUse(IRuntimeContext context, string? assembly);
         SourceCode GetSourceCode(in CancellationToken cancellation);
     }
 }
