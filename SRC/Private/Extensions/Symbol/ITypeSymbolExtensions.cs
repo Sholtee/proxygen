@@ -11,6 +11,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal static class ITypeSymbolExtensions
     {
         public static bool IsInterface(this ITypeSymbol src) => src.TypeKind is TypeKind.Interface;
@@ -398,6 +400,34 @@ namespace Solti.Utils.Proxy.Internals
             sb.Append($"{eol}}}");
 
             return sb.ToString();
+        }
+        public static AccessModifiers GetAccessModifiers(this ITypeSymbol src)
+        {
+            src = src.GetElementType(recurse: true) ?? src;
+
+            AccessModifiers am = src.DeclaredAccessibility switch
+            {
+                Accessibility.Protected => AccessModifiers.Protected,
+                Accessibility.Internal => AccessModifiers.Internal,
+                Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
+                Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
+                Accessibility.Public => AccessModifiers.Public,
+                Accessibility.Private => AccessModifiers.Private,
+                Accessibility.NotApplicable => AccessModifiers.Public, // TODO: FIXME
+                #pragma warning disable CA2201 // In theory we should never reach here.
+                _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
+                #pragma warning restore CA2201
+            };
+
+            if (src is INamedTypeSymbol namedType)
+            {
+                foreach (ITypeSymbol ta in namedType.TypeArguments)
+                {
+                    am = (AccessModifiers) Math.Min((int) am, (int) ta.GetAccessModifiers());
+                }
+            }
+
+            return am;
         }
     }
 }

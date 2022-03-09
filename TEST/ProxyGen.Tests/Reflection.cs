@@ -103,6 +103,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
                 Assert.AreEqual(t1.IsNested, t2.IsNested);
+                Assert.AreEqual(t1.AccessModifiers, t2.AccessModifiers);
                 Assert.AreEqual(t1.IsClass, t2.IsClass);
                 Assert.AreEqual(t1.IsAbstract, t2.IsAbstract);
                 Assert.AreEqual(t1.IsFinal, t2.IsFinal);

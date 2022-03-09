@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolEventInfo : IEventInfo
+    internal sealed class SymbolEventInfo : IEventInfo
     {
         private IEventSymbol UnderlyingSymbol { get; }
 

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataParameterInfo : IParameterInfo
+    internal sealed class MetadataParameterInfo : IParameterInfo
     {
         private ParameterInfo UnderlyingParameter { get; }
 

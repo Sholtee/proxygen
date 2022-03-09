@@ -178,6 +178,8 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        public AccessModifiers AccessModifiers => UnderlyingType.GetAccessModifiers();
+
         private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }

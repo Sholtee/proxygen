@@ -8,7 +8,7 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataPropertyInfo : IPropertyInfo
+    internal sealed class MetadataPropertyInfo : IPropertyInfo
     {
         private PropertyInfo UnderlyingProperty { get; }
 

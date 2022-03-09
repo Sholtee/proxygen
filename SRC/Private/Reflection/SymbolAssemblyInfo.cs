@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolAssemblyInfo : IAssemblyInfo
+    internal sealed class SymbolAssemblyInfo : IAssemblyInfo
     {
         private IAssemblySymbol UnderlyingSymbol { get; }
 

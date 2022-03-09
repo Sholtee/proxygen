@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataEventInfo : IEventInfo
+    internal sealed class MetadataEventInfo : IEventInfo
     {
         private EventInfo UnderlyingEvent { get; }
 

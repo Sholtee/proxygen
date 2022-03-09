@@ -6,8 +6,6 @@
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-using Microsoft.CodeAnalysis;
-
 namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class ModuleInitializerChunkFactory: IChunkFactory
@@ -17,22 +15,23 @@ namespace Solti.Utils.Proxy.Internals
         #pragma warning restore CA2255
         public static void Init() => IChunkFactory.Registered.Entries.Add(new ModuleInitializerChunkFactory());
 
-        public bool ShouldUse(Compilation compilation)
+        public bool ShouldUse(IRuntimeContext context, string? assembly)
         {
             //
             // Azert a bonyolult ellenorzes mert a ModuleInitializerAttribute-t mi magunk is
             // definialhatjuk
             //
 
-            INamedTypeSymbol? type = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
-            if (type is null)
-                return true;
+            ITypeInfo? type = context.GetTypeByQualifiedName(typeof(ModuleInitializerAttribute).FullName);
+            if (type is not null)
+            {
+                if (type.AccessModifiers is AccessModifiers.Public)
+                    return false;
 
-            ITypeInfo typeInfo = SymbolTypeInfo.CreateFrom(type, compilation);
-            if (type.DeclaredAccessibility is Accessibility.Public)
-                return false;
-
-            return typeInfo.DeclaringAssembly?.IsFriend(compilation.Assembly.Name) is not true;
+                if (type.AccessModifiers is AccessModifiers.Internal && assembly is not null && type.DeclaringAssembly!.IsFriend(assembly))
+                    return false;
+            }
+            return true;
         }
 
         public SourceCode GetSourceCode(in CancellationToken cancellation) => new ModuleInitializerSyntaxFactory(OutputType.Unit, null).GetSourceCode(cancellation);

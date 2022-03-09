@@ -10,6 +10,7 @@ namespace Solti.Utils.Proxy.Internals
     internal interface ITypeInfo: IHasName
     {
         IAssemblyInfo? DeclaringAssembly { get; }
+        AccessModifiers AccessModifiers { get; }
         bool IsVoid { get; }
         RefType RefType { get; }
         /// <summary>

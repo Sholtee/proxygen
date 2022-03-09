@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal static partial class TypeExtensions
     {
         //
@@ -256,5 +258,18 @@ namespace Solti.Utils.Proxy.Internals
                     yield return closedArgs[i];
             } 
         }
+
+        public static AccessModifiers GetAccessModifiers(this Type src) => (src = src.HasElementType ? src.GetInnermostElementType()! : src) switch
+        {
+            _ when (src.IsPublic || src.IsNestedPublic) && src.IsVisible => AccessModifiers.Public,
+            _ when src.IsNestedFamily => AccessModifiers.Protected,
+            _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
+            _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
+            _ when src.IsNestedAssembly || !src.IsVisible => AccessModifiers.Internal,
+            _ when src.IsNestedPrivate => AccessModifiers.Private,
+            #pragma warning disable CA2201 // In theory we should never reach here.
+            _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
+            #pragma warning restore CA2201
+        };
     }
 }

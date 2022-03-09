@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataAssemblyInfo : IAssemblyInfo
+    internal sealed class MetadataAssemblyInfo : IAssemblyInfo
     {
         private Assembly UnderlyingAssembly { get; }
 

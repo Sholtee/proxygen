@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolPropertyInfo : IPropertyInfo
+    internal sealed class SymbolPropertyInfo : IPropertyInfo
     {
         private IPropertySymbol UnderlyingSymbol { get; }
 

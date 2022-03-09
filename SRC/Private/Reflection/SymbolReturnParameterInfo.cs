@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolReturnParameterInfo : IParameterInfo 
+    internal sealed class SymbolReturnParameterInfo : IParameterInfo 
     {
         public ParameterKind Kind { get; }
 

@@ -116,9 +116,11 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
+                IRuntimeContext runtimeContext = SymbolRuntimeContext.CreateFrom(compilation);
+
                 foreach (IChunkFactory chunkFactory in IChunkFactory.Registered.Entries)
                 {
-                    if (chunkFactory.ShouldUse(compilation))
+                    if (chunkFactory.ShouldUse(runtimeContext, context.Compilation.Assembly.Name))
                     {
                         SourceCode source = chunkFactory.GetSourceCode(context.CancellationToken);
 

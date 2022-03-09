@@ -150,6 +150,8 @@ namespace Solti.Utils.Proxy.Internals
             _ => null
         };
 
+        public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
+
         public override bool Equals(object obj) => obj is SymbolTypeInfo that && SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, that.UnderlyingSymbol);
 
         public override int GetHashCode() => SymbolEqualityComparer.Default.GetHashCode(UnderlyingSymbol);

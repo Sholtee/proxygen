@@ -7,11 +7,11 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolParameterInfo : IParameterInfo
+    internal sealed class SymbolParameterInfo : IParameterInfo
     {
         private IParameterSymbol UnderlyingSymbol { get; }
 
-        protected Compilation Compilation { get; }
+        private Compilation Compilation { get; }
 
         private SymbolParameterInfo(IParameterSymbol para, Compilation compilation)
         {
