@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -18,6 +19,17 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase
     {
+        private static LiteralExpressionSyntax AsLiteral(string param) => LiteralExpression
+        (
+            SyntaxKind.StringLiteralExpression,
+            Literal(param)
+        );
+
+        private static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
+        (
+            attributes.ToSyntaxList()
+        );
+
         protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector): base(referenceCollector) =>
             OutputType = outputType;
 
@@ -32,84 +44,99 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            return CompilationUnit().WithMembers
+            List<MemberDeclarationSyntax> members = new
             (
-                List<MemberDeclarationSyntax>
-                (
-                    ResolveClasses(context, cancellation).Convert
+                ResolveUnitMembers(context, cancellation)
+            );
+
+            if (members.Some() && OutputType is OutputType.Unit)
+            {
+                members[0] = members[0] switch
+                {
+                    NamespaceDeclarationSyntax ns => ns.WithNamespaceKeyword
                     (
-                        cls => cls.WithAttributeLists
+                        Token
                         (
-                            SingletonList
+                            leading: DisableWarnings(ns.NamespaceKeyword),
+                            kind: SyntaxKind.NamespaceKeyword,
+                            trailing: TriviaList()
+                        )
+                    ), 
+                    ClassDeclarationSyntax cls => cls.WithOpenBraceToken
+                    (
+                        Token
+                        (
+                            leading: DisableWarnings(cls.OpenBraceToken),
+                            kind: SyntaxKind.OpenBraceToken,
+                            trailing: TriviaList()
+                        )
+                    ),
+                    _ => members[0]
+                };
+
+                static SyntaxTriviaList DisableWarnings(SyntaxToken token) =>
+                    //
+                    // Az osszes fordito figyelmeztetes kikapcsolasa:
+                    // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
+                    //
+
+                    token.LeadingTrivia.Insert
+                    (
+                        0,
+                        Trivia
+                        (
+                            PragmaWarningDirectiveTrivia
                             (
-                                Attributes
-                                (
-                                    //
-                                    // Kod-analizis figyelmeztetesek kikapcsolasa (plussz informativ):
-                                    // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
-                                    //
-
-                                    CreateAttribute<GeneratedCodeAttribute>
-                                    (
-                                        AsLiteral("ProxyGen.NET"),
-                                        AsLiteral
-                                        (
-                                            GetType()
-                                                .Assembly
-                                                .GetName()
-                                                .Version
-                                                .ToString()
-                                        )
-                                    ),
-
-                                    //
-                                    // Ezek pedig szerepelnek az xXx.Designer.cs-ben
-                                    //
-
-                                    CreateAttribute<DebuggerNonUserCodeAttribute>(),
-                                    CreateAttribute<CompilerGeneratedAttribute>()
-                                )
-                                .WithOpenBracketToken
-                                (
-                                    Token
-                                    (
-                                        OutputType is not OutputType.Unit ? TriviaList() : TriviaList
-                                        (
-                                            Trivia
-                                            (
-                                                //
-                                                // Az osszes fordito figyelmeztetes kikapcsolasa a generalt fajlban. Ha nincs azonosito lista megadva akkor
-                                                // mindent kikapcsol:
-                                                // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
-                                                //
-
-                                                PragmaWarningDirectiveTrivia
-                                                (
-                                                    Token(SyntaxKind.DisableKeyword),
-                                                    true
-                                                )
-                                            )
-                                        ),
-                                        SyntaxKind.OpenBracketToken,
-                                        TriviaList()
-                                    )
-                                )
+                                Token(SyntaxKind.DisableKeyword),
+                                isActive: true
                             )
                         )
-                    )
-                )
-            );
+                    );
+            }
 
-            static LiteralExpressionSyntax AsLiteral(string param) => LiteralExpression
+            return CompilationUnit().WithMembers
             (
-                SyntaxKind.StringLiteralExpression,
-                Literal(param)
-            );
-
-            static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
-            (
-                attributes.ToSyntaxList()
+                List(members)
             );
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation) => ResolveClasses(context, cancellation).Convert
+        (
+            cls => cls.WithAttributeLists
+            (
+                SingletonList
+                (
+                    Attributes
+                    (
+                        //
+                        // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
+                        //
+
+                        CreateAttribute<GeneratedCodeAttribute>
+                        (
+                            AsLiteral("ProxyGen.NET"),
+                            AsLiteral
+                            (
+                                GetType()
+                                    .Assembly
+                                    .GetName()
+                                    .Version
+                                    .ToString()
+                            )
+                        ),
+
+                        //
+                        // Ezek pedig szerepelnek az xXx.Designer.cs-ben
+                        //
+
+                        CreateAttribute<DebuggerNonUserCodeAttribute>(),
+                        CreateAttribute<CompilerGeneratedAttribute>()
+                    )
+                )
+            )
+        );
     }
 }

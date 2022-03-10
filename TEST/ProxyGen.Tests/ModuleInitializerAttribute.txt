@@ -2,6 +2,7 @@
 #if !NET5_0_OR_GREATER
 namespace System.Runtime.CompilerServices
 {
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "6.0.0.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
     internal sealed class ModuleInitializerAttribute : global::System.Attribute
     {
     }

@@ -23,71 +23,63 @@ namespace Solti.Utils.Proxy.Internals
 
         public override IReadOnlyCollection<string> DefinedClasses { get; } = new string[] { nameof(ModuleInitializerAttribute) };
 
-        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation) => CompilationUnit().WithMembers
-        (
-            members: SingletonList<MemberDeclarationSyntax>
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation)
+        {
+            yield return NamespaceDeclaration
             (
-                NamespaceDeclaration
+                new[] { "System", "Runtime", "CompilerServices" }.Convert(IdentifierName).Qualify()
+            )
+            .WithNamespaceKeyword
+            (
+                Token
                 (
-                    new[] { "System", "Runtime", "CompilerServices" }.Convert(IdentifierName).Qualify()
-                )
-                .WithNamespaceKeyword
-                (
-                    Token
+                    leading: TriviaList
                     (
-                        leading: TriviaList
+                        Trivia
                         (
-                            Trivia
+                            IfDirectiveTrivia
                             (
-                                PragmaWarningDirectiveTrivia
+                                PrefixUnaryExpression
                                 (
-                                    Token(SyntaxKind.DisableKeyword),
-                                    true
-                                )
-                            ),
-                            Trivia
-                            (
-                                IfDirectiveTrivia
-                                (
-                                    PrefixUnaryExpression
-                                    (
-                                        SyntaxKind.LogicalNotExpression,
-                                        IdentifierName("NET5_0_OR_GREATER")
-                                    ),
-                                    isActive: true,
-                                    branchTaken: true,
-                                    conditionValue: true
-                                )
+                                    SyntaxKind.LogicalNotExpression,
+                                    IdentifierName("NET5_0_OR_GREATER")
+                                ),
+                                isActive: true,
+                                branchTaken: true,
+                                conditionValue: true
                             )
-                        ),
-                        kind: SyntaxKind.NamespaceKeyword,
-                        trailing: TriviaList()
-                    )
+                        )
+                    ),
+                    kind: SyntaxKind.NamespaceKeyword,
+                    trailing: TriviaList()
                 )
-                .WithMembers
+            )
+            .WithMembers
+            (
+                List
                 (
-                    List<MemberDeclarationSyntax>
-                    (
-                        ResolveClasses(context, cancellation)
-                    )
+                    base.ResolveUnitMembers(context, cancellation)
                 )
-                .WithCloseBraceToken
+            )
+            .WithCloseBraceToken
+            (
+                Token
                 (
-                    Token
+                    leading: TriviaList(),
+                    kind: SyntaxKind.CloseBraceToken,
+                    trailing: TriviaList
                     (
-                        leading: TriviaList(),
-                        kind: SyntaxKind.CloseBraceToken,
-                        trailing: TriviaList
+                        Trivia
                         (
-                            Trivia
-                            (
-                                EndIfDirectiveTrivia(isActive: true)
-                            )
+                            EndIfDirectiveTrivia(isActive: true)
                         )
                     )
                 )
-            )
-        );
+            );
+        }
 
         #if DEBUG
         internal
