@@ -6,8 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-
-using Microsoft.CodeAnalysis;
+using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -20,15 +19,15 @@ namespace Solti.Utils.Proxy.Internals
         #pragma warning restore CA2255
         public static void Init() => ICodeFactory.Registered.Entries.Add(new ProxyCodeFactory());
 
-        public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(ProxyGenerator<,>).FullName;
+        public bool ShouldUse(ITypeInfo generator) => generator.QualifiedName == typeof(ProxyGenerator<,>).FullName;
 
-        public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
+        public IEnumerable<SourceCode> GetSourceCodes(ITypeInfo generator, string? assembly, CancellationToken cancellation)
         {
-            ITypeSymbol
-                iface = generator.TypeArguments[0],
-                interceptor = generator.TypeArguments[1];
+            IGenericTypeInfo genericTypeInfo = (IGenericTypeInfo) generator;
 
-            Compilation compilation = context.Compilation;
+            ITypeInfo
+                iface = genericTypeInfo.GenericArguments[0],
+                interceptor = genericTypeInfo.GenericArguments[1];
 
             SourceCode result;
 
@@ -36,9 +35,9 @@ namespace Solti.Utils.Proxy.Internals
             {
                 result = new ProxySyntaxFactory
                 (
-                    SymbolTypeInfo.CreateFrom(iface, compilation),
-                    SymbolTypeInfo.CreateFrom(interceptor, compilation),
-                    compilation.AssemblyName!,
+                    iface,
+                    interceptor,
+                    assembly,
                     OutputType.Unit,
                     
                     //
@@ -46,12 +45,12 @@ namespace Solti.Utils.Proxy.Internals
                     //
 
                     !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null
-                ).GetSourceCode(context.CancellationToken);
+                ).GetSourceCode(cancellation);
             }
             catch (Exception e) 
             {
-                e.Data[nameof(iface)] = iface.GetDebugString();
-                e.Data[nameof(interceptor)] = interceptor.GetDebugString();
+                e.Data[nameof(iface)] = iface;
+                e.Data[nameof(interceptor)] = interceptor;
 
                 throw;
             }

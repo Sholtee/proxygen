@@ -6,8 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-
-using Microsoft.CodeAnalysis;
+using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -20,15 +19,15 @@ namespace Solti.Utils.Proxy.Internals
         #pragma warning restore CA2255
         public static void Init() => ICodeFactory.Registered.Entries.Add(new DuckCodeFactory());
 
-        public bool ShouldUse(INamedTypeSymbol generator) => generator.GetQualifiedMetadataName() == typeof(DuckGenerator<,>).FullName;
+        public bool ShouldUse(ITypeInfo generator) => generator.QualifiedName == typeof(DuckGenerator<,>).FullName;
 
-        public IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context)
+        public IEnumerable<SourceCode> GetSourceCodes(ITypeInfo generator, string? assembly, CancellationToken cancellation)
         {
-            ITypeSymbol
-                iface = generator.TypeArguments[0],
-                target = generator.TypeArguments[1];
+            IGenericTypeInfo genericTypeInfo = (IGenericTypeInfo) generator;
 
-            Compilation compilation = context.Compilation;
+            ITypeInfo
+                iface = genericTypeInfo.GenericArguments[0],
+                target = genericTypeInfo.GenericArguments[1];
 
             SourceCode result;
 
@@ -36,23 +35,23 @@ namespace Solti.Utils.Proxy.Internals
             {
                 result = new DuckSyntaxFactory
                 (
-                    SymbolTypeInfo.CreateFrom(iface, compilation),
-                    SymbolTypeInfo.CreateFrom(target, compilation),
-                    compilation.AssemblyName!,
+                    genericTypeInfo.GenericArguments[0],
+                    genericTypeInfo.GenericArguments[1],
+                    assembly,
                     OutputType.Unit,
-                    SymbolAssemblyInfo.CreateFrom(generator.ContainingAssembly, compilation),
+                    generator.DeclaringAssembly!,
 
                     //
                     // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
                     //
 
                     !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null
-                ).GetSourceCode(context.CancellationToken);
+                ).GetSourceCode(cancellation);
             }
             catch (Exception e) 
             {
-                e.Data[nameof(iface)] = iface.GetDebugString();
-                e.Data[nameof(target)] = target.GetDebugString();
+                e.Data[nameof(iface)] = iface;
+                e.Data[nameof(target)] = target;
 
                 throw;
             }

@@ -4,8 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
-
-using Microsoft.CodeAnalysis;
+using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -16,8 +15,9 @@ namespace Solti.Utils.Proxy.Internals
             public static ICollection<ICodeFactory> Entries { get; } = new ConcurrentHashSet<ICodeFactory>();
         }
 
-        bool ShouldUse(INamedTypeSymbol generator);
-        IEnumerable<SourceCode> GetSourceCodes(INamedTypeSymbol generator, GeneratorExecutionContext context);
+        bool ShouldUse(ITypeInfo generator);
+
+        IEnumerable<SourceCode> GetSourceCodes(ITypeInfo generator, string? assembly, CancellationToken cancellation);
 
         //
         // Forrasgenerator nem bovitheti a mar meglevo referencia listat, szoval elvileg
