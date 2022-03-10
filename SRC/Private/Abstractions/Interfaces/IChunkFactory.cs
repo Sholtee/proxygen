@@ -6,8 +6,6 @@
 using System.Collections.Generic;
 using System.Threading;
 
-using Microsoft.CodeAnalysis;
-
 namespace Solti.Utils.Proxy.Internals
 {
     internal interface IChunkFactory
@@ -18,6 +16,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         bool ShouldUse(IRuntimeContext context, string? assembly);
+
         SourceCode GetSourceCode(in CancellationToken cancellation);
     }
 }
