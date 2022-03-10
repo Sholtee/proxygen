@@ -61,14 +61,25 @@ namespace Solti.Utils.Proxy.Internals
                             kind: SyntaxKind.NamespaceKeyword,
                             trailing: TriviaList()
                         )
-                    ), 
-                    ClassDeclarationSyntax cls => cls.WithOpenBraceToken
+                    ),
+                    ClassDeclarationSyntax cls => cls.WithAttributeLists
                     (
-                        Token
+                        cls.AttributeLists.Replace
                         (
-                            leading: DisableWarnings(cls.OpenBraceToken),
-                            kind: SyntaxKind.OpenBraceToken,
-                            trailing: TriviaList()
+                            //
+                            // A ResolveUnitMembers() miatt tuti mindig vannak attributumok
+                            //
+
+                            cls.AttributeLists[0],
+                            cls.AttributeLists[0].WithOpenBracketToken
+                            (
+                                Token
+                                (
+                                    leading: DisableWarnings(cls.AttributeLists[0].OpenBracketToken),
+                                    kind: SyntaxKind.OpenBracketToken,
+                                    trailing: TriviaList()
+                                )
+                            )
                         )
                     ),
                     _ => members[0]
