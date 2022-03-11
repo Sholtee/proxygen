@@ -48,11 +48,13 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></div>
-    <div class="level2"><span class="xref">ProxyGenerator</span></div>
+    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a></div>
+    <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></div>
+    <div class="level3"><span class="xref">ProxyGenerator</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
+    <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a>&gt;</div>
     <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a>&gt;</div>
     <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator.html">ProxyGenerator</a>&gt;</div>
   </div>
@@ -96,7 +98,7 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Generators_ProxyGenerator_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator : Generator, IEquatable&lt;Generator&gt;, IEquatable&lt;ProxyGenerator&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator : Generator, IEquatable&lt;TypeEmitter&gt;, IEquatable&lt;Generator&gt;, IEquatable&lt;ProxyGenerator&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -182,6 +184,9 @@
     </tbody>
   </table>
   <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
+  </div>
   <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
   </div>

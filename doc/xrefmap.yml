@@ -507,6 +507,12 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Instance
   nameWithType: Generator<TInterface, TDescendant>.Instance
   nameWithType.vb: Generator(Of TInterface, TDescendant).Instance
+- uid: Solti.Utils.Proxy.Internals.TypeEmitter
+  name: TypeEmitter
+  href: Solti.Utils.Proxy.Internals.TypeEmitter.html
+  commentId: T:Solti.Utils.Proxy.Internals.TypeEmitter
+  fullName: Solti.Utils.Proxy.Internals.TypeEmitter
+  nameWithType: TypeEmitter
 - uid: Solti.Utils.Proxy.InvocationContext
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html
