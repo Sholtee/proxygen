@@ -163,7 +163,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
-            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(2));
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(
+#if NET5_0_OR_GREATER
+                2
+#else
+                3
+#endif
+            ));
         }
 
         [TestCase

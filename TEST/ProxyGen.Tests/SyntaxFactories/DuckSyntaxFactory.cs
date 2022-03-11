@@ -89,7 +89,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateDuckMethod_ShouldHandleExplicitImplementations()
         {
-            Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(null!).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
+            Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(null).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
         }
 
         [Test]
@@ -139,8 +139,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Append(type.Assembly)
-                .Append(typeof(DuckBase<>).Assembly)
+                .Concat(new[] { type.Assembly, typeof(DuckBase<>).Assembly })
                 .Distinct()
                 .ToArray();
 
@@ -178,9 +177,16 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
                 src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
 
-            // Assert.AreEqual(src1, src2); // deklaraciok sorrendje nem biztos h azonos
-            Assert.DoesNotThrow(() => CreateCompilation(src1, fact1.ReferenceCollector.References.Select(asm => asm.Location)));
-            Assert.DoesNotThrow(() => CreateCompilation(src2, fact2.ReferenceCollector.References.Select(asm => asm.Location)));
+            //
+            // Deklaraciok sorrendje nem biztos h azonos ezert ez a csoda
+            //
+
+            string[]
+                lines1 = src1.Split(Environment.NewLine).OrderBy(l => l).ToArray(),
+                lines2 = src2.Split(Environment.NewLine).OrderBy(l => l).ToArray();
+
+            Assert.That(lines1.Length, Is.EqualTo(lines2.Length));
+            Assert.That(lines1.SequenceEqual(lines2));
         }
 
         [Test]

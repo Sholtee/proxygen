@@ -182,7 +182,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             IInternalInterface proxy = await ProxyGenerator<IInternalInterface, InternalInterfaceProxy>.ActivateAsync(null);
             Assert.That(proxy.Foo(), Is.EqualTo(1));
         }
-#if !NETCOREAPP2_2
+#if NET5_0_OR_GREATER
         public interface IInterfaceContainingMembersHavingAccessibility
         {
             public void Foo();

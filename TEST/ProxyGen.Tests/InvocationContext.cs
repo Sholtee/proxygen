@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IDescendant2 i = null;
 
-            InvocationContext cntx = new(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IList<string> i = null;
 
-            InvocationContext cntx = new(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IDescendant i = null;
 
-            InvocationContext cntx = new(Array.Empty<object>(), () => _ =  i.Prop, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => _ =  i.Prop, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.Tests
         {
             IDescendant i = null;
 
-            InvocationContext cntx = new(Array.Empty<object>(), () => { i.Evt += _ => { }; return null; }, MemberTypes.Event);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => { i.Evt += _ => { }; return null; }, MemberTypes.Event);
 
             EventInfo evt = (EventInfo) cntx.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));

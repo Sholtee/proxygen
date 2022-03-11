@@ -114,36 +114,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            try
-            {
-                IRuntimeContext runtimeContext = SymbolRuntimeContext.CreateFrom(compilation);
-
-                foreach (IChunkFactory chunkFactory in IChunkFactory.Registered.Entries)
-                {
-                    if (chunkFactory.ShouldUse(runtimeContext, compilation.Assembly.Name))
-                    {
-                        SourceCode source = chunkFactory.GetSourceCode(context.CancellationToken);
-
-                        context.AddSource
-                        (
-                            source.Hint,
-                            source.Value
-                        );
-                    }
-                }
-            }
-            #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
-            catch (Exception e)
-            #pragma warning restore CA1031
-            {
-                ReportError
-                (
-                    context,
-                    e,
-                    Location.None
-                );
-                return;
-            }
+            int extensionCount = 0;
 
             foreach (INamedTypeSymbol generatorSymbol in aotGenerators)
             {
@@ -176,6 +147,8 @@ namespace Solti.Utils.Proxy.Internals
                             Diagnostics.PGI00(generatorSymbol.Locations.Single()!, source.Hint)
                         );
                     }
+
+                    extensionCount++;
                 }
                 catch (InvalidSymbolException)
                 {
@@ -194,6 +167,42 @@ namespace Solti.Utils.Proxy.Internals
                         generatorSymbol.Locations.Single()!
                     );
                 }
+            }
+
+            //
+            // Csak ha van is ertelme akkor adjuk hozza a Chunk-okat
+            //
+
+            if (extensionCount > 0)
+            try
+            {
+                IRuntimeContext runtimeContext = SymbolRuntimeContext.CreateFrom(compilation);
+
+                foreach (IChunkFactory chunkFactory in IChunkFactory.Registered.Entries)
+                {
+                    if (chunkFactory.ShouldUse(runtimeContext, compilation.Assembly.Name))
+                    {
+                        SourceCode source = chunkFactory.GetSourceCode(context.CancellationToken);
+
+                        context.AddSource
+                        (
+                            source.Hint,
+                            source.Value
+                        );
+                    }
+                }
+            }
+            #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
+            catch (Exception e)
+            #pragma warning restore CA1031
+            {
+                ReportError
+                (
+                    context,
+                    e,
+                    Location.None
+                );
+                return;
             }
         }
     }
