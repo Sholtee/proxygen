@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                             location => MetadataReference.CreateFromFile(location)
                         )
                 ),
-                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, metadataImportOptions: MetadataImportOptions.All, allowUnsafe: true)
             );
 
             if (!suppressErrors)
