@@ -12,6 +12,7 @@ using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -66,7 +67,7 @@ namespace Solti.Utils.Proxy.Internals
 
             using Stream asm = Compile.ToAssembly
             (
-                syntaxFactory.ResolveUnitAndDump(cancellation),
+                new CompilationUnitSyntax[] { syntaxFactory.ResolveUnitAndDump(cancellation) },
                 syntaxFactory.ContainingAssembly,
                 cacheFile,
                 syntaxFactory

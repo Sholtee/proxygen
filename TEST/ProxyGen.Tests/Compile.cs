@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 )
             );
 
-            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(unit, "cica", null, Array.Empty<MetadataReference>()));
+            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(new CompilationUnitSyntax[] { unit }, "cica", null, Array.Empty<MetadataReference>()));
 
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);

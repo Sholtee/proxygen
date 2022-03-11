@@ -71,7 +71,7 @@ namespace Solti.Utils.Proxy.Internals
         public static ImmutableHashSet<MetadataReference> PlatformAssemblies => FPlatformAssemblies.Value;
 
         public static Stream ToAssembly(
-            CompilationUnitSyntax root,
+            IEnumerable<CompilationUnitSyntax> units,
             string asmName,
             string? outputFile,
             IEnumerable<MetadataReference> references,
@@ -81,12 +81,14 @@ namespace Solti.Utils.Proxy.Internals
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: new SyntaxTree[]
-                {
-                    CSharpSyntaxTree.Create(root)
-                },
+                syntaxTrees: units.Convert(unit => CSharpSyntaxTree.Create(unit)),
                 references: PlatformAssemblies.Union(references),
-                options: CompilationOptionsFactory.Create()
+                options: new CSharpCompilationOptions
+                (
+                    outputKind: OutputKind.DynamicallyLinkedLibrary,
+                    metadataImportOptions: MetadataImportOptions.All,
+                    optimizationLevel: OptimizationLevel.Release
+                )
             );
 
             if (customConfig is not null)
@@ -101,7 +103,16 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (!result.Success)
                 {
-                    string src = root.NormalizeWhitespace(eol: Environment.NewLine).ToFullString();
+                    string src = string.Join
+                    (
+                        Environment.NewLine,
+                        compilation
+                            .SyntaxTrees
+                            .Convert(unit => unit
+                                .GetCompilationUnitRoot()
+                                .NormalizeWhitespace(eol: Environment.NewLine)
+                                .ToFullString())
+                    );
 
                     string[]
                         failures = result

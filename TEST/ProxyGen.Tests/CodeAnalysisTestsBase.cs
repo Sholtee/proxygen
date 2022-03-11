@@ -12,6 +12,7 @@ using System.Runtime.Loader;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
@@ -36,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                             location => MetadataReference.CreateFromFile(location)
                         )
                 ),
-                CompilationOptionsFactory.Create().WithAllowUnsafe(true)
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)
             );
 
             if (!suppressErrors)
@@ -56,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             using Stream asm = Internals.Compile.ToAssembly
             (
-                CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot(),
+                new CompilationUnitSyntax[] { CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot() },
                 Guid.NewGuid().ToString(),
                 null,
                 Internals.Compile.PlatformAssemblies.Concat

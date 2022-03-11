@@ -230,7 +230,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     CSharpSyntaxTree.ParseText(src, new CSharpParseOptions())
                 },
                 fw.Append(typeof(EmbedGeneratedTypeAttribute).Assembly.Location).Select(asm => MetadataReference.CreateFromFile(asm)),
-                CompilationOptionsFactory.Create()
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
             Diagnostic[] errors = compilation
