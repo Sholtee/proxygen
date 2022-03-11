@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -12,24 +13,29 @@ using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal static class TypeEmitter
+    /// <summary>
+    /// Compiles SyntaxFactory outputs to materialized <see cref="Type"/>s.
+    /// </summary>
+    public abstract record TypeEmitter
     {
         private static readonly ConcurrentDictionary<string, Type> FInstances = new();
 
-        /// <summary>
-        /// Registers a generated class.
-        /// </summary>
-        public static void RegisterInstance(Type instance) => FInstances[instance.Name] = instance;
-
         private static AssemblyLoadContext AssemblyLoader { get; } = AssemblyLoadContext.Default;
 
-        public static Type Emit(ProxyUnitSyntaxFactory syntaxFactory, string? asmCacheDir, in CancellationToken cancellation)
+        private protected abstract ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector);
+
+        private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
+
+        internal Type Emit(string? asmName, string? asmCacheDir, CancellationToken cancellation)
         {
-            string className = syntaxFactory.DefinedClasses.Single()!; // TODO: Mi van ha tobb van?
+            ReferenceCollector referenceCollector = new();
+
+            ProxyUnitSyntaxFactory mainUnit = CreateMainUnit(asmName, referenceCollector);
+
+            string className = mainUnit.DefinedClasses.Single()!; // TODO: Mi van ha tobb van?
 
             //
             // 1) A tipus mar be lett toltve (pl beagyazott tipus eseten)
@@ -46,9 +52,9 @@ namespace Solti.Utils.Proxy.Internals
 
             if (!string.IsNullOrEmpty(asmCacheDir))
             {
-                cacheFile = Path.Combine(asmCacheDir, $"{syntaxFactory.ContainingAssembly}.dll");
+                cacheFile = Path.Combine(asmCacheDir, $"{mainUnit.ContainingAssembly}.dll");
 
-                if (File.Exists(cacheFile)) 
+                if (File.Exists(cacheFile))
                     return ExtractType
                     (
                         //
@@ -65,15 +71,24 @@ namespace Solti.Utils.Proxy.Internals
             // 3) Egyik korabbi sem nyert akkor leforditjuk
             //
 
+            List<UnitSyntaxFactoryBase> units = new
+            (
+                CreateChunks(referenceCollector)
+            );
+            units.Add(mainUnit);
+
             using Stream asm = Compile.ToAssembly
             (
-                new CompilationUnitSyntax[] { syntaxFactory.ResolveUnitAndDump(cancellation) },
-                syntaxFactory.ContainingAssembly,
+                units.ConvertAr
+                (
+                    unit => unit.ResolveUnitAndDump(cancellation)
+                ),
+                mainUnit.ContainingAssembly,
                 cacheFile,
-                syntaxFactory
-                    .ReferenceCollector!
-                    .References
-                    .Convert(asm => MetadataReference.CreateFromFile(asm.Location!)),
+                referenceCollector.References.ConvertAr
+                (
+                    asm => MetadataReference.CreateFromFile(asm.Location!)
+                ),
                 customConfig: null,
                 cancellation
             );
@@ -98,5 +113,10 @@ namespace Solti.Utils.Proxy.Internals
                 return asm.GetType(className, throwOnError: true);
             }
         }
+
+        internal static void RegisterInstance(Type instance) => FInstances[instance.Name] = instance;
+#if DEBUG
+        internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;
+#endif
     }
 }

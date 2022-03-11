@@ -5,19 +5,17 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-
-#if NETSTANDARD2_1_OR_GREATER
-using System.Runtime.CompilerServices;
-#endif
 
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
     /// Base of the generators.
     /// </summary>
-    public abstract record Generator
+    public abstract record Generator: TypeEmitter
     {
         //
         // Ha ugyanazzal a kulccsal hivjuk parhuzamosan a GetOrAdd()-et akkor a factory tobbszor is
@@ -28,12 +26,18 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.ActivatorDelegate>> FActivators = new();
 
+        private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
+        {
+            if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
+                yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
+        }
+
         //
         // Mivel a Task minden metodusa szal biztos (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety) ezert nem
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal(string? assemblyCacheDir) => FGeneratedTypes.GetOrAdd
+        internal Task<Type> GetGeneratedTypeAsyncInternal() => FGeneratedTypes.GetOrAdd
         (
             //
             // Ha ket generatornak azonos a hash-e (ezert hasznalunk record tipust) akkor ugyanazt a tipust is generaljak.
@@ -49,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
                     // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
                     //
 
-                    () => TypeEmitter.Emit(GetSyntaxFactory(null), assemblyCacheDir, default)
+                    () => Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
                 ),
                 LazyThreadSafetyMode.ExecutionAndPublication
             )
@@ -63,11 +67,6 @@ namespace Solti.Utils.Proxy.Internals
             FActivators
                 .GetOrAdd(t, new Lazy<ProxyActivator.ActivatorDelegate>(() => ProxyActivator.Create(t)))
                 .Value(tuple);
-
-        /// <summary>
-        /// Returns the associated syntax factory
-        /// </summary>
-        internal abstract ProxyUnitSyntaxFactory GetSyntaxFactory(string? asmName);
 
         #region Public
         /// <summary>
@@ -86,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return Task.WhenAny
             (
-                GetGeneratedTypeAsyncInternal(WorkingDirectories.Instance.AssemblyCacheDir),
+                GetGeneratedTypeAsyncInternal(),
                 tcs.Task
             ).Unwrap();
         }
@@ -95,7 +94,7 @@ namespace Solti.Utils.Proxy.Internals
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal(WorkingDirectories.Instance.AssemblyCacheDir)
+        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal()
             .GetAwaiter()
             .GetResult();
 

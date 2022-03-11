@@ -10,7 +10,6 @@ using BenchmarkDotNet.Attributes;
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
-    using Internals;
 
     [MemoryDiagnoser]
     public class DuckGenerator
@@ -21,13 +20,8 @@ namespace Solti.Utils.Proxy.Perf
         }
 
         [Benchmark]
-        public void AssemblingProxyType() => TypeEmitter.Emit
-        (
-            DuckGenerator<IInterface, Implementation>
-                .Instance
-                .GetSyntaxFactory(Guid.NewGuid().ToString()),
-            null, 
-            default
-        );
+        public void AssemblingProxyType() => DuckGenerator<IInterface, Implementation>
+            .Instance
+            .Emit(Guid.NewGuid().ToString(), default, default);
     }
 }

@@ -71,11 +71,11 @@ namespace Solti.Utils.Proxy.Internals
         public static ImmutableHashSet<MetadataReference> PlatformAssemblies => FPlatformAssemblies.Value;
 
         public static Stream ToAssembly(
-            IEnumerable<CompilationUnitSyntax> units,
+            IReadOnlyCollection<CompilationUnitSyntax> units,
             string asmName,
             string? outputFile,
-            IEnumerable<MetadataReference> references,
-            Func<Compilation, Compilation>? customConfig = null,
+            IReadOnlyCollection<MetadataReference> references,
+            Func<Compilation, Compilation>? customConfig = default,
             in CancellationToken cancellation = default) 
         {
             Compilation compilation = CSharpCompilation.Create

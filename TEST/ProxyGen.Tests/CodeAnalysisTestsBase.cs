@@ -66,7 +66,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     (
                         @ref => MetadataReference.CreateFromFile(@ref.Location)
                     )
-                ),
+                ).ToArray(),
                 customConfig
             );
 
