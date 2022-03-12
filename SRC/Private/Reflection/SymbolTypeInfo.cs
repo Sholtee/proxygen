@@ -29,6 +29,16 @@ namespace Solti.Utils.Proxy.Internals
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
                 INamedTypeSymbol named when named.TypeArguments.Some() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
+
+                //
+                // NET6_0 workaround
+                //
+
+                _ when typeSymbol.Kind is SymbolKind.FunctionPointerType => CreateFrom
+                (
+                    compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
+                    compilation
+                ),
                 _ => new SymbolTypeInfo(typeSymbol, compilation)
             };
         }

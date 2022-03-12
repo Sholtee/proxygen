@@ -164,6 +164,13 @@ namespace Solti.Utils.Proxy.Internals
         {
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 
+            //
+            // NET6_0-tol kezdve lehet statikusokat deklaralni interface-eken is
+            //
+
+            if (includeStatic)
+                flags |= BindingFlags.Static;
+
             if (src.IsInterface)
             {
                 foreach (Type t in src.GetHierarchy())
@@ -183,8 +190,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 //flags |= BindingFlags.FlattenHierarchy;
                 flags |= BindingFlags.NonPublic;
-                if (includeStatic)
-                    flags |= BindingFlags.Static;
 
                 HashSet<int> returnedMembers = new();
 
@@ -261,11 +266,16 @@ namespace Solti.Utils.Proxy.Internals
 
         public static AccessModifiers GetAccessModifiers(this Type src) => (src = src.HasElementType ? src.GetInnermostElementType()! : src) switch
         {
-            _ when (src.IsPublic || src.IsNestedPublic) && src.IsVisible => AccessModifiers.Public,
+            //
+            // Mi van ha a korul zart tipus publikus viszont a korul zaro maga nem (lasd IsVisible)?
+            // Ezt most en onkenyesen akkor publikusnak veszem
+            //
+
+            _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
             _ when src.IsNestedFamily => AccessModifiers.Protected,
             _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
             _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
-            _ when src.IsNestedAssembly || !src.IsVisible => AccessModifiers.Internal,
+            _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
             _ when src.IsNestedPrivate => AccessModifiers.Private,
             #pragma warning disable CA2201 // In theory we should never reach here.
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)

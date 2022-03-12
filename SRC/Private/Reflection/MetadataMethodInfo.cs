@@ -40,11 +40,11 @@ namespace Solti.Utils.Proxy.Internals
 
             public bool IsStatic => UnderlyingMethod.IsStatic;
 
-            public bool IsSpecial => UnderlyingMethod.IsSpecialName;
+            public bool IsSpecial => UnderlyingMethod.IsSpecial();
 
             public AccessModifiers AccessModifiers => UnderlyingMethod.GetAccessModifiers();
 
-            public bool IsFinal => UnderlyingMethod.IsFinal;
+            public bool IsFinal => UnderlyingMethod.IsFinal || AccessModifiers is AccessModifiers.Explicit;
 
             public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderlyingMethod.Equals(that.UnderlyingMethod);
 

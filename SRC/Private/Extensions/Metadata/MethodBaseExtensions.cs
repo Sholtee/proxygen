@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -26,6 +27,18 @@ namespace Solti.Utils.Proxy.Internals
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
             #pragma warning restore CA2201
         };
+
+        private static readonly Regex FIsSpecial = new("^(op|get|set|add|remove)_\\w+", RegexOptions.Compiled);
+
+        public static bool IsSpecial(this MethodBase src) =>
+            //
+            // NET6_0-tol interface-nek lehet absztrakt statikus tagja:
+            // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
+            //
+            // Ha ezeken operatort definialunk akkor az nem lesz SpecialName (sztem mondjuk az kene legyen).
+            //
+
+            src.IsSpecialName || (src.GetAccessModifiers() is AccessModifiers.Explicit && src.IsStatic && FIsSpecial.IsMatch(src.StrippedName()));
 
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface
             ? Array.Empty<Type>()

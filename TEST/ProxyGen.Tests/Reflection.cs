@@ -63,9 +63,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(List<object>), 
             typeof(NestedGeneric<>), 
             typeof(NestedGeneric<List<string>>), 
-#if !NETCOREAPP2_2
             typeof(InterfaceInterceptor<>),
-#endif
             typeof(Generators.ProxyGenerator<,>), 
             typeof(System.ComponentModel.Component), // van esemenye
             typeof(DuckBase<>), 

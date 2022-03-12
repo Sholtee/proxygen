@@ -21,7 +21,18 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
             Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
             Accessibility.Public => AccessModifiers.Public,
-            Accessibility.Private when src.GetImplementedInterfaceMethods().Some() => AccessModifiers.Explicit,
+            Accessibility.Private when /*src.MethodKind is MethodKind.ExplicitInterfaceImplementation*/ src.GetImplementedInterfaceMethods().Some() =>
+                //
+                // NET6_0-tol interface-nek lehet absztrakt statikus tagja:
+                // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
+                //
+                // Es -bar ez sehol nincs dokumentalva- de ugy tunik h ha a tag nyilt-generikus akkor a
+                // generalt IL-ben nem fog szerepelni -> Az ilyen tagokat privatnak tekintjuk
+                //
+
+                src.IsStatic && src.TypeArguments.Some()
+                    ? AccessModifiers.Private
+                    : AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
             #pragma warning disable CA2201 // In theory we should never reach here.
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
