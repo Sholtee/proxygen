@@ -415,7 +415,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
             Assert.DoesNotThrowAsync(() => ProxyGenerator<IMyInterface, ExternalInterceptor<IMyInterface>>.GetGeneratedTypeAsync());
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>.Values;
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>
+            .Values
+#if NET5_0_OR_GREATER
+            .Where(iface => !iface
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Any(m => m.ReturnType.IsByRef || m.GetParameters()
+                    .Any(p => p.ParameterType.IsByRefLike)))
+#endif
+            ;
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void ProxyGenerator_ShouldWorkWith(Type iface) =>

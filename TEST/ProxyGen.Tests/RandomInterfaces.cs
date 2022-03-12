@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Solti.Utils.Proxy.Tests
 {
@@ -21,10 +20,6 @@ namespace Solti.Utils.Proxy.Tests
                     .GetExportedTypes()
                     .Where(t => t.IsInterface))
                 {
-#if NET5_0_OR_GREATER
-                    if (iface.GetMethods(BindingFlags.Instance | BindingFlags.Public).Any(m => m.ReturnType.IsByRef || m.GetParameters().Any(p => p.ParameterType.IsByRefLike)))
-                        continue;
-#endif
                     if (iface.ContainsGenericParameters)
                     {
                         Type[] gas = iface.GetGenericArguments();
