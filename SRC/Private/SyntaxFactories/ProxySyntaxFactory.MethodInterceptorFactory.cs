@@ -33,7 +33,12 @@ namespace Solti.Utils.Proxy.Internals
                 //
 
                 if (met.ReturnValue.Kind >= ParameterKind.Ref)
-                    throw new NotSupportedException(Resources.REF_RETURNS_NOT_SUPPORTED);
+                {
+                    NotSupportedException ex = new(Resources.BYREF_NOT_SUPPORTED);
+                    ex.Data["Method"] = met;
+
+                    throw ex;
+                }
 
                 yield return ResolveMethod(null!, met);
             }

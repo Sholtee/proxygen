@@ -123,6 +123,9 @@
   <data name="AMBIGUOUS_MATCH" xml:space="preserve">
     <value>Ambiguous match for member: {0}</value>
   </data>
+  <data name="BYREF_NOT_SUPPORTED" xml:space="preserve">
+    <value>Passing/returning by reference is not supported.</value>
+  </data>
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>
@@ -158,9 +161,6 @@
   </data>
   <data name="NULL_TARGET" xml:space="preserve">
     <value>The target is NULL.</value>
-  </data>
-  <data name="REF_RETURNS_NOT_SUPPORTED" xml:space="preserve">
-    <value>Reference return values are not supported.</value>
   </data>
   <data name="SEALED_INTERCEPTOR" xml:space="preserve">
     <value>The interceptor can not be sealed.</value>

@@ -79,6 +79,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Passing/returning by reference is not supported..
+        /// </summary>
+        internal static string BYREF_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("BYREF_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compilation failed. See &quot;Data&quot; for details..
         /// </summary>
         internal static string COMPILATION_FAILED {
@@ -183,15 +192,6 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string NULL_TARGET {
             get {
                 return ResourceManager.GetString("NULL_TARGET", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Reference return values are not supported..
-        /// </summary>
-        internal static string REF_RETURNS_NOT_SUPPORTED {
-            get {
-                return ResourceManager.GetString("REF_RETURNS_NOT_SUPPORTED", resourceCulture);
             }
         }
         

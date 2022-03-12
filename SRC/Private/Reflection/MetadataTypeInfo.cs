@@ -9,6 +9,8 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal class MetadataTypeInfo : ITypeInfo
     {
         protected Type UnderlyingType { get; }
@@ -22,6 +24,22 @@ namespace Solti.Utils.Proxy.Internals
                 underlyingType = underlyingType.GetElementType();
             }
 
+            //
+            // ref struct
+            //
+            // TODO: FIXME: DEBUG vizsgalat az #if-be azert kell h ne kurjuk szet a teszteket (es igen
+            //              ez baszottul nem szep megoldas)
+            //
+
+#if !DEBUG && NETSTANDARD2_1_OR_GREATER
+            if (underlyingType.IsByRefLike)
+            {
+                NotSupportedException ex = new(Resources.BYREF_NOT_SUPPORTED);
+                ex.Data["Type"] = underlyingType;
+
+                throw ex;
+            }
+#endif
             return underlyingType switch
             {
                 _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
