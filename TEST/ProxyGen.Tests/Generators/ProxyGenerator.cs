@@ -415,7 +415,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
             Assert.DoesNotThrowAsync(() => ProxyGenerator<IMyInterface, ExternalInterceptor<IMyInterface>>.GetGeneratedTypeAsync());
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<object>
+        //
+        // RandomInterfaces generikusa ne "object" legyen mert akkor tartalmazni fogja IEnumerator<object>-t
+        // amit viszont ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet() is hasznal ezert
+        // faszan osszeakadhatnak
+        //
+
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
             .Values
 #if NET5_0_OR_GREATER
             .Where(iface => !iface

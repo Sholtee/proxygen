@@ -254,7 +254,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
-        [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
+        [TestCaseSource(nameof(RandomInterfaces))]
         public void DuckGenerator_ShouldWorkWith(Type iface) =>
             Assert.DoesNotThrow(() => new DuckGenerator(iface, iface).GetGeneratedType());
 
