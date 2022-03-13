@@ -29,13 +29,19 @@ namespace Solti.Utils.Proxy.Internals
         {
             INamedTypeSymbol egta = compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)!;
 
+            #pragma warning disable RS1024 // Compare symbols correctly
+            HashSet<INamedTypeSymbol> returnedGenerators = new(SymbolEqualityComparer);
+            #pragma warning restore RS1024
+
             foreach (AttributeData attr in compilation.Assembly.GetAttributes())
             {
                 if (SymbolEqualityComparer.Equals(attr.AttributeClass, egta))
                 {
                     Debug.Assert(attr.ConstructorArguments.Length is 1);
 
-                    yield return (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
+                    INamedTypeSymbol generator = (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
+                    if (returnedGenerators.Add(generator))
+                        yield return generator;
                 }
             }
         }

@@ -28,20 +28,36 @@ namespace Solti.Utils.Proxy.Internals.Tests
     [TestFixture]
     public class ProxyEmbedderTests: CodeAnalysisTestsBase
     {
-        [Test]
-        public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations() 
+        [TestCase
+        (
+            @"
+            using System.Collections.Generic;
+
+            using Solti.Utils.Proxy;
+            using Solti.Utils.Proxy.Attributes;
+            using Solti.Utils.Proxy.Generators;
+
+            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            "
+        ),
+        TestCase
+        (
+            @"
+            using System.Collections.Generic;
+
+            using Solti.Utils.Proxy;
+            using Solti.Utils.Proxy.Attributes;
+            using Solti.Utils.Proxy.Generators;
+
+            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>)), EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            "
+        )]
+        public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations(string src) 
         {
             CSharpCompilation compilation = CreateCompilation
             (
-                @"
-                using System.Collections.Generic;
-
-                using Solti.Utils.Proxy;
-                using Solti.Utils.Proxy.Attributes;
-                using Solti.Utils.Proxy.Generators;
-
-                [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
-                ",
+                src,
                 typeof(EmbedGeneratedTypeAttribute).Assembly
             );
 
