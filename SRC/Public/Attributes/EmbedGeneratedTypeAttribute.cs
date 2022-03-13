@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Attributes
     using Properties;
 
     /// <summary>
-    /// Instructs the system to embed the generated type into the assembly being compiled.
+    /// Instructs the system to embed the generated type into the annotated assembly.
     /// </summary>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class EmbedGeneratedTypeAttribute: Attribute
