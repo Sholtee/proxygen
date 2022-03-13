@@ -165,9 +165,6 @@
   <data name="SEALED_INTERCEPTOR" xml:space="preserve">
     <value>The interceptor can not be sealed.</value>
   </data>
-  <data name="SEALED_INVOKE" xml:space="preserve">
-    <value>Invoke() method can not be sealed.</value>
-  </data>
   <data name="TYPE_NOT_FOUND" xml:space="preserve">
     <value>The type "{0}" can not be found.</value>
   </data>
