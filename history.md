@@ -105,3 +105,8 @@
   - *done:* Generator logic has been overhauled
   - *introduced:* Proxy activator (`Generator.Activate()`) feature
   - *introduced:* Untyped API
+- 6.0.0-preview2:
+  - *fixed:* Some `ProxyEmbedder` related issues
+  - *fixed:* Broken `netcoreapp3.0` support
+  - *done:* Code alignments
+  - *done:* Test against `netcoreapp3.0`, `net5.0`, `net6.0`
