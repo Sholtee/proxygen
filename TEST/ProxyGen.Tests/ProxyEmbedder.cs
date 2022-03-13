@@ -162,7 +162,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
-            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo
+            (
+#if NET5_0_OR_GREATER
+                1
+#else
+                2
+#endif
+            ));
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(
 #if NET5_0_OR_GREATER
                 2
@@ -252,7 +259,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
-            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(1));
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGI") && diag.Severity == DiagnosticSeverity.Info), Is.EqualTo(expectedTreeCount - 1));
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(expectedTreeCount));
         }
 

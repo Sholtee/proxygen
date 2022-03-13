@@ -17,16 +17,19 @@ using static System.Environment;
 namespace Solti.Utils.Proxy.Internals
 {
     using Attributes;
-    using Properties;
 
     [Generator]
-    internal sealed class ProxyEmbedder: ISourceGenerator
+    internal sealed partial class ProxyEmbedder : ISourceGenerator
     {
+        private static readonly SymbolEqualityComparer SymbolEqualityComparer  = SymbolEqualityComparer.Default;
+
         internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation)
         {
+            INamedTypeSymbol egta = compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)!;
+
             foreach (AttributeData attr in compilation.Assembly.GetAttributes())
             {
-                if (SymbolEqualityComparer.Default.Equals(attr.AttributeClass, compilation.GetTypeByMetadataName(typeof(EmbedGeneratedTypeAttribute).FullName)))
+                if (SymbolEqualityComparer.Equals(attr.AttributeClass, egta))
                 {
                     Debug.Assert(attr.ConstructorArguments.Length is 1);
 
@@ -89,12 +92,12 @@ namespace Solti.Utils.Proxy.Internals
 
             WorkingDirectories.Setup(configReader);
             SourceGeneratorConfig.Setup(configReader);
-#if DEBUG
+            #if DEBUG
             if (SourceGeneratorConfig.Instance.DebugGenerator)
             {
                 Debugger.Launch();
             }
-#endif
+            #endif
             Compilation compilation = context.Compilation;
 
             IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
@@ -116,56 +119,32 @@ namespace Solti.Utils.Proxy.Internals
 
             int extensionCount = 0;
 
-            foreach (INamedTypeSymbol generatorSymbol in aotGenerators)
+            foreach (INamedTypeSymbol generator in aotGenerators)
             {
                 try
                 {
-                    generatorSymbol.EnsureNotError();
+                    generator.EnsureNotError();
 
-                    ITypeInfo generator = SymbolTypeInfo.CreateFrom(generatorSymbol, compilation);
-
-                    ICodeFactory codeFactory = ICodeFactory.Registered.Entries.Single(cf => cf.ShouldUse(generator), throwOnEmpty: false) ?? throw new InvalidOperationException
+                    ExtendWith
                     (
-                        string.Format
-                        (
-                            SGResources.Culture,
-                            SGResources.NOT_A_GENERATOR,
-                            generator
-                        )
+                        CreateMainUnit(generator, compilation),
+                        generator.Locations.Single()!
                     );
-
-                    foreach (SourceCode source in codeFactory.GetSourceCodes(generator, compilation.AssemblyName, context.CancellationToken))
-                    {
-                        context.AddSource
-                        (
-                            source.Hint,
-                            source.Value
-                        );
-
-                        context.ReportDiagnostic
-                        (
-                            Diagnostics.PGI00(generatorSymbol.Locations.Single()!, source.Hint)
-                        );
-                    }
 
                     extensionCount++;
                 }
                 catch (InvalidSymbolException)
                 {
                     //
-                    // Ugras a kovetkezo generatorra
+                    // Ugras a kovetkezo generatorra. Megjegyzendo h nem csak a "generatorSymbol" lehet hibas u h
+                    // ez a catch jo helyen van itt.
                     //
                 }
                 #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
                 catch (Exception e)
                 #pragma warning restore CA1031
                 {
-                    ReportError
-                    (
-                        context,
-                        e,
-                        generatorSymbol.Locations.Single()!
-                    );
+                    ReportError(context, e, generator.Locations.Single()!);
                 }
             }
 
@@ -174,35 +153,37 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             if (extensionCount > 0)
-            try
             {
-                IRuntimeContext runtimeContext = SymbolRuntimeContext.CreateFrom(compilation);
-
-                foreach (IChunkFactory chunkFactory in IChunkFactory.Registered.Entries)
+                try
                 {
-                    if (chunkFactory.ShouldUse(runtimeContext, compilation.Assembly.Name))
+                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation))
                     {
-                        SourceCode source = chunkFactory.GetSourceCode(context.CancellationToken);
-
-                        context.AddSource
-                        (
-                            source.Hint,
-                            source.Value
-                        );
+                        ExtendWith(chunk, Location.None);
                     }
                 }
+                #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
+                catch (Exception e)
+                #pragma warning restore CA1031
+                {
+                    ReportError(context, e, Location.None);
+                    return;
+                }
             }
-            #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
-            catch (Exception e)
-            #pragma warning restore CA1031
+
+            void ExtendWith(UnitSyntaxFactoryBase unit, Location location)
             {
-                ReportError
+                SourceCode source = unit.GetSourceCode(context.CancellationToken);
+
+                context.AddSource
                 (
-                    context,
-                    e,
-                    Location.None
+                    source.Hint,
+                    source.Value
                 );
-                return;
+
+                context.ReportDiagnostic
+                (
+                    Diagnostics.PGI00(location, source.Hint)
+                );
             }
         }
     }

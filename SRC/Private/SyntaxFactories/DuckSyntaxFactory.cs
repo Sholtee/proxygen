@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo targetType, 
             string? containingAssembly,
             OutputType outputType,
-            IAssemblyInfo thisAssembly,
+            IAssemblyInfo proxygenAsm,
             ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}", referenceCollector) 
         {
             if (!interfaceType.IsInterface)
@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
             // szimbolum van.
             //
 
-            BaseType = ((IGenericTypeInfo) thisAssembly.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
+            BaseType = ((IGenericTypeInfo) proxygenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
                 .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
