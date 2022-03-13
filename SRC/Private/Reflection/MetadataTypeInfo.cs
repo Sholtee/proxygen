@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType switch
         {
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1_OR_GREATER
             _ when UnderlyingType.IsByRefLike => RefType.Ref, // ref struct
 #endif
             _ when UnderlyingType.IsPointer => RefType.Pointer,
