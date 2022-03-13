@@ -18,7 +18,9 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Attributes;
 
-    [Generator]
+    #pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
+    [Generator(LanguageNames.CSharp)]
+    #pragma warning restore CS3016
     internal sealed partial class ProxyEmbedder : ISourceGenerator
     {
         private static readonly SymbolEqualityComparer SymbolEqualityComparer  = SymbolEqualityComparer.Default;
@@ -88,27 +90,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public void Execute(GeneratorExecutionContext context)
         {
-            IConfigReader configReader = new AnalyzerConfigReader(context);
-
-            WorkingDirectories.Setup(configReader);
-            SourceGeneratorConfig.Setup(configReader);
-            #if DEBUG
-            if (SourceGeneratorConfig.Instance.DebugGenerator)
-            {
-                Debugger.Launch();
-            }
-            #endif
-            Compilation compilation = context.Compilation;
-
-            IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
-            if (!aotGenerators.Some())
-                return;
-
             //
             // Csak C# 7.0+ tamogatjuk
             //
 
-            if (compilation.Language != CSharpParseOptions.Default.Language /*context.ParseOptions is not CSharpParseOptions parseOptions*/ || ((CSharpParseOptions) context.ParseOptions).LanguageVersion < LanguageVersion.CSharp7)
+            if (context.Compilation is not CSharpCompilation { LanguageVersion : >= LanguageVersion.CSharp7 } compilation)
             {
                 context.ReportDiagnostic
                 (
@@ -116,6 +102,20 @@ namespace Solti.Utils.Proxy.Internals
                 );
                 return;
             }
+
+            IConfigReader configReader = new AnalyzerConfigReader(context);
+
+            WorkingDirectories.Setup(configReader);
+            SourceGeneratorConfig.Setup(configReader);
+
+            #if DEBUG
+            if (SourceGeneratorConfig.Instance.DebugGenerator)
+                Debugger.Launch();
+            #endif
+
+            IEnumerable<INamedTypeSymbol> aotGenerators = GetAOTGenerators(compilation);
+            if (!aotGenerators.Some())
+                return;
 
             int extensionCount = 0;
 
