@@ -57,11 +57,6 @@ namespace Solti.Utils.Proxy.Internals
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
-            //
-            // - Append() hivas azon perverz esetre ha nem szarmaztunk le az InterfaceInterceptor-bol
-            // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
-            //
-
             string baseInterceptorName = typeof(InterfaceInterceptor<>).FullName;
 
             IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?) 
