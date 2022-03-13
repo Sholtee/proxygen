@@ -355,6 +355,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldValidate()
         {
             Assert.Throws<ArgumentException>(() => ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType());
+            Assert.Throws<ArgumentException>(() => new ProxyGenerator(typeof(IList<string>), typeof(InterfaceInterceptor<IList<int>>)).GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, AbstractInterceptor>.GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, SealedInterceptor>.GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, InterceptorWithPrivateCtor>.GetGeneratedType());

@@ -148,7 +148,7 @@
     <value>The target does not implement the member: {0}</value>
   </data>
   <data name="NOT_AN_INTERCEPTOR" xml:space="preserve">
-    <value>The type must be a InterfaceInterceptor descendant.</value>
+    <value>The type must be a proper InterfaceInterceptor descendant.</value>
   </data>
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>

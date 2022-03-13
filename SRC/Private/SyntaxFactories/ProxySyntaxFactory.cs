@@ -62,8 +62,15 @@ namespace Solti.Utils.Proxy.Internals
             // - A "FullName" nem veszi figyelembe a generikus argumentumokat, ami nekunk pont jo
             //
 
-            string iiFullName = typeof(InterfaceInterceptor<>).FullName;
-            if (interceptorType.QualifiedName != iiFullName && !interceptorType.GetBaseTypes().Some(ic => ic.QualifiedName == iiFullName))
+            string baseInterceptorName = typeof(InterfaceInterceptor<>).FullName;
+
+            IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?) 
+            (
+                interceptorType.QualifiedName == baseInterceptorName
+                    ? interceptorType
+                    : interceptorType.GetBaseTypes().Single(ic => ic.QualifiedName == baseInterceptorName, throwOnEmpty: false)
+            );
+            if (baseInterceptor?.GenericArguments?.Single()?.EqualsTo(interfaceType) is not true)
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)

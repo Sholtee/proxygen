@@ -169,7 +169,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The type must be a InterfaceInterceptor descendant..
+        ///   Looks up a localized string similar to The type must be a proper InterfaceInterceptor descendant..
         /// </summary>
         internal static string NOT_AN_INTERCEPTOR {
             get {
