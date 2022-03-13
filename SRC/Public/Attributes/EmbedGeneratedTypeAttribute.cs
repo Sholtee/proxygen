@@ -24,7 +24,6 @@ namespace Solti.Utils.Proxy.Attributes
         /// <summary>
         /// Creates a new <see cref="EmbedGeneratedTypeAttribute"/> instance.
         /// </summary>
-        /// <param name="generator"></param>
         public EmbedGeneratedTypeAttribute(Type generator) 
         {
             if (generator is null)

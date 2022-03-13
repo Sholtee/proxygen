@@ -10,17 +10,17 @@ namespace Solti.Utils.Proxy.Generators
     using Internals;
 
     /// <summary>
-    /// Type generator for creating proxies that let target behaves like an interface.
+    /// Type generator for creating a proxy that wraps the <see cref="Target"/> to implement the <see cref="Interface"/>.
     /// </summary>
     public sealed record DuckGenerator: Generator
     {
         /// <summary>
-        /// The target who implements all the <see cref="Interface"/> members.
+        /// The target implementing all the <see cref="Interface"/> members.
         /// </summary>
         public Type Target { get; }
 
         /// <summary>
-        /// The interface to which the proxy will be created.
+        /// The interface for which the proxy will be created.
         /// </summary>
         public Type Interface { get; }
 

@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Called on proxy method invocation.
         /// </summary>
-        /// <returns>The object to return to the caller, or null for void methods.</returns>
+        /// <returns>The object to return to the caller or null for void methods.</returns>
         public virtual object? Invoke(InvocationContext context)
         {
             if (context is null)

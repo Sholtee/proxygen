@@ -15,7 +15,7 @@ using System.Runtime.CompilerServices;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Base of the generators.
+    /// Base of typed generators.
     /// </summary>
     /// <remarks>Generators should not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
@@ -24,7 +24,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Gets the concrete generator.
         /// </summary>
-        /// <returns></returns>
         protected abstract Generator GetConcreteGenerator();
 
         /// <summary>

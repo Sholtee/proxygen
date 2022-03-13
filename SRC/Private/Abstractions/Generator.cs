@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Base of the generators.
+    /// Base of untyped generators.
     /// </summary>
     public abstract record Generator: TypeEmitter
     {

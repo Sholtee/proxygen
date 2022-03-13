@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Generators
     public sealed record ProxyGenerator : Generator
     {
         /// <summary>
-        /// The interface to which the proxy will be created.
+        /// The interface for which the proxy will be created.
         /// </summary>
         public Type Interface { get; }
 

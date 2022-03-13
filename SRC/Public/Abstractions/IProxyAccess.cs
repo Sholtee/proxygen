@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Solti.Utils.Proxy
 {
     /// <summary>
-    /// Class that implement this interface has access to the proxy instance that targets it.
+    /// Class implementing this interface has access to the proxy instance that targets it.
     /// </summary>
     public interface IProxyAccess<TInterface> where TInterface: class
     {

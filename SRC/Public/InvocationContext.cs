@@ -42,6 +42,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The arguments passed by the caller.
         /// </summary>
+        /// <remarks>Before the <see cref="InvokeTarget"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "End user is allowed to modify the argument list.")]
         public object?[] Args { get; }
 
@@ -53,6 +54,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Invokes the original method.
         /// </summary>
+        /// <remarks>In most of cases you are not supposed to call this function directly. It is done in the base implementation of <see cref="InterfaceInterceptor{TInterface}.Invoke(InvocationContext)"/> method.</remarks>
         public Func<object?> InvokeTarget { get; }
     }
 }
