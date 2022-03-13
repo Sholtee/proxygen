@@ -495,5 +495,23 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public IList<object> Proxy { get; set; }
         }
+
+        public interface IRefReturn
+        {
+            ref object Foo();
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldThrowOnRefReturnValues() =>
+            Assert.Throws<NotSupportedException>(() => ProxyGenerator<IRefReturn, InterfaceInterceptor<IRefReturn>>.GetGeneratedType());
+
+        public interface IRefStructUsage
+        {
+            void Foo(Span<int> para);
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldThrowOnRefStructs() =>
+            Assert.Throws<NotSupportedException>(() => ProxyGenerator<IRefStructUsage, InterfaceInterceptor<IRefStructUsage>>.GetGeneratedType());
     }
 }

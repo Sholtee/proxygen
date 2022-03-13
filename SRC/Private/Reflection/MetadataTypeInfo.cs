@@ -9,8 +9,6 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal class MetadataTypeInfo : ITypeInfo
     {
         protected Type UnderlyingType { get; }
@@ -24,22 +22,6 @@ namespace Solti.Utils.Proxy.Internals
                 underlyingType = underlyingType.GetElementType();
             }
 
-            //
-            // ref struct
-            //
-            // TODO: FIXME: DEBUG vizsgalat az #if-be azert kell h ne kurjuk szet a teszteket (es igen
-            //              ez baszottul nem szep megoldas)
-            //
-
-#if !DEBUG && NETSTANDARD2_1_OR_GREATER
-            if (underlyingType.IsByRefLike)
-            {
-                NotSupportedException ex = new(Resources.BYREF_NOT_SUPPORTED);
-                ex.Data["Type"] = underlyingType;
-
-                throw ex;
-            }
-#endif
             return underlyingType switch
             {
                 _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
@@ -87,7 +69,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType switch
         {
-            // _ when UnderlyingType.IsByRef => RefType.Ref, // FIXME: ezt nem kene kikommentelni de ugy tunik a Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test)
+#if NETSTANDARD2_1
+            _ when UnderlyingType.IsByRefLike => RefType.Ref, // ref struct
+#endif
             _ when UnderlyingType.IsPointer => RefType.Pointer,
             _ when UnderlyingType.IsArray => RefType.Array,
             _ => RefType.None

@@ -178,7 +178,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.That(gen.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(fileName).Replace("{version}", typeof(ProxyGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values;
+        public static IEnumerable<Type> RandomInterfaces => Proxy
+            .Tests
+            .RandomInterfaces<string>
+            .Values
+#if NET6_0_OR_GREATER
+            .Where(t => !t.GetMethods(BindingFlags.Instance | BindingFlags.Public).Any(m => m.GetParameters().Any(p => p.ParameterType.IsByRefLike)))
+#endif
+            ;
 
         [Test]
         public void GenerateProxyClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType) 

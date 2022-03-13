@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Passing/returning by reference is not supported..
+        ///   Looks up a localized string similar to &quot;reference return value&quot;s and &quot;ref struct&quot;s are not supported..
         /// </summary>
         internal static string BYREF_NOT_SUPPORTED {
             get {

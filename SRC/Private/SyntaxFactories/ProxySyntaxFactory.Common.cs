@@ -13,6 +13,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ProxySyntaxFactory
     {
         #if DEBUG
@@ -68,13 +70,25 @@ namespace Solti.Utils.Proxy.Internals
 
             return DeclareLocal<object[]>
             (
-                EnsureUnused("args", paramz), CreateArray<object>
+                EnsureUnused("args", paramz),
+                CreateArray<object>
                 (
                     paramz.ConvertAr
                     (
-                        param => param.Kind is ParameterKind.Out
-                            ? DefaultExpression(CreateType(param.Type))
-                            : (ExpressionSyntax) IdentifierName(param.Name)
+                        param => (ExpressionSyntax) (param.Kind switch
+                        {
+                            _ when param.Type.RefType is RefType.Ref =>
+                                //
+                                // "ref struct" cast-olhato oljektumma
+                                //
+
+                                throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
+                            ParameterKind.Out => DefaultExpression
+                            (
+                                CreateType(param.Type)
+                            ),
+                            _ => IdentifierName(param.Name)
+                        })
                     )
                 )
             );

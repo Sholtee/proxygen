@@ -64,6 +64,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             IPointerTypeSymbol => RefType.Pointer,
             IArrayTypeSymbol => RefType.Array,
+            _ when UnderlyingSymbol.IsRefLikeType => RefType.Ref,
             _ => RefType.None
         };
 

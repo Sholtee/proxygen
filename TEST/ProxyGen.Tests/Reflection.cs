@@ -59,7 +59,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof((int Int, string String)), 
             typeof(int*), 
             typeof(DateTime), 
-            typeof(List<>), 
+            typeof(List<>),
+            typeof(Span<int>), // ref struct
             typeof(List<object>), 
             typeof(NestedGeneric<>), 
             typeof(NestedGeneric<List<string>>), 
