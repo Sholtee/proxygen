@@ -14,7 +14,7 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public class ReflectionTests : CodeAnalysisTestsBase
     {
         [Test]

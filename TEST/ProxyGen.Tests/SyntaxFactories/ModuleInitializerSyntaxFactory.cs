@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
 
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public class ModuleInitializerSyntaxFactoryTests
     {
         [Test]

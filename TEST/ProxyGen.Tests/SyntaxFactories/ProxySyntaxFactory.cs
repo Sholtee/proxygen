@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
     using static Internals.Tests.CodeAnalysisTestsBase;
 
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class ProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         internal class FooInterceptor : InterfaceInterceptor<IFoo<int>> // direkt internal

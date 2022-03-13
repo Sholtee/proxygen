@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 {
     using Internals;
 
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class DuckGeneratorTests
     {
         private static Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>

@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
     using static Internals.Tests.CodeAnalysisTestsBase;
 
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         public sealed class BadFoo

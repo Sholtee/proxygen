@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     using Internals;
     using Proxy.Tests.External;
 
-    [TestFixture]
+    [TestFixture, Parallelizable(ParallelScope.All)]
     public class ProxyGeneratorTests
     {
         public interface IMyInterface
