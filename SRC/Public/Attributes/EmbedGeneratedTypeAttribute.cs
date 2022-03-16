@@ -13,6 +13,7 @@ namespace Solti.Utils.Proxy.Attributes
     /// <summary>
     /// Instructs the system to embed the generated type into the annotated assembly.
     /// </summary>
+    /// <remarks>This feature is implemented with a <a href="https://docs.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/source-generators-overview">source generator</a>.</remarks>
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class EmbedGeneratedTypeAttribute: Attribute
     {
