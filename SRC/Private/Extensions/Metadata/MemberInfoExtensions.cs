@@ -44,13 +44,17 @@ namespace Solti.Utils.Proxy.Internals
 
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
 
-        public static MemberInfo ExtractFrom(MethodInfo accessor, MemberTypes memberType, out MethodInfo method) // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+        //
+        // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+        //
+
+        public static (MemberInfo Member, MethodInfo Method) ExtractFrom(MethodInfo accessor, MemberTypes memberType) => Cache.GetOrAdd<MethodInfo, (MemberInfo, MethodInfo)>(accessor, () =>
         {
             foreach (Instruction instruction in accessor.GetInstructions())
             {
                 if (instruction.OpCode == OpCodes.Callvirt)
                 {
-                    method = (MethodInfo) instruction.Operand;
+                    MethodInfo method = (MethodInfo) instruction.Operand;
 
                     switch (memberType)
                     {
@@ -58,24 +62,24 @@ namespace Solti.Utils.Proxy.Internals
                             foreach (PropertyInfo prop in method.DeclaringType.GetProperties()) // nem hasznalhatunk SingleOrDefault()-ot mert lambdaban nem hivatkozhatunk by ref parametert [CS1628]
                             {
                                 if (prop.SetMethod == method || prop.GetMethod == method)
-                                    return prop;
+                                    return (prop, method);
                             }
                             break;
                         case MemberTypes.Event:
                             foreach (EventInfo evt in method.DeclaringType.GetEvents())
                             {
                                 if (evt.AddMethod == method || evt.RemoveMethod == method)
-                                    return evt;
+                                    return (evt, method);
                             }
                             break;
                         case MemberTypes.Method:
-                            return method;
+                            return (method, method);
                     }
                 }
             }
 
             throw new NotSupportedException();
-        }
+        });
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

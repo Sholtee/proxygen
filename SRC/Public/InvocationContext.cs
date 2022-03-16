@@ -16,8 +16,6 @@ namespace Solti.Utils.Proxy
     /// </summary>
     public class InvocationContext 
     {
-        private readonly MethodInfo FMethod;
-
         /// <summary>
         /// Creates a new <see cref="InvocationContext"/> instance.
         /// </summary>
@@ -29,7 +27,14 @@ namespace Solti.Utils.Proxy
             if (invokeTarget is null)
                 throw new ArgumentNullException(nameof(invokeTarget));
 
-            Member = MemberInfoExtensions.ExtractFrom(invokeTarget.Method, memberType, out FMethod);
+            //
+            // Delegate.Method fuggetlen a korulzart valtozoktol (lasd: UnderlyingMethodOfDelegate_ShouldBeIndependentFromTheEnclosedVariables)
+            //
+
+            (MemberInfo member, MethodInfo method) = MemberInfoExtensions.ExtractFrom(invokeTarget.Method, memberType);
+
+            Member = member;
+            Method = method;
             Args = args;
             InvokeTarget = invokeTarget;
         }
@@ -37,7 +42,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The interface method being invoked.
         /// </summary>
-        public MethodInfo Method => FMethod;
+        public MethodInfo Method { get; }
 
         /// <summary>
         /// The arguments passed by the caller.
