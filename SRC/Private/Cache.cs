@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
@@ -13,10 +14,10 @@ namespace Solti.Utils.Proxy.Internals
     {
         private static class Implementation<TKey, TValue>
         {
-            public static readonly ConcurrentDictionary<TKey, TValue> Value = new();
+            public static readonly ConcurrentDictionary<object, TValue> Value = new();
         }
 
-        public static TValue GetOrAdd<TKey, TValue>(TKey key, Func<TValue> factory) => Implementation<TKey, Lazy<TValue>>
+        public static TValue GetOrAdd<TKey, TValue>(TKey key, Func<TValue> factory, [CallerMemberName] string scope = "") => Implementation<TKey, Lazy<TValue>>
             .Value
             
             //
@@ -24,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
             // meghivasra kerulhet (MSDN) -> Lazy
             //
 
-            .GetOrAdd(key, new Lazy<TValue>(factory, LazyThreadSafetyMode.ExecutionAndPublication))
+            .GetOrAdd(new { key, scope }, new Lazy<TValue>(factory, LazyThreadSafetyMode.ExecutionAndPublication))
             .Value;
     }
 }
