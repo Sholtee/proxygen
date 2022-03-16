@@ -110,3 +110,8 @@
   - *fixed:* Broken `netcoreapp3.0` support
   - *done:* Code alignments
   - *done:* Test against `netcoreapp3.0`, `net5.0`, `net6.0`
+- 6.0.0:
+  - *fixed:* Missing validation
+  - *fixed:* Crash on attempt to embed the same generator more than once
+- 6.0.1:
+  - *fixed:* Performance issue of generated proxy
