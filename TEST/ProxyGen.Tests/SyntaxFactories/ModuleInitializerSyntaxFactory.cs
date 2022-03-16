@@ -20,7 +20,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ModuleInitializerSyntaxFactory factory = new ModuleInitializerSyntaxFactory(OutputType.Unit, null);
 
-            Assert.That(factory.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("ModuleInitializerAttribute.txt")));
+            Assert.That
+            (
+                factory.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(),
+                Is.EqualTo
+                (
+                    File.ReadAllText("ModuleInitializerAttribute.txt").Replace("{version}", typeof(ModuleInitializerSyntaxFactory).Assembly.GetName().Version.ToString())          
+                )
+            );
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "6.0.0.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Utils.Proxy.Internals.DuckBase<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
     public Duck_2648115D0AA68B747DBE21865A3A6FC2(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target) : base(target)
