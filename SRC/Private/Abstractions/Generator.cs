@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -17,15 +16,6 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     public abstract record Generator: TypeEmitter
     {
-        //
-        // Ha ugyanazzal a kulccsal hivjuk parhuzamosan a GetOrAdd()-et akkor a factory tobbszor is
-        // meghivasra kerulhet (MSDN) -> Lazy
-        //
-
-        private static readonly ConcurrentDictionary<Generator, Lazy<Task<Type>>> FGeneratedTypes = new();
-
-        private static readonly ConcurrentDictionary<Type, Lazy<ProxyActivator.ActivatorDelegate>> FActivators = new();
-
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
@@ -37,36 +27,32 @@ namespace Solti.Utils.Proxy.Internals
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal() => FGeneratedTypes.GetOrAdd
+        internal Task<Type> GetGeneratedTypeAsyncInternal() => Cache.GetOrAdd
         (
             //
             // Ha ket generatornak azonos a hash-e (ezert hasznalunk record tipust) akkor ugyanazt a tipust is generaljak.
             //
 
             this,
-            new Lazy<Task<Type>>
+            () => Task<Type>.Factory.StartNew
             (
-                () => Task<Type>.Factory.StartNew
-                (
-                    //
-                    // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
-                    // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
-                    //
+                //
+                // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
+                // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
+                //
 
-                    () => Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
-                ),
-                LazyThreadSafetyMode.ExecutionAndPublication
+                () => Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
             )
-        ).Value;
+        );
 
         #if NETSTANDARD2_1_OR_GREATER
         private static object ActivateInternal(Type t, ITuple? tuple) => 
         #else
         internal static object ActivateInternal(Type t, object? tuple) =>
         #endif
-            FActivators
-                .GetOrAdd(t, new Lazy<ProxyActivator.ActivatorDelegate>(() => ProxyActivator.Create(t)))
-                .Value(tuple);
+            Cache
+                .GetOrAdd(t, () => ProxyActivator.Create(t))
+                .Invoke(tuple);
 
         #region Public
         /// <summary>
