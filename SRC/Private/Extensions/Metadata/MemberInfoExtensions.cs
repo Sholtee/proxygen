@@ -50,35 +50,36 @@ namespace Solti.Utils.Proxy.Internals
 
         public static (MemberInfo Member, MethodInfo Method) ExtractFrom(MethodInfo accessor, MemberTypes memberType) => Cache.GetOrAdd<MethodInfo, (MemberInfo, MethodInfo)>(accessor, () =>
         {
-            foreach (Instruction instruction in accessor.GetInstructions())
+            MethodInfo method = (MethodInfo) accessor
+                .GetInstructions()
+                .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
+                .Operand;
+
+            return memberType switch
             {
-                if (instruction.OpCode == OpCodes.Callvirt)
-                {
-                    MethodInfo method = (MethodInfo) instruction.Operand;
-
-                    switch (memberType)
-                    {
-                        case MemberTypes.Property:
-                            foreach (PropertyInfo prop in method.DeclaringType.GetProperties()) // nem hasznalhatunk SingleOrDefault()-ot mert lambdaban nem hivatkozhatunk by ref parametert [CS1628]
-                            {
-                                if (prop.SetMethod == method || prop.GetMethod == method)
-                                    return (prop, method);
-                            }
-                            break;
-                        case MemberTypes.Event:
-                            foreach (EventInfo evt in method.DeclaringType.GetEvents())
-                            {
-                                if (evt.AddMethod == method || evt.RemoveMethod == method)
-                                    return (evt, method);
-                            }
-                            break;
-                        case MemberTypes.Method:
-                            return (method, method);
-                    }
-                }
-            }
-
-            throw new NotSupportedException();
+                MemberTypes.Property => 
+                (
+                    method
+                        .DeclaringType
+                        .GetProperties()
+                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+                    method
+                ),
+                MemberTypes.Event =>
+                (
+                    method
+                        .DeclaringType
+                        .GetEvents()
+                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+                    method
+                ),
+                MemberTypes.Method =>
+                (
+                    method,
+                    method
+                ),
+                _ => throw new NotSupportedException()
+            };
         });
 
         //
