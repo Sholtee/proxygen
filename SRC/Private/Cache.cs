@@ -5,8 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -17,7 +15,31 @@ namespace Solti.Utils.Proxy.Internals
             public static readonly ConcurrentDictionary<object, TValue> Value = new();
         }
 
-        public static TValue GetOrAdd<TKey, TValue>(TKey key, Func<TValue> factory, [CallerMemberName] string scope = "") => Implementation<TKey, Lazy<TValue>>
+        private sealed class LazySlim<TValue, TContext> where TValue : class
+        {
+            private readonly Func<TContext, TValue> FFactory;
+            private readonly TContext FContext;
+            private TValue? FValue;
+
+            public LazySlim(/*static*/ Func<TContext, TValue> factory, TContext context)
+            {
+                FFactory = factory;
+                FContext = context;
+            }
+
+            public TValue Value
+            {
+                get 
+                {
+                    if (FValue is null)
+                        lock (FFactory)
+                            FValue ??= FFactory(FContext);
+                    return FValue;
+                }
+            }
+        }
+        
+        public static TValue GetOrAdd<TKey, TValue, TContext>(TKey key, /*static*/ Func<TContext, TValue> factory, TContext context/*, [CallerMemberName] string scope = ""*/) where TValue: class => Implementation<TKey, LazySlim<TValue, TContext>>
             .Value
             
             //
@@ -25,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
             // meghivasra kerulhet (MSDN) -> Lazy
             //
 
-            .GetOrAdd(new { key, scope }, new Lazy<TValue>(factory, LazyThreadSafetyMode.ExecutionAndPublication))
+            .GetOrAdd(/*new { key, scope }*/key!, new LazySlim<TValue, TContext>(factory, context))
             .Value;
     }
 }

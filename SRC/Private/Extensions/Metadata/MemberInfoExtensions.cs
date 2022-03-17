@@ -48,39 +48,38 @@ namespace Solti.Utils.Proxy.Internals
         // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static (MemberInfo Member, MethodInfo Method) ExtractFrom(MethodInfo accessor, MemberTypes memberType) => Cache.GetOrAdd<MethodInfo, (MemberInfo, MethodInfo)>(accessor, () =>
+        public static (MemberInfo Member, MethodInfo Method) ExtractFrom(MethodInfo accessor, MemberTypes memberType)
         {
-            MethodInfo method = (MethodInfo) accessor
-                .GetInstructions()
-                .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
-                .Operand;
-
-            return memberType switch
+            var result = Cache.GetOrAdd(accessor, static ctx =>
             {
-                MemberTypes.Property => 
-                (
-                    method
-                        .DeclaringType
-                        .GetProperties()
-                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
-                    method
-                ),
-                MemberTypes.Event =>
-                (
-                    method
-                        .DeclaringType
-                        .GetEvents()
-                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
-                    method
-                ),
-                MemberTypes.Method =>
-                (
+                MethodInfo method = (MethodInfo) ctx.accessor
+                    .GetInstructions()
+                    .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
+                    .Operand;
+
+                return new
+                {
                     method,
-                    method
-                ),
-                _ => throw new NotSupportedException()
-            };
-        });
+                    member = ctx.memberType switch
+                    {
+                        MemberTypes.Property => method
+                            .DeclaringType
+                            .GetProperties()
+                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+
+                        MemberTypes.Event => method
+                            .DeclaringType
+                            .GetEvents()
+                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+
+                        MemberTypes.Method => (MemberInfo) method,
+                        _ => throw new NotSupportedException()
+                    }
+                };
+            }, new { memberType, accessor });
+
+            return (result.member, result.method);
+        }
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

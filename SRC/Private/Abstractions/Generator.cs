@@ -34,15 +34,16 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             this,
-            () => Task<Type>.Factory.StartNew
+            static self => Task<Type>.Factory.StartNew
             (
                 //
                 // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
                 // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
                 //
 
-                () => Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
-            )
+                () => self.Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
+            ),
+            this
         );
 
         #if NETSTANDARD2_1_OR_GREATER
@@ -51,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
         internal static object ActivateInternal(Type t, object? tuple) =>
         #endif
             Cache
-                .GetOrAdd(t, () => ProxyActivator.Create(t))
+                .GetOrAdd(t, static t => ProxyActivator.Create(t), t)
                 .Invoke(tuple);
 
         #region Public
