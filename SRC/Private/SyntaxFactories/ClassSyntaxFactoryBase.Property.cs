@@ -69,27 +69,33 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected PropertyDeclarationSyntax DeclareProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
+        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
 
             PropertyDeclarationSyntax result = PropertyDeclaration
             (
-                type: CreateType(property.Type),
+                type: ResolveType(property.Type),
                 identifier: Identifier(property.Name)
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(property.DeclaringType))
             );
 
             List<AccessorDeclarationSyntax> accessors = new(2);
 
             if (property.GetMethod is not null && getBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining)
+                );
 
             if (property.SetMethod is not null && setBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
+                );
 
             return !accessors.Some() ? result : result.WithAccessorList
             (
@@ -110,18 +116,18 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected IndexerDeclarationSyntax DeclareIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
+        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
             Debug.Assert(property.Indices.Some());
 
             IndexerDeclarationSyntax result = IndexerDeclaration
             (
-                type: CreateType(property.Type)
+                type: ResolveType(property.Type)
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(property.DeclaringType))
             )
             .WithParameterList
             (
@@ -135,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                         )
                         .WithType
                         (
-                            type: CreateType(index.Type)
+                            type: ResolveType(index.Type)
                         )
                     )
                 )
@@ -144,10 +150,16 @@ namespace Solti.Utils.Proxy.Internals
             List<AccessorDeclarationSyntax> accessors = new(2);
 
             if (property.GetMethod is not null && getBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining)
+                );
 
             if (property.SetMethod is not null && setBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
+                );
 
             return !accessors.Some() ? result : result.WithAccessorList
             (

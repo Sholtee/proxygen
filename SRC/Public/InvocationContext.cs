@@ -10,6 +10,7 @@ using System.Reflection;
 namespace Solti.Utils.Proxy
 {
     using Internals;
+    using Properties;
 
     /// <summary>
     /// Describes the method invocation context.
@@ -19,25 +20,36 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Creates a new <see cref="InvocationContext"/> instance.
         /// </summary>
-        public InvocationContext(object?[] args, Func<object?> invokeTarget, MemberTypes memberType)
+        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch, MemberTypes memberType)
         {
             if (args is null)
                 throw new ArgumentNullException(nameof(args));
 
-            if (invokeTarget is null)
-                throw new ArgumentNullException(nameof(invokeTarget));
+            if (dispatch is null)
+                throw new ArgumentNullException(nameof(dispatch));
+
+            if (dispatch.Target is not null)
+                throw new ArgumentException(Resources.NOT_STATIC, nameof(dispatch));
 
             //
             // Delegate.Method fuggetlen a korulzart valtozoktol (lasd: UnderlyingMethodOfDelegate_ShouldBeIndependentFromTheEnclosedVariables)
             //
 
-            (MemberInfo member, MethodInfo method) = MemberInfoExtensions.ExtractFrom(invokeTarget.Method, memberType);
+            ExtendedMemberInfo memberInfo = MemberInfoExtensions.ExtractFrom(dispatch, memberType);
 
-            Member = member;
-            Method = method;
+            Member = memberInfo.Member;
+            Method = memberInfo.Method;
             Args = args;
-            InvokeTarget = invokeTarget;
+            Dispatch = dispatch;
         }
+
+        /// <summary>
+        /// [Obsolete] Creates a new <see cref="InvocationContext"/> instance.
+        /// </summary>
+        /// <remarks>This constructor is present only for backward compatibility and will throw.</remarks>
+        [Obsolete("This constructor is present only for backward compatibility and will throw.")]
+        public InvocationContext(object?[] args, Func<object?> invokeTarget, MemberTypes memberType) =>
+            throw new NotSupportedException();
 
         /// <summary>
         /// The interface method being invoked.
@@ -59,7 +71,13 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Invokes the original method.
         /// </summary>
-        /// <remarks>In most of cases you are not supposed to call this function directly. It is done in the base implementation of <see cref="InterfaceInterceptor{TInterface}.Invoke(InvocationContext)"/> method.</remarks>
-        public Func<object?> InvokeTarget { get; }
+        /// <remarks>This constructor is present only for backward compatibility and will throw.</remarks>
+        [Obsolete($"{nameof(InvokeTarget)} is obsolete and will throw. Use the {nameof(Dispatch)} instead!")]
+        public Func<object?> InvokeTarget => throw new NotSupportedException();
+
+        /// <summary>
+        /// Gets the dispatcher function.
+        /// </summary>
+        public Func<object, object?[], object?> Dispatch { get; }
     }
 }

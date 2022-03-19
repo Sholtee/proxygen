@@ -8,13 +8,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
-    using static Consts;
 
     [MemoryDiagnoser]
+    [SimpleJob(RunStrategy.Throughput, invocationCount: 1000000)]
     public class GeneratedProxy
     {
         private const string Param = "";
@@ -56,31 +57,13 @@ namespace Solti.Utils.Proxy.Perf
         [GlobalSetup(Target = nameof(ProxyWithoutTarget))]
         public async Task SetupProxyWithoutTarget() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithoutTarget>(null);
 
-        [Benchmark(Baseline = true, OperationsPerInvoke = OperationsPerInvoke)]
-        public void NoProxy()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                FInstance.DoSomething(Param);
-            }
-        }
+        [Benchmark(Baseline = true)]
+        public void NoProxy() => FInstance.DoSomething(Param);
 
-        [Benchmark(OperationsPerInvoke = OperationsPerInvoke)]
-        public void ProxyWithTarget()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                FInstance.DoSomething(Param);
-            }
-        }
+        [Benchmark]
+        public void ProxyWithTarget() => FInstance.DoSomething(Param);
 
-        [Benchmark(OperationsPerInvoke = OperationsPerInvoke)]
-        public void ProxyWithoutTarget()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                FInstance.DoSomething(Param);
-            }
-        }
+        [Benchmark]
+        public void ProxyWithoutTarget() => FInstance.DoSomething(Param);
     }
 }

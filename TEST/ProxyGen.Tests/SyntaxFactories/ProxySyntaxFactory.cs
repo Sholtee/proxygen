@@ -16,6 +16,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using NUnit.Framework;
 
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Generators;
@@ -48,10 +50,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             null
         );
 
-
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
-            Assert.That(CreateGenerator(OutputType.Module).CreateArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(CreateGenerator(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
@@ -60,7 +61,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             IReadOnlyList<ExpressionStatementSyntax> assignments = gen.AssignByRefParameters
             (
-                Foo.Parameters, gen.DeclareLocal<object[]>("args")
+                Foo, gen.ResolveLocal<object[]>("args")
             ).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
@@ -73,12 +74,23 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
 
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = gen.DeclareCallbackLocals(gen.DeclareLocal<object[]>("args"), Foo.Parameters).ToArray();
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = gen.ResolveInvokeTargetLocals
+            (
+                Parameter
+                (
+                    identifier: Identifier("args")
+                )
+                .WithType
+                (
+                    gen.ResolveType<object[]>()
+                ), 
+                Foo
+            ).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
-            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.Int32 cb_a = (global::System.Int32)args[0];"));
-            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.String cb_b;"));
-            Assert.That(locals[2].NormalizeWhitespace().ToFullString(), Is.EqualTo("TT cb_c = (TT)args[2];"));
+            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.Int32 _a = (global::System.Int32)args[0];"));
+            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.String _b;"));
+            Assert.That(locals[2].NormalizeWhitespace().ToFullString(), Is.EqualTo("TT _c = (TT)args[2];"));
         }
 
         [Test]
@@ -86,24 +98,33 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
 
+            ParameterSyntax args = Parameter
+            (
+                identifier: Identifier("args")
+            )
+            .WithType
+            (
+                gen.ResolveType<object[]>()
+            );
+
             IEnumerable<StatementSyntax> assigns = gen.ReassignArgsArray
             (
-                Foo.Parameters,
-                gen.DeclareLocal<object[]>("args"),
-                gen.DeclareCallbackLocals(gen.CreateArgumentsArray(Foo), Foo.Parameters)
+                Foo,
+                args,
+                gen.ResolveInvokeTargetLocals(args, Foo)
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));
-            Assert.That(assigns.First().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (global::System.Object)cb_b;"));
-            Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (global::System.Object)cb_c;"));
+            Assert.That(assigns.First().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (global::System.Object)_b;"));
+            Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (global::System.Object)_c;"));
         }
 
         [Test]
-        public void BuildCallback_ShouldCreateTheProperLambda()
+        public void ResolveInvokeTarget_ShouldCreateTheProperMethod()
         {
             ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
 
-            Assert.That(gen.BuildMethodInterceptorCallback(Foo, gen.DeclareLocal<object[]>("args")).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
+            Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
         }
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
@@ -117,7 +138,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
 
-            Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.DeclareLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
 
         public static (object Method, string File)[] Methods = new[]
@@ -127,7 +148,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         };
 
         [TestCaseSource(nameof(Methods))]
-        public void GenerateProxyMethod_Test((object Method, string File) para)
+        public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
             MethodDeclarationSyntax[] methods = CreateGenerator(OutputType.Module).ResolveMethods(null).ToArray();
 
@@ -136,7 +157,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void GenerateProxyProperty_Test()
+        public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
             BasePropertyDeclarationSyntax[] props = CreateGenerator(OutputType.Module).ResolveProperties(null).ToArray();
 
@@ -145,7 +166,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void GenerateProxyIndexer_Test()
+        public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
             BasePropertyDeclarationSyntax[] props = new ProxySyntaxFactory
             (
@@ -171,7 +192,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCase(OutputType.Module, "ClsSrcModule.txt")]
         [TestCase(OutputType.Unit, "ClsSrcUnit.txt")]
-        public void GenerateProxyClass_Test(int outputType, string fileName)
+        public void ResolveUnit_ShouldGenerateTheDesiredUnit(int outputType, string fileName)
         {
             ProxySyntaxFactory gen = CreateGenerator((OutputType) outputType);
 
@@ -188,7 +209,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             ;
 
         [Test]
-        public void GenerateProxyClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType) 
+        public void ResolveUnit_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType) 
         {
             Assembly[] refs = type
                 .Assembly

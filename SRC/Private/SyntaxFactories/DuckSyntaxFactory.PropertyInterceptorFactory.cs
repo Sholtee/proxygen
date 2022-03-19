@@ -119,14 +119,14 @@ namespace Solti.Utils.Proxy.Internals
                 );
 
             return ifaceProperty.Indices.Some()
-                ? DeclareIndexer
+                ? ResolveIndexer
                 (
                     property: ifaceProperty,
                     getBody: getBody,
                     setBody: setBody,
                     forceInlining: true
                 )
-                : DeclareProperty
+                : ResolveProperty
                 (
                     property: ifaceProperty,
                     getBody: getBody,

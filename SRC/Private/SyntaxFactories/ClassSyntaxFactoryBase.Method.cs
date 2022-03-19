@@ -29,11 +29,15 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     typeArgumentList: TypeArgumentList
                     (
-                        arguments: genericMethod.GenericArguments.ToSyntaxList(CreateType)
+                        arguments: genericMethod.GenericArguments.ToSyntaxList(ResolveType)
                     )
                 );
 
-            return SimpleMemberAccess(AmendTarget(target, method, castTargetTo), identifier);
+            return SimpleMemberAccess
+            (
+                AmendTarget(target, method, castTargetTo),
+                identifier
+            );
         }
 
         /// <summary>
@@ -42,9 +46,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax DeclareMethod(IMethodInfo method, bool forceInlining = false)
+        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method, bool forceInlining = false)
         {
-            TypeSyntax returnTypeSytax = CreateType(method.ReturnValue.Type);
+            TypeSyntax returnTypeSytax = ResolveType(method.ReturnValue.Type);
 
             if (method.ReturnValue.Kind >= ParameterKind.Ref)
             {
@@ -72,7 +76,7 @@ namespace Solti.Utils.Proxy.Internals
                     {
                         ParameterSyntax parameter = Parameter(Identifier(param.Name)).WithType
                         (
-                            type: CreateType(param.Type)
+                            type: ResolveType(param.Type)
                         );
 
                         SyntaxKind? modifier = param.Kind switch
@@ -105,7 +109,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             type => TypeParameter
                             (
-                                CreateType(type).ToFullString()
+                                ResolveType(type).ToFullString()
                             )
                         )
                 )
@@ -117,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (method.DeclaringType.IsInterface) result = result.WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) CreateType(method.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
             );
 
             //
@@ -148,7 +152,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (forceInlining) result = result.WithAttributeLists
             (
-                attributeLists: DeclareMethodImplAttributeToForceInlining()
+                attributeLists: ResolveMethodImplAttributeToForceInlining()
             );
 
             return result;

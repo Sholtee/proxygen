@@ -126,7 +126,7 @@ namespace Solti.Utils.Proxy.Internals
                         // https://docs.microsoft.com/en-us/visualstudio/code-quality/in-source-suppression-overview?view=vs-2019#generated-code
                         //
 
-                        CreateAttribute<GeneratedCodeAttribute>
+                        ResolveAttribute<GeneratedCodeAttribute>
                         (
                             AsLiteral("ProxyGen.NET"),
                             AsLiteral
@@ -143,8 +143,8 @@ namespace Solti.Utils.Proxy.Internals
                         // Ezek pedig szerepelnek az xXx.Designer.cs-ben
                         //
 
-                        CreateAttribute<DebuggerNonUserCodeAttribute>(),
-                        CreateAttribute<CompilerGeneratedAttribute>()
+                        ResolveAttribute<DebuggerNonUserCodeAttribute>(),
+                        ResolveAttribute<CompilerGeneratedAttribute>()
                     )
                 )
             )

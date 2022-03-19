@@ -25,6 +25,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) => DeclareCtor(ctor, ResolveClassName(null!));
+        protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) => ResolveConstructor(ctor, ResolveClassName(null!));
     }
 }

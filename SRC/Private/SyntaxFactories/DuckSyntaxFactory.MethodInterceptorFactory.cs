@@ -78,7 +78,7 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
                 invocation = RefExpression(invocation);
 
-            return DeclareMethod(ifaceMethod, forceInlining: true)
+            return ResolveMethod(ifaceMethod, forceInlining: true)
                 .WithExpressionBody
                 (
                     expressionBody: ArrowExpressionClause(invocation)

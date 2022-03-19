@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -13,6 +14,8 @@ using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    internal sealed record ExtendedMemberInfo(MethodInfo Method, MemberInfo Member);
+
     internal static class MemberInfoExtensions
     {
         private static MemberInfo DoExtractFrom(LambdaExpression expr) 
@@ -48,38 +51,38 @@ namespace Solti.Utils.Proxy.Internals
         // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static (MemberInfo Member, MethodInfo Method) ExtractFrom(MethodInfo accessor, MemberTypes memberType)
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor, MemberTypes memberType) => Cache.GetOrAdd(accessor, static ctx =>
         {
-            var result = Cache.GetOrAdd(accessor, static ctx =>
-            {
-                MethodInfo method = (MethodInfo) ctx.accessor
-                    .GetInstructions()
-                    .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
-                    .Operand;
+            Debug.Assert(ctx.accessor.Target is null);
 
-                return new
+            MethodInfo method = (MethodInfo) ctx
+                .accessor
+                .Method
+                .GetInstructions()
+                .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
+                .Operand;
+
+            return new ExtendedMemberInfo
+            (
+                method,
+                ctx.memberType switch
                 {
-                    method,
-                    member = ctx.memberType switch
-                    {
-                        MemberTypes.Property => method
-                            .DeclaringType
-                            .GetProperties()
-                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+                    MemberTypes.Property => method
+                        .DeclaringType
+                        .GetProperties()
+                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
 
-                        MemberTypes.Event => method
-                            .DeclaringType
-                            .GetEvents()
-                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+                    MemberTypes.Event => method
+                        .DeclaringType
+                        .GetEvents()
+                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
 
-                        MemberTypes.Method => (MemberInfo) method,
-                        _ => throw new NotSupportedException()
-                    }
-                };
-            }, new { memberType, accessor });
+                    MemberTypes.Method => method,
 
-            return (result.member, result.method);
-        }
+                    _ => throw new NotSupportedException()
+                }
+            );
+        }, new { memberType, accessor });
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

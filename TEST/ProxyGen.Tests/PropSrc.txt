@@ -2,23 +2,25 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
 {
     get
     {
-        global::System.Object[] args = new global::System.Object[0];
-        global::System.Func<global::System.Object> invokeTarget = () =>
+        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
         {
-            return (global::System.Object)this.Target.Prop;
-        };
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
+            return (global::System.Object)((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Prop;
+        }
+
+        global::System.Object[] args = new global::System.Object[0];
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 
     set
     {
-        global::System.Object[] args = new global::System.Object[]{value};
-        global::System.Func<global::System.Object> invokeTarget = () =>
+        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
         {
-            global::System.Int32 cb_value = (global::System.Int32)args[0];
-            this.Target.Prop = cb_value;
+            global::System.Int32 _value = (global::System.Int32)args[0];
+            ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Prop = _value;
             return null;
-        };
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
+        }
+
+        global::System.Object[] args = new global::System.Object[]{value};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 }

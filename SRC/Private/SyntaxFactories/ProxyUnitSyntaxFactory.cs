@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
 
             yield return MethodDeclaration
             (
-                CreateType
+                ResolveType
                 (
                     MetadataTypeInfo.CreateFrom(typeof(void))
                 ),
@@ -68,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals
                             // Ne legyen nev utkozes
                             //
 
-                            CreateAttribute(typeof(InternalsVisibleToAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) ?? typeof(ModuleInitializerAttribute))
+                            ResolveAttribute(typeof(InternalsVisibleToAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) ?? typeof(ModuleInitializerAttribute))
                         )
                     )
                 )

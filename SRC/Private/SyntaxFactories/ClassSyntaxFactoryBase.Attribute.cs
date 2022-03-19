@@ -14,17 +14,17 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassSyntaxFactoryBase
     {
-        private SyntaxList<AttributeListSyntax> DeclareMethodImplAttributeToForceInlining() => SingletonList
+        private SyntaxList<AttributeListSyntax> ResolveMethodImplAttributeToForceInlining() => SingletonList
         (
             node: AttributeList
             (
                 attributes: SingletonSeparatedList
                 (
-                    node: CreateAttribute<MethodImplAttribute>
+                    node: ResolveAttribute<MethodImplAttribute>
                     (
                         SimpleMemberAccess
                         (
-                            CreateType
+                            ResolveType
                             (
                                 MetadataTypeInfo.CreateFrom(typeof(MethodImplOptions))
                             ),

@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";
 
-        private AccessorDeclarationSyntax DeclareAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining)
+        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining)
         {
             AccessorDeclarationSyntax declaration = AccessorDeclaration(kind);
 
@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (forceInlining) declaration = declaration.WithAttributeLists
             (
-                attributeLists: DeclareMethodImplAttributeToForceInlining()
+                attributeLists: ResolveMethodImplAttributeToForceInlining()
             );
 
             return declaration;
@@ -54,11 +54,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ArrayCreationExpressionSyntax CreateArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
+        protected ArrayCreationExpressionSyntax ResolveArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
         (
             type: ArrayType
             (
-                elementType: CreateType(elementType)
+                elementType: ResolveType(elementType)
             )
             .WithRankSpecifiers
             (
@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ArrayCreationExpressionSyntax CreateArray<T>(params ExpressionSyntax[] elements) => CreateArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
+        protected ArrayCreationExpressionSyntax ResolveArray<T>(params ExpressionSyntax[] elements) => ResolveArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
 
         /// <summary>
         /// new NameSpace.T(.., ...,)
@@ -94,7 +94,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ObjectCreationExpressionSyntax CreateObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: CreateType<T>()).WithArgumentList
+        protected ObjectCreationExpressionSyntax ResolveObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: ResolveType<T>()).WithArgumentList
         (
             ArgumentList
             (
@@ -108,7 +108,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum =>
-            MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, CreateType<T>(), IdentifierName(val.ToString()));
+        protected MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum => MemberAccessExpression
+        (
+            SyntaxKind.SimpleMemberAccessExpression,
+            ResolveType<T>(),
+            IdentifierName(val.ToString())
+        );
     }
 }

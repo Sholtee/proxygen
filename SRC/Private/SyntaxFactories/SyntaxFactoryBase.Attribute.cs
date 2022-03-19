@@ -17,13 +17,13 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected AttributeSyntax CreateAttribute(Type attribute, params ExpressionSyntax[] paramz)
+        protected AttributeSyntax ResolveAttribute(Type attribute, params ExpressionSyntax[] paramz)
         {
             Debug.Assert(typeof(Attribute).IsAssignableFrom(attribute));
 
             AttributeSyntax attr = Attribute
             (
-                (NameSyntax) CreateType(MetadataTypeInfo.CreateFrom(attribute))
+                (NameSyntax) ResolveType(MetadataTypeInfo.CreateFrom(attribute))
             );
 
             if (paramz.Length > 0) attr = attr.WithArgumentList
@@ -40,6 +40,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected AttributeSyntax CreateAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute => CreateAttribute(typeof(TAttribute), paramz);
+        protected AttributeSyntax ResolveAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute => ResolveAttribute(typeof(TAttribute), paramz);
     }
 }

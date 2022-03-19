@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax DeclareCtor(IConstructorInfo ctor, string className)
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, string className)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
                         )
                         .WithType
                         (
-                            type: CreateType(param.Type)
+                            type: ResolveType(param.Type)
                         )
                     )
                 )

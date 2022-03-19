@@ -25,30 +25,36 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected EventDeclarationSyntax DeclareEvent(IEventInfo @event, CSharpSyntaxNode? addBody, CSharpSyntaxNode? removeBody, bool forceInlining = false)
+        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode? addBody, CSharpSyntaxNode? removeBody, bool forceInlining = false)
         {
             Debug.Assert(@event.DeclaringType.IsInterface);
 
             EventDeclarationSyntax result = EventDeclaration
             (
-                type: CreateType(@event.Type),
+                type: ResolveType(@event.Type),
                 identifier: Identifier(@event.Name)
             )
             .WithExplicitInterfaceSpecifier
             (
                 explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
                 (
-                    (NameSyntax) CreateType(@event.DeclaringType)
+                    (NameSyntax) ResolveType(@event.DeclaringType)
                 )
             );
 
             List<AccessorDeclarationSyntax> accessors = new(2);
 
             if (@event.AddMethod is not null && addBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.AddAccessorDeclaration, addBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.AddAccessorDeclaration, addBody, forceInlining)
+                );
 
             if (@event.RemoveMethod is not null && removeBody is not null)
-                accessors.Add(DeclareAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining));
+                accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining)
+                );
 
             return !accessors.Some() ? result : result.WithAccessorList
             (

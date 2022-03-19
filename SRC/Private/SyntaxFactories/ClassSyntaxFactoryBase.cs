@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         t => (BaseTypeSyntax) SimpleBaseType
                         (
-                            CreateType(t)
+                            ResolveType(t)
                         )
                     )
                 )

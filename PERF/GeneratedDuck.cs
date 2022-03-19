@@ -8,13 +8,14 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Engines;
 
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
-    using static Consts;
 
     [MemoryDiagnoser]
+    [SimpleJob(RunStrategy.Throughput, invocationCount: 1000000)]
     public class GeneratedDuck
     {
         private const string Param = "";
@@ -37,22 +38,10 @@ namespace Solti.Utils.Proxy.Perf
         [GlobalSetup(Target = nameof(Duck))]
         public async Task SetupThroughProxy() => FDuck = await CreateDuck<IInterface, Implementation>(new Implementation());
 
-        [Benchmark(Baseline = true, OperationsPerInvoke = OperationsPerInvoke)]
-        public void NoDuck()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                FOriginal.DoSomething(Param);
-            }
-        }
+        [Benchmark(Baseline = true)]
+        public void NoDuck() => FOriginal.DoSomething(Param);
 
-        [Benchmark(OperationsPerInvoke = OperationsPerInvoke)]
-        public void Duck()
-        {
-            for (int i = 0; i < OperationsPerInvoke; i++)
-            {
-                FDuck.DoSomething(Param);
-            }
-        }
+        [Benchmark]
+        public void Duck() => FDuck.DoSomething(Param);
     }
 }

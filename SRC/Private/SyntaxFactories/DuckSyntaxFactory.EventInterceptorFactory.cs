@@ -82,7 +82,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
                 : null;
 
-            return DeclareEvent
+            return ResolveEvent
             (
                 ifaceEVt,
                 addBody: CreateBody(register: true),

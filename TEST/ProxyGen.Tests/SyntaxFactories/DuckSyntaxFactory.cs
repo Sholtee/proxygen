@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         );
 
         [Test]
-        public void GenerateDuckMethod_ShouldThrowIfTheMethodNotSupported() =>
+        public void ResolveMethod_ShouldThrowIfTheMethodNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
                 () => CreateGenerator<IFoo<int>, BadFoo>().ResolveMethods(default).ToList(),
@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
         [Test]
-        public void GenerateDuckMethod_ShouldGenerateTheDesiredMethodIfSupported()
+        public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported()
         {
             Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(null).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);")));
         }
@@ -87,13 +87,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void GenerateDuckMethod_ShouldHandleExplicitImplementations()
+        public void ResolveMethod_ShouldHandleExplicitImplementations()
         {
             Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(null).Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
         }
 
         [Test]
-        public void GenerateDuckProperty_ShouldThrowIfThePropertyNotSupported() =>
+        public void ResolveProperty_ShouldThrowIfThePropertyNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
                 () => CreateGenerator<IFoo<int>, BadFoo>().ResolveProperties(default).ToList(),
@@ -101,13 +101,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
         [Test]
-        public void GenerateDuckProperty_ShouldGenerateTheDesiredPropertyIfSupported()
+        public void ResolveProperty_ShouldGenerateTheDesiredPropertyIfSupported()
         {
             Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(default).Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     set => this.Target.Prop = value; }")));
         }
 
         [Test]
-        public void GenerateDuckProperty_ShouldThrowIfTheEventNotSupported() =>
+        public void ResolveEvent_ShouldThrowIfTheEventNotSupported() =>
             Assert.Throws<MissingMemberException>
             (
                 () => CreateGenerator<IFoo<int>, BadFoo>().ResolveEvents(default).ToList(),
@@ -115,25 +115,25 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
         [Test]
-        public void GenerateDuckEvent_ShouldGenerateTheDesiredEventIfSupported()
+        public void ResolveEvent_ShouldGenerateTheDesiredEventIfSupported()
         {
             Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(null).Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     remove => this.Target.Event -= value; }")));
         }
 
         [Test]
-        public void GenerateDuckClass_ShouldGenerateTheDesiredClass()
+        public void ResolveUnit_ShouldGenerateTheDesiredClass()
         {
             Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
         }
 
         [Test]
-        public void GenerateDuckProperty_ShouldThrowOnAmbiguousImplementation() =>
+        public void ResolveProperty_ShouldThrowOnAmbiguousImplementation() =>
             Assert.Throws<AmbiguousMatchException>(() => CreateGenerator<IList<int>, List<int>>().ResolveProperties(default).ToList());
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [Test]
-        public void GenerateDuckClass_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType)
+        public void ResolveUnit_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType)
         {
             Assembly[] refs = type
                 .Assembly

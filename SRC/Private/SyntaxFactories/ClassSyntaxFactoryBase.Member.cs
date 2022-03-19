@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         private ExpressionSyntax AmendTarget(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo)
         {
-            target ??= member.IsStatic ? CreateType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
+            target ??= member.IsStatic ? ResolveType(member.DeclaringType) : (ExpressionSyntax) ThisExpression();
 
             if (castTargetTo is not null)
             {
@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 target = ParenthesizedExpression
                 (
-                    CastExpression(CreateType(castTargetTo), target)
+                    CastExpression(ResolveType(castTargetTo), target)
                 );
             }
 

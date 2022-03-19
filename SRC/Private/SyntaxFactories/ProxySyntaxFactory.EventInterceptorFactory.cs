@@ -34,24 +34,24 @@ namespace Solti.Utils.Proxy.Internals
         /// {                                                                                 <br/>
         ///     add                                                                           <br/>
         ///     {                                                                             <br/>
-        ///         object[] args = new object[] {value};                                     <br/>
-        ///         Func[object] invokeTarget = () =>                                         <br/>
+        ///         static object InvokeTarget(ITarget target, object[] args)                 <br/>
         ///         {                                                                         <br/>
-        ///             EventType cb_value = (EventType) args[a];                             <br/>
-        ///             Target.Event += cb_value;                                             <br/>
+        ///             EventType _value = (EventType) args[0];                               <br/>
+        ///             Target.Event += _value;                                               <br/>
         ///             return null;                                                          <br/>
-        ///         };                                                                        <br/>
+        ///         }                                                                         <br/>
+        ///         object[] args = new object[] { value };                                   <br/>
         ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
         ///     }                                                                             <br/>
         ///     remove                                                                        <br/>
         ///     {                                                                             <br/>
-        ///         object[] args = new object[] {value};                                     <br/>
-        ///         Func[object] invokeTarget = () =>                                         <br/>
+        ///         static object InvokeTarget(ITarget target, object[] args)                 <br/>
         ///         {                                                                         <br/>
-        ///             EventType cb_value = (EventType) args[a];                             <br/>
-        ///             Target.Event -= cb_value;                                             <br/>
+        ///             EventType _value = (EventType) args[0];                               <br/>
+        ///             Target.Event -= _value;                                               <br/>
         ///             return null;                                                          <br/>
-        ///         };                                                                        <br/>
+        ///         }                                                                         <br/>
+        ///         object[] args = new object[] { value };                                   <br/>
         ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
         ///     }                                                                             <br/>
         /// }
@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt)
         {
-            return DeclareEvent
+            return ResolveEvent
             (
                 @event: evt,
                 addBody: Block
@@ -80,42 +80,38 @@ namespace Solti.Utils.Proxy.Internals
                 if (method is null)
                     yield break;
 
-                LocalDeclarationStatementSyntax argsArray = CreateArgumentsArray(method);
-                yield return argsArray;
-
-                LocalDeclarationStatementSyntax invokeTarget = DeclareLocal<Func<object>>
+                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget
                 (
-                    nameof(invokeTarget),
-                    DeclareCallback
-                    (
-                        argsArray,
-                        method,
-                        (locals, body) =>
-                        {
-                            body.Add
+                    method,
+                    (target, args, locals, body) =>
+                    {
+                        body.Add
+                        (
+                            ExpressionStatement
                             (
-                                ExpressionStatement
+                                RegisterEvent
                                 (
-                                    RegisterEvent
+                                    evt,
+                                    IdentifierName(target.Identifier),
+                                    add,
+                                    ToIdentifierName
                                     (
-                                        evt,
-                                        MemberAccess(null, Target),
-                                        add,
-                                        ToIdentifierName
-                                        (
-                                            locals.Single()!
-                                        )
-                                    )
+                                        locals.Single()!
+                                    ),
+                                    castTargetTo: evt.DeclaringType
                                 )
-                            );
-                            body.Add
-                            (
-                                ReturnNull()
-                            );
-                        }
-                    )
+                            )
+                        );
+                        body.Add
+                        (
+                            ReturnNull()
+                        );
+                    }
                 );
                 yield return invokeTarget;
+
+                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
+                yield return argsArray;
 
                 yield return ExpressionStatement
                 (
@@ -126,10 +122,13 @@ namespace Solti.Utils.Proxy.Internals
                         castTargetTo: null,
                         Argument
                         (
-                            CreateObject<InvocationContext>
+                            ResolveObject<InvocationContext>
                             (
                                 ToArgument(argsArray),
-                                ToArgument(invokeTarget),
+                                Argument
+                                (
+                                    IdentifierName(invokeTarget.Identifier)
+                                ),
                                 Argument
                                 (
                                     EnumAccess(MemberTypes.Event)

@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy
             if (Target is null)
                 throw new InvalidOperationException(Resources.NULL_TARGET);
 
-            return context.InvokeTarget();
+            return context.Dispatch(Target, context.Args);        
         }
     }
 }

@@ -26,14 +26,31 @@ namespace Solti.Utils.Proxy.Tests
             void Foo();
         }
 
-        private interface IDescendant2 : IList { }
+        [Test]
+        public void Ctor_ShouldResolveMethod()
+        {
+            static object InvokeTarget(object target, object[] args)
+            {
+                ((IList) target).Clear();
+                return null;
+            }
+
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Method);
+
+            MethodInfo met = (MethodInfo) cntx.Member;
+            Assert.That(met.Name, Is.EqualTo(nameof(IList.Clear)));
+        }
 
         [Test]
         public void Ctor_ShouldResolveIndexer() 
         {
-            IDescendant2 i = null;
+            static object InvokeTarget(object target, object[] args)
+            {
+                ((IList) target)[0] = default;
+                return null;
+            }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -43,9 +60,13 @@ namespace Solti.Utils.Proxy.Tests
         [Test]
         public void Ctor_ShouldResolveGenericIndexer() 
         {
-            IList<string> i = null;
+            static object InvokeTarget(object target, object[] args)
+            {
+                ((IList<string>) target)[0] = default;
+                return null;
+            }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => i[0] = default, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -55,9 +76,12 @@ namespace Solti.Utils.Proxy.Tests
         [Test]
         public void Ctor_ShouldResolveProperty()
         {
-            IDescendant i = null;
+            static object InvokeTarget(object target, object[] args)
+            {
+                return ((IDescendant) target).Prop;
+            }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => _ =  i.Prop, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
@@ -67,9 +91,13 @@ namespace Solti.Utils.Proxy.Tests
         [Test]
         public void Ctor_ShouldResolveEvent()
         {
-            IDescendant i = null;
+            static object InvokeTarget(object target, object[] args)
+            {
+                ((IDescendant) target).Evt += _ => { };
+                return null;
+            }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), () => { i.Evt += _ => { }; return null; }, MemberTypes.Event);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Event);
 
             EventInfo evt = (EventInfo) cntx.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));

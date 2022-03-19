@@ -97,10 +97,10 @@ namespace Solti.Utils.Proxy.Internals
         public void Execute(GeneratorExecutionContext context)
         {
             //
-            // Csak C# 7.0+ tamogatjuk
+            // Csak C# 8.0+ tamogatjuk
             //
 
-            if (context.Compilation is not CSharpCompilation { LanguageVersion : >= LanguageVersion.CSharp7 } compilation)
+            if (context.Compilation is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp8 } compilation)
             {
                 context.ReportDiagnostic
                 (

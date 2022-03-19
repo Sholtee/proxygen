@@ -64,14 +64,14 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LocalDeclarationStatementSyntax CreateArgumentsArray(IMethodInfo method)
+        LocalDeclarationStatementSyntax ResolveArgumentsArray(IMethodInfo method)
         {
             IReadOnlyList<IParameterInfo> paramz = method.Parameters;
 
-            return DeclareLocal<object[]>
+            return ResolveLocal<object[]>
             (
                 EnsureUnused("args", paramz),
-                CreateArray<object>
+                ResolveArray<object>
                 (
                     paramz.ConvertAr
                     (
@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
                                 throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
                             ParameterKind.Out => DefaultExpression
                             (
-                                CreateType(param.Type)
+                                ResolveType(param.Type)
                             ),
                             _ => IdentifierName(param.Name)
                         })
@@ -113,7 +113,7 @@ namespace Solti.Utils.Proxy.Internals
                 : returnType is not null
                     ? CastExpression
                     (
-                        type: CreateType(returnType),
+                        type: ResolveType(returnType),
                         expression: result
                     )
                     : result
@@ -148,29 +148,28 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// System.String cb_a;    <br/>
-        /// TT cb_b = (TT)args[1];
+        /// System.String _a;    <br/>
+        /// TT _b = (TT)args[1];
         /// </summary>
         #if DEBUG
         internal
         #else
         private
         #endif
-        LocalDeclarationStatementSyntax[] DeclareCallbackLocals(LocalDeclarationStatementSyntax argsArray, IEnumerable<IParameterInfo> paramz) => paramz.ConvertAr
+        LocalDeclarationStatementSyntax[] ResolveInvokeTargetLocals(ParameterSyntax argsArray, IMethodInfo method) => method.Parameters.ConvertAr
         (
-            //
-            // Az osszes parametert az "args" tombbol vesszuk mert lehet az Invoke() override-ja modositana vmelyik bemeno
-            // erteket.
-            //
-
-            (p, i) => DeclareLocal
+            (p, i) => ResolveLocal
             (
                 p.Type,
-                EnsureUnused($"cb_{p.Name}", paramz),
+                $"_{p.Name}", // statikus metodusban kerulnek felhasznalasra -> nem kell EnsureUnused(), csak "target" es "args"-al akadhatna ossze
                 p.Kind is ParameterKind.Out ? null : CastExpression
                 (
-                    type: CreateType(p.Type),
-                    expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
+                    type: ResolveType(p.Type),
+                    expression: ElementAccessExpression
+                    (
+                        IdentifierName(argsArray.Identifier)
+                    )
+                    .WithArgumentList
                     (
                         argumentList: BracketedArgumentList
                         (
@@ -188,12 +187,12 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// () =>                                          <br/>
-        /// {                                              <br/>
-        ///     System.Int32 cb_a = (System.Int32)args[0]; <br/>
-        ///     System.String cb_b;                        <br/>
-        ///     TT cb_c = (TT)args[2];                     <br/>
-        ///     ...                                        <br/>
+        /// static object InvokeTarget(object target, object[] args) <br/>
+        /// {                                                         <br/>
+        ///     System.Int32 cb_a = (System.Int32)args[0];            <br/>
+        ///     System.String cb_b;                                   <br/>
+        ///     TT cb_c = (TT)args[2];                                <br/>
+        ///     ...                                                   <br/>
         /// };
         /// </summary>
         #if DEBUG
@@ -201,16 +200,53 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LambdaExpressionSyntax DeclareCallback(LocalDeclarationStatementSyntax argsArray, IMethodInfo method, Action<IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
+        LocalFunctionStatementSyntax ResolveInvokeTarget(IMethodInfo method, Action<ParameterSyntax, ParameterSyntax, IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
         {
+            ParameterSyntax
+                target = Parameter
+                (
+                    identifier: Identifier(nameof(target))
+                )
+                .WithType
+                (
+                    ResolveType<object>()
+                ),
+                args = Parameter
+                (
+                    identifier: Identifier(nameof(args))
+                )
+                .WithType
+                (
+                    ResolveType<object[]>()
+                );
+
             List<StatementSyntax> statements = new();
 
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = DeclareCallbackLocals(argsArray, method.Parameters);
+            IReadOnlyList<LocalDeclarationStatementSyntax> locals = ResolveInvokeTargetLocals(args, method);
             statements.AddRange(locals);
 
-            invocationFactory(locals, statements);
+            invocationFactory(target, args, locals, statements);
 
-            return ParenthesizedLambdaExpression
+            return LocalFunctionStatement
+            (
+                returnType: ResolveType<object>(),
+                identifier: Identifier("InvokeTarget")
+            )
+            .WithModifiers
+            (
+                TokenList
+                (
+                    Token(SyntaxKind.StaticKeyword)
+                )
+            )
+            .WithParameterList
+            (
+                ParameterList
+                (
+                    new ParameterSyntax[] { target, args }.ToSyntaxList()
+                )
+            )
+            .WithBody
             (
                 Block(statements)
             );

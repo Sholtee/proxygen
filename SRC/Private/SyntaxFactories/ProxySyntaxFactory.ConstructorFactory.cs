@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) =>
-            DeclareCtor
+            ResolveConstructor
             (
                 ctor,
                 ResolveClassName(null!)
@@ -49,7 +49,10 @@ namespace Solti.Utils.Proxy.Internals
                             kind: SyntaxKind.SimpleAssignmentExpression,
                             left: PropertyAccess
                             (
-                                Proxy,
+                                InterceptorType.Properties.Single
+                                (
+                                    prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
+                                )!,
                                 target: null,
                                 castTargetTo: null
                             ),

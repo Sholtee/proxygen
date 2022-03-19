@@ -2,25 +2,27 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
 {
     get
     {
-        global::System.Object[] args = new global::System.Object[]{index};
-        global::System.Func<global::System.Object> invokeTarget = () =>
+        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
         {
-            global::System.Int32 cb_index = (global::System.Int32)args[0];
-            return (global::System.Object)this.Target[cb_index];
-        };
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
+            global::System.Int32 _index = (global::System.Int32)args[0];
+            return (global::System.Object)((global::System.Collections.Generic.IList<global::System.Int32>)target)[_index];
+        }
+
+        global::System.Object[] args = new global::System.Object[]{index};
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 
     set
     {
-        global::System.Object[] args = new global::System.Object[]{index, value};
-        global::System.Func<global::System.Object> invokeTarget = () =>
+        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
         {
-            global::System.Int32 cb_index = (global::System.Int32)args[0];
-            global::System.Int32 cb_value = (global::System.Int32)args[1];
-            this.Target[cb_index] = cb_value;
+            global::System.Int32 _index = (global::System.Int32)args[0];
+            global::System.Int32 _value = (global::System.Int32)args[1];
+            ((global::System.Collections.Generic.IList<global::System.Int32>)target)[_index] = _value;
             return null;
-        };
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, invokeTarget, global::System.Reflection.MemberTypes.Property));
+        }
+
+        global::System.Object[] args = new global::System.Object[]{index, value};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
     }
 }

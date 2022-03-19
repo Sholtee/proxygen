@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 typeArgumentList: TypeArgumentList
                 (
-                    arguments: genericType.GenericArguments.ToSyntaxList(CreateType)
+                    arguments: genericType.GenericArguments.ToSyntaxList(ResolveType)
                 )
             );
         }
@@ -65,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected TypeSyntax CreateType(ITypeInfo type) 
+        protected TypeSyntax ResolveType(ITypeInfo type) 
         {
             //
             // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type.ElementType is not null && type is not IArrayTypeInfo)
             {
-                TypeSyntax result = CreateType(type.ElementType);
+                TypeSyntax result = ResolveType(type.ElementType);
 
                 if (type.RefType is RefType.Pointer) 
                     result = PointerType(result);
@@ -110,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 return ArrayType
                 (
-                    elementType: CreateType(array.ElementType!)
+                    elementType: ResolveType(array.ElementType!)
                 )
                 .WithRankSpecifiers
                 (
@@ -133,14 +133,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected TypeSyntax CreateType<T>() => CreateType(MetadataTypeInfo.CreateFrom(typeof(T)));
-
-        #if DEBUG
-        internal
-        #endif
-        protected TypeOfExpressionSyntax TypeOf(ITypeInfo type) => TypeOfExpression
-        (
-            CreateType(type)
-        );
+        protected TypeSyntax ResolveType<T>() => ResolveType(MetadataTypeInfo.CreateFrom(typeof(T)));
     }
 }

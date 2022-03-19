@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected LocalDeclarationStatementSyntax DeclareLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
+        protected LocalDeclarationStatementSyntax ResolveLocal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 declaration: VariableDeclaration
                 (
-                    type: CreateType(type),
+                    type: ResolveType(type),
                     variables: SingletonSeparatedList(declarator)
                 )
             );
@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected LocalDeclarationStatementSyntax DeclareLocal<T>(string name, ExpressionSyntax? initializer = null) => DeclareLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
+        protected LocalDeclarationStatementSyntax ResolveLocal<T>(string name, ExpressionSyntax? initializer = null) => ResolveLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
 
         #if DEBUG
         internal

@@ -20,10 +20,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
-        public IPropertyInfo Target { get; }
-
-        public IPropertyInfo Proxy { get; }
-
         public IMethodInfo Invoke { get; }
 
         #if DEBUG
@@ -74,14 +70,6 @@ namespace Solti.Utils.Proxy.Internals
             InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
 
-            Proxy = InterceptorType.Properties.Single
-            (
-                prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
-            )!;
-            Target = InterceptorType.Properties.Single
-            (
-                prop => prop.Name == nameof(InterfaceInterceptor<object>.Target)
-            )!;
             Invoke = InterceptorType.Methods.Single
             (
                 met => met.SignatureEquals

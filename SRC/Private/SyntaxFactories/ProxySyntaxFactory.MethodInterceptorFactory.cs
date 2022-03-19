@@ -45,29 +45,29 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)               <br/>
-        /// {                                                                                                    <br/>
-        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                 <br/>
-        ///                                                                                                      <br/>
-        ///     Func[object] = invokeTarget () =>                                                                <br/>
-        ///     {                                                                                                <br/>
-        ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
-        ///         System.String cb_b;                                                                          <br/>
-        ///         TT cb_c = (TT)args[2];                                                                       <br/>
-        ///         System.Object result;                                                                        <br/>
-        ///         result = this.Target.Foo[TT](cb_a, out cb_b, ref cb_c);                                      <br/>
-        ///                                                                                                      <br/>
-        ///         args[1] = (System.Object)cb_b;                                                               <br/>
-        ///         args[2] = (System.Object)cb_c;                                                               <br/>
-        ///         return result;                                                                               <br/>
-        ///     };                                                                                               <br/>         
-        ///                                                                                                      <br/>
-        ///     System.Object result = Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Method));    <br/>
-        ///                                                                                                      <br/>
-        ///     para2 = (T2) args[1];                                                                            <br/>
-        ///     para3 = (T3) args[2];                                                                            <br/>
-        ///                                                                                                      <br/>
-        ///     return (TResult) result;                                                                         <br/>
+        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)                    <br/>
+        /// {                                                                                                         <br/>
+        ///     static object InvokeTarget(ITarget target, object[] args)                                             <br/>
+        ///     {                                                                                                     <br/>
+        ///         System.Int32 cb_a = (System.Int32) args[0];                                                       <br/>
+        ///         System.String cb_b;                                                                               <br/>
+        ///         TT cb_c = (TT) args[2];                                                                           <br/>
+        ///         System.Object result;                                                                             <br/>
+        ///         result = target.Foo[TT](cb_a, out cb_b, ref cb_c);                                                <br/>
+        ///                                                                                                           <br/>
+        ///         args[1] = (System.Object) cb_b;                                                                   <br/>
+        ///         args[2] = (System.Object) cb_c;                                                                   <br/>
+        ///         return result;                                                                                    <br/>
+        ///     }                                                                                                     <br/>
+        ///                                                                                                           <br/>
+        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                      <br/>
+        ///                                                                                                           <br/>
+        ///     System.Object result = Invoke(new InvocationContext(args, InvokeTarget, MemberTypes.Method));         <br/>
+        ///                                                                                                           <br/>
+        ///     para2 = (T2) args[1];                                                                                 <br/>
+        ///     para3 = (T3) args[2];                                                                                 <br/>
+        ///                                                                                                           <br/>
+        ///     return (TResult) result;                                                                              <br/>
         /// }
         /// </summary>
         #if DEBUG
@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method)
         {
-            return DeclareMethod(method).WithBody
+            return ResolveMethod(method).WithBody
             (
                 body: Block
                 (
@@ -87,16 +87,11 @@ namespace Solti.Utils.Proxy.Internals
             {
                 List<StatementSyntax> statements = new();
 
-                LocalDeclarationStatementSyntax
-                    argsArray = CreateArgumentsArray(method),
-                    invokeTarget = DeclareLocal<Func<object>>
-                    (
-                        EnsureUnused(nameof(invokeTarget), method),
-                        BuildMethodInterceptorCallback(method, argsArray)
-                    );
+                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
+                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget(method);
 
-                statements.Add(argsArray);
                 statements.Add(invokeTarget);
+                statements.Add(argsArray);
 
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
@@ -105,10 +100,13 @@ namespace Solti.Utils.Proxy.Internals
                     castTargetTo: null,
                     Argument
                     (
-                        CreateObject<InvocationContext>
+                        ResolveObject<InvocationContext>
                         (
                             ToArgument(argsArray),
-                            ToArgument(invokeTarget),
+                            Argument
+                            (
+                                IdentifierName(invokeTarget.Identifier)
+                            ),
                             Argument
                             (
                                 EnumAccess(MemberTypes.Method)
@@ -119,7 +117,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (!method.ReturnValue.Type.IsVoid)
                 {
-                    LocalDeclarationStatementSyntax result = DeclareLocal<object>
+                    LocalDeclarationStatementSyntax result = ResolveLocal<object>
                     (
                         EnsureUnused(nameof(result), method),
                         invocation
@@ -128,7 +126,7 @@ namespace Solti.Utils.Proxy.Internals
                     statements.Add(result);
                     statements.AddRange
                     (
-                        AssignByRefParameters(method.Parameters, argsArray)
+                        AssignByRefParameters(method, argsArray)
                     );
                     statements.Add
                     (
@@ -143,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                     );
                     statements.AddRange
                     (
-                        AssignByRefParameters(method.Parameters, argsArray)
+                        AssignByRefParameters(method, argsArray)
                     );
                 }
 
@@ -167,10 +165,10 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray)
+        IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IMethodInfo method, LocalDeclarationStatementSyntax argsArray)
         {
             int i = 0;
-            foreach (IParameterInfo param in paramz)
+            foreach (IParameterInfo param in method.Parameters)
             {
                 if (ByRefs.Some(x => x == param.Kind))
                 {
@@ -182,7 +180,7 @@ namespace Solti.Utils.Proxy.Internals
                             left: IdentifierName(param.Name),
                             right: CastExpression
                             (
-                                type: CreateType(param.Type),
+                                type: ResolveType(param.Type),
                                 expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
                                 (
                                     argumentList: BracketedArgumentList
@@ -217,10 +215,10 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        IEnumerable<StatementSyntax> ReassignArgsArray(IReadOnlyList<IParameterInfo> paramz, LocalDeclarationStatementSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals)
+        IEnumerable<StatementSyntax> ReassignArgsArray(IMethodInfo method, ParameterSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals)
         {
             int i = 0;
-            foreach (IParameterInfo param in paramz)
+            foreach (IParameterInfo param in method.Parameters)
             {
                 if (ByRefs.Some(x => x == param.Kind))
                 {
@@ -229,7 +227,11 @@ namespace Solti.Utils.Proxy.Internals
                         expression: AssignmentExpression
                         (
                             kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
+                            left: ElementAccessExpression
+                            (
+                                IdentifierName(argsArray.Identifier)
+                            )
+                            .WithArgumentList
                             (
                                 argumentList: BracketedArgumentList
                                 (
@@ -248,7 +250,7 @@ namespace Solti.Utils.Proxy.Internals
                             ),
                             right: CastExpression
                             (
-                                type: CreateType<object>(),
+                                type: ResolveType<object>(),
                                 ToIdentifierName(locals[i])
                             )
                         )
@@ -258,22 +260,36 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>                                                   <br/>
+        /// static object InvokeTarget(ITarget target, object[] args)   <br/>
+        /// {                                                           <br/>
+        ///    System.Int32 cb_a = (System.Int32) args[0];              <br/>
+        ///    System.String cb_b;                                      <br/>
+        ///    TT cb_c = (TT) args[2];                                  <br/>
+        ///    System.Object result;                                    <br/>
+        ///    result = target.Foo[TT](cb_a, out cb_b, ref cb_c);       <br/>
+        ///                                                             <br/>
+        ///    args[1] = (System.Object) cb_b;                          <br/>
+        ///    args[2] = (System.Object) cb_c;                          <br/>
+        ///    return result;                                           <br/>
+        /// }                                                           <br/>
+        /// </summary>   
         #if DEBUG
         internal
         #else
         private
         #endif
-        LambdaExpressionSyntax BuildMethodInterceptorCallback(IMethodInfo method, LocalDeclarationStatementSyntax argsArray) => DeclareCallback(argsArray, method, (locals, body) =>
+        LocalFunctionStatementSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, locals, body) =>
         {
             InvocationExpressionSyntax invocation = InvokeMethod
             (
                 method,
-                MemberAccess(null, Target),
-                castTargetTo: null,
+                target: IdentifierName(target.Identifier),
+                castTargetTo: method.DeclaringType,
                 arguments: locals.ConvertAr(ToArgument)
             );
 
-            IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method.Parameters, argsArray, locals);
+            IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method, args, locals);
 
             if (method.ReturnValue.Type.IsVoid)
             {
@@ -289,22 +305,22 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                LocalDeclarationStatementSyntax cb_result = DeclareLocal<object> // ne siman "result" legyen a neve mert a callback-en kivul is lehet ilyen nevu valtozo
+                LocalDeclarationStatementSyntax result = ResolveLocal<object>
                 (
-                    EnsureUnused(nameof(cb_result), method),
+                    EnsureUnused(nameof(result), method),
                     CastExpression
                     (
-                        CreateType<object>(),
+                        ResolveType<object>(),
                         invocation
                     )
                 );
-                body.Add(cb_result);
+                body.Add(result);
                 body.AddRange(argsArrayReassignment);
                 body.Add
                 (
-                    ReturnResult(null, cb_result)
+                    ReturnResult(null, result)
                 );
-            }
+            } 
         });
     }
 }
