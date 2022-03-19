@@ -115,3 +115,6 @@
   - *fixed:* Crash on attempt to embed the same generator more than once
 - 6.0.1:
   - *fixed:* Performance issue of generated proxy
+- 7.0.0-preview1:
+  - *breaking:* Dropped `InvocationContext.InvokeTarget` property
+  - *done:* Significantly imporved performance
