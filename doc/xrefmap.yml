@@ -519,15 +519,15 @@ references:
   commentId: T:Solti.Utils.Proxy.InvocationContext
   fullName: Solti.Utils.Proxy.InvocationContext
   nameWithType: InvocationContext
-- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object},System.Reflection.MemberTypes)
-  name: InvocationContext(Object[], Func<Object>, MemberTypes)
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object__System_Reflection_MemberTypes_
-  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object},System.Reflection.MemberTypes)
-  name.vb: InvocationContext(Object(), Func(Of Object), MemberTypes)
-  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], System.Func<System.Object>, System.Reflection.MemberTypes)
-  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), System.Func(Of System.Object), System.Reflection.MemberTypes)
-  nameWithType: InvocationContext.InvocationContext(Object[], Func<Object>, MemberTypes)
-  nameWithType.vb: InvocationContext.InvocationContext(Object(), Func(Of Object), MemberTypes)
+- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object},System.Reflection.MemberTypes)
+  name: InvocationContext(Object[], Func<Object, Object[], Object>, MemberTypes)
+  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object_System_Object___System_Object__System_Reflection_MemberTypes_
+  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object},System.Reflection.MemberTypes)
+  name.vb: InvocationContext(Object(), Func(Of Object, Object(), Object), MemberTypes)
+  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], System.Func<System.Object, System.Object[], System.Object>, System.Reflection.MemberTypes)
+  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), System.Func(Of System.Object, System.Object(), System.Object), System.Reflection.MemberTypes)
+  nameWithType: InvocationContext.InvocationContext(Object[], Func<Object, Object[], Object>, MemberTypes)
+  nameWithType.vb: InvocationContext.InvocationContext(Object(), Func(Of Object, Object(), Object), MemberTypes)
 - uid: Solti.Utils.Proxy.InvocationContext.#ctor*
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_
@@ -548,19 +548,19 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.InvocationContext.Args
   nameWithType: InvocationContext.Args
-- uid: Solti.Utils.Proxy.InvocationContext.InvokeTarget
-  name: InvokeTarget
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_InvokeTarget
-  commentId: P:Solti.Utils.Proxy.InvocationContext.InvokeTarget
-  fullName: Solti.Utils.Proxy.InvocationContext.InvokeTarget
-  nameWithType: InvocationContext.InvokeTarget
-- uid: Solti.Utils.Proxy.InvocationContext.InvokeTarget*
-  name: InvokeTarget
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_InvokeTarget_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.InvokeTarget
+- uid: Solti.Utils.Proxy.InvocationContext.Dispatch
+  name: Dispatch
+  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Dispatch
+  commentId: P:Solti.Utils.Proxy.InvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.InvocationContext.Dispatch
+  nameWithType: InvocationContext.Dispatch
+- uid: Solti.Utils.Proxy.InvocationContext.Dispatch*
+  name: Dispatch
+  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Dispatch_
+  commentId: Overload:Solti.Utils.Proxy.InvocationContext.Dispatch
   isSpec: "True"
-  fullName: Solti.Utils.Proxy.InvocationContext.InvokeTarget
-  nameWithType: InvocationContext.InvokeTarget
+  fullName: Solti.Utils.Proxy.InvocationContext.Dispatch
+  nameWithType: InvocationContext.Dispatch
 - uid: Solti.Utils.Proxy.InvocationContext.Member
   name: Member
   href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Member
