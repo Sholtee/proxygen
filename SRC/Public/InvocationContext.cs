@@ -44,14 +44,6 @@ namespace Solti.Utils.Proxy
         }
 
         /// <summary>
-        /// [Obsolete] Creates a new <see cref="InvocationContext"/> instance.
-        /// </summary>
-        /// <remarks>This constructor is present only for backward compatibility and will throw.</remarks>
-        [Obsolete("This constructor is present only for backward compatibility and will throw.")]
-        public InvocationContext(object?[] args, Func<object?> invokeTarget, MemberTypes memberType) =>
-            throw new NotSupportedException();
-
-        /// <summary>
         /// The interface method being invoked.
         /// </summary>
         public MethodInfo Method { get; }
@@ -59,7 +51,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The arguments passed by the caller.
         /// </summary>
-        /// <remarks>Before the <see cref="InvokeTarget"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
+        /// <remarks>Before the <see cref="InterfaceInterceptor{TInterface}.Target"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "End user is allowed to modify the argument list.")]
         public object?[] Args { get; }
 
@@ -67,13 +59,6 @@ namespace Solti.Utils.Proxy
         /// The concrete member that is being invoked (e.g.: property or event)
         /// </summary>
         public MemberInfo Member { get; }
-
-        /// <summary>
-        /// Invokes the original method.
-        /// </summary>
-        /// <remarks>This constructor is present only for backward compatibility and will throw.</remarks>
-        [Obsolete($"{nameof(InvokeTarget)} is obsolete and will throw. Use the {nameof(Dispatch)} instead!")]
-        public Func<object?> InvokeTarget => throw new NotSupportedException();
 
         /// <summary>
         /// Gets the dispatcher function.
