@@ -249,6 +249,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
             Type gt = generator.Emit(default, cacheDir, default);
+
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
