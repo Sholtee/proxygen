@@ -42,8 +42,9 @@ BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Reds
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 .NET Core SDK=6.0.200
   [Host]     : .NET Core 6.0.2 (CoreCLR 6.0.222.6406, CoreFX 6.0.222.6406), X64 RyuJIT
-  DefaultJob : .NET Core 6.0.2 (CoreCLR 6.0.222.6406, CoreFX 6.0.222.6406), X64 RyuJIT
+  Job-MKTYCV : .NET Core 6.0.2 (CoreCLR 6.0.222.6406, CoreFX 6.0.222.6406), X64 RyuJIT
 
+InvocationCount=30000  RunStrategy=Throughput  
 </code></pre><table>
 <thead>
 <tr>
@@ -51,6 +52,7 @@ Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 <th style="text-align:right">Mean</th>
 <th style="text-align:right">Error</th>
 <th style="text-align:right">StdDev</th>
+<th style="text-align:right">Median</th>
 <th style="text-align:right">Gen 0</th>
 <th style="text-align:right">Gen 1</th>
 <th style="text-align:right">Gen 2</th>
@@ -60,13 +62,36 @@ Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 <tbody>
 <tr>
 <td>AssemblingProxyType</td>
-<td style="text-align:right">182.8 μs</td>
-<td style="text-align:right">7.86 μs</td>
-<td style="text-align:right">22.18 μs</td>
+<td style="text-align:right">21,150.38 ns</td>
+<td style="text-align:right">2,082.431 ns</td>
+<td style="text-align:right">6,140.093 ns</td>
+<td style="text-align:right">23,356.14 ns</td>
+<td style="text-align:right">0.3000</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
+<td style="text-align:right">5584 B</td>
+</tr>
+<tr>
+<td>GetGeneratedType</td>
+<td style="text-align:right">47.20 ns</td>
+<td style="text-align:right">0.932 ns</td>
+<td style="text-align:right">1.751 ns</td>
+<td style="text-align:right">46.71 ns</td>
+<td style="text-align:right">0.0020</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">8.81 KB</td>
+<td style="text-align:right">-</td>
+<td style="text-align:right">40 B</td>
+</tr>
+<tr>
+<td>Activate</td>
+<td style="text-align:right">101.42 ns</td>
+<td style="text-align:right">1.979 ns</td>
+<td style="text-align:right">2.032 ns</td>
+<td style="text-align:right">100.49 ns</td>
+<td style="text-align:right">0.0067</td>
+<td style="text-align:right">-</td>
+<td style="text-align:right">-</td>
+<td style="text-align:right">128 B</td>
 </tr>
 </tbody>
 </table>
