@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="LNG_NOT_SUPPORTED" xml:space="preserve">
-    <value>Type embedding is supported only in C# 7.0+ compilations.</value>
+    <value>Type embedding is supported only in C# 8+ compilations.</value>
   </data>
   <data name="NOT_A_GENERATOR" xml:space="preserve">
     <value>{0} is not a generator</value>
