@@ -519,15 +519,15 @@ references:
   commentId: T:Solti.Utils.Proxy.InvocationContext
   fullName: Solti.Utils.Proxy.InvocationContext
   nameWithType: InvocationContext
-- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object},System.Reflection.MemberTypes)
-  name: InvocationContext(Object[], Func<Object, Object[], Object>, MemberTypes)
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object_System_Object___System_Object__System_Reflection_MemberTypes_
-  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object},System.Reflection.MemberTypes)
-  name.vb: InvocationContext(Object(), Func(Of Object, Object(), Object), MemberTypes)
-  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], System.Func<System.Object, System.Object[], System.Object>, System.Reflection.MemberTypes)
-  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), System.Func(Of System.Object, System.Object(), System.Object), System.Reflection.MemberTypes)
-  nameWithType: InvocationContext.InvocationContext(Object[], Func<Object, Object[], Object>, MemberTypes)
-  nameWithType.vb: InvocationContext.InvocationContext(Object(), Func(Of Object, Object(), Object), MemberTypes)
+- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object})
+  name: InvocationContext(Object[], Func<Object, Object[], Object>)
+  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object_System_Object___System_Object__
+  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object})
+  name.vb: InvocationContext(Object(), Func(Of Object, Object(), Object))
+  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], System.Func<System.Object, System.Object[], System.Object>)
+  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), System.Func(Of System.Object, System.Object(), System.Object))
+  nameWithType: InvocationContext.InvocationContext(Object[], Func<Object, Object[], Object>)
+  nameWithType.vb: InvocationContext.InvocationContext(Object(), Func(Of Object, Object(), Object))
 - uid: Solti.Utils.Proxy.InvocationContext.#ctor*
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_
