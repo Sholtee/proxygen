@@ -20,7 +20,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         }
 
         global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};
-        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Method));
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
         b = (global::System.String)args[1];
         c = (TT)args[2];
         return (global::System.Int32)result;
@@ -35,7 +35,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         }
 
         global::System.Object[] args = new global::System.Object[0];
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Method));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
     }
 
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
@@ -50,7 +50,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
             }
 
             global::System.Object[] args = new global::System.Object[0];
-            return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
+            return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
         }
 
         set
@@ -63,7 +63,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
             }
 
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Property));
+            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
         }
     }
 
@@ -79,7 +79,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
             }
 
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Event));
+            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
         }
 
         remove
@@ -92,7 +92,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
             }
 
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Event));
+            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
         }
     }
 }

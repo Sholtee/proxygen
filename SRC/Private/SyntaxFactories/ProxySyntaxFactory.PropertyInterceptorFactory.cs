@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -40,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
         ///             return target.Prop;                                                                           <br/>
         ///         }                                                                                                 <br/>
         ///         object[] args = new object[] { };                                                                 <br/>
-        ///         return (TResult) Invoke(new InvocationContext(args, InvokeTarget, MemberTypes.Property));         <br/>
+        ///         return (TResult) Invoke(new InvocationContext(args, InvokeTarget));                               <br/>
         ///     }                                                                                                     <br/>
         ///     set                                                                                                   <br/>
         ///     {                                                                                                     <br/>
@@ -117,10 +116,6 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         invokeTarget.Identifier
                                     )
-                                ),
-                                Argument
-                                (
-                                    EnumAccess(MemberTypes.Property)
                                 )
                             )
                         )
@@ -189,10 +184,6 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         invokeTarget.Identifier
                                     )
-                                ),
-                                Argument
-                                (
-                                    EnumAccess(MemberTypes.Property)
                                 )
                             )
                         )

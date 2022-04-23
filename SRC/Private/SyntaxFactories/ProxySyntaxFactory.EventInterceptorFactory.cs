@@ -3,9 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -41,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
         ///             return null;                                                          <br/>
         ///         }                                                                         <br/>
         ///         object[] args = new object[] { value };                                   <br/>
-        ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
+        ///         Invoke(new InvocationContext(args, invokeTarget));                        <br/>
         ///     }                                                                             <br/>
         ///     remove                                                                        <br/>
         ///     {                                                                             <br/>
@@ -128,10 +126,6 @@ namespace Solti.Utils.Proxy.Internals
                                 Argument
                                 (
                                     IdentifierName(invokeTarget.Identifier)
-                                ),
-                                Argument
-                                (
-                                    EnumAccess(MemberTypes.Event)
                                 )
                             )
                         )

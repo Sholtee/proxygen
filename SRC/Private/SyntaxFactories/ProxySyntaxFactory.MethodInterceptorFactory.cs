@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -62,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
         ///                                                                                                           <br/>
         ///     object[] args = new object[] {para1, para2, default(T3), para4};                                      <br/>
         ///                                                                                                           <br/>
-        ///     System.Object result = Invoke(new InvocationContext(args, InvokeTarget, MemberTypes.Method));         <br/>
+        ///     System.Object result = Invoke(new InvocationContext(args, InvokeTarget));                             <br/>
         ///                                                                                                           <br/>
         ///     para2 = (T2) args[1];                                                                                 <br/>
         ///     para3 = (T3) args[2];                                                                                 <br/>
@@ -106,10 +105,6 @@ namespace Solti.Utils.Proxy.Internals
                             Argument
                             (
                                 IdentifierName(invokeTarget.Identifier)
-                            ),
-                            Argument
-                            (
-                                EnumAccess(MemberTypes.Method)
                             )
                         )
                     )

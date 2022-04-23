@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Method);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
             MethodInfo met = (MethodInfo) cntx.Member;
             Assert.That(met.Name, Is.EqualTo(nameof(IList.Clear)));
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -66,7 +66,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Tests
                 return ((IDescendant) target).Prop;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Property);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget, MemberTypes.Event);
+            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
             EventInfo evt = (EventInfo) cntx.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));

@@ -7,5 +7,5 @@ void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo
     }
 
     global::System.Object[] args = new global::System.Object[0];
-    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Method));
+    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
 }

@@ -10,7 +10,7 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
         }
 
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Event));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
     }
 
     remove
@@ -23,6 +23,6 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
         }
 
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget, global::System.Reflection.MemberTypes.Event));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
     }
 }

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -51,12 +52,13 @@ namespace Solti.Utils.Proxy.Internals
         // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static ExtendedMemberInfo ExtractFrom(Delegate accessor, MemberTypes memberType) => Cache.GetOrAdd(accessor, static ctx =>
-        {
-            Debug.Assert(ctx.accessor.Target is null);
+        private static readonly ConcurrentDictionary<Delegate, ExtendedMemberInfo> FMemberInfoCache = new();
 
-            MethodInfo method = (MethodInfo) ctx
-                .accessor
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor) => FMemberInfoCache.GetOrAdd(accessor, static accessor =>
+        {
+            Debug.Assert(accessor.Target is null);
+
+            MethodInfo method = (MethodInfo) accessor
                 .Method
                 .GetInstructions()
                 .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
@@ -64,25 +66,20 @@ namespace Solti.Utils.Proxy.Internals
 
             return new ExtendedMemberInfo
             (
-                method,
-                ctx.memberType switch
-                {
-                    MemberTypes.Property => method
+                method,   
+                    method
                         .DeclaringType
                         .GetProperties()
-                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method, throwOnEmpty: false) ??
 
-                    MemberTypes.Event => method
+                    method
                         .DeclaringType
                         .GetEvents()
-                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method, throwOnEmpty: false) ??
 
-                    MemberTypes.Method => method,
-
-                    _ => throw new NotSupportedException()
-                }
+                    (MemberInfo) method
             );
-        }, new { memberType, accessor });
+        });
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

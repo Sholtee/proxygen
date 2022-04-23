@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Creates a new <see cref="InvocationContext"/> instance.
         /// </summary>
-        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch, MemberTypes memberType)
+        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch)
         {
             if (args is null)
                 throw new ArgumentNullException(nameof(args));
@@ -31,11 +31,7 @@ namespace Solti.Utils.Proxy
             if (dispatch.Target is not null)
                 throw new ArgumentException(Resources.NOT_STATIC, nameof(dispatch));
 
-            //
-            // Delegate.Method fuggetlen a korulzart valtozoktol (lasd: UnderlyingMethodOfDelegate_ShouldBeIndependentFromTheEnclosedVariables)
-            //
-
-            ExtendedMemberInfo memberInfo = MemberInfoExtensions.ExtractFrom(dispatch, memberType);
+            ExtendedMemberInfo memberInfo = MemberInfoExtensions.ExtractFrom(dispatch);
 
             Member = memberInfo.Member;
             Method = memberInfo.Method;
