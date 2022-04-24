@@ -187,7 +187,7 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// static object InvokeTarget(object target, object[] args) <br/>
+        /// (object target, object[] args) =>                         <br/>
         /// {                                                         <br/>
         ///     System.Int32 cb_a = (System.Int32)args[0];            <br/>
         ///     System.String cb_b;                                   <br/>
@@ -200,7 +200,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LocalFunctionStatementSyntax ResolveInvokeTarget(IMethodInfo method, Action<ParameterSyntax, ParameterSyntax, IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
+        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, Action<ParameterSyntax, ParameterSyntax, IReadOnlyList<LocalDeclarationStatementSyntax>, List<StatementSyntax>> invocationFactory)
         {
             ParameterSyntax
                 target = Parameter
@@ -227,29 +227,42 @@ namespace Solti.Utils.Proxy.Internals
 
             invocationFactory(target, args, locals, statements);
 
-            return LocalFunctionStatement
-            (
-                returnType: ResolveType<object>(),
-                identifier: Identifier("InvokeTarget")
-            )
-            .WithModifiers
-            (
-                TokenList
+            return 
+                ParenthesizedLambdaExpression()
+                .WithParameterList
                 (
-                    Token(SyntaxKind.StaticKeyword)
+                    ParameterList
+                    (
+                        new ParameterSyntax[] { target, args }.ToSyntaxList()
+                    )
                 )
-            )
-            .WithParameterList
-            (
-                ParameterList
+                .WithBody
                 (
-                    new ParameterSyntax[] { target, args }.ToSyntaxList()
-                )
-            )
-            .WithBody
-            (
-                Block(statements)
-            );
+                    Block(statements)
+                );
         }
+
+        /// <summary>
+        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) => <br/>
+        /// {                                                                                                <br/>
+        ///     System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
+        ///     System.String cb_b;                                                                          <br/>
+        ///     TT cb_c = (TT)args[2];                                                                       <br/>
+        ///     ...                                                                                          <br/>
+        /// });
+        /// </summary>
+        #if DEBUG
+        internal
+        #else
+        private
+        #endif
+        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda) => ResolveStaticGlobal<MethodContext>
+        (
+            $"F{lambda.GetMD5HashCode()}",
+            ResolveObject<MethodContext>
+            (
+                Argument(lambda)
+            )     
+        );
     }
 }

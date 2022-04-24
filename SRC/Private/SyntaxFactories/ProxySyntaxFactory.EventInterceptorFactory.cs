@@ -16,72 +16,92 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
+        protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
             foreach (IEventInfo evt in InterfaceType.Events)
             {
                 if (AlreadyImplemented(evt))
                     continue;
 
-                foreach (MemberDeclarationSyntax member in ResolveEvent(null!, evt))
-                {
-                    yield return member;
-                }
+                cls = ResolveEvent(cls, context, evt);
             }
+
+            return cls;
         }
 
         /// <summary>
-        /// event EventType IInterface.Event                                                  <br/>
-        /// {                                                                                 <br/>
-        ///     add                                                                           <br/>
-        ///     {                                                                             <br/>
-        ///         static object InvokeTarget(ITarget target, object[] args)                 <br/>
-        ///         {                                                                         <br/>
-        ///             EventType _value = (EventType) args[0];                               <br/>
-        ///             Target.Event += _value;                                               <br/>
-        ///             return null;                                                          <br/>
-        ///         }                                                                         <br/>
-        ///         object[] args = new object[] { value };                                   <br/>
-        ///         Invoke(new InvocationContext(args, invokeTarget));                        <br/>
-        ///     }                                                                             <br/>
-        ///     remove                                                                        <br/>
-        ///     {                                                                             <br/>
-        ///         static object InvokeTarget(ITarget target, object[] args)                 <br/>
-        ///         {                                                                         <br/>
-        ///             EventType _value = (EventType) args[0];                               <br/>
-        ///             Target.Event -= _value;                                               <br/>
-        ///             return null;                                                          <br/>
-        ///         }                                                                         <br/>
-        ///         object[] args = new object[] { value };                                   <br/>
-        ///         Invoke(new InvocationContext(args, invokeTarget, MemberTypes.Event));     <br/>
-        ///     }                                                                             <br/>
+        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) => <br/>
+        /// {                                                                                                 <br/>
+        ///     EventType _value = (EventType) args[0];                                                       <br/>
+        ///     Target.Event += _value;                                                                       <br/>
+        ///     return null;                                                                                  <br/>
+        /// });                                                                                               <br/>
+        /// private static readonly MethodContext FYyY = new MethodContext((ITarget target, object[] args) => <br/>
+        /// {                                                                                                 <br/>
+        ///     EventType _value = (EventType) args[0];                                                       <br/>
+        ///     Target.Event -= _value;                                                                       <br/>
+        ///     return null;                                                                                  <br/>
+        /// });                                                                                               <br/>
+        /// event EventType IInterface.Event                                                                  <br/>
+        /// {                                                                                                 <br/>
+        ///     add                                                                                           <br/>
+        ///     {                                                                                             <br/>
+        ///         object[] args = new object[] { value };                                                   <br/>
+        ///         Invoke(new InvocationContext(args, FXxX));                                                <br/>
+        ///     }                                                                                             <br/>
+        ///     remove                                                                                        <br/>
+        ///     {                                                                                             <br/>
+        ///         object[] args = new object[] { value };                                                   <br/>
+        ///         Invoke(new InvocationContext(args, FYyY));                                                <br/>
+        ///     }                                                                                             <br/>
         /// }
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt)
+        protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt)
         {
-            yield return ResolveEvent
+            List<MemberDeclarationSyntax> members = new();
+
+            BlockSyntax?
+                add = null,
+                remove = null;
+
+            if (evt.AddMethod is not null)
+            {
+                FieldDeclarationSyntax addCtx = BuildField(true, evt.AddMethod);
+                members.Add(addCtx);
+
+                add = Block
+                (
+                    BuildBody(true, evt.AddMethod, addCtx)
+                );
+            }
+
+            if (evt.RemoveMethod is not null)
+            {
+                FieldDeclarationSyntax removeCtx = BuildField(false, evt.RemoveMethod);
+                members.Add(removeCtx);
+
+                remove = Block
+                (
+                    BuildBody(false, evt.RemoveMethod, removeCtx)
+                );
+            }
+
+            members.Add
             (
-                @event: evt,
-                addBody: Block
-                (
-                    BuildBody(add: true)
-                ),
-                removeBody: Block
-                (
-                    BuildBody(add: false)
-                )
+                ResolveEvent(evt, add, remove)
             );
 
-            IEnumerable<StatementSyntax> BuildBody(bool add)
-            {
-                IMethodInfo? method = add ? evt.AddMethod : evt.RemoveMethod;
-                if (method is null)
-                    yield break;
+            return cls.WithMembers
+            (
+                cls.Members.AddRange(members)
+            );
 
-                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget
+            FieldDeclarationSyntax BuildField(bool add, IMethodInfo method) => ResolveMethodContext
+            (
+                ResolveInvokeTarget
                 (
                     method,
                     (target, args, locals, body) =>
@@ -108,9 +128,11 @@ namespace Solti.Utils.Proxy.Internals
                             ReturnNull()
                         );
                     }
-                );
-                yield return invokeTarget;
+                )
+            );
 
+            IEnumerable<StatementSyntax> BuildBody(bool add, IMethodInfo method, FieldDeclarationSyntax fld)
+            {
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
                 yield return argsArray;
 
@@ -128,7 +150,7 @@ namespace Solti.Utils.Proxy.Internals
                                 ToArgument(argsArray),
                                 Argument
                                 (
-                                    IdentifierName(invokeTarget.Identifier)
+                                    StaticMemberAccess(cls, fld)
                                 )
                             )
                         )

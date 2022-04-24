@@ -2,27 +2,13 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
 {
     add
     {
-        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
-        {
-            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
-            ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Event += _value;
-            return null;
-        }
-
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FE368ED8AFE215C30F18F06E03592AACA));
     }
 
     remove
     {
-        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
-        {
-            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
-            ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Event -= _value;
-            return null;
-        }
-
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F9750C1B0E32217DBCD60481B48459A44));
     }
 }

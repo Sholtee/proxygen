@@ -20,8 +20,10 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
+        protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
+            cls = base.ResolveMethods(cls, context);
+
             foreach (IMethodInfo met in InterfaceType.Methods)
             {
                 if (AlreadyImplemented(met) || met.IsSpecial)
@@ -34,55 +36,60 @@ namespace Solti.Utils.Proxy.Internals
                 if (met.ReturnValue.Kind >= ParameterKind.Ref)
                     throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
 
-                foreach (MemberDeclarationSyntax member in ResolveMethod(null!, met))
-                {
-                    yield return member;
-                }
+                cls = ResolveMethod(cls, context, met);
             }
 
-            foreach (MemberDeclarationSyntax extra in base.ResolveMethods(context))
-            {
-                yield return extra;
-            }
+            return cls;
         }
 
         /// <summary>
+        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) =>         <br/>
+        /// {                                                                                                         <br/>
+        ///     System.Int32 cb_a = (System.Int32) args[0];                                                           <br/>
+        ///     System.String cb_b;                                                                                   <br/>
+        ///     TT cb_c = (TT) args[2];                                                                               <br/>
+        ///     System.Object result;                                                                                 <br/>
+        ///     result = target.Foo[TT](cb_a, out cb_b, ref cb_c);                                                    <br/>
+        ///                                                                                                           <br/>
+        ///     args[1] = (System.Object) cb_b;                                                                       <br/>
+        ///     args[2] = (System.Object) cb_c;                                                                       <br/>
+        ///     return result;                                                                                        <br/>
+        /// });                                                                                                       <br/>
+        ///                                                                                                           <br/>
         /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)                    <br/>
         /// {                                                                                                         <br/>
-        ///     static object InvokeTarget(ITarget target, object[] args)                                             <br/>
-        ///     {                                                                                                     <br/>
-        ///         System.Int32 cb_a = (System.Int32) args[0];                                                       <br/>
-        ///         System.String cb_b;                                                                               <br/>
-        ///         TT cb_c = (TT) args[2];                                                                           <br/>
-        ///         System.Object result;                                                                             <br/>
-        ///         result = target.Foo[TT](cb_a, out cb_b, ref cb_c);                                                <br/>
-        ///                                                                                                           <br/>
-        ///         args[1] = (System.Object) cb_b;                                                                   <br/>
-        ///         args[2] = (System.Object) cb_c;                                                                   <br/>
-        ///         return result;                                                                                    <br/>
-        ///     }                                                                                                     <br/>
-        ///                                                                                                           <br/>
         ///     object[] args = new object[] {para1, para2, default(T3), para4};                                      <br/>
         ///                                                                                                           <br/>
-        ///     System.Object result = Invoke(new InvocationContext(args, InvokeTarget));                             <br/>
+        ///     System.Object result = Invoke(new InvocationContext(args, FXxX));                                     <br/>
         ///                                                                                                           <br/>
         ///     para2 = (T2) args[1];                                                                                 <br/>
         ///     para3 = (T3) args[2];                                                                                 <br/>
-        ///                                                                                                           <br/>
         ///     return (TResult) result;                                                                              <br/>
         /// }
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method)
+        protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method)
         {
-            yield return ResolveMethod(method).WithBody
+            FieldDeclarationSyntax methodCtx = ResolveMethodContext
             (
-                body: Block
-                (
-                    BuildBody()
-                )
+                ResolveInvokeTarget(method)
+            );
+
+            return cls.AddMembers
+            (
+                new MemberDeclarationSyntax[]
+                {
+                    methodCtx,
+                    ResolveMethod(method).WithBody
+                    (
+                        body: Block
+                        (
+                            BuildBody()
+                        )
+                    )
+                }
             );
 
             IEnumerable<StatementSyntax> BuildBody()
@@ -90,9 +97,7 @@ namespace Solti.Utils.Proxy.Internals
                 List<StatementSyntax> statements = new();
 
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
-                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget(method);
 
-                statements.Add(invokeTarget);
                 statements.Add(argsArray);
 
                 InvocationExpressionSyntax invocation = InvokeMethod
@@ -107,7 +112,7 @@ namespace Solti.Utils.Proxy.Internals
                             ToArgument(argsArray),
                             Argument
                             (
-                                IdentifierName(invokeTarget.Identifier)
+                                StaticMemberAccess(cls, methodCtx)
                             )
                         )
                     )
@@ -259,7 +264,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>                                                   <br/>
-        /// static object InvokeTarget(ITarget target, object[] args)   <br/>
+        /// (ITarget target, object[] args) =>                          <br/>
         /// {                                                           <br/>
         ///    System.Int32 cb_a = (System.Int32) args[0];              <br/>
         ///    System.String cb_b;                                      <br/>
@@ -277,7 +282,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LocalFunctionStatementSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, locals, body) =>
+        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, locals, body) =>
         {
             InvocationExpressionSyntax invocation = InvokeMethod
             (

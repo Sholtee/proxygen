@@ -236,11 +236,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context);
+        protected abstract ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context);
 
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method);
+        protected abstract ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method);
     }
 }

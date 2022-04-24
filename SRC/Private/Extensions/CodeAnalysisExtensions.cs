@@ -5,6 +5,9 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
+using System.Text;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -70,6 +73,29 @@ namespace Solti.Utils.Proxy.Internals
                 left: Qualify(coll.GetRange(0, coll.Count - 1)),
                 right: (SimpleNameSyntax) coll[coll.Count - 1]
             );
+        }
+
+        [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms")]
+        public static string GetMD5HashCode(this SyntaxNode node)
+        {
+            using MD5 md5 = MD5.Create();
+            
+            byte[] hash = md5.ComputeHash
+            (
+                Encoding.UTF8.GetBytes(node.ToFullString())
+            );
+
+            StringBuilder sb = new();
+
+            for (int i = 0; i < hash.Length; i++)
+            {
+                sb.Append
+                (
+                    md5.Hash[i].ToString("X2", null)
+                );
+            }
+
+            return sb.ToString();
         }
     }
 }

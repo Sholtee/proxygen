@@ -3,8 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
-
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,8 +15,10 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
+        protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
+            cls = base.ResolveMethods(cls, context);
+
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
                 if (ifaceMethod.IsSpecial)
@@ -32,16 +32,10 @@ namespace Solti.Utils.Proxy.Internals
 
                 Visibility.Check(targetMethod, ContainingAssembly);
 
-                foreach (MemberDeclarationSyntax member in ResolveMethod(ifaceMethod, targetMethod))
-                {
-                    yield return member;
-                }
+                cls = ResolveMethod(cls, ifaceMethod, targetMethod);
             }
 
-            foreach (MemberDeclarationSyntax extra in base.ResolveMethods(context))
-            {
-                yield return extra;
-            }
+            return cls;
 
             static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
                 targetMember is IMethodInfo targetMethod &&
@@ -56,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo targetMethod)
+        protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo targetMethod)
         {
             IMethodInfo ifaceMethod = (IMethodInfo) context;
 
@@ -80,7 +74,13 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
                 invocation = RefExpression(invocation);
 
-            yield return ResolveMethod(ifaceMethod, forceInlining: true)
+            return cls.AddMembers
+            (
+                ResolveMethod
+                (
+                    ifaceMethod,
+                    forceInlining: true
+                )
                 .WithExpressionBody
                 (
                     expressionBody: ArrowExpressionClause(invocation)
@@ -88,7 +88,8 @@ namespace Solti.Utils.Proxy.Internals
                 .WithSemicolonToken
                 (
                     Token(SyntaxKind.SemicolonToken)
-                );
+                )
+            );
         }
     }
 }

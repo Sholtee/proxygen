@@ -156,9 +156,6 @@
   <data name="NOT_A_GENERATOR" xml:space="preserve">
     <value>The parameter must be a Generator descendant.</value>
   </data>
-  <data name="NOT_STATIC" xml:space="preserve">
-    <value>The provided delegate must refer a static method.</value>
-  </data>
   <data name="NO_PUBLIC_CTOR" xml:space="preserve">
     <value>At least one public constructor should be declared on {0}.</value>
   </data>

@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Diagnostics;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -48,6 +49,27 @@ namespace Solti.Utils.Proxy.Internals
             SyntaxKind.SimpleMemberAccessExpression,
             target,
             member
+        );
+
+
+        #if DEBUG
+        internal
+        #endif
+        protected static MemberAccessExpressionSyntax StaticMemberAccess(ClassDeclarationSyntax target, MemberDeclarationSyntax member) => SimpleMemberAccess
+        (
+            AliasQualifiedName
+            (
+                IdentifierName
+                (
+                    Token(SyntaxKind.GlobalKeyword)
+                ),
+                IdentifierName(target.Identifier)
+            ),
+            member switch 
+            {
+                FieldDeclarationSyntax fld => ToIdentifierName(fld),
+                _ => throw new NotSupportedException() // TODO: method, prop, etc
+            }
         );
 
         /// <summary>

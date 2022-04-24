@@ -28,6 +28,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class ProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {
+        private static ClassDeclarationSyntax GetDummyClass() => ClassDeclaration("Dummy");
+
         internal class FooInterceptor : InterfaceInterceptor<IFoo<int>> // direkt internal
         {
             public FooInterceptor(IFoo<int> target) : base(target)
@@ -150,43 +152,39 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(Methods))]
         public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
-            MemberDeclarationSyntax[] methods = CreateGenerator(OutputType.Module).ResolveMethods(null).ToArray();
+            SyntaxList<MemberDeclarationSyntax> methods = CreateGenerator(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
 
-            Assert.That(methods.Count, Is.EqualTo(3));
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
         }
 
         [Test]
         public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
-            MemberDeclarationSyntax[] props = CreateGenerator(OutputType.Module).ResolveProperties(null).ToArray();
+            SyntaxList<MemberDeclarationSyntax> props = CreateGenerator(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
 
-            Assert.That(props.Count, Is.EqualTo(1));
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("PropSrc.txt"))));
         }
 
         [Test]
         public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
-            MemberDeclarationSyntax[] props = new ProxySyntaxFactory
+            SyntaxList<MemberDeclarationSyntax> props = new ProxySyntaxFactory
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
                 "cica", 
                 OutputType.Module,
                 null
-            ).ResolveProperties(null).ToArray();
+            ).ResolveProperties(GetDummyClass(), null).Members;
 
-            Assert.That(props.Count, Is.EqualTo(3));
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("IndexerSrc.txt"))));
         }
 
         [Test]
         public void GenerateProxyEvent_Test()
         {
-            MemberDeclarationSyntax[] evts = CreateGenerator(OutputType.Module).ResolveEvents(null).ToArray();
+            SyntaxList<MemberDeclarationSyntax> evts = CreateGenerator(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
 
-            Assert.That(evts.Count, Is.EqualTo(1));
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("EventSrc.txt"))));
         }
 

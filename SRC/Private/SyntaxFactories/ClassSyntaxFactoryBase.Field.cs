@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -45,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 TokenList
                 (
-                    new[]
+                    new SyntaxToken[]
                     {
                         Token(SyntaxKind.PrivateKeyword),
                         Token(SyntaxKind.StaticKeyword),
@@ -54,5 +55,18 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
         }
+
+        /// <summary>
+        /// private static readonly System.Object paramName [= ...];
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null) => ResolveStaticGlobal
+        (
+            MetadataTypeInfo.CreateFrom(typeof(T)),
+            name,
+            initializer
+        );
     }
 }

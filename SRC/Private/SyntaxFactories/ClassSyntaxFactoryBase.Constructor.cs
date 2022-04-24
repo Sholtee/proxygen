@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -20,13 +21,13 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, string className)
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
             return ConstructorDeclaration
             (
-                identifier: Identifier(className)
+                name
             )
             .WithModifiers
             (
@@ -75,11 +76,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context);
+        protected abstract ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context);
 
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor);
+        protected abstract ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor);
     }
 }

@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
+        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
             foreach (IPropertyInfo ifaceProperty in InterfaceType.Properties)
             {
@@ -36,11 +35,10 @@ namespace Solti.Utils.Proxy.Internals
                     checkSet: ifaceProperty.SetMethod is not null
                 );
 
-                foreach (MemberDeclarationSyntax member in ResolveProperty(ifaceProperty, targetProperty))
-                {
-                    yield return member;
-                }
+                cls = ResolveProperty(cls, ifaceProperty, targetProperty);
             }
+
+            return cls;
 
             [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
             static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
@@ -81,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo targetProperty)
+        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo targetProperty)
         {
             IPropertyInfo ifaceProperty = (IPropertyInfo) context;
 
@@ -121,21 +119,24 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            yield return ifaceProperty.Indices.Some()
-                ? ResolveIndexer
-                (
-                    property: ifaceProperty,
-                    getBody: getBody,
-                    setBody: setBody,
-                    forceInlining: true
-                )
-                : ResolveProperty
-                (
-                    property: ifaceProperty,
-                    getBody: getBody,
-                    setBody: setBody,
-                    forceInlining: true
-                );
+            return cls.AddMembers
+            (
+                ifaceProperty.Indices.Some()
+                    ? ResolveIndexer
+                    (
+                        property: ifaceProperty,
+                        getBody: getBody,
+                        setBody: setBody,
+                        forceInlining: true
+                    )
+                    : ResolveProperty
+                    (
+                        property: ifaceProperty,
+                        getBody: getBody,
+                        setBody: setBody,
+                        forceInlining: true
+                    )
+            );
         }
     }
 }

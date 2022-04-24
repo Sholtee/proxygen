@@ -3,8 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
-
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
@@ -14,23 +12,21 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context)
+        protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
             foreach (IConstructorInfo ctor in BaseType.GetPublicConstructors())
             {
-                foreach (MemberDeclarationSyntax member in ResolveConstructor(null!, ctor))
-                {
-                    yield return member;
-                }
+                cls = ResolveConstructor(cls, context, ctor);
             }
+            return cls;
         }
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor)
-        {
-            yield return ResolveConstructor(ctor, ResolveClassName(null!));
-        }
+        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls.AddMembers
+        (
+            ResolveConstructor(ctor, cls.Identifier)
+        );
     }
 }

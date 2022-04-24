@@ -1,4 +1,4 @@
-static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
+(global::System.Object target, global::System.Object[] args) =>
 {
     global::System.Int32 _a = (global::System.Int32)args[0];
     global::System.String _b;

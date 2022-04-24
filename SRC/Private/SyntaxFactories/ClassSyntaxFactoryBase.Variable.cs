@@ -58,6 +58,22 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument(ToIdentifierName(variable));
+        protected static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument
+        (
+            ToIdentifierName(variable)
+        );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static IdentifierNameSyntax ToIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
+
+        #if DEBUG
+        internal
+        #endif
+        protected static ArgumentSyntax ToArgument(FieldDeclarationSyntax field) => Argument
+        (
+            ToIdentifierName(field)
+        );
     }
 }

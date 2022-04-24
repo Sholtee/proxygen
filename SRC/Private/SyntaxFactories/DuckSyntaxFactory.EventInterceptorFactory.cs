@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -17,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
+        protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
             foreach (IEventInfo ifaceEvt in InterfaceType.Events)
             {
@@ -35,11 +34,10 @@ namespace Solti.Utils.Proxy.Internals
                     checkRemove: ifaceEvt.RemoveMethod is not null
                 );
 
-                foreach (MemberDeclarationSyntax member in ResolveEvent(ifaceEvt, targetEvt))
-                {
-                    yield return member;
-                }
+                cls = ResolveEvent(cls, ifaceEvt, targetEvt);
             }
+
+            return cls;
 
             [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
             static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
@@ -75,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo targetEvt)
+        protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo targetEvt)
         {
             IEventInfo ifaceEVt = (IEventInfo) context;
 
@@ -85,12 +83,15 @@ namespace Solti.Utils.Proxy.Internals
                 ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
                 : null;
 
-            yield return ResolveEvent
+            return cls.AddMembers
             (
-                ifaceEVt,
-                addBody: CreateBody(register: true),
-                removeBody: CreateBody(register: false),
-                forceInlining: true
+                ResolveEvent
+                (
+                    ifaceEVt,
+                    addBody: CreateBody(register: true),
+                    removeBody: CreateBody(register: false),
+                    forceInlining: true
+                )
             );
 
             ArrowExpressionClauseSyntax CreateBody(bool register) => ArrowExpressionClause
