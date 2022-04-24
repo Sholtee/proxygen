@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -49,12 +48,10 @@ namespace Solti.Utils.Proxy.Internals
         public static MemberInfo ExtractFrom<T>(Expression<Func<T, object?>> expr) => DoExtractFrom(expr);
 
         //
-        // settert es esemenyt kifejezesekbol nem fejthetunk ki: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
+        // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        private static readonly ConcurrentDictionary<Delegate, ExtendedMemberInfo> FMemberInfoCache = new();
-
-        public static ExtendedMemberInfo ExtractFrom(Delegate accessor) => FMemberInfoCache.GetOrAdd(accessor, static accessor =>
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor) => Cache.GetOrAdd(accessor, static accessor =>
         {
             Debug.Assert(accessor.Target is null);
 
@@ -64,16 +61,16 @@ namespace Solti.Utils.Proxy.Internals
                 .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
                 .Operand;
 
+            Type declaringType = method.DeclaringType;
+
             return new ExtendedMemberInfo
             (
                 method,   
-                    method
-                        .DeclaringType
+                    declaringType
                         .GetProperties()
                         .Single(prop => prop.SetMethod == method || prop.GetMethod == method, throwOnEmpty: false) ??
 
-                    method
-                        .DeclaringType
+                    declaringType
                         .GetEvents()
                         .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method, throwOnEmpty: false) ??
 

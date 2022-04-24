@@ -42,8 +42,7 @@ namespace Solti.Utils.Proxy.Internals
                 //
 
                 () => self.Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
-            ),
-            this
+            )
         );
 
         #if NETSTANDARD2_1_OR_GREATER
@@ -52,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         internal static object ActivateInternal(Type t, object? tuple) =>
         #endif
             Cache
-                .GetOrAdd(t, static t => ProxyActivator.Create(t), t)
+                .GetOrAdd(t, static t => ProxyActivator.Create(t))
                 .Invoke(tuple);
 
         #region Public

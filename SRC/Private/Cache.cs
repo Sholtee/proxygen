@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         private static class Implementation<TKey, TValue>
         {
-            public static readonly ConcurrentDictionary<object, TValue> Value = new();
+            public static readonly ConcurrentDictionary<TKey, TValue> Value = new();
         }
 
         private sealed class LazySlim<TValue, TContext> where TValue : class
@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
         
-        public static TValue GetOrAdd<TKey, TValue, TContext>(TKey key, /*static*/ Func<TContext, TValue> factory, TContext context/*, [CallerMemberName] string scope = ""*/) where TValue: class => Implementation<TKey, LazySlim<TValue, TContext>>
+        public static TValue GetOrAdd<TKey, TValue>(TKey key, /*static*/ Func<TKey, TValue> factory) where TValue: class => Implementation<TKey, LazySlim<TValue, TKey>>
             .Value
             
             //
@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
             // meghivasra kerulhet (MSDN) -> Lazy
             //
 
-            .GetOrAdd(/*new { key, scope }*/key!, new LazySlim<TValue, TContext>(factory, context))
+            .GetOrAdd(key, new LazySlim<TValue, TKey>(factory, key))
             .Value;
     }
 }
