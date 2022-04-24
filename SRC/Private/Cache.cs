@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
             private readonly TContext FContext;
             private TValue? FValue;
 
-            public LazySlim(/*static*/ Func<TContext, TValue> factory, TContext context)
+            public LazySlim(Func<TContext, TValue> factory, TContext context)
             {
                 FFactory = factory;
                 FContext = context;
@@ -39,12 +39,12 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
         
-        public static TValue GetOrAdd<TKey, TValue>(TKey key, /*static*/ Func<TKey, TValue> factory) where TValue: class => Implementation<TKey, LazySlim<TValue, TKey>>
+        public static TValue GetOrAdd<TKey, TValue>(TKey key, Func<TKey, TValue> factory) where TValue: class => Implementation<TKey, LazySlim<TValue, TKey>>
             .Value
-            
+
             //
-            // Ha ugyanazzal a kulccsal hivjuk parhuzamosan a GetOrAdd()-et akkor a factory tobbszor is
-            // meghivasra kerulhet (MSDN) -> Lazy
+            // Don't use factory function here as it may get called more than once if the GetOrAdd()
+            // is invoked with the same key parallelly (MSDN).
             //
 
             .GetOrAdd(key, new LazySlim<TValue, TKey>(factory, key))
