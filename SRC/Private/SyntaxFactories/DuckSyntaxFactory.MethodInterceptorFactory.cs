@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
         {
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
@@ -32,11 +32,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 Visibility.Check(targetMethod, ContainingAssembly);
 
-                yield return ResolveMethod(ifaceMethod, targetMethod);
-
+                foreach (MemberDeclarationSyntax member in ResolveMethod(ifaceMethod, targetMethod))
+                {
+                    yield return member;
+                }
             }
 
-            foreach (MethodDeclarationSyntax extra in base.ResolveMethods(context))
+            foreach (MemberDeclarationSyntax extra in base.ResolveMethods(context))
             {
                 yield return extra;
             }
@@ -54,7 +56,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo targetMethod)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo targetMethod)
         {
             IMethodInfo ifaceMethod = (IMethodInfo) context;
 
@@ -78,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
                 invocation = RefExpression(invocation);
 
-            return ResolveMethod(ifaceMethod, forceInlining: true)
+            yield return ResolveMethod(ifaceMethod, forceInlining: true)
                 .WithExpressionBody
                 (
                     expressionBody: ArrowExpressionClause(invocation)

@@ -105,12 +105,12 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) => throw new NotImplementedException();
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor) => throw new NotImplementedException();
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context)
         {
             yield break;
         }
@@ -118,12 +118,12 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt) => throw new NotImplementedException();
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt) => throw new NotImplementedException();
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<EventDeclarationSyntax> ResolveEvents(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
         {
             yield break;
         }
@@ -131,12 +131,12 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method) => throw new NotImplementedException();
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method) => throw new NotImplementedException();
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
         {
             yield break;
         }
@@ -144,7 +144,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
         {
             yield break;
         }
@@ -152,6 +152,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property) => throw new NotImplementedException();
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property) => throw new NotImplementedException();
     }
 }

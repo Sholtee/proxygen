@@ -150,7 +150,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(Methods))]
         public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
-            MethodDeclarationSyntax[] methods = CreateGenerator(OutputType.Module).ResolveMethods(null).ToArray();
+            MemberDeclarationSyntax[] methods = CreateGenerator(OutputType.Module).ResolveMethods(null).ToArray();
 
             Assert.That(methods.Count, Is.EqualTo(3));
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
@@ -159,7 +159,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
-            BasePropertyDeclarationSyntax[] props = CreateGenerator(OutputType.Module).ResolveProperties(null).ToArray();
+            MemberDeclarationSyntax[] props = CreateGenerator(OutputType.Module).ResolveProperties(null).ToArray();
 
             Assert.That(props.Count, Is.EqualTo(1));
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("PropSrc.txt"))));
@@ -168,7 +168,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
-            BasePropertyDeclarationSyntax[] props = new ProxySyntaxFactory
+            MemberDeclarationSyntax[] props = new ProxySyntaxFactory
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
@@ -184,7 +184,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyEvent_Test()
         {
-            EventDeclarationSyntax[] evts = CreateGenerator(OutputType.Module).ResolveEvents(null).ToArray();
+            MemberDeclarationSyntax[] evts = CreateGenerator(OutputType.Module).ResolveEvents(null).ToArray();
 
             Assert.That(evts.Count, Is.EqualTo(1));
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("EventSrc.txt"))));

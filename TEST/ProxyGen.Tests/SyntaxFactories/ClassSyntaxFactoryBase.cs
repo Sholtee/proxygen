@@ -30,21 +30,21 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             protected internal override string ResolveClassName(object context) => throw new NotImplementedException();
 
-            protected internal override ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor) => throw new NotImplementedException();
 
-            protected internal override IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context) => throw new NotImplementedException();
 
-            protected internal override EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt) => throw new NotImplementedException();
 
-            protected internal override IEnumerable<EventDeclarationSyntax> ResolveEvents(object context) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context) => throw new NotImplementedException();
 
-            protected internal override MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method) => throw new NotImplementedException();
 
-            protected internal override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context) => throw new NotImplementedException();
 
-            protected internal override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context) => throw new NotImplementedException();
 
-            protected internal override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property) => throw new NotImplementedException();
+            protected internal override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property) => throw new NotImplementedException();
         }
 
 

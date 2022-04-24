@@ -18,14 +18,17 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
         {
             foreach (IPropertyInfo prop in InterfaceType.Properties)
             {
                 if (AlreadyImplemented(prop))
                     continue;
 
-                yield return ResolveProperty(null!, prop);
+                foreach (MemberDeclarationSyntax member in ResolveProperty(null!, prop))
+                {
+                    yield return member;
+                }
             }
         }
 
@@ -57,9 +60,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property)
         {
-            return BuildProperty
+            yield return BuildProperty
             (
                 property.Indices.Some() ? ResolveIndexer : ResolveProperty
             );

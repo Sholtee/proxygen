@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
         {
             //
             // [ModuleInitializerAttribute]

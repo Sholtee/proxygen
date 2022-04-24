@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<EventDeclarationSyntax> ResolveEvents(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
         {
             foreach (IEventInfo ifaceEvt in InterfaceType.Events)
             {
@@ -35,7 +35,10 @@ namespace Solti.Utils.Proxy.Internals
                     checkRemove: ifaceEvt.RemoveMethod is not null
                 );
 
-                yield return ResolveEvent(ifaceEvt, targetEvt);
+                foreach (MemberDeclarationSyntax member in ResolveEvent(ifaceEvt, targetEvt))
+                {
+                    yield return member;
+                }
             }
 
             [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
@@ -72,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override EventDeclarationSyntax ResolveEvent(object context, IEventInfo targetEvt)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo targetEvt)
         {
             IEventInfo ifaceEVt = (IEventInfo) context;
 
@@ -82,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
                 : null;
 
-            return ResolveEvent
+            yield return ResolveEvent
             (
                 ifaceEVt,
                 addBody: CreateBody(register: true),

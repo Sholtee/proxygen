@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MethodDeclarationSyntax> ResolveMethods(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
         {
             foreach (IMethodInfo met in InterfaceType.Methods)
             {
@@ -34,10 +34,13 @@ namespace Solti.Utils.Proxy.Internals
                 if (met.ReturnValue.Kind >= ParameterKind.Ref)
                     throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
 
-                yield return ResolveMethod(null!, met);
+                foreach (MemberDeclarationSyntax member in ResolveMethod(null!, met))
+                {
+                    yield return member;
+                }
             }
 
-            foreach (MethodDeclarationSyntax extra in base.ResolveMethods(context))
+            foreach (MemberDeclarationSyntax extra in base.ResolveMethods(context))
             {
                 yield return extra;
             }
@@ -72,9 +75,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override MethodDeclarationSyntax ResolveMethod(object context, IMethodInfo method)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method)
         {
-            return ResolveMethod(method).WithBody
+            yield return ResolveMethod(method).WithBody
             (
                 body: Block
                 (

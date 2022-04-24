@@ -75,11 +75,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<ConstructorDeclarationSyntax> ResolveConstructors(object context);
+        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context);
 
         #if DEBUG
         internal
         #endif
-        protected abstract ConstructorDeclarationSyntax ResolveConstructor(object context, IConstructorInfo ctor);
+        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor);
     }
 }

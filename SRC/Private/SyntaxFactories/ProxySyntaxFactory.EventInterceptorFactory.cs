@@ -16,14 +16,17 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<EventDeclarationSyntax> ResolveEvents(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
         {
             foreach (IEventInfo evt in InterfaceType.Events)
             {
                 if (AlreadyImplemented(evt))
                     continue;
 
-                yield return ResolveEvent(null!, evt);
+                foreach (MemberDeclarationSyntax member in ResolveEvent(null!, evt))
+                {
+                    yield return member;
+                }
             }
         }
 
@@ -57,9 +60,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override EventDeclarationSyntax ResolveEvent(object context, IEventInfo evt)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt)
         {
-            return ResolveEvent
+            yield return ResolveEvent
             (
                 @event: evt,
                 addBody: Block

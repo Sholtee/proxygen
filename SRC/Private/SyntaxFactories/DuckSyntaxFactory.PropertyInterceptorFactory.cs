@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
         {
             foreach (IPropertyInfo ifaceProperty in InterfaceType.Properties)
             {
@@ -36,7 +36,10 @@ namespace Solti.Utils.Proxy.Internals
                     checkSet: ifaceProperty.SetMethod is not null
                 );
 
-                yield return ResolveProperty(ifaceProperty, targetProperty);
+                foreach (MemberDeclarationSyntax member in ResolveProperty(ifaceProperty, targetProperty))
+                {
+                    yield return member;
+                }
             }
 
             [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
@@ -78,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo targetProperty)
+        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo targetProperty)
         {
             IPropertyInfo ifaceProperty = (IPropertyInfo) context;
 
@@ -118,7 +121,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-            return ifaceProperty.Indices.Some()
+            yield return ifaceProperty.Indices.Some()
                 ? ResolveIndexer
                 (
                     property: ifaceProperty,

@@ -173,11 +173,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<BasePropertyDeclarationSyntax> ResolveProperties(object context);
+        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context);
 
         #if DEBUG
         internal
         #endif
-        protected abstract BasePropertyDeclarationSyntax ResolveProperty(object context, IPropertyInfo property);
+        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property);
     }
 }
