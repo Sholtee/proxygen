@@ -187,15 +187,6 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The provided delegate must refer a static method..
-        /// </summary>
-        internal static string NOT_STATIC {
-            get {
-                return ResourceManager.GetString("NOT_STATIC", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The target is NULL..
         /// </summary>
         internal static string NULL_TARGET {

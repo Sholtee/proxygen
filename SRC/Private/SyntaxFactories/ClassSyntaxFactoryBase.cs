@@ -21,8 +21,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation) => 
-            ClassDeclaration
+        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation)
+        {
+            ClassDeclarationSyntax cls = ClassDeclaration
             (
                 identifier: ResolveClassName(context)
             )
@@ -50,28 +51,28 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 )
-            )
-            .WithMembers
-            (
-                List
-                (
-                    ResolveMembers(context, cancellation)
-                )
             );
+
+            return ResolveMembers(cls, context, cancellation);
+        }
 
         #if DEBUG
         internal
         #endif
-        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveMembers(object context, CancellationToken cancellation)
+        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation)
         {
-            foreach (Func<object, IEnumerable<MemberDeclarationSyntax>> factory in new Func<object, IEnumerable<MemberDeclarationSyntax>>[] { ResolveConstructors, ResolveMethods, ResolveProperties, ResolveEvents })
+            foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> factory in new Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>[]
+            { 
+                ResolveConstructors,
+                ResolveMethods,
+                ResolveProperties,
+                ResolveEvents
+            })
             {
-                foreach (MemberDeclarationSyntax member in factory(context))
-                {
-                    cancellation.ThrowIfCancellationRequested();
-                    yield return member;
-                }
+                cancellation.ThrowIfCancellationRequested();
+                cls = factory(cls, context);
             }
+            return cls;
         }
 
         #if DEBUG

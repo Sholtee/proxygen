@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -18,174 +17,106 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
+        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
             foreach (IPropertyInfo prop in InterfaceType.Properties)
             {
                 if (AlreadyImplemented(prop))
                     continue;
 
-                foreach (MemberDeclarationSyntax member in ResolveProperty(null!, prop))
-                {
-                    yield return member;
-                }
+                cls = ResolveProperty(cls, context, prop);
             }
+
+            return cls;
         }
 
         /// <summary>
-        /// TResult IInterface.Prop                                                                                   <br/>
-        /// {                                                                                                         <br/>
-        ///     get                                                                                                   <br/>
-        ///     {                                                                                                     <br/>
-        ///         static object InvokeTarget(ITarget target, object[] args)                                         <br/>
-        ///         {                                                                                                 <br/>
-        ///             return target.Prop;                                                                           <br/>
-        ///         }                                                                                                 <br/>
-        ///         object[] args = new object[] { };                                                                 <br/>
-        ///         return (TResult) Invoke(new InvocationContext(args, InvokeTarget));                               <br/>
-        ///     }                                                                                                     <br/>
-        ///     set                                                                                                   <br/>
-        ///     {                                                                                                     <br/>
-        ///         static object InvokeTarget(ITarget target, object[] args)                                         <br/>
-        ///         {                                                                                                 <br/>
-        ///           TValue _value = (TValue) args[0];                                                               <br/> 
-        ///           target.Prop = _value;                                                                           <br/>
-        ///           return null;                                                                                    <br/>
-        ///         }                                                                                                 <br/>
-        ///         object[] args = new object[] { value };                                                           <br/>
-        ///         Invoke(new InvocationContext(args, InvokeTarget, MemberTypes.Property));                          <br/>
-        ///     }                                                                                                     <br/>
+        /// private static readonly MethodContext FxXx = new MethodContext((ITarget target, object[] args) =>   <br/>
+        /// {                                                                                                   <br/>
+        ///     return target.Prop;                                                                             <br/>
+        /// });                                                                                                 <br/>
+        /// private static readonly MethodContext FyYy = new MethodContext((ITarget target, object[] args) =>   <br/>
+        /// {                                                                                                   <br/>
+        ///     TValue _value = (TValue) args[0];                                                               <br/> 
+        ///     target.Prop = _value;                                                                           <br/>
+        ///     return null;                                                                                    <br/>
+        /// });                                                                                                 <br/>
+        /// TResult IInterface.Prop                                                                             <br/>
+        /// {                                                                                                   <br/>
+        ///     get                                                                                             <br/>
+        ///     {                                                                                               <br/>
+        ///         object[] args = new object[] { };                                                           <br/>
+        ///         return (TResult) Invoke(new InvocationContext(args, FxXx));                                 <br/>
+        ///     }                                                                                               <br/>
+        ///     set                                                                                             <br/>
+        ///     {                                                                                               <br/>
+        ///         object[] args = new object[] { value };                                                     <br/>
+        ///         Invoke(new InvocationContext(args, FyYy));                                                  <br/>
+        ///     }                                                                                               <br/>
         /// }
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property)
+        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property)
         {
-            yield return BuildProperty
-            (
-                property.Indices.Some() ? ResolveIndexer : ResolveProperty
-            );
+            List<MemberDeclarationSyntax> members = new();
 
-            IEnumerable<StatementSyntax> BuildGet()
+            BlockSyntax?
+                get = null,
+                set = null;
+
+            if (property.GetMethod is not null)
             {
-                if (property.GetMethod is null)
-                    yield break;
-
-                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget
+                FieldDeclarationSyntax getCtx = ResolveMethodContext
                 (
-                    property.GetMethod,
-                    (target, args, locals, body) => body.Add
+                    ResolveInvokeTarget
                     (
-                        ReturnResult
+                        property.GetMethod,
+                        (target, args, locals, body) => body.Add
                         (
-                            null,
-                            CastExpression
+                            ReturnResult
                             (
-                                ResolveType<object>(),
-                                PropertyAccess
+                                null,
+                                CastExpression
                                 (
-                                    property,
-                                    IdentifierName(target.Identifier),
-                                    castTargetTo: property.DeclaringType, 
-                                    locals.Convert(ToArgument)
-                                )
-                            )
-                        )
-
-                    )
-                );
-                yield return invokeTarget;
-
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.GetMethod);
-                yield return argsArray;
-
-                yield return ReturnResult
-                (
-                    property.Type,
-                    InvokeMethod
-                    (
-                        Invoke,
-                        target: null,
-                        castTargetTo: null,
-                        Argument
-                        (
-                            ResolveObject<InvocationContext>
-                            (
-                                ToArgument(argsArray),
-                                Argument
-                                (
-                                    IdentifierName
-                                    (
-                                        invokeTarget.Identifier
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
-            }
-
-            IEnumerable<StatementSyntax> BuildSet()
-            {
-                if (property.SetMethod is null)
-                    yield break;
-
-                LocalFunctionStatementSyntax invokeTarget = ResolveInvokeTarget
-                (
-                    property.SetMethod,
-                    (target, args, locals, body) =>
-                    {
-                        body.Add
-                        (
-                            ExpressionStatement
-                            (
-                                expression: AssignmentExpression
-                                (
-                                    kind: SyntaxKind.SimpleAssignmentExpression,
-                                    left: PropertyAccess
+                                    ResolveType<object>(),
+                                    PropertyAccess
                                     (
                                         property,
                                         IdentifierName(target.Identifier),
                                         castTargetTo: property.DeclaringType,
-                                        locals.Convert
-                                        (
-                                            (local, _) => ToArgument(local),
-                                            (_, i) => i == locals.Count - 1
-                                        )
-                                    ),
-                                    right: ToIdentifierName(locals[locals.Count - 1])
+                                        indices: locals.Convert(ToArgument)
+                                    )
                                 )
                             )
-                        );
-                        body.Add
-                        (
-                            ReturnNull()
-                        );
-                    }
+
+                        )
+                    )
                 );
-                yield return invokeTarget;
+                members.Add(getCtx);
 
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.SetMethod);
-                yield return argsArray;
+                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.GetMethod);
 
-                yield return ExpressionStatement
+                get = Block
                 (
-                    InvokeMethod
+                    argsArray,
+                    ReturnResult
                     (
-                        Invoke,
-                        target: null,
-                        castTargetTo: null,
-                        Argument
+                        property.Type,
+                        InvokeMethod
                         (
-                            ResolveObject<InvocationContext>
+                            Invoke,
+                            target: null,
+                            castTargetTo: null,
+                            Argument
                             (
-                                ToArgument(argsArray),
-                                Argument
+                                ResolveObject<InvocationContext>
                                 (
-                                    IdentifierName
+                                    ToArgument(argsArray),
+                                    Argument
                                     (
-                                        invokeTarget.Identifier
+                                        StaticMemberAccess(cls, getCtx)
                                     )
                                 )
                             )
@@ -194,23 +125,84 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            //
-            // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-            // figyelmen kivul lesz hagyva.
-            //
+            if (property.SetMethod is not null)
+            {
+                FieldDeclarationSyntax setCtx = ResolveMethodContext
+                (
+                    ResolveInvokeTarget
+                    (
+                        property.SetMethod,
+                        (target, args, locals, body) =>
+                        {
+                            body.Add
+                            (
+                                ExpressionStatement
+                                (
+                                    expression: AssignmentExpression
+                                    (
+                                        kind: SyntaxKind.SimpleAssignmentExpression,
+                                        left: PropertyAccess
+                                        (
+                                            property,
+                                            IdentifierName(target.Identifier),
+                                            castTargetTo: property.DeclaringType,
+                                            indices: locals.Convert
+                                            (
+                                                (local, _) => ToArgument(local),
+                                                (_, i) => i == locals.Count - 1
+                                            )
+                                        ),
+                                        right: ToIdentifierName(locals[locals.Count - 1])
+                                    )
+                                )
+                            );
+                            body.Add
+                            (
+                                ReturnNull()
+                            );
+                        }
+                    )
+                );
+                members.Add(setCtx);
 
-            BasePropertyDeclarationSyntax BuildProperty(Func<IPropertyInfo, CSharpSyntaxNode?, CSharpSyntaxNode?, bool, BasePropertyDeclarationSyntax> fact) => fact
+                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.SetMethod);
+
+                set = Block
+                (
+                    argsArray,
+                    ExpressionStatement
+                    (
+                        InvokeMethod
+                        (
+                            Invoke,
+                            target: null,
+                            castTargetTo: null,
+                            Argument
+                            (
+                                ResolveObject<InvocationContext>
+                                (
+                                    ToArgument(argsArray),
+                                    Argument
+                                    (
+                                        StaticMemberAccess(cls, setCtx)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            }
+
+            members.Add
             (
-                property,
-                Block
-                (
-                    BuildGet()
-                ),
-                Block
-                (
-                    BuildSet()
-                ),
-                false
+                property.Indices.Some() 
+                    ? ResolveIndexer(property, get, set, false)
+                    : ResolveProperty(property, get, set, false)
+            );
+
+            return cls.WithMembers
+            (
+                cls.Members.AddRange(members)
             );
         }
     }

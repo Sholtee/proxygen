@@ -33,14 +33,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
-        {
+        protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context) => cls.AddMembers
+        (
             //
             // [ModuleInitializerAttribute]
             // public static void Initialize() => RegisterInstance(typeof(CurrentClass));
             //
 
-            yield return MethodDeclaration
+            MethodDeclaration
             (
                 ResolveType
                 (
@@ -95,10 +95,7 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         Token(SyntaxKind.GlobalKeyword)
                                     ),
-                                    IdentifierName
-                                    (
-                                        ResolveClassName(context)
-                                    )
+                                    IdentifierName(cls.Identifier)
                                 )
                             )
                         )
@@ -108,7 +105,7 @@ namespace Solti.Utils.Proxy.Internals
             .WithSemicolonToken
             (
                 Token(SyntaxKind.SemicolonToken)
-            );
-        }
+            )
+        );
     }
 }

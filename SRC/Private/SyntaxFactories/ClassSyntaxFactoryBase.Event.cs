@@ -86,11 +86,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context);
+        protected abstract ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context);
 
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt);
+        protected abstract ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt);
     }
 }

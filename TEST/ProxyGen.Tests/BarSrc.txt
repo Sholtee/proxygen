@@ -1,11 +1,5 @@
 void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar()
 {
-    static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
-    {
-        ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Bar();
-        return null;
-    }
-
     global::System.Object[] args = new global::System.Object[0];
-    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
+    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FBE6746071B49CF0F5B141E37FF16623F));
 }

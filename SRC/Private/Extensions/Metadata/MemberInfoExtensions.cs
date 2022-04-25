@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -53,8 +52,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public static ExtendedMemberInfo ExtractFrom(Delegate accessor) => Cache.GetOrAdd(accessor, static accessor =>
         {
-            Debug.Assert(accessor.Target is null);
-
             MethodInfo method = (MethodInfo) accessor
                 .Method
                 .GetInstructions()

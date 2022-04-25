@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -13,12 +14,12 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// private static readonly System.Object paramName [= ...];
+        /// [private|public] static readonly System.Object paramName [= ...];
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
+        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null, bool @private = true)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -45,14 +46,28 @@ namespace Solti.Utils.Proxy.Internals
             (
                 TokenList
                 (
-                    new[]
+                    new SyntaxToken[]
                     {
-                        Token(SyntaxKind.PrivateKeyword),
+                        Token(@private ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword),
                         Token(SyntaxKind.StaticKeyword),
                         Token(SyntaxKind.ReadOnlyKeyword)
                     }
                 )
             );
         }
+
+        /// <summary>
+        /// [private|public] static readonly System.Object paramName [= ...];
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null, bool @private = true) => ResolveStaticGlobal
+        (
+            MetadataTypeInfo.CreateFrom(typeof(T)),
+            name,
+            initializer,
+            @private
+        );
     }
 }

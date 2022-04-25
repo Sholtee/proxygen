@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type embedding is supported only in C# 8+ compilations..
+        ///   Looks up a localized string similar to Type embedding is supported only in C# 7+ compilations..
         /// </summary>
         internal static string LNG_NOT_SUPPORTED {
             get {

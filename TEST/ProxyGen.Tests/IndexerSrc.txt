@@ -2,27 +2,13 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
 {
     get
     {
-        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
-        {
-            global::System.Int32 _index = (global::System.Int32)args[0];
-            return (global::System.Object)((global::System.Collections.Generic.IList<global::System.Int32>)target)[_index];
-        }
-
         global::System.Object[] args = new global::System.Object[]{index};
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FBFF56FABEFCB6BD102F55C5BE5489C64));
     }
 
     set
     {
-        static global::System.Object InvokeTarget(global::System.Object target, global::System.Object[] args)
-        {
-            global::System.Int32 _index = (global::System.Int32)args[0];
-            global::System.Int32 _value = (global::System.Int32)args[1];
-            ((global::System.Collections.Generic.IList<global::System.Int32>)target)[_index] = _value;
-            return null;
-        }
-
         global::System.Object[] args = new global::System.Object[]{index, value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, InvokeTarget));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F4610197BDE6BFC09D39D5B2CE17A10EC));
     }
 }

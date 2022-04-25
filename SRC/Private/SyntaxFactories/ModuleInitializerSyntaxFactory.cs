@@ -105,53 +105,41 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructor(object context, IConstructorInfo ctor) => throw new NotImplementedException();
+        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveConstructors(object context)
-        {
-            yield break;
-        }
+        protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvent(object context, IEventInfo evt) => throw new NotImplementedException();
+        protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveEvents(object context)
-        {
-            yield break;
-        }
+        protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethod(object context, IMethodInfo method) => throw new NotImplementedException();
+        protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveMethods(object context)
-        {
-            yield break;
-        }
+        protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperties(object context)
-        {
-            yield break;
-        }
+        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<MemberDeclarationSyntax> ResolveProperty(object context, IPropertyInfo property) => throw new NotImplementedException();
+        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property) => cls;
     }
 }
