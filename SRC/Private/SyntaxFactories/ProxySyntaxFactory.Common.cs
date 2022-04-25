@@ -5,7 +5,9 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -264,5 +266,58 @@ namespace Solti.Utils.Proxy.Internals
                 Argument(lambda)
             )     
         );
+
+        /// <summary>
+        /// private static class WrapperXxX[T1, T2, ...]                                                         <br/>
+        /// {                                                                                                    <br/>
+        ///     public static readonly MethodContext Value = new MethodContext((object target, object[] args) => <br/>
+        ///     {                                                                                                <br/>
+        ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
+        ///         System.String cb_b;                                                                          <br/>
+        ///         T1 cb_c = (T1)args[2];                                                                       <br/>
+        ///         ...                                                                                          <br/>
+        ///     });                                                                                              <br/>
+        /// }
+        /// </summary>
+        #if DEBUG
+        internal
+        #else
+        private
+        #endif
+        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments) => 
+            ClassDeclaration
+            (
+                $"Wrapper{lambda.GetMD5HashCode()}"
+            )
+            .WithModifiers
+            (
+                TokenList
+                (
+                    new SyntaxToken[]
+                    {
+                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.StaticKeyword)
+                    }
+                )
+            )
+            .WithTypeParameterList
+            (
+                TypeParameterList
+                (
+                    genericArguments.ToSyntaxList(ga => TypeParameter(ga.Name))
+                )
+            )
+            .AddMembers
+            (
+                ResolveStaticGlobal<MethodContext>
+                (
+                    $"Value",
+                    ResolveObject<MethodContext>
+                    (
+                        Argument(lambda)
+                    ),
+                    @private: false
+                )
+            );
     }
 }

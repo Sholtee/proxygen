@@ -72,10 +72,16 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method)
         {
-            FieldDeclarationSyntax methodCtx = ResolveMethodContext
-            (
-                ResolveInvokeTarget(method)
-            );
+            MemberDeclarationSyntax methodCtx = method is IGenericMethodInfo genericMethod
+                ? ResolveMethodContext
+                (
+                    ResolveInvokeTarget(method),
+                    genericMethod.GenericArguments
+                )
+                : ResolveMethodContext
+                (
+                    ResolveInvokeTarget(method)
+                );
 
             return cls.AddMembers
             (
@@ -97,8 +103,17 @@ namespace Solti.Utils.Proxy.Internals
                 List<StatementSyntax> statements = new();
 
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
-
                 statements.Add(argsArray);
+
+                MemberAccessExpressionSyntax accessContext = StaticMemberAccess(cls, methodCtx);
+                if (method is IGenericMethodInfo) accessContext = SimpleMemberAccess
+                (
+                    accessContext,
+                    ToIdentifierName
+                    (
+                        (FieldDeclarationSyntax) ((ClassDeclarationSyntax) methodCtx).Members.Single()!
+                    )
+                );
 
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
@@ -110,10 +125,7 @@ namespace Solti.Utils.Proxy.Internals
                         ResolveObject<InvocationContext>
                         (
                             ToArgument(argsArray),
-                            Argument
-                            (
-                                StaticMemberAccess(cls, methodCtx)
-                            )
+                            Argument(accessContext)
                         )
                     )
                 );

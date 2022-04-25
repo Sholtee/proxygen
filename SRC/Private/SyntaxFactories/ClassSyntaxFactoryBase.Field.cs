@@ -14,12 +14,12 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// private static readonly System.Object paramName [= ...];
+        /// [private|public] static readonly System.Object paramName [= ...];
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null)
+        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null, bool @private = true)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     new SyntaxToken[]
                     {
-                        Token(SyntaxKind.PrivateKeyword),
+                        Token(@private ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword),
                         Token(SyntaxKind.StaticKeyword),
                         Token(SyntaxKind.ReadOnlyKeyword)
                     }
@@ -57,16 +57,17 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly System.Object paramName [= ...];
+        /// [private|public] static readonly System.Object paramName [= ...];
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null) => ResolveStaticGlobal
+        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null, bool @private = true) => ResolveStaticGlobal
         (
             MetadataTypeInfo.CreateFrom(typeof(T)),
             name,
-            initializer
+            initializer,
+            @private
         );
     }
 }

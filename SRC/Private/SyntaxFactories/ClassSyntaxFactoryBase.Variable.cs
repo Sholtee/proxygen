@@ -75,5 +75,19 @@ namespace Solti.Utils.Proxy.Internals
         (
             ToIdentifierName(field)
         );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static NameSyntax ToIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null //TODO: move to ClassSyntaxFactoryBase.Identifier.cs
+            ? IdentifierName(cls.Identifier)
+            : GenericName
+            (
+                cls.Identifier,
+                TypeArgumentList
+                (
+                    cls.TypeParameterList.Parameters.ToSyntaxList(ga => (TypeSyntax) IdentifierName(ga.Identifier))
+                )
+            );
     }
 }
