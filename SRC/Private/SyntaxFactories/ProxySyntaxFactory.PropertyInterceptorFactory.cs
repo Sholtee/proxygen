@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
                                         property,
                                         IdentifierName(target.Identifier),
                                         castTargetTo: property.DeclaringType,
-                                        indices: locals.Convert(ToArgument)
+                                        indices: locals.Convert(ResolveArgument)
                                     )
                                 )
                             )
@@ -113,7 +113,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ResolveObject<InvocationContext>
                                 (
-                                    ToArgument(argsArray),
+                                    ResolveArgument(argsArray),
                                     Argument
                                     (
                                         StaticMemberAccess(cls, getCtx)
@@ -148,11 +148,11 @@ namespace Solti.Utils.Proxy.Internals
                                             castTargetTo: property.DeclaringType,
                                             indices: locals.Convert
                                             (
-                                                (local, _) => ToArgument(local),
+                                                (local, _) => ResolveArgument(local),
                                                 (_, i) => i == locals.Count - 1
                                             )
                                         ),
-                                        right: ToIdentifierName(locals[locals.Count - 1])
+                                        right: ResolveIdentifierName(locals[locals.Count - 1])
                                     )
                                 )
                             );
@@ -181,7 +181,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 ResolveObject<InvocationContext>
                                 (
-                                    ToArgument(argsArray),
+                                    ResolveArgument(argsArray),
                                     Argument
                                     (
                                         StaticMemberAccess(cls, setCtx)

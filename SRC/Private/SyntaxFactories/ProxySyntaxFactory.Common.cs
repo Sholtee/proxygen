@@ -134,7 +134,7 @@ namespace Solti.Utils.Proxy.Internals
         private
         #endif
         ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, LocalDeclarationStatementSyntax result) =>
-            ReturnResult(returnType, ToIdentifierName(result));
+            ReturnResult(returnType, ResolveIdentifierName(result));
 
         /// <summary>
         /// return null;

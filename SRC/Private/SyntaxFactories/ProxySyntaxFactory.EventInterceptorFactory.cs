@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
                                     evt,
                                     IdentifierName(target.Identifier),
                                     add,
-                                    ToIdentifierName
+                                    ResolveIdentifierName
                                     (
                                         locals.Single()!
                                     ),
@@ -147,7 +147,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             ResolveObject<InvocationContext>
                             (
-                                ToArgument(argsArray),
+                                ResolveArgument(argsArray),
                                 Argument
                                 (
                                     StaticMemberAccess(cls, fld)

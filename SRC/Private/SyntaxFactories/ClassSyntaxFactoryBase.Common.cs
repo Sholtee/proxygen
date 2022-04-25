@@ -114,5 +114,45 @@ namespace Solti.Utils.Proxy.Internals
             ResolveType<T>(),
             IdentifierName(val.ToString())
         );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static IdentifierNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single()!.Identifier);
+
+        #if DEBUG
+        internal
+        #endif
+        protected static ArgumentSyntax ResolveArgument(LocalDeclarationStatementSyntax variable) => Argument
+        (
+            ResolveIdentifierName(variable)
+        );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static IdentifierNameSyntax ResolveIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
+
+        #if DEBUG
+        internal
+        #endif
+        protected static ArgumentSyntax ResolveArgument(FieldDeclarationSyntax field) => Argument
+        (
+            ResolveIdentifierName(field)
+        );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static NameSyntax ResolveIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null
+            ? IdentifierName(cls.Identifier)
+            : GenericName
+            (
+                cls.Identifier,
+                TypeArgumentList
+                (
+                    cls.TypeParameterList.Parameters.ToSyntaxList(ga => (TypeSyntax) IdentifierName(ga.Identifier))
+                )
+            );
     }
 }

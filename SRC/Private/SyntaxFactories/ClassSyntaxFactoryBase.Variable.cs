@@ -49,45 +49,5 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected LocalDeclarationStatementSyntax ResolveLocal<T>(string name, ExpressionSyntax? initializer = null) => ResolveLocal(MetadataTypeInfo.CreateFrom(typeof(T)), name, initializer);
-
-        #if DEBUG
-        internal
-        #endif
-        protected static IdentifierNameSyntax ToIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single()!.Identifier);
-
-        #if DEBUG
-        internal
-        #endif
-        protected static ArgumentSyntax ToArgument(LocalDeclarationStatementSyntax variable) => Argument
-        (
-            ToIdentifierName(variable)
-        );
-
-        #if DEBUG
-        internal
-        #endif
-        protected static IdentifierNameSyntax ToIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
-
-        #if DEBUG
-        internal
-        #endif
-        protected static ArgumentSyntax ToArgument(FieldDeclarationSyntax field) => Argument
-        (
-            ToIdentifierName(field)
-        );
-
-        #if DEBUG
-        internal
-        #endif
-        protected static NameSyntax ToIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null //TODO: move to ClassSyntaxFactoryBase.Identifier.cs
-            ? IdentifierName(cls.Identifier)
-            : GenericName
-            (
-                cls.Identifier,
-                TypeArgumentList
-                (
-                    cls.TypeParameterList.Parameters.ToSyntaxList(ga => (TypeSyntax) IdentifierName(ga.Identifier))
-                )
-            );
     }
 }

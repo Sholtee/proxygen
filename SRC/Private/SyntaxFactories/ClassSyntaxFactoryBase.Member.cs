@@ -67,8 +67,8 @@ namespace Solti.Utils.Proxy.Internals
             ),
             member switch 
             {
-                FieldDeclarationSyntax fld => ToIdentifierName(fld),
-                ClassDeclarationSyntax cls => (SimpleNameSyntax) ToIdentifierName(cls),
+                FieldDeclarationSyntax fld => ResolveIdentifierName(fld),
+                ClassDeclarationSyntax cls => (SimpleNameSyntax) ResolveIdentifierName(cls),
                 _ => throw new NotSupportedException() // TODO: method, prop, etc
             }
         );

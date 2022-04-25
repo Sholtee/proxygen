@@ -109,7 +109,7 @@ namespace Solti.Utils.Proxy.Internals
                 if (method is IGenericMethodInfo) accessContext = SimpleMemberAccess
                 (
                     accessContext,
-                    ToIdentifierName
+                    ResolveIdentifierName
                     (
                         (FieldDeclarationSyntax) ((ClassDeclarationSyntax) methodCtx).Members.Single()!
                     )
@@ -124,7 +124,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         ResolveObject<InvocationContext>
                         (
-                            ToArgument(argsArray),
+                            ResolveArgument(argsArray),
                             Argument(accessContext)
                         )
                     )
@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
                             right: CastExpression
                             (
                                 type: ResolveType(param.Type),
-                                expression: ElementAccessExpression(ToIdentifierName(argsArray)).WithArgumentList
+                                expression: ElementAccessExpression(ResolveIdentifierName(argsArray)).WithArgumentList
                                 (
                                     argumentList: BracketedArgumentList
                                     (
@@ -266,7 +266,7 @@ namespace Solti.Utils.Proxy.Internals
                             right: CastExpression
                             (
                                 type: ResolveType<object>(),
-                                ToIdentifierName(locals[i])
+                                ResolveIdentifierName(locals[i])
                             )
                         )
                     );
@@ -301,7 +301,7 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target: IdentifierName(target.Identifier),
                 castTargetTo: method.DeclaringType,
-                arguments: locals.ConvertAr(ToArgument)
+                arguments: locals.ConvertAr(ResolveArgument)
             );
 
             IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method, args, locals);
