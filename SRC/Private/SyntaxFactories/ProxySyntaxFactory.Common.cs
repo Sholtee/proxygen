@@ -295,7 +295,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     new SyntaxToken[]
                     {
-                        Token(SyntaxKind.PublicKeyword),
+                        Token(SyntaxKind.PrivateKeyword),
                         Token(SyntaxKind.StaticKeyword)
                     }
                 )
