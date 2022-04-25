@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -15,7 +16,7 @@ namespace Solti.Utils.Proxy.Perf
     using Generators;
 
     [MemoryDiagnoser]
-    [SimpleJob(RunStrategy.Throughput, invocationCount: 1000000)]
+    [SimpleJob(RunStrategy.Throughput, invocationCount: 5000000)]
     public class GeneratedProxy
     {
         private const string Param = "";
@@ -46,6 +47,11 @@ namespace Solti.Utils.Proxy.Perf
             }
             public override object Invoke(InvocationContext context) => 0;
         }
+
+        public class DispatchProxyWithTarget : DispatchProxy // DispatchProxy cannot support target
+        {
+            protected override object Invoke(MethodInfo targetMethod, object[] args) => 0;
+        }
         #endregion
 
         [GlobalSetup(Target = nameof(NoProxy))]
@@ -57,13 +63,19 @@ namespace Solti.Utils.Proxy.Perf
         [GlobalSetup(Target = nameof(ProxyWithoutTarget))]
         public async Task SetupProxyWithoutTarget() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithoutTarget>(null);
 
+        [GlobalSetup(Target = nameof(DispatchProxyWithoutTarget))]
+        public void SetupDispatchProxyWithoutTarget() => FInstance = DispatchProxy.Create<IInterface, DispatchProxyWithTarget>();
+
         [Benchmark(Baseline = true)]
-        public void NoProxy() => FInstance.DoSomething(Param);
+        public int NoProxy() => FInstance.DoSomething(Param);
 
         [Benchmark]
-        public void ProxyWithTarget() => FInstance.DoSomething(Param);
+        public int ProxyWithTarget() => FInstance.DoSomething(Param);
 
         [Benchmark]
-        public void ProxyWithoutTarget() => FInstance.DoSomething(Param);
+        public int ProxyWithoutTarget() => FInstance.DoSomething(Param);
+
+        [Benchmark]
+        public int DispatchProxyWithoutTarget() => FInstance.DoSomething(Param);
     }
 }

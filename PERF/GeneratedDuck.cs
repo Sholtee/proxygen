@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Perf
     using Generators;
 
     [MemoryDiagnoser]
-    [SimpleJob(RunStrategy.Throughput, invocationCount: 1000000)]
+    [SimpleJob(RunStrategy.Throughput, invocationCount: 5000000)]
     public class GeneratedDuck
     {
         private const string Param = "";
