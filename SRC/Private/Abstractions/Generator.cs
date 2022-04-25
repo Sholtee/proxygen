@@ -41,7 +41,8 @@ namespace Solti.Utils.Proxy.Internals
                 // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
                 //
 
-                () => self.Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default)
+                static self => ((Generator) self).Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default),
+                self
             )
         );
 
