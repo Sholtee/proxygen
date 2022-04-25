@@ -519,15 +519,15 @@ references:
   commentId: T:Solti.Utils.Proxy.InvocationContext
   fullName: Solti.Utils.Proxy.InvocationContext
   nameWithType: InvocationContext
-- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object})
-  name: InvocationContext(Object[], Func<Object, Object[], Object>)
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object_System_Object___System_Object__
-  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object})
-  name.vb: InvocationContext(Object(), Func(Of Object, Object(), Object))
-  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], System.Func<System.Object, System.Object[], System.Object>)
-  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), System.Func(Of System.Object, System.Object(), System.Object))
-  nameWithType: InvocationContext.InvocationContext(Object[], Func<Object, Object[], Object>)
-  nameWithType.vb: InvocationContext.InvocationContext(Object(), Func(Of Object, Object(), Object))
+- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],Solti.Utils.Proxy.MethodContext)
+  name: InvocationContext(Object[], MethodContext)
+  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___Solti_Utils_Proxy_MethodContext_
+  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],Solti.Utils.Proxy.MethodContext)
+  name.vb: InvocationContext(Object(), MethodContext)
+  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], Solti.Utils.Proxy.MethodContext)
+  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), Solti.Utils.Proxy.MethodContext)
+  nameWithType: InvocationContext.InvocationContext(Object[], MethodContext)
+  nameWithType.vb: InvocationContext.InvocationContext(Object(), MethodContext)
 - uid: Solti.Utils.Proxy.InvocationContext.#ctor*
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_
@@ -548,45 +548,6 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.InvocationContext.Args
   nameWithType: InvocationContext.Args
-- uid: Solti.Utils.Proxy.InvocationContext.Dispatch
-  name: Dispatch
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Dispatch
-  commentId: P:Solti.Utils.Proxy.InvocationContext.Dispatch
-  fullName: Solti.Utils.Proxy.InvocationContext.Dispatch
-  nameWithType: InvocationContext.Dispatch
-- uid: Solti.Utils.Proxy.InvocationContext.Dispatch*
-  name: Dispatch
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Dispatch_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.Dispatch
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.InvocationContext.Dispatch
-  nameWithType: InvocationContext.Dispatch
-- uid: Solti.Utils.Proxy.InvocationContext.Member
-  name: Member
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Member
-  commentId: P:Solti.Utils.Proxy.InvocationContext.Member
-  fullName: Solti.Utils.Proxy.InvocationContext.Member
-  nameWithType: InvocationContext.Member
-- uid: Solti.Utils.Proxy.InvocationContext.Member*
-  name: Member
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Member_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.Member
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.InvocationContext.Member
-  nameWithType: InvocationContext.Member
-- uid: Solti.Utils.Proxy.InvocationContext.Method
-  name: Method
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Method
-  commentId: P:Solti.Utils.Proxy.InvocationContext.Method
-  fullName: Solti.Utils.Proxy.InvocationContext.Method
-  nameWithType: InvocationContext.Method
-- uid: Solti.Utils.Proxy.InvocationContext.Method*
-  name: Method
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Method_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.Method
-  isSpec: "True"
-  fullName: Solti.Utils.Proxy.InvocationContext.Method
-  nameWithType: InvocationContext.Method
 - uid: Solti.Utils.Proxy.IProxyAccess`1
   name: IProxyAccess<TInterface>
   href: Solti.Utils.Proxy.IProxyAccess-1.html
@@ -613,3 +574,70 @@ references:
   fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface).Proxy
   nameWithType: IProxyAccess<TInterface>.Proxy
   nameWithType.vb: IProxyAccess(Of TInterface).Proxy
+- uid: Solti.Utils.Proxy.MethodContext
+  name: MethodContext
+  href: Solti.Utils.Proxy.MethodContext.html
+  commentId: T:Solti.Utils.Proxy.MethodContext
+  fullName: Solti.Utils.Proxy.MethodContext
+  nameWithType: MethodContext
+- uid: Solti.Utils.Proxy.MethodContext.#ctor(Solti.Utils.Proxy.MethodContext)
+  name: MethodContext(MethodContext)
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_Solti_Utils_Proxy_MethodContext_
+  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(Solti.Utils.Proxy.MethodContext)
+  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(Solti.Utils.Proxy.MethodContext)
+  nameWithType: MethodContext.MethodContext(MethodContext)
+- uid: Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object})
+  name: MethodContext(Func<Object, Object[], Object>)
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__
+  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object})
+  name.vb: MethodContext(Func(Of Object, Object(), Object))
+  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<System.Object, System.Object[], System.Object>)
+  fullName.vb: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func(Of System.Object, System.Object(), System.Object))
+  nameWithType: MethodContext.MethodContext(Func<Object, Object[], Object>)
+  nameWithType.vb: MethodContext.MethodContext(Func(Of Object, Object(), Object))
+- uid: Solti.Utils.Proxy.MethodContext.#ctor*
+  name: MethodContext
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_
+  commentId: Overload:Solti.Utils.Proxy.MethodContext.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.MethodContext.MethodContext
+  nameWithType: MethodContext.MethodContext
+- uid: Solti.Utils.Proxy.MethodContext.Dispatch
+  name: Dispatch
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Dispatch
+  commentId: P:Solti.Utils.Proxy.MethodContext.Dispatch
+  fullName: Solti.Utils.Proxy.MethodContext.Dispatch
+  nameWithType: MethodContext.Dispatch
+- uid: Solti.Utils.Proxy.MethodContext.Dispatch*
+  name: Dispatch
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Dispatch_
+  commentId: Overload:Solti.Utils.Proxy.MethodContext.Dispatch
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.MethodContext.Dispatch
+  nameWithType: MethodContext.Dispatch
+- uid: Solti.Utils.Proxy.MethodContext.Member
+  name: Member
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Member
+  commentId: P:Solti.Utils.Proxy.MethodContext.Member
+  fullName: Solti.Utils.Proxy.MethodContext.Member
+  nameWithType: MethodContext.Member
+- uid: Solti.Utils.Proxy.MethodContext.Member*
+  name: Member
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Member_
+  commentId: Overload:Solti.Utils.Proxy.MethodContext.Member
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.MethodContext.Member
+  nameWithType: MethodContext.Member
+- uid: Solti.Utils.Proxy.MethodContext.Method
+  name: Method
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Method
+  commentId: P:Solti.Utils.Proxy.MethodContext.Method
+  fullName: Solti.Utils.Proxy.MethodContext.Method
+  nameWithType: MethodContext.Method
+- uid: Solti.Utils.Proxy.MethodContext.Method*
+  name: Method
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Method_
+  commentId: Overload:Solti.Utils.Proxy.MethodContext.Method
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.MethodContext.Method
+  nameWithType: MethodContext.Method

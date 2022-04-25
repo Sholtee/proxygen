@@ -42,16 +42,26 @@
   
   <h1 id="Solti_Utils_Proxy_InvocationContext" data-uid="Solti.Utils.Proxy.InvocationContext" class="text-break">Class InvocationContext
   </h1>
-  <div class="markdown level0 summary"><p>Describes the method invocation context.</p>
+  <div class="markdown level0 summary"><p>Describes a method invocation context.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">InvocationContext</span></div>
+    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.MethodContext.html">MethodContext</a></div>
+    <div class="level2"><span class="xref">InvocationContext</span></div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Method">MethodContext.Method</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Member">MethodContext.Member</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Dispatch">MethodContext.Dispatch</a>
+    </div>
     <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
     </div>
@@ -78,18 +88,18 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_InvocationContext_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class InvocationContext</code></pre>
+    <pre><code class="lang-csharp hljs">public class InvocationContext : MethodContext</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
   <a id="Solti_Utils_Proxy_InvocationContext__ctor_" data-uid="Solti.Utils.Proxy.InvocationContext.#ctor*"></a>
-  <h4 id="Solti_Utils_Proxy_InvocationContext__ctor_System_Object___System_Func_System_Object_System_Object___System_Object__" data-uid="Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],System.Func{System.Object,System.Object[],System.Object})">InvocationContext(Object[], Func&lt;Object, Object[], Object&gt;)</h4>
+  <h4 id="Solti_Utils_Proxy_InvocationContext__ctor_System_Object___Solti_Utils_Proxy_MethodContext_" data-uid="Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],Solti.Utils.Proxy.MethodContext)">InvocationContext(Object[], MethodContext)</h4>
   <div class="markdown level1 summary"><p>Creates a new <a class="xref" href="Solti.Utils.Proxy.InvocationContext.html">InvocationContext</a> instance.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public InvocationContext(object[] args, Func&lt;object, object[], object&gt; dispatch)</code></pre>
+    <pre><code class="lang-csharp hljs">public InvocationContext(object[] args, MethodContext methodContext)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -107,8 +117,8 @@
         <td></td>
       </tr>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>[], <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>&gt;</td>
-        <td><span class="parametername">dispatch</span></td>
+        <td><a class="xref" href="Solti.Utils.Proxy.MethodContext.html">MethodContext</a></td>
+        <td><span class="parametername">methodContext</span></td>
         <td></td>
       </tr>
     </tbody>
@@ -142,78 +152,6 @@
   <h5 id="Solti_Utils_Proxy_InvocationContext_Args_remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Before the <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1_Target">Target</a> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the &quot;by ref&quot; parameters set by the target method.</p>
 </div>
-  <a id="Solti_Utils_Proxy_InvocationContext_Dispatch_" data-uid="Solti.Utils.Proxy.InvocationContext.Dispatch*"></a>
-  <h4 id="Solti_Utils_Proxy_InvocationContext_Dispatch" data-uid="Solti.Utils.Proxy.InvocationContext.Dispatch">Dispatch</h4>
-  <div class="markdown level1 summary"><p>Gets the dispatcher function.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Func&lt;object, object[], object&gt; Dispatch { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.func-3">Func</a>&lt;<a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>, <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>[], <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a>&gt;</td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Solti_Utils_Proxy_InvocationContext_Member_" data-uid="Solti.Utils.Proxy.InvocationContext.Member*"></a>
-  <h4 id="Solti_Utils_Proxy_InvocationContext_Member" data-uid="Solti.Utils.Proxy.InvocationContext.Member">Member</h4>
-  <div class="markdown level1 summary"><p>The concrete member that is being invoked (e.g.: property or event)</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MemberInfo Member { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.memberinfo">MemberInfo</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Solti_Utils_Proxy_InvocationContext_Method_" data-uid="Solti.Utils.Proxy.InvocationContext.Method*"></a>
-  <h4 id="Solti_Utils_Proxy_InvocationContext_Method" data-uid="Solti.Utils.Proxy.InvocationContext.Method">Method</h4>
-  <div class="markdown level1 summary"><p>The interface method being invoked.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MethodInfo Method { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
 </article>
           </div>
           
