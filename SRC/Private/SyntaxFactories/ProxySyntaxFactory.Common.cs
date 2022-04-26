@@ -304,7 +304,11 @@ namespace Solti.Utils.Proxy.Internals
             (
                 TypeParameterList
                 (
-                    genericArguments.ToSyntaxList(ga => TypeParameter(ga.Name))
+                    genericArguments.ToSyntaxList(ga =>
+                    {
+                        Debug.Assert(ga.IsGenericParameter, "Argument must be a generic parameter");
+                        return TypeParameter(ga.Name);
+                    })
                 )
             )
             .AddMembers
