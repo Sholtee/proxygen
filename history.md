@@ -118,3 +118,6 @@
 - 7.0.0-preview1:
   - *breaking:* Dropped `InvocationContext.InvokeTarget` property
   - *done:* Significantly imporved performance
+- 7.0.0-preview2:
+  - *done:* More performant generated code
+  - *introduced:* `MethodContext` class
