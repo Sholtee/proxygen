@@ -56,7 +56,7 @@ public class MyClass : IMyInterface, IProxyAccess<IMyInterface>
 
 For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/ProxyGenerator.cs ) or [that](https://github.com/Sholtee/injector#decorating-services ).
 ### To create ducks:
-1. Declare an interface that covers the desired members of the target class:
+1. Declare an interface that covers all the desired members of the target class:
   ```csharp
   public class TargetClass // does not implement IDuck
   {
