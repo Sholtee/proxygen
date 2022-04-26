@@ -4,10 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+using static System.Diagnostics.Debug;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -52,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
             if (am is AccessModifiers.Private)
                 throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
 
-            Debug.Assert(am is AccessModifiers.Public, $"Unknown AccessModifier: {am}");
+            Assert(am is AccessModifiers.Public, $"Unknown AccessModifier: {am}");
         }
 
         public static void Check(IPropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
@@ -60,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkGet) 
             {
                 IMethodInfo? get = property.GetMethod;
-                Debug.Assert(get is not null, "property.GetMethod == NULL");
+                Assert(get is not null, "property.GetMethod == NULL");
 
                 Check(get!, assemblyName, allowProtected);
             }
@@ -68,7 +66,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkSet)
             {
                 IMethodInfo? set = property.SetMethod;
-                Debug.Assert(set is not null, "property.SetMethod == NULL");
+                Assert(set is not null, "property.SetMethod == NULL");
 
                 Check(set!, assemblyName, allowProtected);
             }
@@ -79,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkAdd)
             {
                 IMethodInfo? add = @event.AddMethod;
-                Debug.Assert(add is not null, "event.AddMethod == NULL");
+                Assert(add is not null, "event.AddMethod == NULL");
 
                 Check(add!, assemblyName, allowProtected);
             }
@@ -87,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
             if (checkRemove)
             {
                 IMethodInfo? remove = @event.RemoveMethod;
-                Debug.Assert(remove is not null, "event.RemoveMethod == NULL");
+                Assert(remove is not null, "event.RemoveMethod == NULL");
 
                 Check(remove!, assemblyName, allowProtected);
             }
@@ -95,8 +93,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Check(ITypeInfo type, string assemblyName)
         {
-            if (type.DeclaringAssembly is null)
-                throw new NotSupportedException();
+            if (type.IsGenericParameter)
+                return;
 
             //
             // Tomb es mutato tipusnal az elem tipusat kell vizsgaljuk
@@ -108,39 +106,35 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            ReferenceCollector collector = new();
-            collector.AddType(type);
-
             //
-            // Korbedolgozas arra az esetre ha a "type" GeneratorExecutionContext-bol jon es nem
-            // teljes ujraforditas van
+            // Generikusnal a generikus parametereket
             //
 
-            if (collector.References.Some(@ref => @ref.Location is null))
-                return;
-
-            //
-            // Mivel az "internal" es "protected" kulcsszavak nem leteznek IL szinten ezert reflexioval
-            // nem tudnank megallapitani h a tipus lathato e a kodunk szamara szoval a forditotol kerjuk
-            // el.
-            //
-
-            CSharpCompilation comp = CSharpCompilation.Create
-            (
-                null,
-                references: collector
-                    .References
-                    .Convert(@ref => MetadataReference.CreateFromFile(@ref.Location!))
-            );
-
-            switch (type.ToSymbol(comp).DeclaredAccessibility) 
+            if (type is IGenericTypeInfo genericType)
             {
-                case Accessibility.Private:
+                foreach (ITypeInfo ga in genericType.GenericArguments)
+                {
+                    Check(ga, assemblyName);
+                }
+
+                if (!genericType.IsGenericDefinition)
+                    Check(genericType.GenericDefinition, assemblyName);
+
+                return;
+            }
+
+            if (type.DeclaringAssembly is null)
+                throw new NotSupportedException();
+
+            switch (type.AccessModifiers) 
+            {
+                case AccessModifiers.Private:
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
-                case Accessibility.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
+                case AccessModifiers.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
-                case Accessibility.NotApplicable:
-                    throw new InvalidOperationException();
+                default:
+                    Assert(type.AccessModifiers is not AccessModifiers.Unknown, "Unknown access modifier");
+                    break;
             }
         }
     }
