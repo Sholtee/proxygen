@@ -344,6 +344,19 @@ references:
   commentId: T:Solti.Utils.Proxy.Internals.Generator
   fullName: Solti.Utils.Proxy.Internals.Generator
   nameWithType: Generator
+- uid: Solti.Utils.Proxy.Internals.Generator.#ctor(System.Int32)
+  name: Generator(Int32)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor_System_Int32_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.#ctor(System.Int32)
+  fullName: Solti.Utils.Proxy.Internals.Generator.Generator(System.Int32)
+  nameWithType: Generator.Generator(Int32)
+- uid: Solti.Utils.Proxy.Internals.Generator.#ctor*
+  name: Generator
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.#ctor
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.Generator
+  nameWithType: Generator.Generator
 - uid: Solti.Utils.Proxy.Internals.Generator.Activate(System.Object)
   name: Activate(Object)
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_System_Object_
@@ -370,6 +383,19 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.Generator.ActivateAsync
   nameWithType: Generator.ActivateAsync
+- uid: Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
+  name: Equals(Object)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_System_Object_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
+  fullName: Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
+  nameWithType: Generator.Equals(Object)
+- uid: Solti.Utils.Proxy.Internals.Generator.Equals*
+  name: Equals
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.Equals
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.Equals
+  nameWithType: Generator.Equals
 - uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   name: GetGeneratedType()
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType
@@ -383,12 +409,15 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   nameWithType: Generator.GetGeneratedType
-- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  name: GetGeneratedTypeAsync(CancellationToken)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  nameWithType: Generator.GetGeneratedTypeAsync(CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken@)
+  name: GetGeneratedTypeAsync(in CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken__
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken@)
+  name.vb: GetGeneratedTypeAsync(ByRef CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(in System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(ByRef System.Threading.CancellationToken)
+  nameWithType: Generator.GetGeneratedTypeAsync(in CancellationToken)
+  nameWithType.vb: Generator.GetGeneratedTypeAsync(ByRef CancellationToken)
 - uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync*
   name: GetGeneratedTypeAsync
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_
@@ -396,6 +425,19 @@ references:
   isSpec: "True"
   fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync
   nameWithType: Generator.GetGeneratedTypeAsync
+- uid: Solti.Utils.Proxy.Internals.Generator.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetHashCode
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetHashCode()
+  nameWithType: Generator.GetHashCode()
+- uid: Solti.Utils.Proxy.Internals.Generator.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetHashCode
+  isSpec: "True"
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetHashCode
+  nameWithType: Generator.GetHashCode
 - uid: Solti.Utils.Proxy.Internals.Generator`2
   name: Generator<TInterface, TDescendant>
   href: Solti.Utils.Proxy.Internals.Generator-2.html
