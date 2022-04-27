@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
         // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static ExtendedMemberInfo ExtractFrom(Delegate accessor) => Cache.GetOrAdd(accessor, static accessor =>
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor)
         {
             MethodInfo method = (MethodInfo) accessor
                 .Method
@@ -73,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
 
                     (MemberInfo) method
             );
-        });
+        }
 
         //
         // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van

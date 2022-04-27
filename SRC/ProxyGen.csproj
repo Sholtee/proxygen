@@ -28,6 +28,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Mono.Reflection" Version="2.*" />
+    <PackageReference Include="Solti.Utils.Primitives" Version="7.0.0-preview*" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.*" />
     <PackageReference Include="System.Runtime.Loader" Version="4.*" />
   </ItemGroup>

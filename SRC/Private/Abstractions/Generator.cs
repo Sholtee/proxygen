@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Primitives;
+
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
