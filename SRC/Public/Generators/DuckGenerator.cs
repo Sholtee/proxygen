@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating a proxy that wraps the <see cref="Target"/> to implement the <see cref="Interface"/>.
     /// </summary>
-    public sealed record DuckGenerator: Generator
+    public sealed class DuckGenerator: Generator
     {
         /// <summary>
         /// The target implementing all the <see cref="Interface"/> members.
@@ -27,14 +27,17 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="DuckGenerator"/> instance.
         /// </summary>
-        public DuckGenerator(Type iface, Type target)
+        public DuckGenerator(Type iface, Type target): base
+        (
+            (target ?? throw new ArgumentNullException(nameof(target))).GetHashCode() ^ (iface ?? throw new ArgumentNullException(nameof(iface))).GetHashCode()
+        )
         {
             //
             // Nem kell itt tulzasba vinni a validalast, generalaskor ugy is elhasal majd a rendszer ha vmi gond van
             //
 
-            Target = target ?? throw new ArgumentNullException(nameof(target));
-            Interface = iface ?? throw new ArgumentNullException(nameof(iface));
+            Target = target;
+            Interface = iface;
         }
 
         private protected override ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector) => new DuckSyntaxFactory

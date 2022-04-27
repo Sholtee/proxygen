@@ -16,13 +16,15 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
-    public abstract record Generator: TypeEmitter
+    public abstract class Generator: TypeEmitter
     {
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
+
+        private readonly int FHashCode;
 
         //
         // Mivel a Task minden metodusa szal biztos (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety) ezert nem
@@ -32,7 +34,7 @@ namespace Solti.Utils.Proxy.Internals
         internal Task<Type> GetGeneratedTypeAsyncInternal() => Cache.GetOrAdd
         (
             //
-            // Ha ket generatornak azonos a hash-e (ezert hasznalunk record tipust) akkor ugyanazt a tipust is generaljak.
+            // Ha ket generatornak azonos a hash-e akkor ugyanazt a tipust is generaljak.
             //
 
             this,
@@ -48,36 +50,26 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        #if NETSTANDARD2_1_OR_GREATER
-        private static object ActivateInternal(Type t, ITuple? tuple) => 
-        #else
-        internal static object ActivateInternal(Type t, object? tuple) =>
-        #endif
-            Cache
-                .GetOrAdd(t, static t => ProxyActivator.Create(t))
-                .Invoke(tuple);
+        internal Task<ProxyActivator.ActivatorDelegate> GetActivatorAsyncInternal() => Cache.GetOrAdd
+        (
+            this,
+            async static self => ProxyActivator.Create
+            (
+                await self.GetGeneratedTypeAsyncInternal()
+            ) 
+        );
+
+        /// <summary>
+        /// Creates a new <see cref="Generator"/> instance.
+        /// </summary>
+        protected Generator(int hashCode) => FHashCode = hashCode;
 
         #region Public
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
-        {
-            TaskCompletionSource<Type> tcs = new();
-
-            //
-            // Ha a megszakitas mar kerelmezve lett akkor a SetCanceled() azonnal meghivasra kerul
-            //
-
-            cancellation.Register(tcs.SetCanceled);
-
-            return Task.WhenAny
-            (
-                GetGeneratedTypeAsyncInternal(),
-                tcs.Task
-            ).Unwrap();
-        }
+        public Task<Type> GetGeneratedTypeAsync(in CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal().AsCancellable(cancellation);
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
@@ -98,7 +90,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default) =>
         #endif
-            ActivateInternal(await GetGeneratedTypeAsync(cancellation).ConfigureAwait(false), tuple);
+            (await GetActivatorAsyncInternal().AsCancellable(cancellation)).Invoke(tuple);
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -110,7 +102,16 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public object Activate(object? tuple) =>
         #endif
-            ActivateInternal(GetGeneratedType(), tuple);
+            GetActivatorAsyncInternal()
+            .GetAwaiter()
+            .GetResult()
+            .Invoke(tuple);
+
+        /// <inheritdoc/>
+        public sealed override int GetHashCode() => FHashCode;
+
+        /// <inheritdoc/>
+        public sealed override bool Equals(object obj) => ReferenceEquals(obj, this) || (obj?.GetType() == GetType() && ((Generator) obj).FHashCode == FHashCode);
         #endregion
     }
 }

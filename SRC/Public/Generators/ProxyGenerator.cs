@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating proxies that intercept interface method calls.
     /// </summary>
-    public sealed record ProxyGenerator : Generator
+    public sealed class ProxyGenerator : Generator
     {
         /// <summary>
         /// The interface for which the proxy will be created.
@@ -27,14 +27,17 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="ProxyGenerator"/> instance.
         /// </summary>
-        public ProxyGenerator(Type iface, Type interceptor)
+        public ProxyGenerator(Type iface, Type interceptor): base
+        (
+            (iface ?? throw new ArgumentNullException(nameof(iface))).GetHashCode() ^ (interceptor ?? throw new ArgumentNullException(nameof(interceptor))).GetHashCode()
+        )
         {
             //
             // Nem kell itt tulzasba vinni a validalast, generalaskor ugy is elhasal majd a rendszer ha vmi gond van
             //
 
-            Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
-            Interface = iface ?? throw new ArgumentNullException(nameof(iface));
+            Interceptor = interceptor;
+            Interface = iface;
         }
 
         private protected override ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector) => new ProxySyntaxFactory

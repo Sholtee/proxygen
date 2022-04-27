@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Compiles SyntaxFactory outputs to materialized <see cref="Type"/>s.
     /// </summary>
-    public abstract record TypeEmitter
+    public abstract class TypeEmitter
     {
         private static readonly ConcurrentDictionary<string, Type> FInstances = new();
 

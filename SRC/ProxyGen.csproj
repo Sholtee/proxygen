@@ -13,6 +13,7 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsRoslynComponent>true</IsRoslynComponent>
+	  <NoWarn>CA2007;</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
