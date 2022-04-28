@@ -46,9 +46,9 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     Expression.New
                     (
-                        typeof(MissingMemberException).GetConstructor(new[] { typeof(string), typeof(string) }) ?? throw new MissingMethodException(typeof(MissingMemberException).Name, "Ctor"),
+                        typeof(MissingMemberException).GetConstructor(new[] { typeof(string), typeof(string) }) ?? throw new MissingMethodException(typeof(MissingMemberException).Name, ConstructorInfo.ConstructorName),
                         Expression.Constant(proxyType.Name),
-                        Expression.Constant("Ctor")
+                        Expression.Constant(ConstructorInfo.ConstructorName)
                     )
                 )
             );
