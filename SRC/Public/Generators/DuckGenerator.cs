@@ -29,7 +29,11 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public DuckGenerator(Type iface, Type target): base
         (
-            (target ?? throw new ArgumentNullException(nameof(target))).GetHashCode() ^ (iface ?? throw new ArgumentNullException(nameof(iface))).GetHashCode()
+            new
+            {
+                Target = target ?? throw new ArgumentNullException(nameof(target)),
+                Interface = iface ?? throw new ArgumentNullException(nameof(iface))
+            }.GetHashCode()
         )
         {
             //

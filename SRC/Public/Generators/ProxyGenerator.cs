@@ -29,7 +29,11 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public ProxyGenerator(Type iface, Type interceptor): base
         (
-            (iface ?? throw new ArgumentNullException(nameof(iface))).GetHashCode() ^ (interceptor ?? throw new ArgumentNullException(nameof(interceptor))).GetHashCode()
+            new
+            {
+                Interface = iface ?? throw new ArgumentNullException(nameof(iface)),
+                Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor))
+            }.GetHashCode()
         )
         {
             //
