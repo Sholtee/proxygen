@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
         // "[<PropName_1>xXx, <PropName_2>xXx]": anonim oljektum property-k
         //
 
-        private static readonly Regex TypeNameReplacer = new Regex(@"\&|\*|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
+        private static readonly Regex TypeNameReplacer = new(@"\&|\*|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
 
         public static string GetFriendlyName(this Type src)
         {
