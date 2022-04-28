@@ -117,7 +117,9 @@
   - *fixed:* Performance issue of generated proxy
 - 7.0.0-preview1:
   - *breaking:* Dropped `InvocationContext.InvokeTarget` property
-  - *done:* Significantly imporved performance
+  - *improved:* Significantly imporved performance
 - 7.0.0-preview2:
-  - *done:* More performant generated code
+  - *improved:* More performant generated code
   - *introduced:* `MethodContext` class
+- 7.0.0-preview3:
+  - *improved:* Proxy activation performance
