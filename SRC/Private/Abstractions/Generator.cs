@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         // gond ha ugyanazon a peldanyon osztozunk.
         //
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal() => Cache.GetOrAdd
+        internal Task<Type> GetGeneratedTypeAsyncInternal() => CacheSlim.GetOrAdd
         (
             //
             // Ha ket generatornak azonos a hash-e akkor ugyanazt a tipust is generaljak.
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        internal Task<ProxyActivator.ActivatorDelegate> GetActivatorAsyncInternal() => Cache.GetOrAdd
+        internal Task<ProxyActivator.ActivatorDelegate> GetActivatorAsyncInternal() => CacheSlim.GetOrAdd
         (
             this,
             async static self => ProxyActivator.Create
