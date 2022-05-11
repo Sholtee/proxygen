@@ -123,3 +123,5 @@
   - *introduced:* `MethodContext` class
 - 7.0.0-preview3:
   - *improved:* Proxy activation performance
+- 7.0.0-preview4:
+  - *fixed:* Caching issue
