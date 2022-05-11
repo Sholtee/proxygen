@@ -16,15 +16,13 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
-    public abstract class Generator: TypeEmitter
+    public abstract record Generator: TypeEmitter
     {
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
-
-        private readonly int FHashCode;
 
         //
         // Mivel a Task minden metodusa szal biztos (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety) ezert nem
@@ -58,11 +56,6 @@ namespace Solti.Utils.Proxy.Internals
                 await self.GetGeneratedTypeAsyncInternal()
             ) 
         );
-
-        /// <summary>
-        /// Creates a new <see cref="Generator"/> instance.
-        /// </summary>
-        protected Generator(int hashCode) => FHashCode = hashCode;
 
         #region Public
         /// <summary>
@@ -106,12 +99,6 @@ namespace Solti.Utils.Proxy.Internals
             .GetAwaiter()
             .GetResult()
             .Invoke(tuple);
-
-        /// <inheritdoc/>
-        public sealed override int GetHashCode() => FHashCode;
-
-        /// <inheritdoc/>
-        public sealed override bool Equals(object obj) => ReferenceEquals(obj, this) || (obj?.GetType() == GetType() && ((Generator) obj).FHashCode == FHashCode);
         #endregion
     }
 }
