@@ -96,12 +96,20 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IMethodSymbol>
-        (
-            static m => m,
-            static m => m.GetOverriddenMethod(),
-            includeStatic
-        );
+        public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false, bool skipSpecial = true)
+        {
+            IEnumerable<IMethodSymbol> methods = src.ListMembersInternal<IMethodSymbol>
+            (
+                static m => m,
+                static m => m.GetOverriddenMethod(),
+                includeStatic
+            );
+
+            if (skipSpecial)
+                methods = methods.Convert(static m => m, m => m.IsSpecial());
+
+            return methods;
+        }
 
         public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false)
         {

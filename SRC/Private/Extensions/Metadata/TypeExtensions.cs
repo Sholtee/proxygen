@@ -103,13 +103,21 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsAbstract(this Type src) => src.IsAbstract && !src.IsSealed; // statikus osztalyok IL szinten "sealed abstract"-k
 
-        public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
-        (
-            static (t, f) => t.GetMethods(f),
-            static m => m,
-            static m => m.GetOverriddenMethod(),
-            includeStatic
-        );
+        public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false, bool skipSpecial = true)
+        {
+            IEnumerable<MethodInfo> methods = src.ListMembersInternal
+            (
+                static (t, f) => t.GetMethods(f),
+                static m => m,
+                static m => m.GetOverriddenMethod(),
+                includeStatic
+            );
+
+            if (skipSpecial)
+                methods = methods.Convert(static m => m, static m => m.IsSpecial());
+
+            return methods;
+        }
 
         public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false)
         {
