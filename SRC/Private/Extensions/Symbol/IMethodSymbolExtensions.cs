@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
             if (overriddenMethod is not null)
                 return overriddenMethod;
 
-            for (INamedTypeSymbol? baseType = src.ContainingType; (baseType = baseType?.BaseType) is not null;)
+            foreach(INamedTypeSymbol baseType in src.ContainingType.GetBaseTypes())
             {
                 IMethodSymbol? baseMethod = GetBaseMethods(baseType).Single(throwOnEmpty: false);
                 if (baseMethod is not null)

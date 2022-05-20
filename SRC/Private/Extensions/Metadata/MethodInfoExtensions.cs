@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
                 .GetParameters()
                 .ConvertAr(static p => p.ParameterType);
 
-            for (Type? baseType = method.ReflectedType; (baseType = baseType?.BaseType) is not null;)
+            foreach (Type baseType in method.ReflectedType.GetBaseTypes())
             {
                 MethodInfo? overriddenMethod = baseType.GetMethod
                 (
