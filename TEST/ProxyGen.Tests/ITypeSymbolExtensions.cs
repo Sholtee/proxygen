@@ -287,19 +287,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void GetUniqueHashCode_ShouldDistinguishBetweenArraysAndPointers() 
-        {
-            Compilation compilation = CreateCompilation(string.Empty);
-
-            ITypeSymbol
-                int32 = compilation.GetSpecialType(SpecialType.System_Int32),
-                intAr = compilation.CreateArrayTypeSymbol(int32),
-                intPtr = compilation.CreatePointerTypeSymbol(int32);
-
-            Assert.AreNotEqual(intAr.GetUniqueHashCode(), intPtr.GetUniqueHashCode());
-        }
-
-        [Test]
         public void GenericParameterAndItsDeclaringGeneric_ShouldBeConsideredEqual() 
         {
             Compilation compilation = CreateCompilation // mondjuk ez kibaszott perverz :D

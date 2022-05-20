@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsNested(this Type src) =>
             //
-            // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
+            // GetInnermostElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
             // mar nem beagyazott tipus.
             //
 
@@ -106,63 +106,75 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false) => src.ListMembersInternal
         (
             static (t, f) => t.GetMethods(f),
-            MethodBaseExtensions.GetAccessModifiers,
-
-            //
-            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa, valamint a generikus argumentumok
-            // szama a lenyeges.
-            //
-
-            static m =>
-            {
-                HashCode hk = new();
-
-                foreach (ParameterInfo p in m.GetParameters())
-                {
-                    hk.Add(p.ParameterType);
-                }
-
-                hk.Add(new
-                {
-                    m.Name,
-                    m.GetGenericArguments().Length,
-                    m.IsStatic, // ugyanolyan nevvel es parameterekkel lehet statikus es nem statikus is
-                });
-
-                return hk.ToHashCode();
-            },
+            static m => m,
+            static m => m.GetOverriddenMethod(),
             includeStatic
         );
 
-        public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false) => src.ListMembersInternal
-        (
-            static (t, f) => t.GetProperties(f),
+        public static IEnumerable<PropertyInfo> ListProperties(this Type src, bool includeStatic = false)
+        {
+            return src.ListMembersInternal
+            (
+                static (t, f) => t.GetProperties(f),
+                GetUnderlyingMethod,
+                static p => GetUnderlyingMethod(p).GetOverriddenMethod(),
+                includeStatic
+            );
 
             //
             // A nagyobb lathatosagut tekintjuk mervadonak
             //
 
-            static p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
-            static p => new { p.Name, (p.GetMethod ?? p.SetMethod).IsStatic }.GetHashCode(),
-            includeStatic
-        );
+            static MethodInfo GetUnderlyingMethod(PropertyInfo prop)
+            {
+                if (prop.GetMethod is null)
+                    return prop.SetMethod;
 
-        public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic = false) => src.ListMembersInternal
-        (
-            static (t, f) => t.GetEvents(f),
-            static e => (e.AddMethod ?? e.RemoveMethod).GetAccessModifiers(),
-            static e => new { e.Name, (e.AddMethod ?? e.RemoveMethod).IsStatic }.GetHashCode(),
-            includeStatic
-        );
+                if (prop.SetMethod is null)
+                    return prop.GetMethod;
+
+                return prop.GetMethod.GetAccessModifiers() > prop.SetMethod.GetAccessModifiers()
+                    ? prop.GetMethod
+                    : prop.SetMethod;
+            }
+        }
+
+        public static IEnumerable<EventInfo> ListEvents(this Type src, bool includeStatic = false)
+        {
+            return src.ListMembersInternal
+            (
+                static (t, f) => t.GetEvents(f),
+                GetUnderlyingMethod,
+                static e => GetUnderlyingMethod(e).GetOverriddenMethod(),
+                includeStatic
+            );
+
+            //
+            // A nagyobb lathatosagut tekintjuk mervadonak
+            //
+
+            static MethodInfo GetUnderlyingMethod(EventInfo evt)
+            {
+                if (evt.AddMethod is null)
+                    return evt.RemoveMethod;
+
+                if (evt.RemoveMethod is null)
+                    return evt.AddMethod;
+
+                return evt.AddMethod.GetAccessModifiers() > evt.RemoveMethod.GetAccessModifiers()
+                    ? evt.AddMethod
+                    : evt.RemoveMethod;
+            }
+        }
 
         private static IEnumerable<TMember> ListMembersInternal<TMember>(
             this Type src, 
             Func<Type, BindingFlags, TMember[]> getter, 
-            Func<TMember, AccessModifiers> getVisibility, 
-            Func<TMember, int> getHashCode, 
+            Func<TMember, MethodInfo> getUnderlyingMethod, 
+            Func<TMember, MethodInfo?> getOverriddenMethod, 
             bool includeStatic) where TMember: MemberInfo
         {
-            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
             //
             // NET6_0-tol kezdve lehet statikusokat deklaralni interface-eken is
@@ -191,7 +203,7 @@ namespace Solti.Utils.Proxy.Internals
                 //flags |= BindingFlags.FlattenHierarchy;
                 flags |= BindingFlags.NonPublic;
 
-                HashSet<int> returnedMembers = new();
+                HashSet<MethodInfo> overriddenMethods = new();
 
                 //
                 // Sorrend fontos, a leszarmazottol haladunk az os fele
@@ -201,12 +213,22 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     foreach (TMember member in getter(t, flags))
                     {
+                        MethodInfo? 
+                            overriddenMethod = getOverriddenMethod(member),
+                            underlyingMethod = getUnderlyingMethod(member);
+
+                        if (overriddenMethod is not null)
+                            overriddenMethods.Add(overriddenMethod);
+
+                        if (overriddenMethods.Contains(underlyingMethod))
+                            continue;
+
                         //
                         // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
                         // jok vagyunk.
                         //
 
-                        if (getVisibility(member) is not AccessModifiers.Private && returnedMembers.Add(getHashCode(member)))
+                        if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
                             yield return member;
                     }
                 }

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* MethodBaseExtensions.cs                                                       *
+* MethodInfoExtensions.cs                                                       *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal static class MethodBaseExtensions
+    internal static class MethodInfoExtensions
     {
         public static AccessModifiers GetAccessModifiers(this MethodBase src) => src switch
         {
@@ -73,6 +73,57 @@ namespace Solti.Utils.Proxy.Internals
                 if (mapIndex >= 0) 
                     yield return mapping.InterfaceMethods[mapIndex.Value];
             }
+        }
+
+        //
+        // GetBaseDefinition() nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
+        //
+
+        public static MethodInfo? GetOverriddenMethod(this MethodInfo method)
+        {
+            Type[] paramz = method
+                .GetParameters()
+                .ConvertAr(static p => p.ParameterType);
+
+            for (Type? baseType = method.ReflectedType; (baseType = baseType?.BaseType) is not null;)
+            {
+                MethodInfo? overriddenMethod = baseType.GetMethod
+                (
+                    method.Name,
+                    bindingAttr:
+                        BindingFlags.DeclaredOnly |
+                        (method.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic) |
+                        (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance),
+                    binder: null,
+                    callConvention: method.CallingConvention,
+                    types: paramz,
+                    modifiers: null
+                );
+                if (overriddenMethod is not null)
+                {
+                    //
+                    // A default binder nem a pontos szignaturara keres hanem a kompatibilisre, ami baszottul
+                    // nagy kulonbseg: pl typeof(Object).GetMethod("Equals", new[] { typeof(Akarmi) }) sose null,
+                    // hisz az Object.Equals(object) barmivel hivhato (tehat azt kapjuk vissza).
+                    // Na mar most, az kurva elet hogy en nem irok sajat bindert u h +1 check
+                    //
+
+                    ParameterInfo[] overriddenParamz = overriddenMethod.GetParameters();
+
+                    bool matched = true;
+                    for (int i = 0; i < overriddenParamz.Length; i++)
+                    {
+                        if (overriddenParamz[i].ParameterType != paramz[i])
+                        {
+                            matched = false;
+                            break;
+                        }
+                    }
+                    if (matched)
+                        return overriddenMethod;
+                }
+            }
+            return null;
         }
     }
 }

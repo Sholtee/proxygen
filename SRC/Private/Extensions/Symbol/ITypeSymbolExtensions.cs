@@ -98,87 +98,69 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IMethodSymbol>
         (
-            IMethodSymbolExtensions.GetAccessModifiers,
-
-            //
-            // Metodus visszaterese lenyegtelen, csak a nev, parameter tipusa es atadasa kell
-            //
-
-            static m =>
-            {
-                HashCode hk = new();
-
-                foreach (IParameterSymbol p in m.Parameters)
-                {
-                    hk.Add(new 
-                    { 
-                        PK = p.GetParameterKind(),
-                        HC = p.Type.GetUniqueHashCode()
-                    });
-                }
-
-                hk.Add(new
-                {
-                    m.Name,
-                    m.TypeArguments.Length,
-                    m.IsStatic, // ugyanolyan nevvel es parameterekkel lehet statikus es nem statikus is
-                });
-
-                return hk.ToHashCode();
-            },
+            static m => m,
+            static m => m.GetOverriddenMethod(),
             includeStatic
         );
 
-        public static int GetUniqueHashCode(this ITypeSymbol src) => src switch 
+        public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false)
         {
-            //
-            // symbolof(int32*) == symbolof(int[]). Ebbol fakadoan pl symbolof(List<int*>) == symbolof(List<int[]>) 
-            // Lasd: PointersAndArrays_ShouldBeConsideredEqual teszt
-            //
+            return src.ListMembersInternal<IPropertySymbol>
+            (
+                GetUnderlyingMethod,
+                static p => GetUnderlyingMethod(p).GetOverriddenMethod(),
+                includeStatic
+            );
 
-            IArrayTypeSymbol array => new 
-            { 
-                Extra = typeof(IArrayTypeSymbol), 
-                TypeHash = array.ElementType.GetUniqueHashCode() 
-            }.GetHashCode(),
-            IPointerTypeSymbol pointer => new 
-            { 
-                Extra = typeof(IPointerTypeSymbol), 
-                TypeHash = pointer.PointedAtType.GetUniqueHashCode() 
-            }.GetHashCode(),
-
-            //
-            // symbolof(List<T>) == symbolof(T), lehet en vagyok a fasz de ennek tenyleg igy kene lennie?
-            // Lasd: GenericParameterAndItsDeclaringGeneric_ShouldBeConsideredEqual teszt
-            //
-
-            _ when src.IsGenericParameter() => src.GetGenericParameterIndex()!.Value,
-
-            _ => SymbolEqualityComparer.Default.GetHashCode(src)
-        };
-
-        public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IPropertySymbol>
-        (
             //
             // A nagyobb lathatosagut tekintjuk mervadonak
             //
 
-            static p => (AccessModifiers) Math.Max((int) (p.GetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown), (int) (p.SetMethod?.GetAccessModifiers() ?? AccessModifiers.Unknown)),
-            static p => new { p.Name, p.IsStatic }.GetHashCode(),
-            includeStatic
-        );
+            static IMethodSymbol GetUnderlyingMethod(IPropertySymbol prop)
+            {
+                if (prop.GetMethod is null)
+                    return prop.SetMethod!;
 
-        public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IEventSymbol>
-        (
-            static e => (e.AddMethod ?? e.RemoveMethod)?.GetAccessModifiers() ?? AccessModifiers.Unknown,
-            static e => new { e.Name, e.IsStatic }.GetHashCode(),
-            includeStatic
-        );
+                if (prop.SetMethod is null)
+                    return prop.GetMethod;
+
+                return prop.GetMethod.GetAccessModifiers() > prop.SetMethod.GetAccessModifiers()
+                    ? prop.GetMethod
+                    : prop.SetMethod;
+            }
+        }
+
+        public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false)
+        {
+            return src.ListMembersInternal<IEventSymbol>
+            (
+                GetUnderlyingMethod,
+                static e => GetUnderlyingMethod(e).GetOverriddenMethod(),
+                includeStatic
+            );
+
+            //
+            // A nagyobb lathatosagut tekintjuk mervadonak
+            //
+
+            static IMethodSymbol GetUnderlyingMethod(IEventSymbol evt)
+            {
+                if (evt.AddMethod is null)
+                    return evt.RemoveMethod!;
+
+                if (evt.RemoveMethod is null)
+                    return evt.AddMethod;
+
+                return evt.AddMethod.GetAccessModifiers() > evt.RemoveMethod.GetAccessModifiers()
+                    ? evt.AddMethod
+                    : evt.RemoveMethod;
+            }
+        }
 
         private static IEnumerable<TMember> ListMembersInternal<TMember>(
             this ITypeSymbol src, 
-            Func<TMember, AccessModifiers> getVisibility,
-            Func<TMember, int> getHashCode,
+            Func<TMember, IMethodSymbol> getUnderlyingMethod,
+            Func<TMember, IMethodSymbol?> getOverriddenMethod,
             bool includeStatic) where TMember : ISymbol
         {
             if (src.IsInterface())
@@ -194,7 +176,13 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                HashSet<int> returnedMembers = new();
+                //
+                // TODO: IMethodSymbolComparer-t irni
+                //
+
+                #pragma warning disable RS1024 // Compare symbols correctly
+                HashSet<IMethodSymbol> overriddenMethods = new();
+                #pragma warning restore RS1024
 
                 //
                 // Sorrend szamit: a leszarmazottaktol haladunk az os fele
@@ -204,8 +192,26 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     foreach (ISymbol symbol in t.GetMembers())
                     {
-                        if (symbol is TMember member && getVisibility(member) > AccessModifiers.Private && (includeStatic || !member.IsStatic) && returnedMembers.Add(getHashCode(member)))
-                            yield return member;
+                        if (symbol is TMember member && (includeStatic || !member.IsStatic))
+                        {
+                            IMethodSymbol?
+                                overriddenMethod = getOverriddenMethod(member),
+                                underlyingMethod = getUnderlyingMethod(member);
+
+                            if (overriddenMethod is not null)
+                                overriddenMethods.Add(overriddenMethod);
+
+                            if (overriddenMethods.Contains(underlyingMethod))
+                                continue;
+
+                            //
+                            // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
+                            // jok vagyunk.
+                            //
+
+                            if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
+                                yield return member;
+                        }
                     }
                 }
             }
@@ -226,10 +232,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
-            string? metadataName = src.GetQualifiedMetadataName();
-            if (metadataName is null)
-                return null;
-
             //
             // Tombnek es mutatonak nincs tartalmazo szerelvenye.
             //
@@ -238,7 +240,7 @@ namespace Solti.Utils.Proxy.Internals
             if (containingAsm is null)
                 return null;
 
-            return $"{metadataName}, {containingAsm.Identity}";
+            return $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
         public static bool IsGenericArgument(this ITypeSymbol src) => src
@@ -258,14 +260,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             src = src.GetElementType(recurse: true) ?? src;
 
-            return
-                src.ContainingType is not null &&
-                src.BaseType is null &&
-                src.SpecialType is not SpecialType.System_Object &&
-                !src.IsInterface();
+            return src.ContainingSymbol switch
+            {
+                IMethodSymbol method => method.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
+                INamedTypeSymbol type => type.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
+                _ => false
+            };
         }
 
-        public static string? GetQualifiedMetadataName(this ITypeSymbol src)
+        public static string GetQualifiedMetadataName(this ITypeSymbol src)
         {
             ITypeSymbol? elementType = src.GetElementType(recurse: true);
 
@@ -300,33 +303,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static int? GetGenericParameterIndex(this ITypeSymbol src) 
-        {
-            if (!src.IsGenericParameter())
-                return null;
-
-            IEqualityComparer<ISymbol> comparer = SymbolEqualityComparer.Default;
-
-            return src switch
-            {
-                //
-                // class ClassA<T>.Foo(T para)
-                //
-
-                _ when src.ContainingSymbol is INamedTypeSymbol srcContainer =>
-                    srcContainer.TypeArguments.IndexOf(src, comparer),
-
-                //
-                // class ClassA.Foo<T>(T para)
-                //
-
-                _ when src.ContainingSymbol is IMethodSymbol srcMethod =>
-                    srcMethod.TypeArguments.IndexOf(src, comparer) * -1, // ha a parameter metoduson van definialva akkor negativ szam
-
-                _ => null
-            };
-        }
-
         public static IEnumerable<ITypeSymbol> GetAllInterfaces(this ITypeSymbol src) 
         {
             //
@@ -346,13 +322,16 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (iface.IsGenericType())
                 {
-                    ITypeSymbol[] tas = iface.TypeArguments.ConvertAr(ta => !ta.IsValueType
-                        //
-                        // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
-                        //
+                    ITypeSymbol[] tas = iface.TypeArguments.ConvertAr
+                    (
+                        ta => !ta.IsValueType
+                            //
+                            // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
+                            //
 
-                        ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
-                        : ta);
+                            ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+                            : ta
+                    );
 
                     iface = iface.OriginalDefinition.Construct(tas);
                 }

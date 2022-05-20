@@ -104,5 +104,50 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
+
+        public static IMethodSymbol? GetOverriddenMethod(this IMethodSymbol src)
+        {
+            IMethodSymbol? overriddenMethod = src.OverriddenMethod;
+            if (overriddenMethod is not null)
+                return overriddenMethod;
+
+            for (INamedTypeSymbol? baseType = src.ContainingType; (baseType = baseType?.BaseType) is not null;)
+            {
+                IMethodSymbol? baseMethod = GetBaseMethods(baseType).Single(throwOnEmpty: false);
+                if (baseMethod is not null)
+                    return baseMethod;
+            }
+
+            return null;
+
+            IEnumerable<IMethodSymbol> GetBaseMethods(INamedTypeSymbol baseType)
+            {
+                foreach (ISymbol member in baseType.GetMembers(src.Name))
+                {
+                    if (member.IsStatic != src.IsStatic || member is not IMethodSymbol baseMethod)
+                        continue;
+
+                    if (baseMethod.Parameters.Length != src.Parameters.Length)
+                        continue;
+
+                    bool match = true;
+                    for (int i = 0; i < baseMethod.Parameters.Length; i++)
+                    {
+                        IParameterSymbol
+                            basePara = baseMethod.Parameters[i],
+                            para = src.Parameters[i];
+
+                        if (!SymbolEqualityComparer.Default.Equals(basePara.Type, para.Type) || basePara.RefKind != para.RefKind)
+                        {
+                            match = false;
+                            break;
+                        }
+                    }
+
+                    if (match)
+                        yield return baseMethod;
+                }
+            }
+        }
     }
 }
