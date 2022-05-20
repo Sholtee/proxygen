@@ -105,6 +105,10 @@ namespace Solti.Utils.Proxy.Internals
 
             (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
 
+        //
+        // OverriddenMethod nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
+        //
+
         public static IMethodSymbol? GetOverriddenMethod(this IMethodSymbol src)
         {
             IMethodSymbol? overriddenMethod = src.OverriddenMethod;

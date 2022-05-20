@@ -110,16 +110,16 @@ namespace Solti.Utils.Proxy.Internals
 
                     ParameterInfo[] overriddenParamz = overriddenMethod.GetParameters();
 
-                    bool matched = true;
+                    bool match = true;
                     for (int i = 0; i < overriddenParamz.Length; i++)
                     {
                         if (overriddenParamz[i].ParameterType != paramz[i])
                         {
-                            matched = false;
+                            match = false;
                             break;
                         }
                     }
-                    if (matched)
+                    if (match)
                         return overriddenMethod;
                 }
             }
