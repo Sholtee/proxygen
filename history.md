@@ -125,3 +125,5 @@
   - *improved:* Proxy activation performance
 - 7.0.0-preview4:
   - *fixed:* Caching issue
+- 7.0.0-preview5:
+  - *improved:* Reflection
