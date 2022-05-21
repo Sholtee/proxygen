@@ -42,7 +42,7 @@ BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Reds
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
 .NET Core SDK=6.0.202
   [Host]     : .NET Core 6.0.4 (CoreCLR 6.0.422.16404, CoreFX 6.0.422.16404), X64 RyuJIT
-  Job-CTGSXM : .NET Core 6.0.4 (CoreCLR 6.0.422.16404, CoreFX 6.0.422.16404), X64 RyuJIT
+  Job-BGHRAU : .NET Core 6.0.4 (CoreCLR 6.0.422.16404, CoreFX 6.0.422.16404), X64 RyuJIT
 
 InvocationCount=30000  RunStrategy=Throughput  
 </code></pre><table>
@@ -52,6 +52,7 @@ InvocationCount=30000  RunStrategy=Throughput
 <th style="text-align:right">Mean</th>
 <th style="text-align:right">Error</th>
 <th style="text-align:right">StdDev</th>
+<th style="text-align:right">Median</th>
 <th style="text-align:right">Gen 0</th>
 <th style="text-align:right">Gen 1</th>
 <th style="text-align:right">Gen 2</th>
@@ -61,19 +62,21 @@ InvocationCount=30000  RunStrategy=Throughput
 <tbody>
 <tr>
 <td>AssemblingProxyType</td>
-<td style="text-align:right">17,272.48 ns</td>
-<td style="text-align:right">345.315 ns</td>
-<td style="text-align:right">557.619 ns</td>
+<td style="text-align:right">21,889.51 ns</td>
+<td style="text-align:right">1,960.114 ns</td>
+<td style="text-align:right">5,779.440 ns</td>
+<td style="text-align:right">18,238.91 ns</td>
 <td style="text-align:right">0.3000</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">5584 B</td>
+<td style="text-align:right">5849 B</td>
 </tr>
 <tr>
 <td>GetGeneratedType</td>
-<td style="text-align:right">52.99 ns</td>
-<td style="text-align:right">0.908 ns</td>
-<td style="text-align:right">1.727 ns</td>
+<td style="text-align:right">50.36 ns</td>
+<td style="text-align:right">0.765 ns</td>
+<td style="text-align:right">0.639 ns</td>
+<td style="text-align:right">50.29 ns</td>
 <td style="text-align:right">0.0020</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
@@ -81,9 +84,10 @@ InvocationCount=30000  RunStrategy=Throughput
 </tr>
 <tr>
 <td>Activate</td>
-<td style="text-align:right">79.91 ns</td>
-<td style="text-align:right">1.512 ns</td>
-<td style="text-align:right">1.340 ns</td>
+<td style="text-align:right">80.51 ns</td>
+<td style="text-align:right">0.946 ns</td>
+<td style="text-align:right">0.839 ns</td>
+<td style="text-align:right">80.32 ns</td>
 <td style="text-align:right">0.0047</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
