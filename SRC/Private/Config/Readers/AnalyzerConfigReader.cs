@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
@@ -14,8 +13,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string BasePath => ReadValueInternal("MSBuildProjectDirectory")!;
 
-        public AnalyzerConfigReader(in GeneratorExecutionContext context) =>
-            ConfigOptions = context.AnalyzerConfigOptions.GlobalOptions;
+        public AnalyzerConfigReader(AnalyzerConfigOptions configOptions) => ConfigOptions = configOptions;
 
         //
         // Ugy tunik h a CompilerVisibleProperty (lasd ProxyGen.NET.targets) miatt ha az adott build property neve

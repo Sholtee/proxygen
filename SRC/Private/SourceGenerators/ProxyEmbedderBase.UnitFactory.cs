@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxyEmbedder.UnitFactory.cs                                                  *
+* ProxyEmbedderBase.UnitFactory.cs                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -14,16 +14,16 @@ namespace Solti.Utils.Proxy.Internals
     using Generators;
     using Properties;
 
-    internal sealed partial class ProxyEmbedder
+    internal abstract partial class ProxyEmbedderBase
     {
-        private static ReferenceCollector? CreateReferenceCollector() =>
+        protected static ReferenceCollector? CreateReferenceCollector() =>
             //
             // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
             //
 
             !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null;
 
-        private static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
+        protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
         {
             string qualifiedName = generator.GetQualifiedMetadataName()!;
 
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        private static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(Compilation compilation)
+        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(Compilation compilation)
         {
             //
             // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni

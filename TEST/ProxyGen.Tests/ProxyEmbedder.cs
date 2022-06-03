@@ -26,8 +26,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
     public interface IMyService { }
 
     [TestFixture]
-    public class ProxyEmbedderTests: CodeAnalysisTestsBase
+    public class ProxyEmbedderTests : CodeAnalysisTestsBase
     {
+        private static IReadOnlyDictionary<string, Func<GeneratorDriver>> CreateGeneratorDriver = new Dictionary<string, Func<GeneratorDriver>>
+        {
+            {nameof(ISourceGenerator), () =>  CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3()) },
+            {nameof(IIncrementalGenerator), () => CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV4()) }
+        };
+
         [TestCase
         (
             @"
@@ -53,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
             "
         )]
-        public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations(string src) 
+        public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations(string src)
         {
             CSharpCompilation compilation = CreateCompilation
             (
@@ -61,14 +67,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 typeof(EmbedGeneratedTypeAttribute).Assembly
             );
 
-            INamedTypeSymbol[] res = ProxyEmbedder.GetAOTGenerators(compilation).ToArray();
+            INamedTypeSymbol[] res = ProxyEmbedder_RoslynV3.GetAOTGenerators(compilation).ToArray();
 
             Assert.That(res.Length, Is.EqualTo(1));
             Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.ProxyGenerator<System.Collections.Generic.IList<int>, Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>>"));
         }
 
         [Test]
-        public void LogException_ShouldCreateALogFileForTheGivenException() 
+        public void LogException_ShouldCreateALogFileForTheGivenException()
         {
             //
             // Ha a tesztunket az OpenCover hivta akkor ertelemszeruen a "runtimeconfig.json" nem lesz
@@ -80,91 +86,97 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 typeof(AppContext).InvokeMember
                 (
                     "SetData", // netcore 2.x-ben van 3.x-ben nincs
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod, 
-                    null, 
-                    null, 
-                    new object[] 
-                    { 
-                        "ProxyGen.LogDump", 
-                        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs") 
+                    BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod,
+                    null,
+                    null,
+                    new object[]
+                    {
+                        "ProxyGen.LogDump",
+                        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs")
                     }
                 );
 
                 WorkingDirectories.Setup(new RuntimeConfigReader());
             }
 
-            string logFile = ProxyEmbedder.LogException(new Exception(), default);
+            string logFile = ProxyEmbedderBase.LogException(new Exception(), default);
 
             Assert.That(File.Exists(logFile));
         }
 
-        [TestCase
-        (
-            @"
-            using System.Collections.Generic;
+        public static IEnumerable<string> Generators { get; } = new[]
+        {
+            nameof(ISourceGenerator),
+            nameof(IIncrementalGenerator)
+        };
 
-            using Solti.Utils.Proxy;
-            using Solti.Utils.Proxy.Attributes;
-            using Solti.Utils.Proxy.Generators;
-
-            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
-            "
-        )]
-        [TestCase
-        (
-            @"
-            using System.Collections.Generic;
-
-            using Solti.Utils.Proxy;
-            using Solti.Utils.Proxy.Attributes;
-            using Solti.Utils.Proxy.Generators;
-
-            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<MyNamespace.IMyInterface, InterfaceInterceptor<MyNamespace.IMyInterface>>))]
-
-            namespace MyNamespace
+        public static IEnumerable<string> ValidSources1
+        {
+            get
             {
-                internal interface IMyInterface // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
-                {
-                    void Foo();
-                }
+                yield return
+                    @"
+                    using System.Collections.Generic;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+                    ";
+                yield return
+                    @"
+                    using System.Collections.Generic;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<MyNamespace.IMyInterface, InterfaceInterceptor<MyNamespace.IMyInterface>>))]
+
+                    namespace MyNamespace
+                    {
+                        internal interface IMyInterface // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
+                        {
+                            void Foo();
+                        }
+                    }
+                    ";
+                yield return
+                    @"
+                    using System.Collections;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, IEnumerable>))]
+                    ";
+                yield return
+                    @"
+                    using System.Collections.Generic;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyImpl>))]
+
+                    public interface IMyInterface
+                    {
+                        void Foo();
+                    }
+
+                    public class MyImpl 
+                    {
+                        internal void Foo() {} // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
+                    } 
+                    ";
             }
-            "
-        )]
-        [TestCase
-        (
-            @"
-            using System.Collections;
+        }
 
-            using Solti.Utils.Proxy;
-            using Solti.Utils.Proxy.Attributes;
-            using Solti.Utils.Proxy.Generators;
-
-            [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, IEnumerable>))]
-            "
-        )]
-        [TestCase
-        (
-            @"
-            using System.Collections.Generic;
-
-            using Solti.Utils.Proxy;
-            using Solti.Utils.Proxy.Attributes;
-            using Solti.Utils.Proxy.Generators;
-
-            [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyImpl>))]
-
-            public interface IMyInterface
-            {
-                void Foo();
-            }
-
-            public class MyImpl 
-            {
-                internal void Foo() {} // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
-            } 
-            "
-        )]
-        public void Execute_ShouldExtendTheOriginalSource(string src) 
+        [Test]
+        public void Execute_ShouldExtendTheOriginalSource([ValueSource(nameof(ValidSources1))] string src, [ValueSource(nameof(Generators))] string generatorId) 
         {
             Compilation compilation = CreateCompilation
             (
@@ -173,8 +185,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             );
 
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
-
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+ 
+            GeneratorDriver driver = CreateGeneratorDriver[generatorId]();
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
@@ -271,7 +283,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
 
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
@@ -290,7 +302,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
 
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
@@ -318,7 +330,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
 
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags, Is.Empty);
@@ -345,7 +357,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
 
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))));
@@ -385,7 +397,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 new VisualBasicCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
             );
 
-            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder());
+            GeneratorDriver driver = CSharpGeneratorDriver.Create(new ProxyEmbedder_RoslynV3());
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
             Assert.That(diags.Any(diag => diag.Id == "PGE00" && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage() == SGResources.LNG_NOT_SUPPORTED));
@@ -412,7 +424,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             GeneratorDriver driver = CSharpGeneratorDriver.Create
             (
-                new ISourceGenerator[] { new ProxyEmbedder() }, 
+                new ISourceGenerator[] { new ProxyEmbedder_RoslynV3() }, 
                 parseOptions: new CSharpParseOptions(Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp6)
             );
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
