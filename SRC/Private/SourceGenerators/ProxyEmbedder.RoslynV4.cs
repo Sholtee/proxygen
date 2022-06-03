@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
             static bool IsEmbedGeneratedTypeAttribute(SyntaxToken token) => token.Text is "EmbedGeneratedTypeAttribute" or "EmbedGeneratedType";
         }
 
-        private static INamedTypeSymbol? GetAotGenerators(GeneratorSyntaxContext context, CancellationToken cancellationToken)
+        private static INamedTypeSymbol? ExtractGenerator(GeneratorSyntaxContext context, CancellationToken cancellationToken)
         {
             AttributeSyntax attr = (AttributeSyntax) context.Node;
             
@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             IncrementalValuesProvider<INamedTypeSymbol> aotGenerators = context
                 .SyntaxProvider
-                .CreateSyntaxProvider(IsEmbedGeneratedTypeAttribute, GetAotGenerators)
+                .CreateSyntaxProvider(IsEmbedGeneratedTypeAttribute, ExtractGenerator)
                 .Where(static gen => gen is not null)!;
 
             IncrementalValueProvider<(Compilation, (AnalyzerConfigOptionsProvider, ImmutableArray<INamedTypeSymbol>))> aotGeneratorsAndCompilation = context

@@ -60,12 +60,6 @@ namespace Solti.Utils.Proxy.Internals
 
         protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(Compilation compilation)
         {
-            //
-            // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
-            //
-
-            ReferenceCollector? referenceCollector = !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new() : null;
-
             INamedTypeSymbol? miaSym = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
 
             if (miaSym is not null)
@@ -77,7 +71,14 @@ namespace Solti.Utils.Proxy.Internals
                 if (miaSym.DeclaredAccessibility is Accessibility.Public)
                     yield break;
 
-                if (miaSym.DeclaredAccessibility is Accessibility.Internal && (SymbolEqualityComparer.Equals(miaSym.ContainingAssembly, compilation.Assembly) || miaSym.ContainingAssembly.GivesAccessTo(compilation.Assembly)))
+                if 
+                (
+                    miaSym.DeclaredAccessibility is Accessibility.Internal &&     
+                    (
+                        SymbolEqualityComparer.Equals(miaSym.ContainingAssembly, compilation.Assembly) || 
+                        miaSym.ContainingAssembly.GivesAccessTo(compilation.Assembly)
+                    )
+                ) 
                     yield break;
             }
 
