@@ -74,7 +74,11 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     parameters: method.Parameters.ToSyntaxList(param =>
                     {
-                        ParameterSyntax parameter = Parameter(Identifier(param.Name)).WithType
+                        ParameterSyntax parameter = Parameter
+                        (
+                            Identifier(param.Name)
+                        )
+                        .WithType
                         (
                             type: ResolveType(param.Type)
                         );

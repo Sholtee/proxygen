@@ -80,7 +80,10 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+                (
+                    (NameSyntax) ResolveType(property.DeclaringType)
+                )
             );
 
             List<AccessorDeclarationSyntax> accessors = new(2);
@@ -127,7 +130,10 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithExplicitInterfaceSpecifier
             (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(property.DeclaringType))
+                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+                (
+                    (NameSyntax) ResolveType(property.DeclaringType)
+                )
             )
             .WithParameterList
             (
