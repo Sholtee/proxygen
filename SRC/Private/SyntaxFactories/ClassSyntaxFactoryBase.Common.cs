@@ -64,14 +64,17 @@ namespace Solti.Utils.Proxy.Internals
             (
                 rankSpecifiers: SingletonList
                 (
-                    ArrayRankSpecifier(SingletonSeparatedList
+                    ArrayRankSpecifier
                     (
-                        elements.Some() ? OmittedArraySizeExpression() : (ExpressionSyntax)LiteralExpression
+                        SingletonSeparatedList
                         (
-                            SyntaxKind.NumericLiteralExpression,
-                            Literal(0)
+                            elements.Some() ? OmittedArraySizeExpression() : (ExpressionSyntax) LiteralExpression
+                            (
+                                SyntaxKind.NumericLiteralExpression,
+                                Literal(0)
+                            )
                         )
-                    ))
+                    )
                 )
             ),
             initializer: !elements.Some() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
