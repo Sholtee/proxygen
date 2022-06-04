@@ -127,3 +127,5 @@
   - *fixed:* Caching issue
 - 7.0.0-preview5:
   - *improved:* Reflection
+- 7.0.0-preview6:
+  - *introduced:* `ProxyEmbedder` uses Roslyn's source generator V2 API
