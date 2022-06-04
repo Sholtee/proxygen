@@ -16,18 +16,12 @@ namespace Solti.Utils.Proxy.Internals
     {
         private static bool IsEmbedGeneratedTypeAttribute(SyntaxNode node, CancellationToken cancellation)
         {
-            if (node is not AttributeSyntax attr)
-                return false;
-
-            switch (attr.Name)
+            return (node as AttributeSyntax)?.Name switch
             {
-                case SimpleNameSyntax sn:
-                    return IsEmbedGeneratedTypeAttribute(sn.Identifier);
-                case QualifiedNameSyntax qn:
-                    return IsEmbedGeneratedTypeAttribute(qn.Right.Identifier);
-                default:
-                    return false;
-            }
+                SimpleNameSyntax sn => IsEmbedGeneratedTypeAttribute(sn.Identifier),
+                QualifiedNameSyntax qn => IsEmbedGeneratedTypeAttribute(qn.Right.Identifier),
+                _ => false,
+            };
 
             static bool IsEmbedGeneratedTypeAttribute(SyntaxToken token) => token.Text is "EmbedGeneratedTypeAttribute" or "EmbedGeneratedType";
         }
@@ -42,9 +36,10 @@ namespace Solti.Utils.Proxy.Internals
             if (attr.ArgumentList.Arguments[0].Expression is not TypeOfExpressionSyntax typeOf)
                 return null;
 
-            return context
-                .SemanticModel
-                .GetTypeInfo(typeOf.Type, cancellationToken).Type as INamedTypeSymbol;
+            if (context.SemanticModel.GetSymbolInfo(typeOf.Type, cancellationToken).Symbol is not INamedTypeSymbol namedType)
+                return null;
+
+            return namedType;
         }
 
         void IIncrementalGenerator.Initialize(IncrementalGeneratorInitializationContext context)
@@ -52,18 +47,17 @@ namespace Solti.Utils.Proxy.Internals
             IncrementalValuesProvider<INamedTypeSymbol> aotGenerators = context
                 .SyntaxProvider
                 .CreateSyntaxProvider(IsEmbedGeneratedTypeAttribute, ExtractGenerator)
+                .WithComparer(SymbolEqualityComparer)
                 .Where(static gen => gen is not null)!;
 
-            IncrementalValueProvider<(Compilation, (AnalyzerConfigOptionsProvider, ImmutableArray<INamedTypeSymbol>))> aotGeneratorsAndCompilation = context
+            IncrementalValueProvider<(Compilation, AnalyzerConfigOptionsProvider)> compilationAndOptions = context
                 .CompilationProvider
+                .Combine(context.AnalyzerConfigOptionsProvider);
+
+            IncrementalValueProvider<((Compilation, AnalyzerConfigOptionsProvider), ImmutableArray<INamedTypeSymbol>)> aotGeneratorsAndCompilation = compilationAndOptions
                 .Combine
                 (
-                    context
-                        .AnalyzerConfigOptionsProvider
-                        .Combine
-                        (
-                            aotGenerators.Collect()
-                        )
+                    aotGenerators.Collect()
                 );
 
             context.RegisterSourceOutput
@@ -71,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
                 aotGeneratorsAndCompilation,
                 static (spc, src) =>
                 {
-                    (Compilation Compilation, (AnalyzerConfigOptionsProvider Opts, ImmutableArray<INamedTypeSymbol> AotGenerators)) = src;
+                    ((Compilation Compilation, AnalyzerConfigOptionsProvider Opts), ImmutableArray<INamedTypeSymbol> AotGenerators) = src;
 
                     Execute
                     (

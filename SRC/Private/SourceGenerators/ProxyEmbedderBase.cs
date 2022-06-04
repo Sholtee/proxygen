@@ -99,7 +99,6 @@ namespace Solti.Utils.Proxy.Internals
                 #pragma warning restore CA1031
                 {
                     ReportError(e, Location.None);
-                    return;
                 }
             }
 
