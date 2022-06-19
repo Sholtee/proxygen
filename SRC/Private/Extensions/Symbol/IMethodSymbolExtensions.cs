@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<INamedTypeSymbol>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Convert(m => m.ContainingType);
+                .Convert(static m => m.ContainingType);
 
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {

@@ -144,7 +144,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<IConstructorInfo>()
             : UnderlyingType
                 .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .ConvertAr(ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
+                .ConvertAr(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), static ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{QualifiedName}, {UnderlyingType.Assembly}"

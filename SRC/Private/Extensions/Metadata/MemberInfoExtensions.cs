@@ -55,7 +55,7 @@ namespace Solti.Utils.Proxy.Internals
             MethodInfo method = (MethodInfo) accessor
                 .Method
                 .GetInstructions()
-                .Single(instruction => instruction.OpCode == OpCodes.Callvirt)!
+                .Single(static instruction => instruction.OpCode == OpCodes.Callvirt)!
                 .Operand;
 
             Type declaringType = method.DeclaringType;

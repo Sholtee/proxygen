@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
                                     src
                                         .ReferenceCollector
                                         .References
-                                        .Convert(@ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
+                                        .Convert(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
                                 ),
                                 cancellation: cancellation
                             );

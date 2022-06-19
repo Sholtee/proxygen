@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<Type>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Convert(m => m.ReflectedType);
+                .Convert(static m => m.ReflectedType);
 
         public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
         {

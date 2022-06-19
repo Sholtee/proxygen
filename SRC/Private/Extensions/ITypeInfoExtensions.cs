@@ -203,7 +203,7 @@ namespace Solti.Utils.Proxy.Internals
                     //
 
                     ex.Data["containingAsm"] = src.DeclaringAssembly?.Name;
-                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Convert(@ref => @ref.Display));
+                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Convert(static @ref => @ref.Display));
 
                     throw ex;
                 }
@@ -243,7 +243,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 ReadGenericArguments(src);
 
-                return queried.MakeGenericType(gas.ConvertAr(ga => ga));
+                return queried.MakeGenericType(gas.ConvertAr(static ga => ga));
 
                 void ReadGenericArguments(ITypeInfo src)
                 {

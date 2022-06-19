@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Type[] itemTypes = ctor
                     .GetParameters()
-                    .ConvertAr(p => p.ParameterType);
+                    .ConvertAr(static p => p.ParameterType);
 
                 if (itemTypes.Length is 0)
                 {

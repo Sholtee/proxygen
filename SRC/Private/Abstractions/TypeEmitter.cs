@@ -87,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
                 cacheFile,
                 referenceCollector.References.ConvertAr
                 (
-                    asm => MetadataReference.CreateFromFile(asm.Location!)
+                    static asm => MetadataReference.CreateFromFile(asm.Location!)
                 ),
                 customConfig: null,
                 cancellation

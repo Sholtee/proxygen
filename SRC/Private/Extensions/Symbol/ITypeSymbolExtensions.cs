@@ -332,7 +332,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     ITypeSymbol[] tas = iface.TypeArguments.ConvertAr
                     (
-                        ta => !ta.IsValueType
+                        static ta => !ta.IsValueType
                             //
                             // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
                             //
@@ -375,7 +375,7 @@ namespace Solti.Utils.Proxy.Internals
 
             sb.Append($"{eol}{{");
 
-            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Convert(m => m, m => m.IsSpecial()))
+            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Convert(static m => m, static m => m.IsSpecial()))
                 sb.Append($"{eol}  {method.ToDisplayString(fmt)};");
 
             foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))

@@ -148,7 +148,7 @@ namespace Solti.Utils.Proxy.Internals
                                             castTargetTo: property.DeclaringType,
                                             indices: locals.Convert
                                             (
-                                                (local, _) => ResolveArgument(local),
+                                                static (local, _) => ResolveArgument(local),
                                                 (_, i) => i == locals.Count - 1
                                             )
                                         ),

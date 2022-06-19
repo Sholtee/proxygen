@@ -122,7 +122,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
-            .ConvertAr(m => SymbolMethodInfo.CreateFrom(m, Compilation), m => !m.IsClassMethod());
+            .ConvertAr(m => SymbolMethodInfo.CreateFrom(m, Compilation), static m => !m.IsClassMethod());
 
         private static readonly IReadOnlyList<MethodKind> Ctors = new[] 
         {

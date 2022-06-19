@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: units.Convert(unit => CSharpSyntaxTree.Create(unit)),
+                syntaxTrees: units.Convert(static unit => CSharpSyntaxTree.Create(unit)),
                 references: PlatformAssemblies.Union(references),
                 options: new CSharpCompilationOptions
                 (
@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
                         Environment.NewLine,
                         compilation
                             .SyntaxTrees
-                            .Convert(unit => unit
+                            .Convert(static unit => unit
                                 .GetCompilationUnitRoot()
                                 .NormalizeWhitespace(eol: Environment.NewLine)
                                 .ToFullString())
@@ -117,8 +117,8 @@ namespace Solti.Utils.Proxy.Internals
                     string[]
                         failures = result
                             .Diagnostics
-                            .ConvertAr(d => d.ToString(), d => d.Severity is not DiagnosticSeverity.Error),
-                        refs = references.ConvertAr(r => r.Display!);
+                            .ConvertAr(static d => d.ToString(), static d => d.Severity is not DiagnosticSeverity.Error),
+                        refs = references.ConvertAr(static r => r.Display!);
 
                     InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 

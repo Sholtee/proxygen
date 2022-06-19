@@ -72,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Invoke = InterceptorType.Methods.Single
             (
-                met => met.SignatureEquals
+                static met => met.SignatureEquals
                 (
                     MetadataMethodInfo.CreateFrom
                     (

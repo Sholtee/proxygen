@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
             BaseType = ((IGenericTypeInfo) proxygenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
-                .Single(prop => prop.Name == nameof(DuckBase<object>.Target))!;
+                .Single(static prop => prop.Name == nameof(DuckBase<object>.Target))!;
         }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
@@ -83,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
         protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
             TMember[] possibleTargets = targetMembers
-              .ConvertAr(targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
+              .ConvertAr(static targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
 
             if (!possibleTargets.Some())
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
