@@ -115,12 +115,12 @@ namespace Solti.Utils.Proxy.Internals
 
             return src.ContainingMember switch
             {
-                IGenericTypeInfo type => GetIndex(type),
-                IGenericMethodInfo method => GetIndex(method) * -1,  // ha a parameter metoduson van definialva akkor negativ szam
+                IGenericTypeInfo type => GetIndex(src, type),
+                IGenericMethodInfo method => GetIndex(src, method) * -1,  // ha a parameter metoduson van definialva akkor negativ szam
                 _ => 0
             };
 
-            int GetIndex<T>(IGeneric<T> generic) where T: IGeneric<T>
+            static int GetIndex<T>(ITypeInfo src, IGeneric<T> generic) where T: IGeneric<T>
             {
                 int index = 0;
                 foreach (ITypeInfo ga in generic.GenericArguments)
@@ -168,7 +168,9 @@ namespace Solti.Utils.Proxy.Internals
             {
                 int arity = (src as IGenericTypeInfo)?.GenericArguments?.Count ?? 0;
 
-                symbol = src.EnclosingType.ToSymbol(compilation)
+                symbol = src
+                    .EnclosingType
+                    .ToSymbol(compilation)
                     .GetTypeMembers(src.Name, arity)
                     .Single()!;
             }
@@ -238,21 +240,24 @@ namespace Solti.Utils.Proxy.Internals
 
                 foreach (ITypeInfo parent in src.GetParentTypes())
                 {
-                    ReadGenericArguments(parent);
+                    ReadGenericArguments(parent, gas);
                 }
 
-                ReadGenericArguments(src);
+                ReadGenericArguments(src, gas);
 
                 return queried.MakeGenericType(gas.ConvertAr(static ga => ga));
 
-                void ReadGenericArguments(ITypeInfo src)
+                static void ReadGenericArguments(ITypeInfo src, IList<Type> gas)
                 {
                     if (src is not IGenericTypeInfo generic)
                         return;
 
                     foreach (ITypeInfo ga in generic.GenericArguments)
                     {
-                         gas.Add(ga.ToMetadata());
+                         gas.Add
+                         (
+                             ga.ToMetadata()
+                         );
                     }
                 }
             }
