@@ -74,9 +74,6 @@
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.MD</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/Sholtee/ProxyGen</RepositoryUrl>
-    <RepositoryBranch>$(CurrentBranch)</RepositoryBranch>
   </PropertyGroup>
   
   <!-- 
