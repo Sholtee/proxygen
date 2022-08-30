@@ -129,3 +129,5 @@
   - *improved:* Reflection
 - 7.0.0-preview6:
   - *introduced:* `ProxyEmbedder` uses Roslyn's source generator V2 API
+- 7.0.0:
+  - *updated:* Solti.Utils.Primitives
