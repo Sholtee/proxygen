@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
-    <OutputPath>..\..\BIN\</OutputPath>
+    <OutputPath>..\..\BIN\$(Configuration)</OutputPath>
     <AssemblyName>Solti.Utils.Proxy.Tests.EmbeddedTypes</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests.EmbeddedTypes</RootNamespace>
     <LangVersion>9</LangVersion>
@@ -22,8 +22,8 @@
   <Import Project="..\..\SRC\ProxyGen.NET.targets" />
     
   <PropertyGroup>
-    <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
-    <ProxyGen_LogDump>$(OutputPath)Logs</ProxyGen_LogDump>
+    <ProxyGen_SourceDump>$(OutputPath)\Logs</ProxyGen_SourceDump>
+    <ProxyGen_LogDump>$(OutputPath)\Logs</ProxyGen_LogDump>
     <ProxyGen_DebugGenerator>false</ProxyGen_DebugGenerator>
   </PropertyGroup>
 

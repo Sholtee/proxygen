@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <OutputType>Library</OutputType>
     <IsPackable>false</IsPackable>
-    <OutputPath>..\..\BIN\</OutputPath>
+    <OutputPath>..\..\BIN\$(Configuration)</OutputPath>
     <AssemblyName>Solti.Utils.Proxy.Tests.External</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests.External</RootNamespace>
   </PropertyGroup>

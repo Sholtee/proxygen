@@ -8,7 +8,7 @@
     <AssemblyName>ProxyGen.Perf</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Perf</RootNamespace>
     <Configurations>Debug;Release</Configurations>
-    <OutputPath>..\BIN\</OutputPath>
+    <OutputPath>..\BIN\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

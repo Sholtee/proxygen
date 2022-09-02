@@ -8,7 +8,7 @@
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
-    <OutputPath>..\..\BIN\</OutputPath>
+    <OutputPath>..\..\BIN\$(Configuration)</OutputPath>
     <OutputType>Library</OutputType>
     <Configurations>Debug</Configurations>
   </PropertyGroup>

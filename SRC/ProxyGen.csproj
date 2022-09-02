@@ -7,7 +7,7 @@
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release</Configurations>
-    <OutputPath>..\BIN\</OutputPath>
+    <OutputPath>..\BIN\$(Configuration)</OutputPath>
     <LangVersion>10</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
