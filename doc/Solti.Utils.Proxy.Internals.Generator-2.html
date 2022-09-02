@@ -52,36 +52,11 @@
       <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator-2.html">DuckGenerator&lt;TInterface, TTarget&gt;</a></div>
       <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator-2.html">ProxyGenerator&lt;TInterface, TInterceptor&gt;</a></div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">Object.Equals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype">Object.GetType()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.memberwiseclone#system-object-memberwiseclone">Object.MemberwiseClone()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#system-object-referenceequals(system-object-system-object)">Object.ReferenceEquals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Internals_Generator_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class Generator&lt;TInterface, TDescendant&gt;
-    where TDescendant : Generator&lt;TInterface, TDescendant&gt;, new()</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Generator&lt;TInterface, TDescendant&gt; : Object where TDescendant : Generator&lt;TInterface, TDescendant&gt;, new()</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -105,6 +80,16 @@
   <h5 id="Solti_Utils_Proxy_Internals_Generator_2_remarks"><strong>Remarks</strong></h5>
   <div class="markdown level0 remarks"><p>Generators should not be instantiated. To access the created <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> use the <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType">GetGeneratedType()</a> or <a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_">GetGeneratedTypeAsync(CancellationToken)</a> method.</p>
 </div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_Generator_2__ctor_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.#ctor*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2__ctor" data-uid="Solti.Utils.Proxy.Internals.Generator`2.#ctor">Generator()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Generator()</code></pre>
+  </div>
   <h3 id="properties">Properties
   </h3>
   <a id="Solti_Utils_Proxy_Internals_Generator_2_Instance_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Instance*"></a>
@@ -134,13 +119,13 @@
   <h3 id="methods">Methods
   </h3>
   <a id="Solti_Utils_Proxy_Internals_Generator_2_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Object_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Object)">Activate(Object)</h4>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Runtime_CompilerServices_ITuple_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Runtime.CompilerServices.ITuple)">Activate(ITuple)</h4>
   <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static TInterface Activate(object tuple)</code></pre>
+    <pre><code class="lang-csharp hljs">public static TInterface Activate(ITuple tuple)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -153,7 +138,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.runtime.compilerservices.ituple">ITuple</a></td>
         <td><span class="parametername">tuple</span></td>
         <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
 </td>
@@ -177,13 +162,13 @@
     </tbody>
   </table>
   <a id="Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Object_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Object,System.Threading.CancellationToken)">ActivateAsync(Object, CancellationToken)</h4>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)">ActivateAsync(ITuple, CancellationToken)</h4>
   <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static async Task&lt;TInterface&gt; ActivateAsync(object tuple, CancellationToken cancellation = default(CancellationToken))</code></pre>
+    <pre><code class="lang-csharp hljs">public static Task&lt;TInterface&gt; ActivateAsync(ITuple tuple, CancellationToken cancellation = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -196,7 +181,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.runtime.compilerservices.ituple">ITuple</a></td>
         <td><span class="parametername">tuple</span></td>
         <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
 </td>
@@ -283,7 +268,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public static Task&lt;Type&gt; GetGeneratedTypeAsync(CancellationToken cancellation = default(CancellationToken))</code></pre>
+    <pre><code class="lang-csharp hljs">public static Task&lt;Type&gt; GetGeneratedTypeAsync(CancellationToken cancellation = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">

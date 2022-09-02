@@ -58,46 +58,29 @@
     <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a>&gt;</div>
     <div><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">IEquatable</a>&lt;<a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a>&gt;</div>
   </div>
-  <div class="inheritedMembers">
-    <h5>Inherited Members</h5>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">Object.Equals(Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">Object.Equals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gethashcode#system-object-gethashcode">Object.GetHashCode()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.gettype#system-object-gettype">Object.GetType()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.memberwiseclone#system-object-memberwiseclone">Object.MemberwiseClone()</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.referenceequals#system-object-referenceequals(system-object-system-object)">Object.ReferenceEquals(Object, Object)</a>
-    </div>
-    <div>
-      <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object.tostring#system-object-tostring">Object.ToString()</a>
-    </div>
-  </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Internals_Generator_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class Generator : TypeEmitter, IEquatable&lt;TypeEmitter&gt;, IEquatable&lt;Generator&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public abstract class Generator : TypeEmitter</code></pre>
   </div>
-  <h3 id="methods">Methods
+  <h3 id="constructors">Constructors
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_Generator_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_Generator_Activate_System_Object_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate(System.Object)">Activate(Object)</h4>
-  <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
-</div>
+  <a id="Solti_Utils_Proxy_Internals_Generator__ctor_" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator__ctor" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor">Generator()</h4>
+  <div class="markdown level1 summary"></div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public object Activate(object tuple)</code></pre>
+    <pre><code class="lang-csharp hljs">protected Generator()</code></pre>
+  </div>
+  <a id="Solti_Utils_Proxy_Internals_Generator__ctor_" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator__ctor_Solti_Utils_Proxy_Internals_Generator_" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor(Solti.Utils.Proxy.Internals.Generator)">Generator(Generator)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Generator(Generator original)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -110,7 +93,87 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">original</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_Generator_EqualityContract_" data-uid="Solti.Utils.Proxy.Internals.Generator.EqualityContract*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_EqualityContract" data-uid="Solti.Utils.Proxy.Internals.Generator.EqualityContract">EqualityContract</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override Type EqualityContract { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_EqualityContract">TypeEmitter.EqualityContract</a></div>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_Generator__Clone___" data-uid="Solti.Utils.Proxy.Internals.Generator.{Clone}$*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator__Clone__" data-uid="Solti.Utils.Proxy.Internals.Generator.{Clone}$">&lt;Clone&gt;$()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract override TypeEmitter &lt;Clone&gt;$()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter__Clone__">TypeEmitter.&lt;Clone&gt;$()</a></div>
+  <a id="Solti_Utils_Proxy_Internals_Generator_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_Activate_System_Runtime_CompilerServices_ITuple_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)">Activate(ITuple)</h4>
+  <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public object Activate(ITuple tuple)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.runtime.compilerservices.ituple">ITuple</a></td>
         <td><span class="parametername">tuple</span></td>
         <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
 </td>
@@ -134,13 +197,13 @@
     </tbody>
   </table>
   <a id="Solti_Utils_Proxy_Internals_Generator_ActivateAsync_" data-uid="Solti.Utils.Proxy.Internals.Generator.ActivateAsync*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Object_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Object,System.Threading.CancellationToken)">ActivateAsync(Object, CancellationToken)</h4>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)">ActivateAsync(ITuple, CancellationToken)</h4>
   <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public async Task&lt;object&gt; ActivateAsync(object tuple, CancellationToken cancellation = default(CancellationToken))</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;object&gt; ActivateAsync(ITuple tuple, CancellationToken cancellation = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -153,7 +216,7 @@
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.runtime.compilerservices.ituple">ITuple</a></td>
         <td><span class="parametername">tuple</span></td>
         <td><p>A <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.tuple">Tuple</a> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
 </td>
@@ -182,6 +245,130 @@
       </tr>
     </tbody>
   </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_Equals_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_Equals_Solti_Utils_Proxy_Internals_Generator_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.Generator)">Equals(Generator)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual bool Equals(Generator other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_Equals_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_Equals_Solti_Utils_Proxy_Internals_TypeEmitter_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)">Equals(TypeEmitter)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public sealed override bool Equals(TypeEmitter other)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a></td>
+        <td><span class="parametername">other</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_Equals_Solti_Utils_Proxy_Internals_TypeEmitter_">TypeEmitter.Equals(TypeEmitter)</a></div>
+  <a id="Solti_Utils_Proxy_Internals_Generator_Equals_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_Equals_System_Object_" data-uid="Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)">Equals(Object)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override bool Equals(object obj)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.object">Object</a></td>
+        <td><span class="parametername">obj</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_Equals_System_Object_">TypeEmitter.Equals(Object)</a></div>
   <a id="Solti_Utils_Proxy_Internals_Generator_GetGeneratedType_" data-uid="Solti.Utils.Proxy.Internals.Generator.GetGeneratedType*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_Generator_GetGeneratedType" data-uid="Solti.Utils.Proxy.Internals.Generator.GetGeneratedType">GetGeneratedType()</h4>
   <div class="markdown level1 summary"><p>Gets the generated <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a>.</p>
@@ -216,7 +403,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;Type&gt; GetGeneratedTypeAsync(in CancellationToken cancellation = default(CancellationToken))</code></pre>
+    <pre><code class="lang-csharp hljs">public Task&lt;Type&gt; GetGeneratedTypeAsync(in CancellationToken cancellation = null)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -253,6 +440,190 @@
   <h5 id="Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>The returned <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.type">Type</a> is generated only once.</p>
 </div>
+  <a id="Solti_Utils_Proxy_Internals_Generator_GetHashCode_" data-uid="Solti.Utils.Proxy.Internals.Generator.GetHashCode*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_GetHashCode" data-uid="Solti.Utils.Proxy.Internals.Generator.GetHashCode">GetHashCode()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override int GetHashCode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_GetHashCode">TypeEmitter.GetHashCode()</a></div>
+  <a id="Solti_Utils_Proxy_Internals_Generator_PrintMembers_" data-uid="Solti.Utils.Proxy.Internals.Generator.PrintMembers*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_PrintMembers_System_Text_StringBuilder_" data-uid="Solti.Utils.Proxy.Internals.Generator.PrintMembers(System.Text.StringBuilder)">PrintMembers(StringBuilder)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected override bool PrintMembers(StringBuilder builder)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.text.stringbuilder">StringBuilder</a></td>
+        <td><span class="parametername">builder</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_PrintMembers_System_Text_StringBuilder_">TypeEmitter.PrintMembers(StringBuilder)</a></div>
+  <a id="Solti_Utils_Proxy_Internals_Generator_ToString_" data-uid="Solti.Utils.Proxy.Internals.Generator.ToString*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_ToString" data-uid="Solti.Utils.Proxy.Internals.Generator.ToString">ToString()</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public override string ToString()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.string">String</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_ToString">TypeEmitter.ToString()</a></div>
+  <h3 id="operators">Operators
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_Generator_op_Equality_" data-uid="Solti.Utils.Proxy.Internals.Generator.op_Equality*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_op_Equality_Solti_Utils_Proxy_Internals_Generator_Solti_Utils_Proxy_Internals_Generator_" data-uid="Solti.Utils.Proxy.Internals.Generator.op_Equality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)">Equality(Generator, Generator)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator ==(Generator left, Generator right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_op_Inequality_" data-uid="Solti.Utils.Proxy.Internals.Generator.op_Inequality*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_op_Inequality_Solti_Utils_Proxy_Internals_Generator_Solti_Utils_Proxy_Internals_Generator_" data-uid="Solti.Utils.Proxy.Internals.Generator.op_Inequality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)">Inequality(Generator, Generator)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static bool operator !=(Generator left, Generator right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">left</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></td>
+        <td><span class="parametername">right</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://docs.microsoft.com/dotnet/api/system.boolean">Boolean</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
   <h3 id="implements">Implements</h3>
   <div>
       <a class="xref" href="https://docs.microsoft.com/dotnet/api/system.iequatable-1">System.IEquatable&lt;T&gt;</a>
