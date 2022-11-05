@@ -5,8 +5,6 @@ internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Util
     {
     }
 
-    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Duck_2648115D0AA68B747DBE21865A3A6FC2));
     [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
     global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);
     [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -18,4 +16,17 @@ internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Util
     event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         remove => this.Target.Event -= value; }
+
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    {
+        switch (tuple)
+        {
+            case global::System.Tuple<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>> t0:
+                return new Duck_2648115D0AA68B747DBE21865A3A6FC2(t0.Item1);
+            default:
+                throw new global::System.NotSupportedException();
+        }
+    };
+    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Duck_2648115D0AA68B747DBE21865A3A6FC2));
 }
