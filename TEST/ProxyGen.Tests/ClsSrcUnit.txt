@@ -7,8 +7,6 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         this.Proxy = this;
     }
 
-    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A));
     private static class WrapperBD8C74C6501C257EC01888B1DE3E00C5<TT>
     {
         public static readonly global::Solti.Utils.Proxy.MethodContext Value = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
@@ -94,4 +92,17 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
             this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F9750C1B0E32217DBCD60481B48459A44));
         }
     }
+
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    {
+        switch (tuple)
+        {
+            case global::System.Tuple<global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>> t0:
+                return new global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A(t0.Item1);
+            default:
+                throw new global::System.NotSupportedException();
+        }
+    };
+    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A));
 }

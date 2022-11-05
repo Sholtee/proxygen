@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        internal Task<ProxyActivator.ActivatorDelegate> GetActivatorAsyncInternal() => CacheSlim.GetOrAdd
+        internal Task<Func<object?, object>> GetActivatorAsyncInternal() => CacheSlim.GetOrAdd
         (
             this,
             async static self => ProxyActivator.Create

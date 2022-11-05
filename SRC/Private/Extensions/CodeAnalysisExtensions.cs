@@ -53,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// SyntaxNode1, SyntaxNode2, ....
         /// </summary>
-        public static SeparatedSyntaxList<TNode> ToSyntaxList<TNode>(this IEnumerable<TNode> src) where TNode : SyntaxNode => ToSyntaxList(src, x => x);
+        public static SeparatedSyntaxList<TNode> ToSyntaxList<TNode>(this IEnumerable<TNode> src) where TNode : SyntaxNode => ToSyntaxList(src, static x => x);
 
         /// <summary>
         /// Name1.Name2.Name3.....
