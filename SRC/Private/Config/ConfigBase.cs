@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly ThreadLocal<TDescendant> FInstance = new
         (
-            () => 
+            static () => 
             {
                 TDescendant instance = new();
                 instance.InitWithDefaults();
