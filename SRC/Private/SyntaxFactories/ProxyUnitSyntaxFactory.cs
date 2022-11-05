@@ -122,6 +122,8 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
+        public const string ACTIVATOR_NAME = "__Activator";
+
         #if DEBUG
         internal
         #endif
@@ -155,7 +157,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             VariableDeclarator
                             (
-                                Identifier("__Activator")
+                                Identifier(ACTIVATOR_NAME)
                             )
                             .WithInitializer
                             (
@@ -365,7 +367,7 @@ namespace Solti.Utils.Proxy.Internals
                 return generic.ReplaceNodes
                 (
                     gn.DescendantNodes().OfType<TypeSyntax>(),
-                    (_, typeArgument) => ctor.ParameterList.Parameters[arity++].Type!
+                    (_, _) => ctor.ParameterList.Parameters[arity++].Type!
                 );
             }
         }
