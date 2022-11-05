@@ -131,3 +131,5 @@
   - *introduced:* `ProxyEmbedder` uses Roslyn's source generator V2 API
 - 7.0.0:
   - *updated:* Solti.Utils.Primitives
+- 7.1.0:
+  - *improved:* Proxy activator (now it is part of the generated class, no expression compilation required)
