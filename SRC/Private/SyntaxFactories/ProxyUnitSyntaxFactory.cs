@@ -307,7 +307,14 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             ObjectCreationExpression
                             (
-                                IdentifierName(cls.Identifier)
+                                AliasQualifiedName
+                                (
+                                    IdentifierName
+                                    (
+                                        Token(SyntaxKind.GlobalKeyword)
+                                    ),
+                                    IdentifierName(cls.Identifier)
+                                )
                             )
                             .WithArgumentList
                             (
