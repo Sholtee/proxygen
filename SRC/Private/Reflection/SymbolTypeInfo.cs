@@ -21,6 +21,7 @@ namespace Solti.Utils.Proxy.Internals
             UnderlyingSymbol = typeSymbol;
             Compilation = compilation;
         }
+
         public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation)
         {
             typeSymbol.EnsureNotError();

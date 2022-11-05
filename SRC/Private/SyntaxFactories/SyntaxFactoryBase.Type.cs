@@ -46,7 +46,10 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
                 (
-                    IdentifierName(Token(SyntaxKind.GlobalKeyword)),
+                    IdentifierName
+                    (
+                        Token(SyntaxKind.GlobalKeyword)
+                    ),
                     (SimpleNameSyntax) names[0]
                 );
             }
@@ -133,6 +136,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected TypeSyntax ResolveType<T>() => ResolveType(MetadataTypeInfo.CreateFrom(typeof(T)));
+        protected TypeSyntax ResolveType<T>() => ResolveType
+        (
+            MetadataTypeInfo.CreateFrom(typeof(T))
+        );
     }
 }

@@ -17,8 +17,6 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            cls = base.ResolveMethods(cls, context);
-
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
                 if (ifaceMethod.IsSpecial)
