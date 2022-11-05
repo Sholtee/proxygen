@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
@@ -75,7 +76,7 @@ namespace Solti.Utils.Proxy.Internals
             return false;
         }
 
-        public static T? Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T: class
+        public static T? Single<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null, bool throwOnEmpty = true) where T : class
         {
             T? result = null;
 
@@ -93,6 +94,15 @@ namespace Solti.Utils.Proxy.Internals
                 throw new InvalidOperationException();
 
             return result;
+        }
+
+        public static IEnumerable<T> OfType<T>(this IEnumerable src) where T : class
+        {
+            foreach (object item in src)
+            {
+                if (item is T result)
+                    yield return result;
+            }
         }
     }
 }
