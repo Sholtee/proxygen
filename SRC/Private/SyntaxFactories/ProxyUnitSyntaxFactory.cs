@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -32,24 +31,17 @@ namespace Solti.Utils.Proxy.Internals
             ResolveClassName(null!)
         };
 
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation)
+        protected override IEnumerable<Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>> MemberResolvers
         {
-            cls = base.ResolveMembers(cls, context, cancellation);
-
-            foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> factory in new Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>[]
+            get
             {
-                ResolveActivator,
-                ResolveInitializer
-            })
-            {
-                cancellation.ThrowIfCancellationRequested();
-                cls = factory(cls, context);
+                foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> resolver in base.MemberResolvers)
+                {
+                    yield return resolver;
+                }
+                yield return ResolveActivator;
+                yield return ResolveInitializer;
             }
-
-            return cls;
         }
 
         #if DEBUG

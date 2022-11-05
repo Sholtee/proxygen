@@ -56,21 +56,26 @@ namespace Solti.Utils.Proxy.Internals
             return ResolveMembers(cls, context, cancellation);
         }
 
+        protected virtual IEnumerable<Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>> MemberResolvers
+        {
+            get
+            {
+                yield return ResolveConstructors;
+                yield return ResolveMethods;
+                yield return ResolveProperties;
+                yield return ResolveEvents;
+            }
+        }
+
         #if DEBUG
         internal
         #endif
         protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation)
         {
-            foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> factory in new Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>[]
-            { 
-                ResolveConstructors,
-                ResolveMethods,
-                ResolveProperties,
-                ResolveEvents
-            })
+            foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> resolver in MemberResolvers)
             {
                 cancellation.ThrowIfCancellationRequested();
-                cls = factory(cls, context);
+                cls = resolver(cls, context);
             }
             return cls;
         }
