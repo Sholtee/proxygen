@@ -56,7 +56,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static readonly Lazy<ImmutableHashSet<MetadataReference>> FPlatformAssemblies = new
         (
-            () => ImmutableHashSet.CreateRange
+            static () => ImmutableHashSet.CreateRange
             (
                 MetadataReferenceComparer.Instance,
                 GetPlatformAssemblies
