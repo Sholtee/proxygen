@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Task<Type> GetGeneratedTypeAsync(in CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal().AsCancellable(cancellation);
+        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal().AsCancellable(cancellation);
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
