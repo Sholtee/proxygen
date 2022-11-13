@@ -689,15 +689,12 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   nameWithType: Generator.GetGeneratedType
-- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken@)
-  name: GetGeneratedTypeAsync(in CancellationToken)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken__
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken@)
-  name.vb: GetGeneratedTypeAsync(ByRef CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(in System.Threading.CancellationToken)
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(ByRef System.Threading.CancellationToken)
-  nameWithType: Generator.GetGeneratedTypeAsync(in CancellationToken)
-  nameWithType.vb: Generator.GetGeneratedTypeAsync(ByRef CancellationToken)
+- uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  name: GetGeneratedTypeAsync(CancellationToken)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  nameWithType: Generator.GetGeneratedTypeAsync(CancellationToken)
 - uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync*
   name: GetGeneratedTypeAsync
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedTypeAsync_
