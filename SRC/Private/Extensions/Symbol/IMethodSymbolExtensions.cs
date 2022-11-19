@@ -47,6 +47,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
+            //
+            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // the implementors.
+            //
+
+            if (src.IsStatic)
+                yield break;
+
             INamedTypeSymbol containingType = src.ContainingType;
 
             foreach (ITypeSymbol iface in containingType.GetAllInterfaces())

@@ -65,6 +65,14 @@ namespace Solti.Utils.Proxy.Internals
             if (reflectedType.IsInterface)
                 yield break;
 
+            //
+            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // the implementors.
+            //
+
+            if (src.IsStatic)
+                yield break;
+
             foreach (Type iface in reflectedType.GetInterfaces())
             {
                 //
