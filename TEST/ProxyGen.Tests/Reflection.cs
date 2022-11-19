@@ -264,7 +264,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -274,7 +274,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsP(IReadOnlyList<IParameterInfo> l1, IReadOnlyList<IParameterInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -284,7 +284,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsM(IReadOnlyList<IMethodInfo> l1, IReadOnlyList<IMethodInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -294,7 +294,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsPr(IReadOnlyList<IPropertyInfo> l1, IReadOnlyList<IPropertyInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -304,7 +304,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsE(IReadOnlyList<IEventInfo> l1, IReadOnlyList<IEventInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {

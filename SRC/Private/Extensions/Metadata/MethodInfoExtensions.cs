@@ -40,6 +40,16 @@ namespace Solti.Utils.Proxy.Internals
 
             src.IsSpecialName || (src.GetAccessModifiers() is AccessModifiers.Explicit && src.IsStatic && FIsSpecial.IsMatch(src.StrippedName()));
 
+        public static bool IsFinal(this MethodBase src) =>
+            src.IsFinal ||
+            src.GetAccessModifiers() is AccessModifiers.Explicit ||
+
+            //
+            // Starting from C# 11 interfaces may have static abstract methods.
+            //
+
+            (src.IsStatic && !src.IsAbstract);
+
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface
             ? Array.Empty<Type>()
             : src

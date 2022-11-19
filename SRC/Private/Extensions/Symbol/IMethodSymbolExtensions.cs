@@ -99,11 +99,18 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsFinal(this IMethodSymbol src) => 
             src.IsSealed ||
+
             //
-            // A fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol
+            // The compiler makes method sealed virtual if it implements some insterface method.
             //
 
-            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
+            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some()) ||
+
+            //
+            // Starting from C# 11 interfaces may have static abstract methods.
+            //
+
+            (src.IsStatic && !src.IsAbstract);
 
         //
         // OverriddenMethod nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
