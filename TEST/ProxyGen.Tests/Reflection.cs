@@ -321,7 +321,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(SystemTypes)), Parallelizable]
         public void TypeInfo_AbstractionTestAgainstSystemType(Type t)
         {
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
             if (t.Name.Contains("NonRandomizedStringEqualityComparer"))
                 Assert.Ignore("Needs investigation");
 #endif
