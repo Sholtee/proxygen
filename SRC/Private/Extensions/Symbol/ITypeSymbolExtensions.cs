@@ -49,19 +49,13 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             _ when src is IArrayTypeSymbol array => $"{array.ElementType.GetFriendlyName()}[{(array.Rank - 1).Times(static () => ',').Join()}]",
-            _ when src.IsNested() => src.ToDisplayString
-            (
-                new SymbolDisplayFormat
-                (
-                    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly,
-                    miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
-                )
-            ),
             _ => src.ToDisplayString
             (
                 new SymbolDisplayFormat
                 (
-                    typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
+                    typeQualificationStyle: src.IsNested()
+                        ? SymbolDisplayTypeQualificationStyle.NameOnly
+                        : SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
                     miscellaneousOptions: SymbolDisplayMiscellaneousOptions.ExpandNullable
                 )
             )
@@ -69,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsBoundNullable(this INamedTypeSymbol src) =>
             src.ConstructedFrom?.SpecialType is SpecialType.System_Nullable_T &&
-            !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
+            !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src);
 
         public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Some();
 
