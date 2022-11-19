@@ -106,7 +106,11 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             if (skipSpecial)
-                methods = methods.Convert(static m => m, m => m.IsSpecial());
+                methods = methods.Convert
+                (
+                    static m => m,
+                    static m => m.IsSpecial()
+                );
 
             return methods;
         }
