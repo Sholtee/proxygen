@@ -6,6 +6,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -103,6 +104,18 @@ namespace Solti.Utils.Proxy.Internals
                 if (item is T result)
                     yield return result;
             }
+        }
+
+        public static string Join(this IEnumerable src)
+        {
+            StringBuilder sb = new();
+
+            foreach (object item in src)
+            {
+                sb.Append(item);
+            }
+
+            return sb.ToString();
         }
     }
 }

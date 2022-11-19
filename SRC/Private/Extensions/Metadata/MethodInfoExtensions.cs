@@ -31,14 +31,17 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly Regex FIsSpecial = new("^(op|get|set|add|remove)_\\w+", RegexOptions.Compiled);
 
         public static bool IsSpecial(this MethodBase src) =>
+            src.IsSpecialName ||
+
             //
-            // NET6_0-tol interface-nek lehet absztrakt statikus tagja:
-            // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
-            //
-            // Ha ezeken operatort definialunk akkor az nem lesz SpecialName (sztem mondjuk az kene legyen).
+            // Starting from C# 11 interfaces may have static abstract methods.
             //
 
-            src.IsSpecialName || (src.GetAccessModifiers() is AccessModifiers.Explicit && src.IsStatic && FIsSpecial.IsMatch(src.StrippedName()));
+            (src.IsStatic && src.IsAbstract);
+
+        public static bool IsFinal(this MethodBase src) =>
+            src.IsFinal ||
+            src.GetAccessModifiers() is AccessModifiers.Explicit;
 
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface
             ? Array.Empty<Type>()
@@ -53,6 +56,14 @@ namespace Solti.Utils.Proxy.Internals
 
             Type reflectedType = src.ReflectedType;
             if (reflectedType.IsInterface)
+                yield break;
+
+            //
+            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // the implementors.
+            //
+
+            if (src.IsStatic)
                 yield break;
 
             foreach (Type iface in reflectedType.GetInterfaces())

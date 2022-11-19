@@ -47,6 +47,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
+            //
+            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // the implementors.
+            //
+
+            if (src.IsStatic)
+                yield break;
+
             INamedTypeSymbol containingType = src.ContainingType;
 
             foreach (ITypeSymbol iface in containingType.GetAllInterfaces())
@@ -82,7 +90,12 @@ namespace Solti.Utils.Proxy.Internals
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
                 src = src.GetImplementedInterfaceMethods().Single()!;
 
-            return SpecialMethods.Some(mk => mk == src.MethodKind);
+            return SpecialMethods.Some(mk => mk == src.MethodKind) ||
+                //
+                // Starting from C# 11 interfaces may have static abstract methods.
+                //
+
+                (src.IsStatic && src.IsAbstract);
         }
 
         private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
@@ -99,8 +112,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsFinal(this IMethodSymbol src) => 
             src.IsSealed ||
+
             //
-            // A fordito implicit lepecsetelt virtualist csinal az interface tagot megvalosito metodusbol
+            // The compiler makes method sealed virtual if it implements some insterface method.
             //
 
             (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());

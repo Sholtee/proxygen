@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
 	<CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+	<LangVersion>10</LangVersion>
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
@@ -22,8 +23,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.0.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.3.*" />
     <PackageReference Include="System.Runtime.Loader" Version="4.*" />
   </ItemGroup>
 

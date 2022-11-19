@@ -53,11 +53,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void TypeInfo_AbstractionTest([Values(
             typeof(void), 
             typeof(object), 
-            typeof(int), 
+            typeof(int),
             typeof(int[]), 
-            typeof(int[,]), 
+            typeof(int[,]),
             typeof((int Int, string String)), 
-            typeof(int*), 
+            typeof(int*),
+            typeof(nint),
+            typeof(nint[]),
             typeof(DateTime), 
             typeof(List<>),
             typeof(Span<int>), // ref struct
@@ -264,7 +266,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -274,7 +276,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsP(IReadOnlyList<IParameterInfo> l1, IReadOnlyList<IParameterInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -284,7 +286,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsM(IReadOnlyList<IMethodInfo> l1, IReadOnlyList<IMethodInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -294,7 +296,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsPr(IReadOnlyList<IPropertyInfo> l1, IReadOnlyList<IPropertyInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -304,7 +306,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             void AssertSequenceEqualsE(IReadOnlyList<IEventInfo> l1, IReadOnlyList<IEventInfo> l2)
             {
-                Assert.That(l1.Count, Is.EqualTo(l2.Count));
+                Assert.AreEqual(l1.Count, l2.Count);
 
                 for (int i = 0; i < l1.Count; i++)
                 {
@@ -321,7 +323,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(SystemTypes)), Parallelizable]
         public void TypeInfo_AbstractionTestAgainstSystemType(Type t)
         {
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
             if (t.Name.Contains("NonRandomizedStringEqualityComparer"))
                 Assert.Ignore("Needs investigation");
 #endif
