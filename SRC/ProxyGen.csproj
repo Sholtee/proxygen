@@ -24,7 +24,7 @@
 
   <ItemGroup>
 	<PackageReference Include="IndexRange" Version="1.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="6.*">
       <!-- This package is a develpement dependency -->
       <PrivateAssets>all</PrivateAssets>
