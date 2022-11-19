@@ -36,9 +36,19 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
-            _ when src.IsTupleType || src.IsNativeIntegerType => src.ContainingNamespace.ToString() + Type.Delimiter + src.Name, // ne "(T Item1, TT item2)" formaban legyen
+            //
+            // nint => System.IntPtr, (T Item1, TT item2) => System.Tuple<T, TT>
+            //
+
+            _ when src.IsTupleType || src.IsNativeIntegerType => src.ContainingNamespace.ToString() + Type.Delimiter + src.Name,
             _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
             _ when src is IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
+
+            //
+            // nint[,] => System.IntPtr[,]
+            //
+
+            _ when src is IArrayTypeSymbol array => $"{array.ElementType.GetFriendlyName()}[{(array.Rank - 1).Times(static () => ',').Join()}]",
             _ when src.IsNested() => src.ToDisplayString
             (
                 new SymbolDisplayFormat
@@ -57,7 +67,9 @@ namespace Solti.Utils.Proxy.Internals
             )
         };
 
-        public static bool IsBoundNullable(this INamedTypeSymbol src) => src.ConstructedFrom?.SpecialType is SpecialType.System_Nullable_T && !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
+        public static bool IsBoundNullable(this INamedTypeSymbol src) =>
+            src.ConstructedFrom?.SpecialType is SpecialType.System_Nullable_T &&
+            !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src); // !src.IsGenericTypeDefinition() baszik itt mukodni
 
         public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Some();
 

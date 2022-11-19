@@ -53,11 +53,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void TypeInfo_AbstractionTest([Values(
             typeof(void), 
             typeof(object), 
-            typeof(int), 
+            typeof(int),
             typeof(int[]), 
-            typeof(int[,]), 
+            typeof(int[,]),
             typeof((int Int, string String)), 
-            typeof(int*), 
+            typeof(int*),
+            typeof(nint),
+            typeof(nint[]),
             typeof(DateTime), 
             typeof(List<>),
             typeof(Span<int>), // ref struct

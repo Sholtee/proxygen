@@ -5,6 +5,7 @@
 	<CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+	<LangVersion>10</LangVersion>
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
