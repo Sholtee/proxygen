@@ -8,7 +8,7 @@
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <OutputPath>..\BIN\$(Configuration)</OutputPath>
-    <LangVersion>10</LangVersion>
+    <LangVersion>11</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

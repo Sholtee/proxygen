@@ -62,16 +62,19 @@ namespace Solti.Utils.Proxy.Internals
 
             return new ExtendedMemberInfo
             (
-                method,   
-                    declaringType
-                        .GetProperties()
-                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method, throwOnEmpty: false) ??
-
-                    declaringType
-                        .GetEvents()
-                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method, throwOnEmpty: false) ??
-
-                    (MemberInfo) method
+                method,
+                method.IsSpecialName
+                    ? method.Name switch
+                    {
+                        ['g', 'e', 't', '_', ..] or ['s', 'e', 't', '_', ..] => declaringType
+                            .GetProperties()
+                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+                        ['a', 'd', 'd', '_', ..] or ['r', 'e', 'm', 'o', 'v', 'e', '_', ..] => declaringType
+                            .GetEvents()
+                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+                        _ => throw new NotSupportedException()
+                    }
+                    : method
             );
         }
 
