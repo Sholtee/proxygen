@@ -4,6 +4,7 @@
   "app": "\\SRC\\ProxyGen.csproj",
   "vendor": "\\Vendor",
   "tests": "\\TEST\\ProxyGen.Tests\\ProxyGen.Tests.csproj",
+  "skipon": ["net7.0"],
   "artifacts": "\\Artifacts",
   "coveragefilter": "+[Solti.Utils.Proxy*]* -[Solti.Utils.Proxy.Tests*]* -[*]*.Properties.*",
   "perftests": "\\PERF\\ProxyGen.Perf.csproj",
