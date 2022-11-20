@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -26,6 +27,27 @@ namespace Solti.Utils.Proxy.Internals
 
         private static AssemblyLoadContext AssemblyLoader { get; } = AssemblyLoadContext.Default;
 
+        private static void RunInitializers(Assembly assembly)
+        {
+            //
+            // Module initializers won't run if the containing assembly being loaded
+            // from code.
+            //
+
+            foreach (Module module in assembly.GetModules())
+            {
+                RuntimeHelpers.RunModuleConstructor(module.ModuleHandle);
+            }
+        }
+
+        private static Type? GetInstanceFromCache(string className, bool throwOnMissing)
+        {
+            FInstances.TryGetValue(className, out Type type);
+            if (type is null && throwOnMissing)
+                throw new TypeLoadException(className);  // FIXME: somehow try to set the TypeName property
+            return type;
+        }
+
         private protected abstract ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector);
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
@@ -36,17 +58,18 @@ namespace Solti.Utils.Proxy.Internals
 
             ProxyUnitSyntaxFactory mainUnit = CreateMainUnit(asmName, referenceCollector);
 
-            string className = mainUnit.DefinedClasses.Single()!; // TODO: Mi van ha tobb van?
+            string className = mainUnit.DefinedClasses.Single()!; // TODO: support multiple defined classes
 
             //
-            // 1) A tipus mar be lett toltve (pl beagyazott tipus eseten)
+            // 1) Type already loaded (for e.g. in case of embedded types)
             //
 
-            if (FInstances.TryGetValue(className, out Type type))
+            Type? type = GetInstanceFromCache(className, throwOnMissing: false);
+            if (type is not null)
                 return type;
 
             //
-            // 2) Ha fizikailag mentjuk a szerelvenyt akkor lehet korabban mar letre lett hozva
+            // 2) If the assembly physically stored, try to load it from the cache directory.
             // 
 
             string? cacheFile = null;
@@ -56,27 +79,38 @@ namespace Solti.Utils.Proxy.Internals
                 cacheFile = Path.Combine(asmCacheDir, $"{mainUnit.ContainingAssembly}.dll");
 
                 if (File.Exists(cacheFile))
-                    return ExtractType
+                {
+                    RunInitializers
                     (
                         //
-                        // Kivetelt dob ha mar egyszer be lett toltve
+                        // Will throw if the assembly already loaded.
                         //
 
                         AssemblyLoader.LoadFromAssemblyPath(cacheFile)
                     );
 
+                    return GetInstanceFromCache(className, throwOnMissing: true)!;
+                }
+
+                //
+                // Couldn't find the assembly, in the next step we will compile it. Make sure the
+                // cache directory exits.
+                //
+
                 Directory.CreateDirectory(asmCacheDir);
             }
 
             //
-            // 3) Egyik korabbi sem nyert akkor leforditjuk
+            // 3) Compile the assembly from the scratch.
             //
 
             List<UnitSyntaxFactoryBase> units = new
             (
                 CreateChunks(referenceCollector)
-            );
-            units.Add(mainUnit);
+            )
+            {
+                mainUnit
+            };
 
             using Stream asm = Compile.ToAssembly
             (
@@ -94,28 +128,25 @@ namespace Solti.Utils.Proxy.Internals
                 cancellation
             );
 
-            return ExtractType
+            RunInitializers
             (
+                //
+                // Will throw if the assembly already loaded.
+                //
+
                 AssemblyLoader.LoadFromStream(asm)
             );
 
-            Type ExtractType(Assembly asm)
-            {
-                //
-                // Fasz se tudja miert de ha dinamikusan toltunk be egy szerelvenyt akkor annak a module-inicializaloja
-                // nem fog lefutni... Ezert jol meghivjuk kezzel
-                //
-
-                foreach (Module module in asm.GetModules())
-                {
-                    RuntimeHelpers.RunModuleConstructor(module.ModuleHandle);
-                }
-
-                return asm.GetType(className, throwOnError: true);
-            }
+            return GetInstanceFromCache(className, throwOnMissing: true)!;
         }
 
-        internal static void RegisterInstance(Type instance) => FInstances[instance.Name] = instance;
+        internal static void RegisterInstance(Type instance)
+        {
+            if (!FInstances.TryAdd(instance.Name, instance))
+            {
+                Trace.TraceWarning($"Instance already loaded: {instance.Name}");
+            }
+        }
 #if DEBUG
         internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;
 #endif
