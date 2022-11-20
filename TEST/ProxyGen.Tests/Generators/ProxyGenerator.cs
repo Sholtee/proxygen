@@ -220,11 +220,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(interceptor.Contexts.Count, Is.EqualTo(2));
 
+            //
+            // IList.Add is NOT "inherited"
+            //
+
             InvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.Method, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
+
+            //
+            // IList.Count IS "inherited" from ICollection
+            //
 
             context = interceptor.Contexts[1];
 
