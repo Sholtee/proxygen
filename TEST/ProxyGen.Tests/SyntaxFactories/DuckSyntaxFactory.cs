@@ -128,7 +128,24 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveUnit_ShouldGenerateTheDesiredClass()
         {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("DuckClsSrc.txt").Replace("{version}", typeof(DuckGenerator<,>).Assembly.GetName().Version.ToString())));
+            Assert.That
+            (
+                CreateGenerator<IFoo<int>, GoodFoo<int>>()
+                    .ResolveUnit(null, default)
+                    .NormalizeWhitespace(eol: "\n")
+                    .ToFullString(),
+                Is.EqualTo
+                (
+                    File
+                        .ReadAllText("DuckClsSrc.txt")
+                        .Replace("\r", string.Empty)
+                        .Replace("{version}", typeof(DuckGenerator<,>)
+                            .Assembly
+                            .GetName()
+                            .Version
+                            .ToString())
+                )
+            );
         }
 
         [Test]
