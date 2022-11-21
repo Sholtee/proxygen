@@ -28,8 +28,6 @@ namespace Solti.Utils.Proxy.Internals
             #pragma warning restore CA2201
         };
 
-        private static readonly Regex FIsSpecial = new("^(op|get|set|add|remove)_\\w+", RegexOptions.Compiled);
-
         public static bool IsSpecial(this MethodBase src) =>
             src.IsSpecialName ||
 
