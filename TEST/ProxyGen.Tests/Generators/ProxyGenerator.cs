@@ -195,9 +195,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
             Assert.DoesNotThrowAsync(() => ProxyGenerator<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>.ActivateAsync(Tuple.Create((IInterfaceContainingMembersHavingAccessibility) null)));
 #endif
-        public class ListProxyWithContext : InterfaceInterceptor<IList<object>>
+        public class ListProxyWithContext<TInterface, TTarget> : InterfaceInterceptor<TInterface, TTarget>
+            where TInterface: class
+            where TTarget: TInterface
         {
-            public ListProxyWithContext() : base(new List<object>()) { }
+            public ListProxyWithContext(TTarget target) : base(target) { }
 
             public override object Invoke(InvocationContext context)
             {
@@ -211,12 +213,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldCallInvokeWithTheAppropriateArguments()
         {
-            IList<object> proxy = await ProxyGenerator<IList<object>, ListProxyWithContext>.ActivateAsync(null);
+            IList<object> proxy = await ProxyGenerator<IList<object>, ListProxyWithContext<IList<object>, IList<object>>>.ActivateAsync(Tuple.Create((IList<object>) new List<object>()));
 
             proxy.Add(100);
             _ = proxy.Count;
 
-            ListProxyWithContext interceptor = (ListProxyWithContext)proxy;
+            ListProxyWithContext<IList<object>, IList<object>> interceptor = (ListProxyWithContext<IList<object>, IList<object>>) proxy;
 
             Assert.That(interceptor.Contexts.Count, Is.EqualTo(2));
 
@@ -229,6 +231,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
+            Assert.That(context.TargetMember, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
 
             //
             // IList.Count IS "inherited" from ICollection
@@ -238,10 +241,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
-            PropertyInfo prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom(() => proxy.Count);
+            PropertyInfo prop = (PropertyInfo) MemberInfoExtensions.ExtractFrom(() => proxy.Count);
 
             Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.InterfaceMember, Is.EqualTo(prop));
+            Assert.That(context.TargeteMethod, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.TargetMember, Is.EqualTo(prop));
         }
 
         public interface IInterfaceHavingGenericMethod

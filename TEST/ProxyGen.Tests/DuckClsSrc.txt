@@ -24,7 +24,7 @@ internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Util
             case global::System.Tuple<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>> t0:
                 return new global::Duck_2648115D0AA68B747DBE21865A3A6FC2(t0.Item1);
             default:
-                throw new global::System.NotSupportedException();
+                throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]

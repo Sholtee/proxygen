@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Generators;
     using Internals;
-
     using static Internals.Tests.CodeAnalysisTestsBase;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
@@ -43,23 +43,25 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (Bar, "global::System.Object[] args = new global::System.Object[0];")
         };
 
-        private static ProxySyntaxFactory CreateGenerator(OutputType outputType) => new ProxySyntaxFactory
+        private static ProxySyntaxFactory CreateGenerator(Type iface, Type interceptor, OutputType outputType) => new ProxySyntaxFactory
         (
-            MetadataTypeInfo.CreateFrom(typeof(IFoo<int>)),
-            MetadataTypeInfo.CreateFrom(typeof(FooInterceptor)),
+            MetadataTypeInfo.CreateFrom(iface),
+            MetadataTypeInfo.CreateFrom(interceptor),
             typeof(ProxySyntaxFactoryTests).Assembly.GetName().Name,
             outputType,
             null
         );
 
+        private static ProxySyntaxFactory CreateGenerator<TInterface, TInterceptor>(OutputType outputType) => CreateGenerator(typeof(TInterface), typeof(TInterceptor), outputType);
+
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
-            Assert.That(CreateGenerator(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             IReadOnlyList<ExpressionStatementSyntax> assignments = gen.AssignByRefParameters
             (
@@ -74,7 +76,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void LocalArgs_ShouldBeDeclaredForEachArgument()
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = gen.ResolveInvokeTargetLocals
             (
@@ -98,7 +100,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ReassignArgsArray_ShouldCopyByRefArgumentsBack()
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             ParameterSyntax args = Parameter
             (
@@ -124,7 +126,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveInvokeTarget_ShouldCreateTheProperMethod()
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
         }
@@ -138,7 +140,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(ReturnTypes))]
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para)
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
@@ -152,7 +154,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(Methods))]
         public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
-            SyntaxList<MemberDeclarationSyntax> methods = CreateGenerator(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
+            SyntaxList<MemberDeclarationSyntax> methods = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
 
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
         }
@@ -160,7 +162,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = CreateGenerator(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
+            SyntaxList<MemberDeclarationSyntax> props = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
 
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("PropSrc.txt"))));
         }
@@ -183,16 +185,17 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void GenerateProxyEvent_Test()
         {
-            SyntaxList<MemberDeclarationSyntax> evts = CreateGenerator(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
+            SyntaxList<MemberDeclarationSyntax> evts = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
 
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("EventSrc.txt"))));
         }
 
-        [TestCase(OutputType.Module, "ClsSrcModule.txt")]
-        [TestCase(OutputType.Unit, "ClsSrcUnit.txt")]
-        public void ResolveUnit_ShouldGenerateTheDesiredUnit(int outputType, string fileName)
+        [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Module, "ClsSrcModule.txt")]
+        [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Unit, "ClsSrcUnit.txt")]
+        [TestCase(typeof(IList), typeof(InterfaceInterceptor<IList, List<object>>), OutputType.Module, "TargetClsSrcModule.txt")]
+        public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, Type interceptor, int outputType, string fileName)
         {
-            ProxySyntaxFactory gen = CreateGenerator((OutputType) outputType);
+            ProxySyntaxFactory gen = CreateGenerator(iface, interceptor, (OutputType) outputType);
 
             Assert.That
             (
@@ -281,7 +284,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void Factory_CanBeCancelled()
         {
-            ProxySyntaxFactory gen = CreateGenerator(OutputType.Module);
+            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {

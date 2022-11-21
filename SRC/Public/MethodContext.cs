@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy
@@ -33,14 +34,21 @@ namespace Solti.Utils.Proxy
 
             if (mappings is not null)
             {
-                TargeteMethod = mappings[InterfaceMethod];
-                TargetMember = MemberInfoExtensions.ExtractFrom(TargeteMethod);
+                //
+                // We dont wanna a TypeInitializationException to be thrown so make sure we won't throw
+                //
+
+                if (mappings.TryGetValue(InterfaceMethod, out MethodInfo targetmethod))
+                {           
+                    TargeteMethod = targetmethod;
+                    TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
+                }
+                else
+                    Trace.TraceWarning($"Cannot get target method for: {InterfaceMethod}");
             }
-            else
-            {
-                TargeteMethod = InterfaceMethod;
-                TargetMember = InterfaceMember;
-            }
+
+            TargeteMethod ??= InterfaceMethod;
+            TargetMember ??= InterfaceMember;
         }
 
         /// <summary>

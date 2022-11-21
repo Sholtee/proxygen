@@ -38,6 +38,9 @@
     <None Update="ClsSrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TargetClsSrcModule.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="BarSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
