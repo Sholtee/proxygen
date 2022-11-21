@@ -17,8 +17,6 @@ Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>
 Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator() -> void
 Solti.Utils.Proxy.InterfaceInterceptor<TInterface>
 Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.InterfaceInterceptor(TInterface? target) -> void
-Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Proxy.set -> void
-Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Target.get -> TInterface?
 Solti.Utils.Proxy.Internals.DuckBase<T>
 Solti.Utils.Proxy.Internals.DuckBase<T>.DuckBase(T target) -> void
 Solti.Utils.Proxy.Internals.DuckBase<T>.Target.get -> T
@@ -50,4 +48,3 @@ static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAs
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType() -> System.Type!
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Type!>!
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Instance.get -> Solti.Utils.Proxy.Internals.Generator!
-virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.Invoke(Solti.Utils.Proxy.InvocationContext! context) -> object?

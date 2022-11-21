@@ -20,6 +20,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
+        public ITypeInfo TargetType { get; }
+
         public IMethodInfo Invoke { get; }
 
         #if DEBUG
@@ -53,7 +55,10 @@ namespace Solti.Utils.Proxy.Internals
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
 
-            string baseInterceptorName = typeof(InterfaceInterceptor<>).FullName;
+            if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_INTERCEPTOR, nameof(interceptorType));
+
+            string baseInterceptorName = typeof(InterfaceInterceptor<,>).FullName;
 
             IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?) 
             (
@@ -61,14 +66,18 @@ namespace Solti.Utils.Proxy.Internals
                     ? interceptorType
                     : interceptorType.GetBaseTypes().Single(ic => ic.QualifiedName == baseInterceptorName, throwOnEmpty: false)
             );
-            if (baseInterceptor?.GenericArguments?.Single()?.EqualsTo(interfaceType) is not true)
-                throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
-            if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
-                throw new ArgumentException(Resources.GENERIC_INTERCEPTOR, nameof(interceptorType));
+            bool validInterceptor =
+                baseInterceptor is not null &&
+                baseInterceptor.GenericArguments[0].Equals(interfaceType) &&
+                interfaceType.IsAccessibleFrom(baseInterceptor.GenericArguments[1]);
+
+            if (!validInterceptor)
+                throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
             InterfaceType = interfaceType;        
             InterceptorType = interceptorType;
+            TargetType = baseInterceptor!.GenericArguments[1];
 
             Invoke = InterceptorType.Methods.Single
             (
