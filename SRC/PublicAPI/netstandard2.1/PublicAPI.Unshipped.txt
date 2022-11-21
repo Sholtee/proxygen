@@ -2,4 +2,6 @@ Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>
 Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.InterfaceInterceptor(TTarget? target) -> void
 Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Proxy.set -> void
 Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Target.get -> TTarget?
+Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>
+static Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Mappings.get -> System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>!
 virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InvocationContext! context) -> object?
