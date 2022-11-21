@@ -50,32 +50,44 @@ namespace Solti.Utils.Proxy.Internals
         // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static ExtendedMemberInfo ExtractFrom(Delegate accessor)
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor, int callIndex = 0)
         {
-            MethodInfo method = (MethodInfo) accessor
+            MethodInfo method = accessor
                 .Method
                 .GetInstructions()
-                .Single(static instruction => instruction.OpCode == OpCodes.Callvirt)!
-                .Operand;
-
-            Type declaringType = method.DeclaringType;
+                .ConvertAr
+                (
+                    convert: static instruction => (MethodInfo) instruction.Operand,
+                    drop: static instruction => instruction.OpCode != OpCodes.Callvirt
+                )[callIndex];
 
             return new ExtendedMemberInfo
             (
                 method,
-                method.IsSpecialName
-                    ? method.Name switch
-                    {
-                        ['g', 'e', 't', '_', ..] or ['s', 'e', 't', '_', ..] => declaringType
-                            .GetProperties()
-                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
-                        ['a', 'd', 'd', '_', ..] or ['r', 'e', 'm', 'o', 'v', 'e', '_', ..] => declaringType
-                            .GetEvents()
-                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
-                        _ => throw new NotSupportedException()
-                    }
-                    : method
+                ExtractFrom(method)
             );
+        }
+
+        public static MemberInfo ExtractFrom(MethodInfo method)
+        {
+            Type declaringType = method.DeclaringType;
+
+            BindingFlags bindingFlags = declaringType.IsInterface
+                ? BindingFlags.Instance | BindingFlags.Public
+                : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+
+            return method.IsSpecialName
+                ? method.Name switch
+                {
+                    ['g', 'e', 't', '_', ..] or ['s', 'e', 't', '_', ..] => declaringType
+                        .GetProperties(bindingFlags)
+                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
+                    ['a', 'd', 'd', '_', ..] or ['r', 'e', 'm', 'o', 'v', 'e', '_', ..] => declaringType
+                        .GetEvents(bindingFlags)
+                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
+                    _ => throw new NotSupportedException()
+                }
+                : method;
         }
 
         //

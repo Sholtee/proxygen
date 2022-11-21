@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public override object Invoke(InvocationContext context)
             {
-                if (context.Method.Name == nameof(Target.Hooked)) return 1986;
+                if (context.InterfaceMethod.Name == nameof(Target.Hooked)) return 1986;
                 return base.Invoke(context);
             }
 
@@ -228,7 +228,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Method, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
 
             //
             // IList.Count IS "inherited" from ICollection
@@ -240,8 +240,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             PropertyInfo prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom(() => proxy.Count);
 
-            Assert.That(context.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.Member, Is.EqualTo(prop));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.InterfaceMember, Is.EqualTo(prop));
         }
 
         public interface IInterfaceHavingGenericMethod

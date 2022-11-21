@@ -41,18 +41,18 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) =>         <br/>
+        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) =>          <br/>
         /// {                                                                                                         <br/>
         ///     System.Int32 cb_a = (System.Int32) args[0];                                                           <br/>
         ///     System.String cb_b;                                                                                   <br/>
         ///     TT cb_c = (TT) args[2];                                                                               <br/>
         ///     System.Object result;                                                                                 <br/>
-        ///     result = target.Foo[TT](cb_a, out cb_b, ref cb_c);                                                    <br/>
+        ///     result = ((TInterface) target).Foo[TT](cb_a, out cb_b, ref cb_c);                                     <br/>
         ///                                                                                                           <br/>
         ///     args[1] = (System.Object) cb_b;                                                                       <br/>
         ///     args[2] = (System.Object) cb_c;                                                                       <br/>
         ///     return result;                                                                                        <br/>
-        /// });                                                                                                       <br/>
+        /// }, InterfaceMap[TInterface, TTarget].Value | null);                                                       <br/>
         ///                                                                                                           <br/>
         /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)                    <br/>
         /// {                                                                                                         <br/>

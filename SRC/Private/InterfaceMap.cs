@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -26,7 +27,18 @@ namespace Solti.Utils.Proxy.Internals
 
                 for (int i = 0; i < mapping.InterfaceMethods.Length; i++)
                 {
-                    dict.Add(mapping.InterfaceMethods[i], mapping.TargetMethods[i]);
+                    try
+                    {
+                        dict.Add(mapping.InterfaceMethods[i], mapping.TargetMethods[i]);
+                    }
+                    catch (Exception ex)
+                    {
+                        //
+                        // We dont wanna a TypeInitializationException to be thrown so eat the exception
+                        //
+
+                        Trace.TraceWarning($"Cannot register mapping (${mapping.InterfaceMethods[i].Name}): {ex.Message}");
+                    }
                 }
             }
 
@@ -36,6 +48,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Returns the cached mappings.
         /// </summary>
-        public static IReadOnlyDictionary<MethodInfo, MethodInfo> Mappings { get; } = GetMappings();
+        public static IReadOnlyDictionary<MethodInfo, MethodInfo> Value { get; } = GetMappings();
     }
 }
