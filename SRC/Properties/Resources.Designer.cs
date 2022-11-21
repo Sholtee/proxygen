@@ -97,6 +97,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Constructor with the given layout cannot be found..
+        /// </summary>
+        internal static string CTOR_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("CTOR_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dynamic assemblies are not supported..
         /// </summary>
         internal static string DYNAMIC_ASM {
