@@ -77,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
                 : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 
             return method.IsSpecialName
-                ? method.Name switch
+                ? method.StrippedName() switch
                 {
                     ['g', 'e', 't', '_', ..] or ['s', 'e', 't', '_', ..] => declaringType
                         .GetProperties(bindingFlags)
