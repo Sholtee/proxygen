@@ -78,11 +78,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         SingletonSeparatedList
                         (
-                            //
-                            // Ne legyen nev utkozes
-                            //
-
-                            ResolveAttribute(typeof(InternalsVisibleToAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) ?? typeof(ModuleInitializerAttribute))
+                            ResolveAttribute(typeof(ModuleInitializerAttribute))
                         )
                     )
                 )

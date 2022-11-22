@@ -20,6 +20,11 @@ namespace Solti.Utils.Proxy.Internals
     {
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
+            //
+            // Don't use Type.GetType() here as it would find the internal implementation in this
+            // assembly.
+            //
+
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
