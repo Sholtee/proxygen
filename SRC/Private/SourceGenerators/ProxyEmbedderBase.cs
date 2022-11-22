@@ -112,9 +112,9 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            void ExtendWith(UnitSyntaxFactoryBase unit, Location location)
+            void ExtendWith(UnitSyntaxFactoryBase syntaxFactory, Location location)
             {
-                SourceCode source = unit.GetSourceCode(cancellation);
+                SourceCode source = syntaxFactory.GetSourceCode(cancellation); 
 
                 addSource(source);
 
