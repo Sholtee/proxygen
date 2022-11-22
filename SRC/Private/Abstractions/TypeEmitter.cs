@@ -42,8 +42,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static Type? GetInstanceFromCache(string className, bool throwOnMissing)
         {
-            FInstances.TryGetValue(className, out Type type);
-            if (type is null && throwOnMissing)
+            if (!FInstances.TryGetValue(className, out Type type) && throwOnMissing)
                 throw new TypeLoadException(className);  // FIXME: somehow try to set the TypeName property
             return type;
         }
