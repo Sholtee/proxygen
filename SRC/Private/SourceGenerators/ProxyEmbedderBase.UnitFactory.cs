@@ -16,17 +16,26 @@ namespace Solti.Utils.Proxy.Internals
 
     internal abstract partial class ProxyEmbedderBase
     {
-        private static IReadOnlyDictionary<string, IUnitFactory> SourceFactories { get; } = GetSourceFactories();
+        private static IReadOnlyDictionary<string, SupportsSourceGenerationAttributeBase> SourceFactories { get; } = GetSourceFactories();
 
-        private static IReadOnlyDictionary<string, IUnitFactory> GetSourceFactories()
+        private static IReadOnlyDictionary<string, SupportsSourceGenerationAttributeBase> GetSourceFactories()
         {
-            Dictionary<string, IUnitFactory> result = new();
+            Dictionary<string, SupportsSourceGenerationAttributeBase> result = new();
 
-            foreach (Type type in typeof(Generator).Assembly.GetTypes())
+            foreach (Type type in typeof(Generator).Assembly.GetExportedTypes())
             {
                 SupportsSourceGenerationAttributeBase? ssg = type.GetCustomAttribute<SupportsSourceGenerationAttributeBase>();
-                if (ssg is not null)
-                    result.Add(type.FullName, ssg.SourceFactory);
+                if (ssg is null)
+                    continue;
+
+                try
+                {
+                    result.Add(type.FullName, ssg);
+                }
+                catch
+                {
+                    // Don't throw in initialization phase
+                }
             }
 
             return result;
@@ -43,8 +52,8 @@ namespace Solti.Utils.Proxy.Internals
 
         protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
         {
-            return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out IUnitFactory sourceFactory)
-                ? sourceFactory.CreateMainUnit
+            return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out SupportsSourceGenerationAttributeBase ssga)
+                ? ssga.CreateMainUnit
                 (
                     generator,
                     compilation,

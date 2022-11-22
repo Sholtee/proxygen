@@ -9,9 +9,9 @@ namespace Solti.Utils.Proxy.Generators
 {
     using Internals;
 
-    file sealed class UnitFactory : IUnitFactory
+    file sealed class SupportsSourceGenerationAttribute : SupportsSourceGenerationAttributeBase
     {
-        public ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new ProxySyntaxFactory
+        public override ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new ProxySyntaxFactory
         (
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Generators
     /// </summary>
     /// <typeparam name="TInterface">The interface for which the proxy will be created.</typeparam>
     /// <typeparam name="TInterceptor">An <see cref="InterfaceInterceptor{TInterface}"/> descendant that has at least one public constructor.</typeparam>
-    [SupportsSourceGeneration<UnitFactory>]
+    [SupportsSourceGeneration]
     public sealed class ProxyGenerator<TInterface, TInterceptor> : Generator<TInterface, ProxyGenerator<TInterface, TInterceptor>> where TInterface : class where TInterceptor: InterfaceInterceptor<TInterface>
     {
         /// <inheritdoc/>

@@ -1,16 +1,17 @@
 ﻿/********************************************************************************
-* IUnitFactory.cs                                                               *
+* SupportsSourceGenerationAttributeBase.cs                                      *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Threading;
+using System;
 
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IUnitFactory
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    internal abstract class SupportsSourceGenerationAttributeBase : Attribute
     {
-        ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector);
+        public abstract ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector);
     }
 }
