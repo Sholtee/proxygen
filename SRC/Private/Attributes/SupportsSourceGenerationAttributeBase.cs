@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis;
 namespace Solti.Utils.Proxy.Internals
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    internal abstract class SupportsSourceGenerationAttributeBase : Attribute
+    internal abstract class SupportsSourceGenerationAttributeBase : Attribute, ISupportsSourceGeneration
     {
         public abstract ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector);
     }

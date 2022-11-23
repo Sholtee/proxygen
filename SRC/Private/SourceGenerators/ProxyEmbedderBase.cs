@@ -55,6 +55,8 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (INamedTypeSymbol generator in aotGenerators)
             {
+                Location location = generator.Locations[0];  // don't use Single() here
+
                 try
                 {
                     generator.EnsureNotError();
@@ -62,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                     ExtendWith
                     (
                         CreateMainUnit(generator, compilation),
-                        generator.Locations.Single()!
+                        location
                     );
 
                     extensionCount++;
@@ -77,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals
                 catch (Exception e)
                 #pragma warning restore CA1031
                 {
-                    ReportError(e, generator.Locations.Single()!);
+                    ReportError(e, location);
                 }
             }
 

@@ -16,11 +16,11 @@ namespace Solti.Utils.Proxy.Internals
 
     internal abstract partial class ProxyEmbedderBase
     {
-        private static IReadOnlyDictionary<string, SupportsSourceGenerationAttributeBase> SourceFactories { get; } = GetSourceFactories();
+        private static IReadOnlyDictionary<string, ISupportsSourceGeneration> SourceFactories { get; } = GetSourceFactories();
 
-        private static IReadOnlyDictionary<string, SupportsSourceGenerationAttributeBase> GetSourceFactories()
+        private static IReadOnlyDictionary<string, ISupportsSourceGeneration> GetSourceFactories()
         {
-            Dictionary<string, SupportsSourceGenerationAttributeBase> result = new();
+            Dictionary<string, ISupportsSourceGeneration> result = new();
 
             foreach (Type type in typeof(Generator).Assembly.GetExportedTypes())
             {
@@ -52,8 +52,8 @@ namespace Solti.Utils.Proxy.Internals
 
         protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
         {
-            return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out SupportsSourceGenerationAttributeBase ssga)
-                ? ssga.CreateMainUnit
+            return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
+                ? ssg.CreateMainUnit
                 (
                     generator,
                     compilation,
