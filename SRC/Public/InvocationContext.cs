@@ -14,11 +14,7 @@ namespace Solti.Utils.Proxy
     public class InvocationContext : MethodContext
     {
 #if DEBUG
-        /// <summary>
-        /// Creates a new <see cref="InvocationContext"/> instance.
-        /// </summary>
-        [SuppressMessage("ApiDesign", "RS0016:Add public types and members to the declared API", Justification = "This method exists in debug builds only")]
-        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, null)
+        internal InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, null)
             => Args = args ?? throw new ArgumentNullException(nameof(args));
 #endif
         /// <summary>
