@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -23,8 +22,6 @@ namespace Solti.Utils.Proxy.Internals
     /// <remarks>Static methods of this type are thread safe while instance methods are NOT.</remarks>
     public abstract record TypeEmitter
     {
-        private static readonly ConcurrentDictionary<string, Type> FInstances = new();
-
         private static AssemblyLoadContext AssemblyLoader { get; } = AssemblyLoadContext.Default;
 
         private static void RunInitializers(Assembly assembly)
@@ -42,8 +39,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static Type? GetInstanceFromCache(string className, bool throwOnMissing)
         {
-            FInstances.TryGetValue(className, out Type type);
-            if (type is null && throwOnMissing)
+            if (!LoadedTypes.Values.TryGetValue(className, out Type type) && throwOnMissing)
                 throw new TypeLoadException(className);  // FIXME: somehow try to set the TypeName property
             return type;
         }
@@ -138,14 +134,6 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             return GetInstanceFromCache(className, throwOnMissing: true)!;
-        }
-
-        internal static void RegisterInstance(Type instance)
-        {
-            if (!FInstances.TryAdd(instance.Name, instance))
-            {
-                Trace.TraceWarning($"Instance already loaded: {instance.Name}");
-            }
         }
 #if DEBUG
         internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;

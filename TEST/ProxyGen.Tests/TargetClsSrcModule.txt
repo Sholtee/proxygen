@@ -221,5 +221,5 @@ internal sealed class Proxy_C8B58DFC1D6F06625CAD157191B66E8E : global::Solti.Uti
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.GeneratedClass.RegisterInstance(typeof(global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E));
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E));
 }

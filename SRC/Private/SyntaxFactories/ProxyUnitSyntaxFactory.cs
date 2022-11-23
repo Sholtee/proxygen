@@ -53,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
         (
             //
             // [ModuleInitializerAttribute]
-            // public static void Initialize() => RegisterInstance(typeof(CurrentClass)); // C# 7.0 compatible
+            // public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass)); // C# 7.0 compatible
             //
 
             MethodDeclaration
@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GeneratedClass.RegisterInstance(null!))
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => LoadedTypes.Register(null!))
                         ),
                         target: null,
                         castTargetTo: null,
