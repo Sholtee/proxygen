@@ -38,7 +38,6 @@ Solti.Utils.Proxy.Internals.TypeEmitter
 Solti.Utils.Proxy.InvocationContext
 Solti.Utils.Proxy.InvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.InvocationContext.InvocationContext(object?[]! args, Solti.Utils.Proxy.MethodContext! methodContext) -> void
-Solti.Utils.Proxy.InvocationContext.InvocationContext(object?[]! args, System.Func<object!, object?[]!, object?>! dispatch) -> void
 Solti.Utils.Proxy.IProxyAccess<TInterface>
 Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy.set -> void
 Solti.Utils.Proxy.MethodContext
