@@ -1,7 +1,7 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen/master) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/sholtee/proxygen/master)
 > .NET proxy generator powered by [Roslyn](https://github.com/dotnet/roslyn )
 
-**This documentation refers the version 7.X of the library**
+**This documentation refers the version 8.X of the library**
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
 ### To hook into interface method calls:
@@ -27,6 +27,20 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
 	  
 	  return base.Invoke(context); // Let the original method do its work
     }  
+  }
+  // OR
+  public class MyInterceptorTargetingTheImplementation: InterfaceInterceptor<IMyInterface, MyInterfaceImplementation>
+  {
+      public MyInterceptor(MyInterfaceImplementation target) : base(target) {}
+
+      public override object? Invoke(InvocationContext context)
+      {
+          MemberInfo
+              ifaceMember  = context.InterfaceMember,  // Will point to the invoked IMyInterface member (e.g.: IMyInterface.Foo())
+              targetMember = context.TargetMember; // Will point to the underlying MyInterfaceImplementation member (e.g. MyInterfaceImplementation.Foo())
+
+          return base.Invoke(context);
+      }
   }
   ```
   ```
@@ -149,6 +163,8 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
 - 6.X
   - The `InvocationContext.InvokeTarget` property has been removed but you should not be affected by it
   - As proxy embedder has been reimplemented using the [v2](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md ) Source Generator API, this feature now requires VS 2022
+- 7.X
+  - `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMamber|InterfaceMethod`
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )

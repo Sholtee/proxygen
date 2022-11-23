@@ -133,3 +133,8 @@
   - *updated:* Solti.Utils.Primitives
 - 7.1.0:
   - *improved:* Proxy activator (now it is part of the generated class, no expression compilation required)
+- 8.0.0-preview1:
+  - *breaking*: `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMamber|InterfaceMethod`
+  - *introduce*: `InterfaceInterceptor<TInterface, TTarget>` class
+  - *updated:* Roslyn to v4.3
+  - *done:* Run tests against `net7.0`
