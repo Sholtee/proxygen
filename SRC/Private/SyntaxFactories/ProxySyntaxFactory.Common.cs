@@ -245,13 +245,39 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// InterfaceMap[TInterface, TTarget].Value | null
+        /// </summary>
+        #if DEBUG
+        internal
+        #else
+        private
+        #endif
+        ExpressionSyntax ResolveInterfaceMap()
+        {
+            if (TargetType.IsInterface)
+                return LiteralExpression(SyntaxKind.NullLiteralExpression);
+
+            IGenericTypeInfo map = 
+            (
+                (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceMap<,>))
+            ).Close(InterfaceType, TargetType);
+
+            return MemberAccessExpression
+            (
+                SyntaxKind.SimpleMemberAccessExpression,
+                ResolveType(map),
+                IdentifierName(nameof(InterfaceMap<object, object>.Value))
+            );
+        }
+
+        /// <summary>
         /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) => <br/>
         /// {                                                                                                <br/>
         ///     System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
         ///     System.String cb_b;                                                                          <br/>
         ///     TT cb_c = (TT)args[2];                                                                       <br/>
         ///     ...                                                                                          <br/>
-        /// });
+        /// }, InterfaceMap[TInterface, TTarget].Value | null);
         /// </summary>
         #if DEBUG
         internal
@@ -263,7 +289,11 @@ namespace Solti.Utils.Proxy.Internals
             $"F{lambda.GetMD5HashCode()}",
             ResolveObject<MethodContext>
             (
-                Argument(lambda)
+                Argument(lambda),
+                Argument
+                (
+                    ResolveInterfaceMap()
+                )
             )     
         );
 
@@ -276,7 +306,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         System.String cb_b;                                                                          <br/>
         ///         T1 cb_c = (T1)args[2];                                                                       <br/>
         ///         ...                                                                                          <br/>
-        ///     });                                                                                              <br/>
+        ///     }, InterfaceMap[TInterface, TTarget].Value | null);                                              <br/>
         /// }
         /// </summary>
         #if DEBUG
@@ -318,7 +348,11 @@ namespace Solti.Utils.Proxy.Internals
                     $"Value",
                     ResolveObject<MethodContext>
                     (
-                        Argument(lambda)
+                        Argument(lambda),
+                        Argument
+                        (
+                            ResolveInterfaceMap()
+                        )
                     ),
                     @private: false
                 )

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* InterfaceInterceptor.cs                                                       *
+* InterfaceInterceptor{TInterface, TTarget}.cs                                  *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -14,30 +14,33 @@ namespace Solti.Utils.Proxy
     /// Provides the mechanism for intercepting interface method calls.
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
-    public class InterfaceInterceptor<TInterface>: GeneratedClass, IHasTarget<TInterface?>, IProxyAccess<TInterface> where TInterface: class
+    /// <typeparam name="TTarget">The target interface implementation.</typeparam>
+    public class InterfaceInterceptor<TInterface, TTarget> : GeneratedClass, IHasTarget<TTarget?>, IProxyAccess<TInterface>
+        where TInterface : class
+        where TTarget : TInterface
     {
         /// <summary>
         /// The target of this interceptor.
         /// </summary>
-        public TInterface? Target { get; }
+        public TTarget? Target { get; }
 
         /// <summary>
         /// The most outer enclosing proxy.
         /// </summary>
         public TInterface Proxy
         {
-            set 
+            set
             {
                 if (Target is IProxyAccess<TInterface> proxyAccess)
                     proxyAccess.Proxy = value ?? throw new ArgumentNullException(nameof(value));
-            } 
+            }
         }
 
         /// <summary>
-        /// Creates a new <see cref="InterfaceInterceptor{TInterface}"/> instance against the given <paramref name="target"/>.
+        /// Creates a new <see cref="InterfaceInterceptor{TInterface, TTarget}"/> instance against the given <paramref name="target"/>.
         /// </summary>
         /// <param name="target">The target of this interceptor.</param>
-        public InterfaceInterceptor(TInterface? target) => Target = target;
+        public InterfaceInterceptor(TTarget? target) => Target = target;
 
         /// <summary>
         /// Called on proxy method invocation.
@@ -51,7 +54,7 @@ namespace Solti.Utils.Proxy
             if (Target is null)
                 throw new InvalidOperationException(Resources.NULL_TARGET);
 
-            return context.Dispatch(Target, context.Args);        
+            return context.Dispatch(Target, context.Args);
         }
     }
 }

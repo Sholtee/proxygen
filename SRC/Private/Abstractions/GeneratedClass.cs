@@ -3,8 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
@@ -12,9 +10,5 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     public abstract class GeneratedClass
     {
-        /// <summary>
-        /// Registers a generated class.
-        /// </summary>
-        internal protected static void RegisterInstance(Type instance) => TypeEmitter.RegisterInstance(instance ?? throw new ArgumentNullException(nameof(instance)));
     }
 }

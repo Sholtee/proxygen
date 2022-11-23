@@ -4,6 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy
@@ -19,16 +21,34 @@ namespace Solti.Utils.Proxy
         /// Creates a new <see cref="MethodContext"/> instance.
         /// </summary>
         /// <remarks>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</remarks>
-        public MethodContext(Func<object, object?[], object?> dispatch)
+        public MethodContext(Func<object, object?[], object?> dispatch, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
         {
             if (dispatch is null)
                 throw new ArgumentNullException(nameof(dispatch));
 
-            ExtendedMemberInfo memberInfo = MemberInfoExtensions.ExtractFrom(dispatch);
+            ExtendedMemberInfo ifaceMember = MemberInfoExtensions.ExtractFrom(dispatch);
 
-            Member = memberInfo.Member;
-            Method = memberInfo.Method;
+            InterfaceMember = ifaceMember.Member;
+            InterfaceMethod = ifaceMember.Method;
             Dispatch = dispatch;
+
+            if (mappings is not null)
+            {
+                //
+                // We dont wanna a TypeInitializationException to be thrown so make sure we won't throw
+                //
+
+                if (mappings.TryGetValue(InterfaceMethod, out MethodInfo targetmethod))
+                {           
+                    TargeteMethod = targetmethod;
+                    TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
+                }
+                else
+                    Trace.TraceWarning($"Cannot get target method for: {InterfaceMethod}");
+            }
+
+            TargeteMethod ??= InterfaceMethod;
+            TargetMember ??= InterfaceMember;
         }
 
         /// <summary>
@@ -39,20 +59,32 @@ namespace Solti.Utils.Proxy
             if (src is null)
                 throw new ArgumentNullException(nameof(src));
 
-            Member = src.Member;
-            Method = src.Method;
-            Dispatch = src.Dispatch;
+            InterfaceMember = src.InterfaceMember;
+            InterfaceMethod = src.InterfaceMethod;
+            TargetMember    = src.TargetMember;
+            TargeteMethod   = src.TargeteMethod;
+            Dispatch        = src.Dispatch;
         }
 
         /// <summary>
-        /// The concrete method behind the <see cref="Member"/>.
+        /// The concrete method behind the <see cref="InterfaceMember"/>.
         /// </summary>
-        public MethodInfo Method { get; }
+        public MethodInfo InterfaceMethod { get; }
 
         /// <summary>
-        /// The member  (property, event or method) that is being invoked.
+        /// The member (property, event or method) that is being invoked.
         /// </summary>
-        public MemberInfo Member { get; }
+        public MemberInfo InterfaceMember { get; }
+
+        /// <summary>
+        /// The concrete method behind the <see cref="TargetMember"/>.
+        /// </summary>
+        public MethodInfo TargeteMethod { get; }
+
+        /// <summary>
+        /// The member (property, event or method) that is being targeted.
+        /// </summary>
+        public MemberInfo TargetMember { get; }
 
         /// <summary>
         /// Gets the dispatcher function.

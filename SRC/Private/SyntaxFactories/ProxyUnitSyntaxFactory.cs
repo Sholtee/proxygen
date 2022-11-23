@@ -15,6 +15,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal abstract class ProxyUnitSyntaxFactory : UnitSyntaxFactoryBase
     {
         protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector): base(outputType, referenceCollector) =>
@@ -51,7 +53,7 @@ namespace Solti.Utils.Proxy.Internals
         (
             //
             // [ModuleInitializerAttribute]
-            // public static void Initialize() => RegisterInstance(typeof(CurrentClass)); // C# 7.0 compatible
+            // public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass)); // C# 7.0 compatible
             //
 
             MethodDeclaration
@@ -91,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => GeneratedClass.RegisterInstance(null!))
+                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => LoadedTypes.Register(null!))
                         ),
                         target: null,
                         castTargetTo: null,
@@ -132,7 +134,7 @@ namespace Solti.Utils.Proxy.Internals
             //    {
             //       case null: return new Class();
             //       case Tuple<int, string> t1: return new Class(t1.Item1, t1.Item2);  // C# 7.0 compatible
-            //       default: throw new NotSupportedException();
+            //       default: throw new MissingMethodException("...");
             //    }
             // }
             //
@@ -233,11 +235,24 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             ObjectCreationExpression
                             (
-                                ResolveType<NotSupportedException>()
+                                ResolveType<MissingMethodException>()
                             )
                             .WithArgumentList
                             (
-                                ArgumentList()
+                                ArgumentList
+                                (
+                                    SingletonSeparatedList
+                                    (
+                                        Argument
+                                        (
+                                            LiteralExpression
+                                            (
+                                                SyntaxKind.StringLiteralExpression,
+                                                Literal(Resources.CTOR_NOT_FOUND)
+                                            )
+                                        )
+                                    )
+                                )
                             )
                         )
                     )

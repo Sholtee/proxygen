@@ -1,0 +1,225 @@
+﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+internal sealed class Proxy_C8B58DFC1D6F06625CAD157191B66E8E : global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>, global::System.Collections.IList
+{
+    public Proxy_C8B58DFC1D6F06625CAD157191B66E8E(global::System.Collections.Generic.List<global::System.Object> target) : base(target)
+    {
+        this.Proxy = this;
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F216A71373120C748E0BB3975148A1694 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Object _value = (global::System.Object)args[0];
+        global::System.Object result = (global::System.Object)((global::System.Collections.IList)target).Add(_value);
+        return result;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Int32 global::System.Collections.IList.Add(global::System.Object value)
+    {
+        global::System.Object[] args = new global::System.Object[]{value};
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F216A71373120C748E0BB3975148A1694));
+        return (global::System.Int32)result;
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F9603498CDE474A8402D24FF8E8873F0F = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Object _value = (global::System.Object)args[0];
+        global::System.Object result = (global::System.Object)((global::System.Collections.IList)target).Contains(_value);
+        return result;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Boolean global::System.Collections.IList.Contains(global::System.Object value)
+    {
+        global::System.Object[] args = new global::System.Object[]{value};
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F9603498CDE474A8402D24FF8E8873F0F));
+        return (global::System.Boolean)result;
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F7FF27BBE0542036B087CB75825545D32 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        ((global::System.Collections.IList)target).Clear();
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    void global::System.Collections.IList.Clear()
+    {
+        global::System.Object[] args = new global::System.Object[0];
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F7FF27BBE0542036B087CB75825545D32));
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F81E57D292B4408A06F6474231C23742D = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Object _value = (global::System.Object)args[0];
+        global::System.Object result = (global::System.Object)((global::System.Collections.IList)target).IndexOf(_value);
+        return result;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Int32 global::System.Collections.IList.IndexOf(global::System.Object value)
+    {
+        global::System.Object[] args = new global::System.Object[]{value};
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F81E57D292B4408A06F6474231C23742D));
+        return (global::System.Int32)result;
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F8BED7603FC37C8EBB1236B9D0008DE97 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Int32 _index = (global::System.Int32)args[0];
+        global::System.Object _value = (global::System.Object)args[1];
+        ((global::System.Collections.IList)target).Insert(_index, _value);
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    void global::System.Collections.IList.Insert(global::System.Int32 index, global::System.Object value)
+    {
+        global::System.Object[] args = new global::System.Object[]{index, value};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F8BED7603FC37C8EBB1236B9D0008DE97));
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F832FC37EA779A38C9D8B47398CBD415C = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Object _value = (global::System.Object)args[0];
+        ((global::System.Collections.IList)target).Remove(_value);
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    void global::System.Collections.IList.Remove(global::System.Object value)
+    {
+        global::System.Object[] args = new global::System.Object[]{value};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F832FC37EA779A38C9D8B47398CBD415C));
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F12796D241CA17DDBC87AE9E9D20E2B95 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Int32 _index = (global::System.Int32)args[0];
+        ((global::System.Collections.IList)target).RemoveAt(_index);
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    void global::System.Collections.IList.RemoveAt(global::System.Int32 index)
+    {
+        global::System.Object[] args = new global::System.Object[]{index};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F12796D241CA17DDBC87AE9E9D20E2B95));
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F050F61B0F47ACD1FFEC3A3E195CBEF35 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Array _array = (global::System.Array)args[0];
+        global::System.Int32 _index = (global::System.Int32)args[1];
+        ((global::System.Collections.ICollection)target).CopyTo(_array, _index);
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    void global::System.Collections.ICollection.CopyTo(global::System.Array array, global::System.Int32 index)
+    {
+        global::System.Object[] args = new global::System.Object[]{array, index};
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F050F61B0F47ACD1FFEC3A3E195CBEF35));
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F6A56BE2D5CB0664E3B68FF9C791076AC = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Object result = (global::System.Object)((global::System.Collections.IEnumerable)target).GetEnumerator();
+        return result;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Collections.IEnumerator global::System.Collections.IEnumerable.GetEnumerator()
+    {
+        global::System.Object[] args = new global::System.Object[0];
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F6A56BE2D5CB0664E3B68FF9C791076AC));
+        return (global::System.Collections.IEnumerator)result;
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F7B5254AF092378BD0D92D1E4E4647DD7 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Int32 _index = (global::System.Int32)args[0];
+        return (global::System.Object)((global::System.Collections.IList)target)[_index];
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    private static readonly global::Solti.Utils.Proxy.MethodContext F20C0BB4B2C1E494817CBF266451B30EC = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        global::System.Int32 _index = (global::System.Int32)args[0];
+        global::System.Object _value = (global::System.Object)args[1];
+        ((global::System.Collections.IList)target)[_index] = _value;
+        return null;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Object global::System.Collections.IList.this[global::System.Int32 index]
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[]{index};
+            return (global::System.Object)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F7B5254AF092378BD0D92D1E4E4647DD7));
+        }
+
+        set
+        {
+            global::System.Object[] args = new global::System.Object[]{index, value};
+            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F20C0BB4B2C1E494817CBF266451B30EC));
+        }
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F38B6496D5E944D6402BB438C876FE3D0 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        return (global::System.Object)((global::System.Collections.IList)target).IsReadOnly;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Boolean global::System.Collections.IList.IsReadOnly
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Boolean)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F38B6496D5E944D6402BB438C876FE3D0));
+        }
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext FDB8C2551BF50FE77E1BE075252451DB0 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        return (global::System.Object)((global::System.Collections.IList)target).IsFixedSize;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Boolean global::System.Collections.IList.IsFixedSize
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Boolean)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.FDB8C2551BF50FE77E1BE075252451DB0));
+        }
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext FB59BBFD094513A519EE7A6230F6DC0D0 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        return (global::System.Object)((global::System.Collections.ICollection)target).Count;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Int32 global::System.Collections.ICollection.Count
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.FB59BBFD094513A519EE7A6230F6DC0D0));
+        }
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext F5B94BF4C5D5A293D5CEAF8F2D13380A1 = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        return (global::System.Object)((global::System.Collections.ICollection)target).SyncRoot;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Object global::System.Collections.ICollection.SyncRoot
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Object)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.F5B94BF4C5D5A293D5CEAF8F2D13380A1));
+        }
+    }
+
+    private static readonly global::Solti.Utils.Proxy.MethodContext FBD4858B382560650E25FEB09C2AFD90A = new global::Solti.Utils.Proxy.MethodContext((global::System.Object target, global::System.Object[] args) =>
+    {
+        return (global::System.Object)((global::System.Collections.ICollection)target).IsSynchronized;
+    }, global::Solti.Utils.Proxy.Internals.InterfaceMap<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>.Value);
+    global::System.Boolean global::System.Collections.ICollection.IsSynchronized
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Boolean)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E.FBD4858B382560650E25FEB09C2AFD90A));
+        }
+    }
+
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    {
+        switch (tuple)
+        {
+            case global::System.Tuple<global::System.Collections.Generic.List<global::System.Object>> t0:
+                return new global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E(t0.Item1);
+            default:
+                throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
+        }
+    };
+    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Proxy_C8B58DFC1D6F06625CAD157191B66E8E));
+}

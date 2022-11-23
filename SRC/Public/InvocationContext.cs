@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Creates a new <see cref="InvocationContext"/> instance.
         /// </summary>
-        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch)
+        public InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, null)
             => Args = args ?? throw new ArgumentNullException(nameof(args));
 #endif
         /// <summary>
@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The arguments passed by the caller.
         /// </summary>
-        /// <remarks>Before the <see cref="InterfaceInterceptor{TInterface}.Target"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
+        /// <remarks>Before the <see cref="InterfaceInterceptor{TInterface, TTarget}.Target"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "End user is allowed to modify the argument list.")]
         public object?[] Args { get; }
     }

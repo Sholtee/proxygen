@@ -160,6 +160,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<ITypeInfo> GetParentTypes(this ITypeInfo src) => new Stack<ITypeInfo>(src.GetEnclosingTypes());
 
+        public static bool IsAccessibleFrom(this ITypeInfo src, ITypeInfo type) =>
+            type.EqualsTo(src) ||
+            type.Interfaces.Some(iface => iface.EqualsTo(src)) ||
+            type.GetBaseTypes().Some(baseType => baseType.EqualsTo(src));
+
         public static ITypeSymbol ToSymbol(this ITypeInfo src, Compilation compilation)
         {
             INamedTypeSymbol? symbol;

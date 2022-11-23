@@ -129,6 +129,9 @@
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>
+  <data name="CTOR_NOT_FOUND" xml:space="preserve">
+    <value>Constructor with the given layout cannot be found.</value>
+  </data>
   <data name="DYNAMIC_ASM" xml:space="preserve">
     <value>Dynamic assemblies are not supported.</value>
   </data>
