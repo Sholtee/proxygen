@@ -6,47 +6,60 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Generators;
     using Properties;
 
     internal abstract partial class ProxyEmbedderBase
     {
-        protected static ReferenceCollector? CreateReferenceCollector() =>
+        private static IReadOnlyDictionary<string, ISupportsSourceGeneration> SourceFactories { get; } = GetSourceFactories();
+
+        private static IReadOnlyDictionary<string, ISupportsSourceGeneration> GetSourceFactories()
+        {
+            Dictionary<string, ISupportsSourceGeneration> result = new();
+
+            foreach (Type type in typeof(Generator).Assembly.GetExportedTypes())
+            {
+                SupportsSourceGenerationAttributeBase? ssg = type.GetCustomAttribute<SupportsSourceGenerationAttributeBase>();
+                if (ssg is null)
+                    continue;
+
+                try
+                {
+                    result.Add(type.FullName, ssg);
+                }
+                catch
+                {
+                    // Don't throw in initialization phase
+                }
+            }
+
+            return result;
+        }
+
+        private static ReferenceCollector? CreateReferenceCollector() =>
             //
-            // Ha nem kell dump-olni a referenciakat akkor felesleges oket osszegyujteni
+            // Collectiong references required only when dumping the source
             //
 
-            !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump) ? new ReferenceCollector() : null;
+            !string.IsNullOrEmpty(WorkingDirectories.Instance.SourceDump)
+                ? new ReferenceCollector()
+                : null;
 
         protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
         {
-            string qualifiedName = generator.GetQualifiedMetadataName()!;
-
-            return generator switch
-            {
-                _ when qualifiedName == typeof(DuckGenerator<,>).FullName => new DuckSyntaxFactory
+            return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
+                ? ssg.CreateMainUnit
                 (
-                    SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
-                    SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-                    compilation.Assembly.Name,
-                    OutputType.Unit,
-                    SymbolAssemblyInfo.CreateFrom(generator.ContainingAssembly, compilation),
+                    generator,
+                    compilation,
                     CreateReferenceCollector()
-                ),
-                _ when qualifiedName == typeof(ProxyGenerator<,>).FullName => new ProxySyntaxFactory
-                (
-                    SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
-                    SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-                    compilation.Assembly.Name,
-                    OutputType.Unit,
-                    CreateReferenceCollector()
-                ),
-                _ => throw new InvalidOperationException
+                )
+                : throw new InvalidOperationException
                 (
                     string.Format
                     (
@@ -54,8 +67,7 @@ namespace Solti.Utils.Proxy.Internals
                         SGResources.NOT_A_GENERATOR,
                         generator
                     )
-                )
-            };
+                );
         }
 
         protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(Compilation compilation)
