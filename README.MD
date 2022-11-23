@@ -164,7 +164,7 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
   - The `InvocationContext.InvokeTarget` property has been removed but you should not be affected by it
   - As proxy embedder has been reimplemented using the [v2](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md ) Source Generator API, this feature now requires VS 2022
 - 7.X
-  - `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMamber|InterfaceMethod`
+  - `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMember|InterfaceMethod`
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
