@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class DuckBase&lt;T&gt;
+    <title>Class LoadedTypes
    | ProxyGen </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class DuckBase&lt;T&gt;
+    <meta name="title" content="Class LoadedTypes
    | ProxyGen ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -37,52 +37,61 @@
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes">
   
   
-  <h1 id="Solti_Utils_Proxy_Internals_DuckBase_1" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1" class="text-break">Class DuckBase&lt;T&gt;
+  <h1 id="Solti_Utils_Proxy_Internals_LoadedTypes" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes" class="text-break">Class LoadedTypes
   </h1>
-  <div class="markdown level0 summary"><p>Defines the base class for duck typing.</p>
+  <div class="markdown level0 summary"><p>Contains the loaded proxy <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>s</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.GeneratedClass.html">GeneratedClass</a></div>
-    <div class="level2"><span class="xref">DuckBase&lt;T&gt;</span></div>
+    <div class="level1"><span class="xref">LoadedTypes</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
-  <h5 id="Solti_Utils_Proxy_Internals_DuckBase_1_syntax">Syntax</h5>
+  <h5 id="Solti_Utils_Proxy_Internals_LoadedTypes_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class DuckBase&lt;T&gt; : GeneratedClass</code></pre>
+    <pre><code class="lang-csharp hljs">public static class LoadedTypes : Object</code></pre>
   </div>
-  <h5 class="typeParameters">Type Parameters</h5>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Solti_Utils_Proxy_Internals_LoadedTypes_Values_" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes.Values*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_LoadedTypes_Values" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes.Values">Values</h4>
+  <div class="markdown level1 summary"><p>The values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;string, Type&gt; Values { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
-        <th>Name</th>
+        <th>Type</th>
         <th>Description</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="parametername">T</span></td>
-        <td><p>The target type.</p>
-</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">String</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a>&gt;</td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="constructors">Constructors
+  <h3 id="methods">Methods
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_DuckBase_1__ctor_" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1.#ctor*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_DuckBase_1__ctor__0_" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1.#ctor(`0)">DuckBase(T)</h4>
-  <div class="markdown level1 summary"><p>Creates a new <a class="xref" href="Solti.Utils.Proxy.Internals.DuckBase-1.html">DuckBase&lt;T&gt;</a> instance.</p>
+  <a id="Solti_Utils_Proxy_Internals_LoadedTypes_Register_" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes.Register*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_LoadedTypes_Register_System_Type_" data-uid="Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type)">Register(Type)</h4>
+  <div class="markdown level1 summary"><p>Registers a new <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public DuckBase(T target)</code></pre>
+    <pre><code class="lang-csharp hljs">public static void Register(Type instance)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -95,35 +104,23 @@
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">T</span></td>
-        <td><span class="parametername">target</span></td>
-        <td><p>The target of the entity being created.</p>
-</td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.type">Type</a></td>
+        <td><span class="parametername">instance</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>
-  <h3 id="properties">Properties
-  </h3>
-  <a id="Solti_Utils_Proxy_Internals_DuckBase_1_Target_" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1.Target*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_DuckBase_1_Target" data-uid="Solti.Utils.Proxy.Internals.DuckBase`1.Target">Target</h4>
-  <div class="markdown level1 summary"><p>The target.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public T Target { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
+  <h5 class="exceptions">Exceptions</h5>
   <table class="table table-bordered table-striped table-condensed">
     <thead>
       <tr>
         <th>Type</th>
-        <th>Description</th>
+        <th>Condition</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td><span class="xref">T</span></td>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentnullexception">ArgumentNullException</a></td>
         <td></td>
       </tr>
     </tbody>

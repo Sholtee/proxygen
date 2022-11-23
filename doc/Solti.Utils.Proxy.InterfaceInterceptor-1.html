@@ -49,7 +49,8 @@
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
     <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.GeneratedClass.html">GeneratedClass</a></div>
-    <div class="level2"><span class="xref">InterfaceInterceptor&lt;TInterface&gt;</span></div>
+    <div class="level2"><a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-2.html">InterfaceInterceptor</a>&lt;TInterface, TInterface&gt;</div>
+    <div class="level3"><span class="xref">InterfaceInterceptor&lt;TInterface&gt;</span></div>
   </div>
   <div class="implements">
     <h5>Implements</h5>
@@ -58,14 +59,20 @@
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <a class="xref" href="Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass_RegisterInstance_System_Type_">GeneratedClass.RegisterInstance(Type)</a>
+      <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Invoke_Solti_Utils_Proxy_InvocationContext_">InterfaceInterceptor&lt;TInterface, TInterface&gt;.Invoke(InvocationContext)</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Target">InterfaceInterceptor&lt;TInterface, TInterface&gt;.Target</a>
+    </div>
+    <div>
+      <a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Proxy">InterfaceInterceptor&lt;TInterface, TInterface&gt;.Proxy</a>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.html">Solti.Utils.Proxy</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_InterfaceInterceptor_1_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public class InterfaceInterceptor&lt;TInterface&gt; : GeneratedClass, IProxyAccess&lt;TInterface&gt; where TInterface : class</code></pre>
+    <pre><code class="lang-csharp hljs">public class InterfaceInterceptor&lt;TInterface&gt; : InterfaceInterceptor&lt;TInterface, TInterface&gt;, IProxyAccess&lt;TInterface&gt; where TInterface : class</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -108,100 +115,6 @@
         <td><span class="xref">TInterface</span></td>
         <td><span class="parametername">target</span></td>
         <td><p>The target of this interceptor.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="properties">Properties
-  </h3>
-  <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_Proxy_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy*"></a>
-  <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Proxy" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Proxy">Proxy</h4>
-  <div class="markdown level1 summary"><p>The most outer enclosing proxy.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TInterface Proxy { set; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">TInterface</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_Target_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Target*"></a>
-  <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Target" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Target">Target</h4>
-  <div class="markdown level1 summary"><p>The target of this interceptor.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public TInterface Target { get; }</code></pre>
-  </div>
-  <h5 class="propertyValue">Property Value</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">TInterface</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h3 id="methods">Methods
-  </h3>
-  <a id="Solti_Utils_Proxy_InterfaceInterceptor_1_Invoke_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke*"></a>
-  <h4 id="Solti_Utils_Proxy_InterfaceInterceptor_1_Invoke_Solti_Utils_Proxy_InvocationContext_" data-uid="Solti.Utils.Proxy.InterfaceInterceptor`1.Invoke(Solti.Utils.Proxy.InvocationContext)">Invoke(InvocationContext)</h4>
-  <div class="markdown level1 summary"><p>Called on proxy method invocation.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public virtual object Invoke(InvocationContext context)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="Solti.Utils.Proxy.InvocationContext.html">InvocationContext</a></td>
-        <td><span class="parametername">context</span></td>
-        <td></td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></td>
-        <td><p>The object to return to the caller or null for void methods.</p>
 </td>
       </tr>
     </tbody>

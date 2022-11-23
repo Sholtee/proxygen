@@ -5,10 +5,10 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Class GeneratedClass
+    <title>Class InterfaceMap&lt;TInterface, TImplementation&gt;
    | ProxyGen </title>
     <meta name="viewport" content="width=device-width">
-    <meta name="title" content="Class GeneratedClass
+    <meta name="title" content="Class InterfaceMap&lt;TInterface, TImplementation&gt;
    | ProxyGen ">
     <meta name="generator" content="docfx 2.59.3.0">
     
@@ -37,37 +37,70 @@
       <div role="main" class="container body-content hide-when-search">
         <div class="article row grid">
           <div class="col-md-10">
-            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.GeneratedClass">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.Internals.InterfaceMap`2">
   
   
-  <h1 id="Solti_Utils_Proxy_Internals_GeneratedClass" data-uid="Solti.Utils.Proxy.Internals.GeneratedClass" class="text-break">Class GeneratedClass
+  <h1 id="Solti_Utils_Proxy_Internals_InterfaceMap_2" data-uid="Solti.Utils.Proxy.Internals.InterfaceMap`2" class="text-break">Class InterfaceMap&lt;TInterface, TImplementation&gt;
   </h1>
-  <div class="markdown level0 summary"><p>Represents the base of all the generated classes.</p>
+  <div class="markdown level0 summary"><p>Cached interface mappings. Intended for private use only.</p>
 </div>
   <div class="markdown level0 conceptual"></div>
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">Object</a></div>
-    <div class="level1"><span class="xref">GeneratedClass</span></div>
-      <div class="level2"><a class="xref" href="Solti.Utils.Proxy.InterfaceInterceptor-2.html">InterfaceInterceptor&lt;TInterface, TTarget&gt;</a></div>
-      <div class="level2"><a class="xref" href="Solti.Utils.Proxy.Internals.DuckBase-1.html">DuckBase&lt;T&gt;</a></div>
+    <div class="level1"><span class="xref">InterfaceMap&lt;TInterface, TImplementation&gt;</span></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
-  <h5 id="Solti_Utils_Proxy_Internals_GeneratedClass_syntax">Syntax</h5>
+  <h5 id="Solti_Utils_Proxy_Internals_InterfaceMap_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public abstract class GeneratedClass : Object</code></pre>
+    <pre><code class="lang-csharp hljs">public static class InterfaceMap&lt;TInterface, TImplementation&gt; : Object where TInterface : class where TImplementation : TInterface</code></pre>
   </div>
-  <h3 id="constructors">Constructors
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TInterface</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="parametername">TImplementation</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_GeneratedClass__ctor_" data-uid="Solti.Utils.Proxy.Internals.GeneratedClass.#ctor*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_GeneratedClass__ctor" data-uid="Solti.Utils.Proxy.Internals.GeneratedClass.#ctor">GeneratedClass()</h4>
-  <div class="markdown level1 summary"></div>
+  <a id="Solti_Utils_Proxy_Internals_InterfaceMap_2_Value_" data-uid="Solti.Utils.Proxy.Internals.InterfaceMap`2.Value*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_InterfaceMap_2_Value" data-uid="Solti.Utils.Proxy.Internals.InterfaceMap`2.Value">Value</h4>
+  <div class="markdown level1 summary"><p>Returns the cached mappings.</p>
+</div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">protected GeneratedClass()</code></pre>
+    <pre><code class="lang-csharp hljs">public static IReadOnlyDictionary&lt;MethodInfo, MethodInfo&gt; Value { get; }</code></pre>
   </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
 </article>
           </div>
           
