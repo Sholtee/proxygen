@@ -21,7 +21,9 @@ namespace Solti.Utils.Proxy
         /// Creates a new <see cref="MethodContext"/> instance.
         /// </summary>
         /// <remarks>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</remarks>
+        #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public MethodContext(Func<object, object?[], object?> dispatch, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
+        #pragma warning restore CS8618
         {
             if (dispatch is null)
                 throw new ArgumentNullException(nameof(dispatch));
@@ -34,21 +36,26 @@ namespace Solti.Utils.Proxy
 
             if (mappings is not null)
             {
-                //
-                // We dont wanna a TypeInitializationException to be thrown so make sure we won't throw
-                //
+                if (mappings.TryGetValue(InterfaceMethod.IsGenericMethod ? InterfaceMethod.GetGenericMethodDefinition() : InterfaceMethod, out MethodInfo targetmethod))
+                {
+                    if (targetmethod.IsGenericMethod)
+                        targetmethod = targetmethod.MakeGenericMethod(InterfaceMethod.GetGenericArguments());
 
-                if (mappings.TryGetValue(InterfaceMethod, out MethodInfo targetmethod))
-                {           
                     TargeteMethod = targetmethod;
                     TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
                 }
                 else
+                    //
+                    // Leave TargetXxX set to NULL instead of throwing as this method is being called in initializers.
+                    // 
+
                     Trace.TraceWarning($"Cannot get target method for: {InterfaceMethod}");
             }
-
-            TargeteMethod ??= InterfaceMethod;
-            TargetMember ??= InterfaceMember;
+            else
+            {
+                TargeteMethod = InterfaceMethod;
+                TargetMember = InterfaceMember;
+            }
         }
 
         /// <summary>
