@@ -211,7 +211,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperMethod_InterfaceTarget()
+        public async Task GeneratredProxy_ShouldPassTheProperMethodInfo_InterfaceTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, IList<int>>>.ActivateAsync(Tuple.Create((IList<int>) new List<int>()));
             proxy.Add(100);
@@ -228,7 +228,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperMethod_ClassTarget()
+        public async Task GeneratredProxy_ShouldPassTheProperMethodInfo_ClassTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, List<int>>>.ActivateAsync(Tuple.Create(new List<int>()));
             proxy.Add(100);
@@ -255,7 +255,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperGenericMethod_InterfaceTarget()
+        public async Task GeneratredProxy_ShouldPassTheProperGenericMethodInfo_InterfaceTarget()
         {
             IMyInterfceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfceHavingGenericMethod, InterceptorPersistingContext<IMyInterfceHavingGenericMethod, IMyInterfceHavingGenericMethod>>.ActivateAsync
             (
@@ -275,7 +275,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperGenericMethod_ClassTarget()
+        public async Task GeneratredProxy_ShouldPassTheProperGenericMethodInfo_ClassTarget()
         {
             IMyInterfceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfceHavingGenericMethod, InterceptorPersistingContext<IMyInterfceHavingGenericMethod, MyInterfceHavingGenericMethodImpl>>.ActivateAsync
             (
