@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -76,18 +77,25 @@ namespace Solti.Utils.Proxy.Internals
                 ? BindingFlags.Instance | BindingFlags.Public
                 : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 
-            return method.IsSpecialName
-                ? method.StrippedName() switch
+            MemberInfo? member = null;
+
+            if (method.IsSpecialName)
+            {
+                member = method.StrippedName() switch
                 {
-                    ['g', 'e', 't', '_', ..] or ['s', 'e', 't', '_', ..] => declaringType
+                    ['g' or 'G', 'e' or 'E', 't' or 'T', '_', ..] or ['s' or 'S', 'e' or 'E', 't' or 'T', '_', ..] => declaringType
                         .GetProperties(bindingFlags)
                         .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
-                    ['a', 'd', 'd', '_', ..] or ['r', 'e', 'm', 'o', 'v', 'e', '_', ..] => declaringType
+                    ['a' or 'A', 'd' or 'D', 'd' or 'D', '_', ..] or ['r' or 'R', 'e' or 'E', 'm' or 'M', 'o' or 'O', 'v' or 'V', 'e' or 'E', '_', ..] => declaringType
                         .GetEvents(bindingFlags)
                         .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
-                    _ => throw new NotSupportedException()
-                }
-                : method;
+                    _ => null
+                };
+                if (member is null)
+                    Trace.TraceWarning($"Unsupported special method: {method}");
+            }
+
+            return member ?? method;
         }
 
         //
