@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Generators
     [SupportsSourceGeneration]
     public sealed class ProxyGenerator<TInterface, TInterceptor> : Generator<TInterface, ProxyGenerator<TInterface, TInterceptor>>
         where TInterface : class
-        where TInterceptor: GeneratedClass
+        where TInterceptor: InterfaceInterceptorBase<TInterface>
     {
         /// <inheritdoc/>
         protected override Generator GetConcreteGenerator() => new ProxyGenerator(typeof(TInterface), typeof(TInterceptor));

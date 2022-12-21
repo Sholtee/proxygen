@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     /// <typeparam name="T">The target type.</typeparam>
     [SuppressMessage("Design", "CA1012:Abstract types should not have public constructors", Justification = "Proxygenerator needs public constructor")]
-    public abstract class DuckBase<T>: GeneratedClass, IHasTarget<T>
+    public abstract class DuckBase<T>: IHasTarget<T>
     {
         /// <summary>
         /// The target.

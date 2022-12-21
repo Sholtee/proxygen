@@ -1,14 +1,14 @@
 ﻿/********************************************************************************
-* GeneratedClass.cs                                                             *
+* InterfaceInterceptorBase.cs                                                   *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Represents the base of all the generated classes.
+    /// Represents the base class of interface interceptors.
     /// </summary>
-    public abstract class GeneratedClass
+    public abstract class InterfaceInterceptorBase<TInterface>
     {
     }
 }

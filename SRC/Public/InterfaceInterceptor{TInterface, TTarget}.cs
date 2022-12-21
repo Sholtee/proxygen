@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
     /// <typeparam name="TTarget">The target interface implementation.</typeparam>
-    public class InterfaceInterceptor<TInterface, TTarget> : GeneratedClass, IHasTarget<TTarget?>, IProxyAccess<TInterface>
+    public class InterfaceInterceptor<TInterface, TTarget> : InterfaceInterceptorBase<TInterface>, IHasTarget<TTarget?>, IProxyAccess<TInterface>
         where TInterface : class
         where TTarget : TInterface
     {
