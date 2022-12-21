@@ -41,29 +41,31 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) =>          <br/>
-        /// {                                                                                                         <br/>
-        ///     System.Int32 cb_a = (System.Int32) args[0];                                                           <br/>
-        ///     System.String cb_b;                                                                                   <br/>
-        ///     TT cb_c = (TT) args[2];                                                                               <br/>
-        ///     System.Object result;                                                                                 <br/>
-        ///     result = ((TInterface) target).Foo[TT](cb_a, out cb_b, ref cb_c);                                     <br/>
-        ///                                                                                                           <br/>
-        ///     args[1] = (System.Object) cb_b;                                                                       <br/>
-        ///     args[2] = (System.Object) cb_c;                                                                       <br/>
-        ///     return result;                                                                                        <br/>
-        /// }, InterfaceMap[TInterface, TTarget].Value | null);                                                       <br/>
-        ///                                                                                                           <br/>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)                    <br/>
-        /// {                                                                                                         <br/>
-        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                      <br/>
-        ///                                                                                                           <br/>
-        ///     System.Object result = Invoke(new InvocationContext(args, FXxX));                                     <br/>
-        ///                                                                                                           <br/>
-        ///     para2 = (T2) args[1];                                                                                 <br/>
-        ///     para3 = (T3) args[2];                                                                                 <br/>
-        ///     return (TResult) result;                                                                              <br/>
+        /// <code>
+        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) =>       
+        /// {                                                                                                    
+        ///     System.Int32 cb_a = (System.Int32) args[0];                                                       
+        ///     System.String cb_b;                                                                               
+        ///     TT cb_c = (TT) args[2];                                                                          
+        ///     System.Object result;                                                                                
+        ///     result = ((TInterface) target).Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);                                  
+        ///                                                                                                        
+        ///     args[1] = (System.Object) cb_b;                                                                  
+        ///     args[2] = (System.Object) cb_c;                                                                     
+        ///     return result;                                                                                       
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                   
+        ///                                                                                                          
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)            
+        /// {                                                                                                     
+        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                   
+        ///                                                                                                         
+        ///     System.Object result = Invoke(new InvocationContext(args, FXxX));                                   
+        ///                                                                                                       
+        ///     para2 = (T2) args[1];                                                                            
+        ///     para3 = (T3) args[2];                                                                               
+        ///     return (TResult) result;                                                                         
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -165,13 +167,15 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly IReadOnlyCollection<ParameterKind> ByRefs = new[] { ParameterKind.Ref, ParameterKind.Out };
 
         /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)   <br/>
-        /// {                                                                                        <br/>
-        ///   ...                                                                                    <br/>
-        ///   para2 = (T2) args[1];                                                                  <br/>
-        ///   para3 = (T3) args[2];                                                                  <br/>
-        ///   ...                                                                                    <br/>
+        /// <code>
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
+        /// {                                                                                  
+        ///   ...                                                                             
+        ///   para2 = (T2) args[1];                                                             
+        ///   para3 = (T3) args[2];                                                               
+        ///   ...                                                                                  
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -220,8 +224,10 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// args[0] = (System.Object)cb_a // ref <br/>
+        /// <code>
+        /// args[0] = (System.Object)cb_a // ref
         /// args[2] = (TT)cb_c // out
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -273,19 +279,21 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        /// <summary>                                                   <br/>
-        /// (ITarget target, object[] args) =>                          <br/>
-        /// {                                                           <br/>
-        ///    System.Int32 cb_a = (System.Int32) args[0];              <br/>
-        ///    System.String cb_b;                                      <br/>
-        ///    TT cb_c = (TT) args[2];                                  <br/>
-        ///    System.Object result;                                    <br/>
-        ///    result = target.Foo[TT](cb_a, out cb_b, ref cb_c);       <br/>
-        ///                                                             <br/>
-        ///    args[1] = (System.Object) cb_b;                          <br/>
-        ///    args[2] = (System.Object) cb_c;                          <br/>
-        ///    return result;                                           <br/>
-        /// }                                                           <br/>
+        /// <summary>    
+        /// <code>
+        /// (ITarget target, object[] args) =>                         
+        /// {                                                           
+        ///    System.Int32 cb_a = (System.Int32) args[0];         
+        ///    System.String cb_b;                                      
+        ///    TT cb_c = (TT) args[2];                               
+        ///    System.Object result;                                  
+        ///    result = target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);      
+        ///                                                             
+        ///    args[1] = (System.Object) cb_b;                         
+        ///    args[2] = (System.Object) cb_c;                         
+        ///    return result;                                          
+        /// }   
+        /// </code>
         /// </summary>   
         #if DEBUG
         internal

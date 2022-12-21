@@ -49,7 +49,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// new System.Object[] {..., ..., ...}
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -84,7 +86,9 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
+        /// <code>
         /// new System.Object[] {..., ..., ...}
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -92,7 +96,9 @@ namespace Solti.Utils.Proxy.Internals
         protected ArrayCreationExpressionSyntax ResolveArray<T>(params ExpressionSyntax[] elements) => ResolveArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
 
         /// <summary>
+        /// <code>
         /// new NameSpace.T(.., ...,)
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -103,19 +109,6 @@ namespace Solti.Utils.Proxy.Internals
             (
                 arguments.ToSyntaxList()
             )
-        );
-
-        /// <summary>
-        /// Enum.Member
-        /// </summary>
-        #if DEBUG
-        internal
-        #endif
-        protected MemberAccessExpressionSyntax EnumAccess<T>(T val) where T : Enum => MemberAccessExpression
-        (
-            SyntaxKind.SimpleMemberAccessExpression,
-            ResolveType<T>(),
-            IdentifierName(val.ToString())
         );
 
         #if DEBUG

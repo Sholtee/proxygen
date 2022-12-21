@@ -16,11 +16,11 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// target.Property           <br/>
-        ///                           <br/>
-        /// OR                        <br/>
-        ///                           <br/>
+        /// <code>
+        /// target.Property                           
+        /// // OR                                         
         /// target.Propery[index]
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -34,11 +34,11 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// target.Property           <br/>
-        ///                           <br/>
-        /// OR                        <br/>
-        ///                           <br/>
+        /// <code>
+        /// target.Property         
+        /// // OR        
         /// target.Propery[index]
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -60,11 +60,13 @@ namespace Solti.Utils.Proxy.Internals
             );
 
         /// <summary>
-        /// int IInterface[T].Prop <br/>
-        /// {                      <br/>
-        ///   get{...}             <br/>
-        ///   set{...}             <br/>
-        /// }                      <br/>
+        /// <code>
+        /// int IInterface[T].Prop
+        /// {                      
+        ///   get{...}            
+        ///   set{...}           
+        /// }                    
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -110,11 +112,13 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// int IInterface.this[string index, ...] <br/>
-        /// {                                      <br/>
-        ///   get{...}                             <br/>
-        ///   set{...}                             <br/>
-        /// }                                      <br/>
+        /// <code>
+        /// int IInterface.this[string index, ...]
+        /// {                                     
+        ///   get{...}                            
+        ///   set{...}                           
+        /// }            
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

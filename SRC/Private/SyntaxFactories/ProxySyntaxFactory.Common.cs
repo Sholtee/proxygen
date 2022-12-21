@@ -54,12 +54,14 @@ namespace Solti.Utils.Proxy.Internals
             .Some(iface => iface.EqualsTo(member.DeclaringType));
 
         /// <summary>
-        /// TResult IInterface.Foo[TGeneric](T1 para1, ref T2 para2, out T3 para3, TGeneric para4)  <br/>
-        /// {                                                                                       <br/>
-        ///   ...                                                                                   <br/>
-        ///   object[] args = new object[]{para1, para2, default(T3), para4};                       <br/>
-        ///   ...                                                                                   <br/>
+        /// <code>
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4) 
+        /// {                                                                                
+        ///   ...                                                                          
+        ///   object[] args = new object[]{para1, para2, default(T3), para4};              
+        ///   ...                                                                            
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -97,11 +99,11 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// return;          <br/>
-        ///                  <br/>
-        /// OR               <br/>
-        ///                  <br/>
+        /// <code>
+        /// return;
+        /// // OR
         /// return (T) ...;
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -122,11 +124,11 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// return;             <br/>
-        ///                     <br/>
-        /// OR                  <br/>
-        ///                     <br/>
+        /// <code>
+        /// return;
+        /// // OR
         /// return (T) result;
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -137,7 +139,9 @@ namespace Solti.Utils.Proxy.Internals
             ReturnResult(returnType, ResolveIdentifierName(result));
 
         /// <summary>
+        /// <code>
         /// return null;
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -150,8 +154,10 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// System.String _a;    <br/>
-        /// TT _b = (TT)args[1];
+        /// <code>
+        /// System.String _a;
+        /// TT _b = (TT) args[1];
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -189,13 +195,15 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// (object target, object[] args) =>                         <br/>
-        /// {                                                         <br/>
-        ///     System.Int32 cb_a = (System.Int32)args[0];            <br/>
-        ///     System.String cb_b;                                   <br/>
-        ///     TT cb_c = (TT)args[2];                                <br/>
-        ///     ...                                                   <br/>
+        /// <code>
+        /// (object target, object[] args) =>   
+        /// {                                             
+        ///     System.Int32 cb_a = (System.Int32) args[0]; 
+        ///     System.String cb_b;                   
+        ///     TT cb_c = (TT) args[2];                
+        ///     ...                                          
         /// };
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -245,7 +253,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// InterfaceMap[TInterface, TTarget].Value | null
+        /// <code>
+        /// InterfaceMap&lt;TInterface, TTarget&gt;.Value | null
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -271,13 +281,15 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) => <br/>
-        /// {                                                                                                <br/>
-        ///     System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
-        ///     System.String cb_b;                                                                          <br/>
-        ///     TT cb_c = (TT)args[2];                                                                       <br/>
-        ///     ...                                                                                          <br/>
-        /// }, InterfaceMap[TInterface, TTarget].Value | null);
+        /// <code>
+        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) => 
+        /// {                                                                                               
+        ///     System.Int32 cb_a = (System.Int32) args[0];                                                
+        ///     System.String cb_b;                                                                     
+        ///     TT cb_c = (TT) args[2];                                                                    
+        ///     ...                                                                                    
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -298,16 +310,18 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
-        /// private static class WrapperXxX[T1, T2, ...]                                                         <br/>
-        /// {                                                                                                    <br/>
-        ///     public static readonly MethodContext Value = new MethodContext((object target, object[] args) => <br/>
-        ///     {                                                                                                <br/>
-        ///         System.Int32 cb_a = (System.Int32)args[0];                                                   <br/>
-        ///         System.String cb_b;                                                                          <br/>
-        ///         T1 cb_c = (T1)args[2];                                                                       <br/>
-        ///         ...                                                                                          <br/>
-        ///     }, InterfaceMap[TInterface, TTarget].Value | null);                                              <br/>
+        /// <code>
+        /// private static class WrapperXxX&lt;T1, T2, ...&gt;                                               
+        /// {                                                                                                   
+        ///     public static readonly MethodContext Value = new MethodContext((object target, object[] args) => 
+        ///     {                                                                                               
+        ///         System.Int32 cb_a = (System.Int32) args[0];                                                  
+        ///         System.String cb_b;                                                                      
+        ///         T1 cb_c = (T1) args[2];                                                                 
+        ///         ...                                                                                     
+        ///     }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

@@ -15,16 +15,17 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyUnitSyntaxFactory
     {
+        /// <summary>
+        /// <code>
+        /// [ModuleInitializerAttribute]
+        /// public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass)); // C# 7.0 compatible
+        /// </code>
+        /// </summary>
         #if DEBUG
         internal
         #endif
         protected virtual ClassDeclarationSyntax ResolveInitializer(ClassDeclarationSyntax cls, object context) => cls.AddMembers
         (
-            //
-            // [ModuleInitializerAttribute]
-            // public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass)); // C# 7.0 compatible
-            //
-
             MethodDeclaration
             (
                 ResolveType

@@ -62,13 +62,15 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// event TDelegate IFoo[System.Int32].Event     <br/>
-        /// {                                            <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   add => Target.Event += value;              <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   remove => Target.Event -= value;           <br/>
+        /// <code>
+        /// event TDelegate IFoo&lt;System.Int32&gt;.Event    
+        /// {                                           
+        ///   [MethodImplAttribute(AggressiveInlining)] 
+        ///   add => Target.Event += value;             
+        ///   [MethodImplAttribute(AggressiveInlining)] 
+        ///   remove => Target.Event -= value;         
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

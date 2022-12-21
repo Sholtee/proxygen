@@ -16,7 +16,9 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// TypeName(int a, string b, ...): base(a, b, ...){ }
+        /// <code>
+        /// TypeName(T a, TT b, ...): base(a, b, ...) { }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

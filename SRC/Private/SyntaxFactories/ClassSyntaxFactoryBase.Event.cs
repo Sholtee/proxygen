@@ -16,11 +16,13 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// event TDelegate IInterface.EventName <br/>
-        /// {                                    <br/>
-        ///   add{...}                           <br/>
-        ///   remove{...}                        <br/>
-        /// }                                    <br/>
+        /// <code>
+        /// event TDelegate IInterface.EventName
+        /// {                                    
+        ///   add{...}                           
+        ///   remove{...}                       
+        /// }                                    
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -66,7 +68,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// target.Event [+|-]= ...;
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

@@ -31,29 +31,31 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly MethodContext FxXx = new MethodContext((ITarget target, object[] args) =>   <br/>
-        /// {                                                                                                   <br/>
-        ///     return target.Prop;                                                                             <br/>
-        /// });                                                                                                 <br/>
-        /// private static readonly MethodContext FyYy = new MethodContext((ITarget target, object[] args) =>   <br/>
-        /// {                                                                                                   <br/>
-        ///     TValue _value = (TValue) args[0];                                                               <br/> 
-        ///     target.Prop = _value;                                                                           <br/>
-        ///     return null;                                                                                    <br/>
-        /// });                                                                                                 <br/>
-        /// TResult IInterface.Prop                                                                             <br/>
-        /// {                                                                                                   <br/>
-        ///     get                                                                                             <br/>
-        ///     {                                                                                               <br/>
-        ///         object[] args = new object[] { };                                                           <br/>
-        ///         return (TResult) Invoke(new InvocationContext(args, FxXx));                                 <br/>
-        ///     }                                                                                               <br/>
-        ///     set                                                                                             <br/>
-        ///     {                                                                                               <br/>
-        ///         object[] args = new object[] { value };                                                     <br/>
-        ///         Invoke(new InvocationContext(args, FyYy));                                                  <br/>
-        ///     }                                                                                               <br/>
+        /// <code>
+        /// private static readonly MethodContext FxXx = new MethodContext((ITarget target, object[] args) =>  
+        /// {                                                                                                 
+        ///     return target.Prop;                                                                           
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                          
+        /// private static readonly MethodContext FyYy = new MethodContext((ITarget target, object[] args) =>  
+        /// {                                                                                                
+        ///     TValue _value = (TValue) args[0];                                                             
+        ///     target.Prop = _value;                                                                         
+        ///     return null;                                                                                   
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                            
+        /// TResult IInterface.Prop                                                                          
+        /// {                                                                                                 
+        ///     get                                                                                            
+        ///     {                                                                                            
+        ///         object[] args = new object[] { };                                                          
+        ///         return (TResult) Invoke(new InvocationContext(args, FxXx));                               
+        ///     }                                                                                            
+        ///     set                                                                                         
+        ///     {                                                                                            
+        ///         object[] args = new object[] { value };                                                  
+        ///         Invoke(new InvocationContext(args, FyYy));                                               
+        ///     }                                                                                              
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

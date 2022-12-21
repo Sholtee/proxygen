@@ -12,7 +12,9 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
+        /// <code>
         /// System.Object paramName [= ...];
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -43,7 +45,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// System.Object paramName [= ...];
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

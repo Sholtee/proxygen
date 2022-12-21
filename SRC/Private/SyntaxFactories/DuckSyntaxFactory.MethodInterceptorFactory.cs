@@ -42,8 +42,10 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// [MethodImplAttribute(AggressiveInlining)]  <br/>
-        /// ref TResult IFoo[TGeneric1].Bar[TGeneric2](TGeneric1 para1, ref T1 para2, out T2 para3, TGeneric2 para4) => ref Target.Foo[TGeneric2](para1, ref para2, out para3, para4);
+        /// <code>
+        /// [MethodImplAttribute(AggressiveInlining)]
+        /// ref TResult IFoo&lt;TGeneric1&gt;.Bar&lt;TGeneric2&gt;(TGeneric1 para1, ref T1 para2, out T2 para3, TGeneric2 para4) => ref Target.Foo&lt;TGeneric2&gt;(para1, ref para2, out para3, para4);
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

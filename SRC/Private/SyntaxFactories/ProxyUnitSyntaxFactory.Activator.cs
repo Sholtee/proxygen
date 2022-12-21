@@ -20,23 +20,24 @@ namespace Solti.Utils.Proxy.Internals
     {
         public const string ACTIVATOR_NAME = "__Activator";
 
+        /// <summary>
+        /// <code>
+        /// public static readonly Func&lt;object, object&gt; __Activator = tuple =>
+        /// {
+        ///    switch (tuple)
+        ///    {
+        ///        case null: return new Class();
+        ///        case Tuple&lt;int, string&gt; t1: return new Class(t1.Item1, t1.Item2);  // C# 7.0 compatible
+        ///        default: throw new MissingMethodException("...");
+        ///    }
+        /// }
+        /// </code>
+        /// </summary>
         #if DEBUG
         internal
         #endif
         protected virtual ClassDeclarationSyntax ResolveActivator(ClassDeclarationSyntax cls, object context)
         {
-            //
-            // public static readonly Func<object, object> __Activator = tuple =>
-            // {
-            //    switch (tuple)
-            //    {
-            //       case null: return new Class();
-            //       case Tuple<int, string> t1: return new Class(t1.Item1, t1.Item2);  // C# 7.0 compatible
-            //       default: throw new MissingMethodException("...");
-            //    }
-            // }
-            //
-
             const string tuple = nameof(tuple);
 
             return cls.AddMembers

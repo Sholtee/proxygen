@@ -30,35 +30,37 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) => <br/>
-        /// {                                                                                                 <br/>
-        ///     EventType _value = (EventType) args[0];                                                       <br/>
-        ///     Target.Event += _value;                                                                       <br/>
-        ///     return null;                                                                                  <br/>
-        /// });                                                                                               <br/>
-        /// private static readonly MethodContext FYyY = new MethodContext((ITarget target, object[] args) => <br/>
-        /// {                                                                                                 <br/>
-        ///     EventType _value = (EventType) args[0];                                                       <br/>
-        ///     Target.Event -= _value;                                                                       <br/>
-        ///     return null;                                                                                  <br/>
-        /// });                                                                                               <br/>
-        /// event EventType IInterface.Event                                                                  <br/>
-        /// {                                                                                                 <br/>
-        ///     add                                                                                           <br/>
-        ///     {                                                                                             <br/>
-        ///         object[] args = new object[] { value };                                                   <br/>
-        ///         Invoke(new InvocationContext(args, FXxX));                                                <br/>
-        ///     }                                                                                             <br/>
-        ///     remove                                                                                        <br/>
-        ///     {                                                                                             <br/>
-        ///         object[] args = new object[] { value };                                                   <br/>
-        ///         Invoke(new InvocationContext(args, FYyY));                                                <br/>
-        ///     }                                                                                             <br/>
+        /// <code>
+        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) =>
+        /// {                                                                                                
+        ///     EventType _value = (EventType) args[0];                                                      
+        ///     Target.Event += _value;                                                                      
+        ///     return null;                                                                                  
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                              
+        /// private static readonly MethodContext FYyY = new MethodContext((ITarget target, object[] args) => 
+        /// {                                                                                                 
+        ///     EventType _value = (EventType) args[0];                                                      
+        ///     Target.Event -= _value;                                                                       
+        ///     return null;                                                                                 
+        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                             
+        /// event EventType IInterface.Event                                                                  
+        /// {                                                                                                 
+        ///     add                                                                                          
+        ///     {                                                                                           
+        ///         object[] args = new object[] { value };                                                
+        ///         Invoke(new InvocationContext(args, FXxX));                                               
+        ///     }                                                                                            
+        ///     remove                                                                                       
+        ///     {                                                                                          
+        ///         object[] args = new object[] { value };                                             
+        ///         Invoke(new InvocationContext(args, FYyY));                                              
+        ///     }                                                                                           
         /// }
+        /// </code>
         /// </summary>
-        #if DEBUG
+#if DEBUG
         internal
-        #endif
+#endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt)
         {
             List<MemberDeclarationSyntax> members = new();

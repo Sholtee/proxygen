@@ -14,7 +14,9 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
+        /// <code>
         /// [private|public] static readonly System.Object paramName [= ...];
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -57,7 +59,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// [private|public] static readonly System.Object paramName [= ...];
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

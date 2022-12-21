@@ -16,8 +16,10 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class SyntaxFactoryBase
     {
         /// <summary>
-        /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] <br/>
+        /// <code>
+        /// Namespace.ParentType[T].NestedType[TT] -> NestedType[TT] 
         /// Namespace.ParentType[T] -> global::Namespace.ParentType[T]
+        /// </code>
         /// </summary>
         private NameSyntax GetQualifiedName(ITypeInfo type)
         {

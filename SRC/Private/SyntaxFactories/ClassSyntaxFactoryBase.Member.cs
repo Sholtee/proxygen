@@ -74,7 +74,9 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <summary>
+        /// <code>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Member
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

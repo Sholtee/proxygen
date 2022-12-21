@@ -68,13 +68,15 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// System.Int32 IFoo[System.Int32].Prop         <br/>
-        /// {                                            <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   get => Target.Prop;                        <br/>
-        ///   [MethodImplAttribute(AggressiveInlining)]  <br/>
-        ///   set => Target.Prop = value;                <br/>
+        /// <code>
+        /// System.Int32 IFoo&lt;System.Int32&gt;.Prop 
+        /// {                                         
+        ///   [MethodImplAttribute(AggressiveInlining)] 
+        ///   get => Target.Prop;                     
+        ///   [MethodImplAttribute(AggressiveInlining)] 
+        ///   set => Target.Prop = value;              
         /// }
+        /// </code>
         /// </summary>
         #if DEBUG
         internal

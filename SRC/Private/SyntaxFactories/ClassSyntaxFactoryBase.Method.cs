@@ -16,7 +16,9 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
-        /// [[(Type)] target | [(Type)] this | Namespace.Type].Method[...](...)
+        /// <code>
+        /// [[(Type)] target | [(Type)] this | Namespace.Type].Method&lt;...&gt;(...)
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -41,7 +43,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// int IInterface.Foo[T](string a, ref T b)
+        /// <code>
+        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b)
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -163,7 +167,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// target.Foo(..., ref ..., ...)
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
@@ -211,7 +217,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
+        /// <code>
         /// target.Foo(ref a, b, c)
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
