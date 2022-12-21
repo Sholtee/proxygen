@@ -576,24 +576,6 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
   nameWithType: DuckBase<T>.Target
   nameWithType.vb: DuckBase(Of T).Target
-- uid: Solti.Utils.Proxy.Internals.GeneratedClass
-  name: GeneratedClass
-  href: Solti.Utils.Proxy.Internals.GeneratedClass.html
-  commentId: T:Solti.Utils.Proxy.Internals.GeneratedClass
-  fullName: Solti.Utils.Proxy.Internals.GeneratedClass
-  nameWithType: GeneratedClass
-- uid: Solti.Utils.Proxy.Internals.GeneratedClass.#ctor
-  name: GeneratedClass()
-  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass__ctor
-  commentId: M:Solti.Utils.Proxy.Internals.GeneratedClass.#ctor
-  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.GeneratedClass()
-  nameWithType: GeneratedClass.GeneratedClass()
-- uid: Solti.Utils.Proxy.Internals.GeneratedClass.#ctor*
-  name: GeneratedClass
-  href: Solti.Utils.Proxy.Internals.GeneratedClass.html#Solti_Utils_Proxy_Internals_GeneratedClass__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Internals.GeneratedClass.#ctor
-  fullName: Solti.Utils.Proxy.Internals.GeneratedClass.GeneratedClass
-  nameWithType: GeneratedClass.GeneratedClass
 - uid: Solti.Utils.Proxy.Internals.Generator
   name: Generator
   href: Solti.Utils.Proxy.Internals.Generator.html
@@ -895,6 +877,31 @@ references:
   fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Instance
   nameWithType: Generator<TInterface, TDescendant>.Instance
   nameWithType.vb: Generator(Of TInterface, TDescendant).Instance
+- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1
+  name: InterfaceInterceptorBase<TInterface>
+  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html
+  commentId: T:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1
+  name.vb: InterfaceInterceptorBase(Of TInterface)
+  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>
+  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface)
+  nameWithType: InterfaceInterceptorBase<TInterface>
+  nameWithType.vb: InterfaceInterceptorBase(Of TInterface)
+- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
+  name: InterfaceInterceptorBase()
+  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html#Solti_Utils_Proxy_Internals_InterfaceInterceptorBase_1__ctor
+  commentId: M:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
+  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase()
+  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase()
+  nameWithType: InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase()
+  nameWithType.vb: InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase()
+- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor*
+  name: InterfaceInterceptorBase
+  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html#Solti_Utils_Proxy_Internals_InterfaceInterceptorBase_1__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
+  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase
+  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase
+  nameWithType: InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase
+  nameWithType.vb: InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase
 - uid: Solti.Utils.Proxy.Internals.InterfaceMap`2
   name: InterfaceMap<TInterface, TImplementation>
   href: Solti.Utils.Proxy.Internals.InterfaceMap-2.html

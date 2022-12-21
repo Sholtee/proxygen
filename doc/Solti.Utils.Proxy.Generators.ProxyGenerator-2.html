@@ -76,7 +76,7 @@
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
   <h5 id="Solti_Utils_Proxy_Generators_ProxyGenerator_2_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator&lt;TInterface, TInterceptor&gt; : Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt; where TInterface : class where TInterceptor : GeneratedClass</code></pre>
+    <pre><code class="lang-csharp hljs">public sealed class ProxyGenerator&lt;TInterface, TInterceptor&gt; : Generator&lt;TInterface, ProxyGenerator&lt;TInterface, TInterceptor&gt;&gt; where TInterface : class where TInterceptor : InterfaceInterceptorBase&lt;TInterface&gt;</code></pre>
   </div>
   <h5 class="typeParameters">Type Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
