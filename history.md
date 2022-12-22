@@ -138,3 +138,6 @@
   - *introduce*: `InterfaceInterceptor<TInterface, TTarget>` class
   - *updated:* Roslyn to v4.3
   - *done:* Run tests against `net7.0`
+- 8.0.0:
+  - *breaking*: Dropped `GeneratedClass` class
+  - *done*: Some minor code alignment
