@@ -40,9 +40,9 @@
 <pre><code class="lang-ini">
 BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Redstone5)
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
-.NET Core SDK=6.0.302
-  [Host]     : .NET Core 6.0.7 (CoreCLR 6.0.722.32202, CoreFX 6.0.722.32202), X64 RyuJIT
-  Job-AQWMPL : .NET Core 6.0.7 (CoreCLR 6.0.722.32202, CoreFX 6.0.722.32202), X64 RyuJIT
+.NET Core SDK=7.0.100
+  [Host]     : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
+  Job-EDRTVC : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
 
 InvocationCount=30000  RunStrategy=Throughput  
 </code></pre><table>
@@ -61,19 +61,19 @@ InvocationCount=30000  RunStrategy=Throughput
 <tbody>
 <tr>
 <td>AssemblingProxyType</td>
-<td style="text-align:right">18,435.95 ns</td>
-<td style="text-align:right">359.560 ns</td>
-<td style="text-align:right">559.791 ns</td>
-<td style="text-align:right">0.3000</td>
+<td style="text-align:right">32,003.48 ns</td>
+<td style="text-align:right">1,768.579 ns</td>
+<td style="text-align:right">5,074.383 ns</td>
+<td style="text-align:right">0.3333</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">5849 B</td>
+<td style="text-align:right">6193 B</td>
 </tr>
 <tr>
 <td>GetGeneratedType</td>
-<td style="text-align:right">51.56 ns</td>
-<td style="text-align:right">0.431 ns</td>
-<td style="text-align:right">0.360 ns</td>
+<td style="text-align:right">87.51 ns</td>
+<td style="text-align:right">3.357 ns</td>
+<td style="text-align:right">9.413 ns</td>
 <td style="text-align:right">0.0020</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
@@ -81,9 +81,9 @@ InvocationCount=30000  RunStrategy=Throughput
 </tr>
 <tr>
 <td>Activate</td>
-<td style="text-align:right">79.17 ns</td>
-<td style="text-align:right">0.674 ns</td>
-<td style="text-align:right">0.598 ns</td>
+<td style="text-align:right">72.23 ns</td>
+<td style="text-align:right">1.353 ns</td>
+<td style="text-align:right">1.712 ns</td>
 <td style="text-align:right">0.0047</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>

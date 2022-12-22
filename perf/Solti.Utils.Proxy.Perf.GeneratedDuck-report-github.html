@@ -40,9 +40,9 @@
 <pre><code class="lang-ini">
 BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Redstone5)
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
-.NET Core SDK=6.0.302
-  [Host]     : .NET Core 6.0.7 (CoreCLR 6.0.722.32202, CoreFX 6.0.722.32202), X64 RyuJIT
-  Job-DEBUQZ : .NET Core 6.0.7 (CoreCLR 6.0.722.32202, CoreFX 6.0.722.32202), X64 RyuJIT
+.NET Core SDK=7.0.100
+  [Host]     : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
+  Job-QLJUSJ : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
 
 InvocationCount=5000000  RunStrategy=Throughput  
 </code></pre><table>
@@ -63,9 +63,9 @@ InvocationCount=5000000  RunStrategy=Throughput
 <tbody>
 <tr>
 <td>NoDuck</td>
-<td style="text-align:right">5.607 ns</td>
-<td style="text-align:right">0.1503 ns</td>
-<td style="text-align:right">0.1671 ns</td>
+<td style="text-align:right">5.618 ns</td>
+<td style="text-align:right">0.2017 ns</td>
+<td style="text-align:right">0.5623 ns</td>
 <td style="text-align:right">1.00</td>
 <td style="text-align:right">0.00</td>
 <td style="text-align:right">-</td>
@@ -75,11 +75,11 @@ InvocationCount=5000000  RunStrategy=Throughput
 </tr>
 <tr>
 <td>Duck</td>
-<td style="text-align:right">6.588 ns</td>
-<td style="text-align:right">0.1546 ns</td>
-<td style="text-align:right">0.1207 ns</td>
-<td style="text-align:right">1.17</td>
-<td style="text-align:right">0.04</td>
+<td style="text-align:right">7.415 ns</td>
+<td style="text-align:right">0.2077 ns</td>
+<td style="text-align:right">0.5722 ns</td>
+<td style="text-align:right">1.33</td>
+<td style="text-align:right">0.15</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
