@@ -43,7 +43,6 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
       }
   }
   ```
-  ```
 2. Generate a proxy instance invoking the desired constructor:
   ```csharp
   using System;
