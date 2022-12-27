@@ -24,17 +24,37 @@ namespace Solti.Utils.Proxy.Internals.Tests
             NonAnnotatedAssembly = nameof(NonAnnotatedAssembly),
             AnnotatedAssembly = nameof(AnnotatedAssembly);
 
-        [Test]
-        public void Check_ShouldThrowIfTheTypeNotVisible()
+        public static IEnumerable<(TestDelegate, string)> NotVisibleTypes
         {
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), AnnotatedAssembly));
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), AnnotatedAssembly));
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<object>)), NonAnnotatedAssembly));
+            get
+            {
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<IInternalInterface>)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+            }
         }
+
+        [Test]
+        public void Check_ShouldThrowOnInvisibleTypes([ValueSource(nameof(NotVisibleTypes))] (TestDelegate, string) check) =>
+            Assert.Throws<MemberAccessException>(check.Item1, check.Item2);
+
+        public static IEnumerable<TestDelegate> VisibleTypes
+        {
+            get
+            {
+                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), AnnotatedAssembly);
+                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<IInternalInterface>)), AnnotatedAssembly);
+                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), AnnotatedAssembly);
+                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<object>)), NonAnnotatedAssembly);
+            }
+        }
+
+        [Test]
+        public void Check_ShouldNotThrowOnVisibleTypes([ValueSource(nameof(VisibleTypes))] TestDelegate check) => Assert.DoesNotThrow(check);
 
         internal interface IInternalInterface { }
 
@@ -49,28 +69,38 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
         }
 
-        [Test]
-        public void Check_ShouldThrowIfTheMemberNotVisible()
+        public static IEnumerable<(TestDelegate, string)> NotVisibleMembers
         {
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList)), "cica"));
-
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly));
-
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: true, checkSet: false));
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.IVT_REQUIRED);
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), AnnotatedAssembly, checkGet: false, checkSet: true));
-
-            Assert.DoesNotThrow(() => Visibility.Check(MetadataEventInfo.CreateFrom(typeof(TestClass).GetEvent(nameof(TestClass.PublicEvent))), NonAnnotatedAssembly, checkAdd: true, checkRemove: true));
-
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
-
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
-            Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
+            get
+            {
+                yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
+            }
         }
+
+        [Test]
+        public void Check_ShouldThrowOnInvisibleMembers([ValueSource(nameof(NotVisibleMembers))] (TestDelegate, string) check) =>
+            Assert.Throws<MemberAccessException>(check.Item1, check.Item2);
+
+        public static IEnumerable<TestDelegate> VisibleMembers
+        {
+            get
+            {
+                yield return static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly);
+                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: true, checkSet: false);
+                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), AnnotatedAssembly, checkGet: false, checkSet: true);
+                yield return static () => Visibility.Check(MetadataEventInfo.CreateFrom(typeof(TestClass).GetEvent(nameof(TestClass.PublicEvent))), NonAnnotatedAssembly, checkAdd: true, checkRemove: true);
+            }
+        }
+
+        [Test]
+        public void Check_ShouldNotThrowOnVisibleMembers([ValueSource(nameof(VisibleMembers))] TestDelegate check) => Assert.DoesNotThrow(check);
 
         public class TestClass 
         {
