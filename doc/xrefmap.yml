@@ -1204,18 +1204,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.MethodContext.InterfaceMethod
   fullName: Solti.Utils.Proxy.MethodContext.InterfaceMethod
   nameWithType: MethodContext.InterfaceMethod
-- uid: Solti.Utils.Proxy.MethodContext.TargeteMethod
-  name: TargeteMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargeteMethod
-  commentId: P:Solti.Utils.Proxy.MethodContext.TargeteMethod
-  fullName: Solti.Utils.Proxy.MethodContext.TargeteMethod
-  nameWithType: MethodContext.TargeteMethod
-- uid: Solti.Utils.Proxy.MethodContext.TargeteMethod*
-  name: TargeteMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargeteMethod_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.TargeteMethod
-  fullName: Solti.Utils.Proxy.MethodContext.TargeteMethod
-  nameWithType: MethodContext.TargeteMethod
 - uid: Solti.Utils.Proxy.MethodContext.TargetMember
   name: TargetMember
   href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMember
@@ -1228,3 +1216,15 @@ references:
   commentId: Overload:Solti.Utils.Proxy.MethodContext.TargetMember
   fullName: Solti.Utils.Proxy.MethodContext.TargetMember
   nameWithType: MethodContext.TargetMember
+- uid: Solti.Utils.Proxy.MethodContext.TargetMethod
+  name: TargetMethod
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMethod
+  commentId: P:Solti.Utils.Proxy.MethodContext.TargetMethod
+  fullName: Solti.Utils.Proxy.MethodContext.TargetMethod
+  nameWithType: MethodContext.TargetMethod
+- uid: Solti.Utils.Proxy.MethodContext.TargetMethod*
+  name: TargetMethod
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMethod_
+  commentId: Overload:Solti.Utils.Proxy.MethodContext.TargetMethod
+  fullName: Solti.Utils.Proxy.MethodContext.TargetMethod
+  nameWithType: MethodContext.TargetMethod
