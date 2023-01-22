@@ -141,3 +141,5 @@
 - 8.0.0:
   - *breaking*: Dropped `GeneratedClass` class
   - *done*: Some minor code alignment
+- 8.0.1:
+  - *fixed*: Typo in `MethodContext` class (I consider it as a fix instead of breaking change).
