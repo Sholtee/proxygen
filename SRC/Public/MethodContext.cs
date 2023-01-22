@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy
                     if (targetmethod.IsGenericMethod)
                         targetmethod = targetmethod.MakeGenericMethod(InterfaceMethod.GetGenericArguments());
 
-                    TargeteMethod = targetmethod;
+                    TargetMethod = targetmethod;
                     TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
                 }
                 else
@@ -53,7 +53,7 @@ namespace Solti.Utils.Proxy
             }
             else
             {
-                TargeteMethod = InterfaceMethod;
+                TargetMethod = InterfaceMethod;
                 TargetMember = InterfaceMember;
             }
         }
@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy
             InterfaceMember = src.InterfaceMember;
             InterfaceMethod = src.InterfaceMethod;
             TargetMember    = src.TargetMember;
-            TargeteMethod   = src.TargeteMethod;
+            TargetMethod    = src.TargetMethod;
             Dispatch        = src.Dispatch;
         }
 
@@ -86,7 +86,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// The concrete method behind the <see cref="TargetMember"/>.
         /// </summary>
-        public MethodInfo TargeteMethod { get; }
+        public MethodInfo TargetMethod { get; }
 
         /// <summary>
         /// The member (property, event or method) that is being targeted.

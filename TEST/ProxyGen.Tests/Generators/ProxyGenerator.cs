@@ -223,7 +223,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargeteMethod, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
         }
 
@@ -240,8 +240,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<IList<int>>(lst => lst.Add(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargeteMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<List<int>>(lst => lst.Add(100))));
-            Assert.That(context.TargetMember, Is.EqualTo(context.TargeteMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<List<int>>(lst => lst.Add(100))));
+            Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
         }
 
         public interface IMyInterfceHavingGenericMethod
@@ -270,7 +270,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.GenericMethod(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargeteMethod, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
         }
 
@@ -290,8 +290,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<IMyInterfceHavingGenericMethod>(iface => iface.GenericMethod(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargeteMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<MyInterfceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
-            Assert.That(context.TargetMember, Is.EqualTo(context.TargeteMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<MyInterfceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
+            Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
         }
 
         [Test]
@@ -314,7 +314,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.InterfaceMember, Is.EqualTo(prop));
-            Assert.That(context.TargeteMethod, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMember));
         }
 
@@ -341,7 +341,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom<List<int>>(lst => lst.Count);
 
-            Assert.That(context.TargeteMethod, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.TargetMember, Is.EqualTo(prop));
         }
 
@@ -365,7 +365,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.InterfaceMethod, Is.EqualTo(evt.AddMethod));
             Assert.That(context.InterfaceMember, Is.EqualTo(evt));
-            Assert.That(context.TargeteMethod, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMember));
         }
 
@@ -390,7 +390,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.InterfaceMember, Is.EqualTo(evt));
 
             evt = typeof(EventSource).GetEvent("Event");
-            Assert.That(context.TargeteMethod, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.TargetMethod, Is.EqualTo(evt.AddMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.TargetMember));
         }
 
