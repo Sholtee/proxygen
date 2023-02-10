@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Reflection;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -50,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? new ReferenceCollector()
                 : null;
 
-        protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation)
+        protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
         {
             return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
                 ? ssg.CreateMainUnit
@@ -70,7 +71,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(Compilation compilation)
+        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation)
         {
             INamedTypeSymbol? miaSym = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
 
@@ -94,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
                     yield break;
             }
 
-            yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, CreateReferenceCollector());
+            yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, CreateReferenceCollector(), compilation.LanguageVersion);
         }
     }
 }

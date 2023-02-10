@@ -1,4 +1,4 @@
-(global::System.Object target, global::System.Object[] args) =>
+static (global::System.Object target, global::System.Object[] args) =>
 {
     global::System.Int32 _a = (global::System.Int32)args[0];
     global::System.String _b;

@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
             attributes.ToSyntaxList()
         );
 
-        protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector): base(referenceCollector) =>
+        protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector, LanguageVersion languageVersion): base(referenceCollector, languageVersion) =>
             OutputType = outputType;
 
         #if DEBUG

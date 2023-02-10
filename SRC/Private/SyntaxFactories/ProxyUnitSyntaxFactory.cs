@@ -6,13 +6,14 @@
 using System;
 using System.Collections.Generic;
 
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyUnitSyntaxFactory : UnitSyntaxFactoryBase
     {
-        protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector): base(outputType, referenceCollector) =>
+        protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion): base(outputType, referenceCollector, languageVersion) =>
             ContainingAssembly = containingAssembly;
 
         public string ContainingAssembly { get; }

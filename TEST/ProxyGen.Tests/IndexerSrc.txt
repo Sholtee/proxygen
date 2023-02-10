@@ -3,12 +3,12 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
     get
     {
         global::System.Object[] args = new global::System.Object[]{index};
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FBFF56FABEFCB6BD102F55C5BE5489C64));
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F9E6B0EC6A27814BA41BB12EEF71182FD));
     }
 
     set
     {
         global::System.Object[] args = new global::System.Object[]{index, value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F4610197BDE6BFC09D39D5B2CE17A10EC));
+        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F86DB1045576883520B2900E0E8FC5501));
     }
 }

@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ClassSyntaxFactoryBase: SyntaxFactoryBase
     {
-        public ClassSyntaxFactoryBase(ReferenceCollector? referenceCollector) : base(referenceCollector) { }
+        public ClassSyntaxFactoryBase(ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : base(referenceCollector, languageVersion) { }
 
         #if DEBUG
         internal

@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// (object target, object[] args) =>   
+        /// satic (object target, object[] args) =>   
         /// {                                             
         ///     System.Int32 cb_a = (System.Int32) args[0]; 
         ///     System.String cb_b;                   
@@ -237,8 +237,7 @@ namespace Solti.Utils.Proxy.Internals
 
             invocationFactory(target, args, locals, statements);
 
-            return 
-                ParenthesizedLambdaExpression()
+            ParenthesizedLambdaExpressionSyntax lambda = ParenthesizedLambdaExpression()
                 .WithParameterList
                 (
                     ParameterList
@@ -250,6 +249,16 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     Block(statements)
                 );
+
+            if (LanguageVersion >= LanguageVersion.CSharp9)
+                lambda = lambda.WithModifiers
+                (
+                    modifiers: TokenList
+                    (
+                        Token(SyntaxKind.StaticKeyword)
+                    )
+                );
+            return lambda;
         }
 
         /// <summary>
@@ -282,7 +291,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) => 
+        /// private static readonly MethodContext FXxX = new MethodContext(static (object target, object[] args) => 
         /// {                                                                                               
         ///     System.Int32 cb_a = (System.Int32) args[0];                                                
         ///     System.String cb_b;                                                                     
@@ -313,7 +322,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// private static class WrapperXxX&lt;T1, T2, ...&gt;                                               
         /// {                                                                                                   
-        ///     public static readonly MethodContext Value = new MethodContext((object target, object[] args) => 
+        ///     public static readonly MethodContext Value = new MethodContext(static (object target, object[] args) => 
         ///     {                                                                                               
         ///         System.Int32 cb_a = (System.Int32) args[0];                                                  
         ///         System.String cb_b;                                                                      

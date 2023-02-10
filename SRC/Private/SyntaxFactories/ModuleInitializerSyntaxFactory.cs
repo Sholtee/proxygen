@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal class ModuleInitializerSyntaxFactory : UnitSyntaxFactoryBase
     {
-        public ModuleInitializerSyntaxFactory(OutputType outputType, ReferenceCollector? referenceCollector) : base(outputType, referenceCollector)
+        public ModuleInitializerSyntaxFactory(OutputType outputType, ReferenceCollector? referenceCollector = null, LanguageVersion languageVersion = LanguageVersion.Latest) : base(outputType, referenceCollector, languageVersion)
         {
         }
 

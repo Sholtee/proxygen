@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     {
         private sealed class ClassSyntaxFactory : ClassSyntaxFactoryBase
         {
-            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(referenceCollector) {}
+            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(referenceCollector, LanguageVersion.Latest) {}
 
             protected internal override IEnumerable<ITypeInfo> ResolveBases(object context) => throw new NotImplementedException();
 

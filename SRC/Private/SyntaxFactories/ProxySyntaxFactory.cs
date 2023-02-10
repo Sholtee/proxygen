@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
@@ -47,7 +48,8 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo interceptorType,
             string? containingAssembly,
             OutputType outputType,
-            ReferenceCollector? referenceCollector): base(outputType, containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}", referenceCollector) 
+            ReferenceCollector? referenceCollector = null,
+            LanguageVersion languageVersion = LanguageVersion.Latest): base(outputType, containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}", referenceCollector, languageVersion) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
