@@ -1,4 +1,4 @@
-﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "8.0.1.0"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal sealed class Proxy_C8B58DFC1D6F06625CAD157191B66E8E : global::Solti.Utils.Proxy.InterfaceInterceptor<global::System.Collections.IList, global::System.Collections.Generic.List<global::System.Object>>, global::System.Collections.IList
 {
     public Proxy_C8B58DFC1D6F06625CAD157191B66E8E(global::System.Collections.Generic.List<global::System.Object> target) : base(target)
