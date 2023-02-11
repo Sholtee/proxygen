@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
         public static IGenericConstraint? CreateFrom(Type genericArgument)
         {
             MetadataGenericConstraint result = new(genericArgument);
-            return !result.DefaultConstructor && result.Reference && !result.Struct && !result.ConstraintTypes.Some()
+            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Some()
                 ? null
                 : result;
         }

@@ -182,7 +182,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                         internal void Foo() {} // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
                     } 
                     ";
-                /*
                 yield return
                     @"
                     using System;
@@ -201,11 +200,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                     public class GenericImplHavingConstraint
                     {
-                        void Foo<T>() where T : class, IDisposable {}
-                        void Bar<T, TT>() where T: new() where TT : struct {}
+                        public void Foo<T>() where T : class, IDisposable {}
+                        public void Bar<T, TT>() where T: new() where TT : struct {}
                     }
                     ";
-                */
             }
         }
 
