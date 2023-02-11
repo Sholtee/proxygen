@@ -46,6 +46,10 @@ namespace Solti.Utils.Proxy.Internals
             };
 
             static bool Equals(IParameterInfo p1, IParameterInfo p2) => p1.Kind == p2.Kind && p1.Type.EqualsTo(p2.Type);
+
+            //
+            // TODO: validate constraints too
+            //
         }
     }
 }

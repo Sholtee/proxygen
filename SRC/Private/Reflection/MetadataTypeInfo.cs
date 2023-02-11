@@ -210,9 +210,12 @@ namespace Solti.Utils.Proxy.Internals
 
             public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
+            public IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints => throw new NotImplementedException();
+
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
-                if (UnderlyingType.IsNested) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
+                if (UnderlyingType.IsNested)
+                    throw new NotImplementedException(); // TODO
 
                 Type[] gas = new Type[genericArgs.Length];
 

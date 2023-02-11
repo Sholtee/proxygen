@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -75,6 +76,22 @@ namespace Solti.Utils.Proxy.Internals
             (
                 UnderlyingMethod.GetGenericMethodDefinition()
             );
+
+            private IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>>? FGenericConstraints;
+            public IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints => FGenericConstraints ??= !UnderlyingMethod.IsGenericMethodDefinition
+                ? new Dictionary<ITypeInfo, IReadOnlyList<object>>(0)
+                : UnderlyingMethod.GetGenericArguments().ConvertDict
+                (
+                    static ga => new KeyValuePair<ITypeInfo, IReadOnlyList<object>>
+                    (
+                        MetadataTypeInfo.CreateFrom(ga),
+                        ImmutableList.Create<object>().AddRange
+                        (
+                            ga.GetGenericConstraints()
+                        )
+                    ),
+                    drop: static ga => !ga.GetGenericConstraints().Some()
+                );
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

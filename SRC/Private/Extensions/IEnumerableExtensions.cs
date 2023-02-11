@@ -63,6 +63,18 @@ namespace Solti.Utils.Proxy.Internals
         public static TConverted[] ConvertAr<TConverted, TConcrete>(this IEnumerable<TConcrete> original, Func<TConcrete, TConverted> convert, Func<TConcrete, bool>? drop = null) =>
             original.ConvertAr((element, _) => convert(element), drop is not null ? (element, _) => drop(element) : null);
 
+        public static IReadOnlyDictionary<TKey, TValue> ConvertDict<TOriginal, TKey, TValue>(this IEnumerable<TOriginal> original, Func<TOriginal, KeyValuePair<TKey, TValue>> convert, Func<TOriginal, bool>? drop = null)
+        {
+            Dictionary<TKey, TValue> dict = new();
+
+            foreach (KeyValuePair<TKey, TValue> pair in original.Convert(convert, drop))
+            {
+                dict.Add(pair.Key, pair.Value);
+            }
+
+            return dict;
+        }
+
         public static bool Some<T>(this IEnumerable<T> src, Func<T, bool>? predicate = null)
         {
             if (predicate is null && src is ICollection<T> coll)

@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -13,6 +14,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
@@ -44,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b)
+        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
         /// </code>
         /// </summary>
         #if DEBUG
@@ -105,57 +108,76 @@ namespace Solti.Utils.Proxy.Internals
                         return parameter;
                     })
                 )
-            );
-
-            if (method is IGenericMethodInfo genericMethod) result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
-            (
-                typeParameterList: TypeParameterList
-                (
-                    parameters: genericMethod
-                        .GenericArguments
-                        .ToSyntaxList
-                        (
-                            type => TypeParameter
-                            (
-                                ResolveType(type).ToFullString()
-                            )
-                        )
-                )
-            );
-
-            //
-            // Interface implementaciokat mindig expliciten deklaraljuk
-            //
-
-            if (method.DeclaringType.IsInterface) result = result.WithExplicitInterfaceSpecifier
+            )
+            .WithExplicitInterfaceSpecifier
             (
                 explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
             );
 
-            //
-            // Kulonben a lathatosagnak meg kell egyeznie
-            //
-
-            else 
+            if (method is IGenericMethodInfo genericMethod)
             {
-                List<SyntaxKind> modifiers = new(); // lehet tobb is ("internal protected" pl)
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Public))
-                    modifiers.Add(SyntaxKind.PublicKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Protected))
-                    modifiers.Add(SyntaxKind.ProtectedKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Internal))
-                    modifiers.Add(SyntaxKind.InternalKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Private)) // private protected
-                    modifiers.Add(SyntaxKind.PrivateKeyword);
-
-                result = result.WithModifiers
+                result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
                 (
-                    TokenList(modifiers.Convert(Token))
+                    typeParameterList: TypeParameterList
+                    (
+                        parameters: genericMethod
+                            .GenericArguments
+                            .ToSyntaxList
+                            (
+                                type => TypeParameter
+                                (
+                                    ResolveType(type).ToFullString()
+                                )
+                            )
+                    )
                 );
+
+                if (genericMethod.IsGenericDefinition)
+                {
+                    result = result.WithConstraintClauses
+                    (
+                        List
+                        (
+                            genericMethod.GenericConstraints.ConvertAr
+                            (
+                                constraint => TypeParameterConstraintClause
+                                (
+                                    IdentifierName
+                                    (
+                                        constraint.Key.Name  // T, T, etc
+                                    )
+                                )
+                                .WithConstraints
+                                (
+                                    GetContraints(constraint.Value).ToSyntaxList()
+                                ),
+                                drop: constraint => !GetContraints(constraint.Value).Some()
+                            )
+                        )
+                    );
+
+                    IEnumerable<TypeParameterConstraintSyntax> GetContraints(IEnumerable<object> constraints)
+                    {
+                        foreach (object constraint in constraints)
+                        {
+                            switch (constraint)
+                            {
+                                case ITypeInfo type:
+                                    //
+                                    // Explicit interface implementations must not specify type constraits
+                                    //
+                                    break;
+                                case IGenericConstraint gc:
+                                    if (gc.Struct)
+                                        yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                                    if (gc.Reference)
+                                        yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+                                    break;
+                                default: throw new NotSupportedException(Resources.CONSTRAINT_NOT_SUPPORTED);
+                            }
+                        }
+                    }
+                }
             }
 
             if (forceInlining) result = result.WithAttributeLists

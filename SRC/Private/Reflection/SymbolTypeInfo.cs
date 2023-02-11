@@ -197,9 +197,12 @@ namespace Solti.Utils.Proxy.Internals
                 .TypeArguments
                 .ConvertAr(ti => CreateFrom(ti, Compilation));
 
+            public IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints => throw new NotImplementedException();
+
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
-                if (UnderlyingSymbol.ContainingType is not null) throw new NotSupportedException(); // TODO: implementalni ha hasznalni kell majd
+                if (UnderlyingSymbol.ContainingType is not null)
+                    throw new NotImplementedException(); // TODO
 
                 ITypeSymbol[] gas = new ITypeSymbol[genericArgs.Length];
 

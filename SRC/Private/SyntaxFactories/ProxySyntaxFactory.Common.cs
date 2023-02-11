@@ -320,7 +320,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// private static class WrapperXxX&lt;T1, T2, ...&gt;                                               
+        /// private static class WrapperXxX&lt;T1, T2, ...&gt; [where ...]                                            
         /// {                                                                                                   
         ///     public static readonly MethodContext Value = new MethodContext(static (object target, object[] args) => 
         ///     {                                                                                               
@@ -337,8 +337,9 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments) => 
-            ClassDeclaration
+        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments, IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> constraints)
+        {
+            return ClassDeclaration
             (
                 $"Wrapper{lambda.GetMD5HashCode()}"
             )
@@ -364,6 +365,26 @@ namespace Solti.Utils.Proxy.Internals
                     })
                 )
             )
+            .WithConstraintClauses
+            (
+                List
+                (
+                    constraints.ConvertAr
+                    (
+                        constraint => TypeParameterConstraintClause
+                        (
+                            IdentifierName
+                            (
+                                constraint.Key.Name  // T, T, etc
+                            )
+                        )
+                        .WithConstraints
+                        (
+                            GetContraints(constraint.Value).ToSyntaxList()
+                        )
+                    )
+                )
+            )
             .AddMembers
             (
                 ResolveStaticGlobal<MethodContext>
@@ -380,5 +401,31 @@ namespace Solti.Utils.Proxy.Internals
                     @private: false
                 )
             );
+
+            IEnumerable<TypeParameterConstraintSyntax> GetContraints(IEnumerable<object> constraints)
+            {
+                foreach (object constraint in constraints)
+                {
+                    switch (constraint)
+                    {
+                        case ITypeInfo type:
+                            yield return TypeConstraint
+                            (
+                                ResolveType(type)
+                            );
+                            break;
+                        case IGenericConstraint gc:
+                            if (gc.Struct)
+                                yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                            if (gc.Reference)
+                                yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+                            if (gc.DefaultConstructor)
+                                yield return ConstructorConstraint();
+                            break;
+                        default: throw new NotSupportedException(Resources.CONSTRAINT_NOT_SUPPORTED);
+                    }
+                }
+            }
+        }
     }
 }

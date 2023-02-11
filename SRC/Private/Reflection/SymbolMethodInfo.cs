@@ -87,6 +87,8 @@ namespace Solti.Utils.Proxy.Internals
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.ConvertAr(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
 
+            public IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints => new Dictionary<ITypeInfo, IReadOnlyList<object>>();
+
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }
     }
