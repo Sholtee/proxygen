@@ -26,8 +26,8 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         IReadOnlyList<ITypeInfo> GenericArguments { get; }
         /// <summary>
-        /// A list of <see cref="IGenericConstraint"/> and <see cref="ITypeInfo"/> objects.
+        /// A list of <see cref="IGenericConstraint"/> objects.
         /// </summary>
-        IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints { get; }
+        IReadOnlyList<IGenericConstraint> GenericConstraints { get; }
     }
 }

@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Collections.Generic;
+
 namespace Solti.Utils.Proxy.Internals
 {
     internal interface IGenericConstraint
@@ -19,5 +21,9 @@ namespace Solti.Utils.Proxy.Internals
         /// The type must be a value type: <code>where T: struct</code>
         /// </summary>
         bool Struct { get; }
+
+        ITypeInfo Target { get; }
+
+        IReadOnlyList<ITypeInfo> ConstraintTypes { get; }
     }
 }

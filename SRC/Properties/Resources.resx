@@ -129,9 +129,6 @@
   <data name="COMPILATION_FAILED" xml:space="preserve">
     <value>Compilation failed. See "Data" for details.</value>
   </data>
-  <data name="CONSTRAINT_NOT_SUPPORTED" xml:space="preserve">
-    <value>Not supported constraint.</value>
-  </data>
   <data name="CTOR_NOT_FOUND" xml:space="preserve">
     <value>Constructor with the given layout cannot be found.</value>
   </data>

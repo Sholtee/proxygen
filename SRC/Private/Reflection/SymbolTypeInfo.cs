@@ -197,7 +197,7 @@ namespace Solti.Utils.Proxy.Internals
                 .TypeArguments
                 .ConvertAr(ti => CreateFrom(ti, Compilation));
 
-            public IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> GenericConstraints => throw new NotImplementedException();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {

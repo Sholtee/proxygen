@@ -315,28 +315,5 @@ namespace Solti.Utils.Proxy.Internals
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
             #pragma warning restore CA2201
         };
-
-        public static IEnumerable<object> GetGenericConstraints(this Type src)
-        {
-            //
-            // Return first to comply the specifications
-            //
-
-            IGenericConstraint? genericConstraint = MetadataGenericConstraint.CreateFrom(src);
-            if (genericConstraint is not null)
-                yield return genericConstraint;
-
-            foreach (Type constraint in src.GetGenericParameterConstraints())
-            {
-                if (constraint == typeof(ValueType) && genericConstraint?.Struct is true)
-                    //
-                    // We don't want a
-                    //     "where TT : struct, global::System.ValueType"
-                    //
-
-                    continue;
-                yield return MetadataTypeInfo.CreateFrom(constraint);
-            }
-        }
     }
 }

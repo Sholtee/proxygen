@@ -14,8 +14,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
@@ -144,38 +142,28 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     IdentifierName
                                     (
-                                        constraint.Key.Name  // T, T, etc
+                                        constraint.Target.Name  // T, T, etc
                                     )
                                 )
                                 .WithConstraints
                                 (
-                                    GetContraints(constraint.Value).ToSyntaxList()
+                                    GetContraints(constraint).ToSyntaxList()
                                 ),
-                                drop: constraint => !GetContraints(constraint.Value).Some()
+                                drop: constraint => !GetContraints(constraint).Some()
                             )
                         )
                     );
 
-                    IEnumerable<TypeParameterConstraintSyntax> GetContraints(IEnumerable<object> constraints)
+                    static IEnumerable<TypeParameterConstraintSyntax> GetContraints(IGenericConstraint constraint)
                     {
-                        foreach (object constraint in constraints)
-                        {
-                            switch (constraint)
-                            {
-                                case ITypeInfo type:
-                                    //
-                                    // Explicit interface implementations must not specify type constraits
-                                    //
-                                    break;
-                                case IGenericConstraint gc:
-                                    if (gc.Struct)
-                                        yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
-                                    if (gc.Reference)
-                                        yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
-                                    break;
-                                default: throw new NotSupportedException(Resources.CONSTRAINT_NOT_SUPPORTED);
-                            }
-                        }
+                        //
+                        // Explicit interface implementations must not specify type constraits
+                        //
+
+                        if (constraint.Struct)
+                            yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                        if (constraint.Reference)
+                            yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
                     }
                 }
             }

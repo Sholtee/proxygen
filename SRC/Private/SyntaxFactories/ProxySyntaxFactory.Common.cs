@@ -337,7 +337,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments, IReadOnlyDictionary<ITypeInfo, IReadOnlyList<object>> constraints)
+        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments, IEnumerable<IGenericConstraint> constraints)
         {
             return ClassDeclaration
             (
@@ -375,12 +375,12 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             IdentifierName
                             (
-                                constraint.Key.Name  // T, T, etc
+                                constraint.Target.Name  // T, T, etc
                             )
                         )
                         .WithConstraints
                         (
-                            GetContraints(constraint.Value).ToSyntaxList()
+                            GetContraints(constraint).ToSyntaxList()
                         )
                     )
                 )
@@ -402,28 +402,21 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            IEnumerable<TypeParameterConstraintSyntax> GetContraints(IEnumerable<object> constraints)
+            IEnumerable<TypeParameterConstraintSyntax> GetContraints(IGenericConstraint constraint)
             {
-                foreach (object constraint in constraints)
+                if (constraint.Struct)
+                    yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                if (constraint.Reference)
+                    yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+                if (constraint.DefaultConstructor)
+                    yield return ConstructorConstraint();
+
+                foreach (ITypeInfo typeConstraint in constraint.ConstraintTypes)
                 {
-                    switch (constraint)
-                    {
-                        case ITypeInfo type:
-                            yield return TypeConstraint
-                            (
-                                ResolveType(type)
-                            );
-                            break;
-                        case IGenericConstraint gc:
-                            if (gc.Struct)
-                                yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
-                            if (gc.Reference)
-                                yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
-                            if (gc.DefaultConstructor)
-                                yield return ConstructorConstraint();
-                            break;
-                        default: throw new NotSupportedException(Resources.CONSTRAINT_NOT_SUPPORTED);
-                    }
+                    yield return TypeConstraint
+                    (
+                        ResolveType(typeConstraint)
+                    );
                 }
             }
         }
