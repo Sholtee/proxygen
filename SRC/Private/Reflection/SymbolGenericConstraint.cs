@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         public static IGenericConstraint? CreateFrom(ITypeParameterSymbol genericArgument, Compilation compilation)
         {
             SymbolGenericConstraint result = new(genericArgument, compilation);
-            return !result.DefaultConstructor && result.Reference && !result.Struct && !result.ConstraintTypes.Some()
+            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Some()
                 ? null
                 : result;
         }
