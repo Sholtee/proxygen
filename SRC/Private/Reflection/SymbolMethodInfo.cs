@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 using Microsoft.CodeAnalysis;
 
@@ -68,24 +69,33 @@ namespace Solti.Utils.Proxy.Internals
         {
             public SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : base(method, compilation) { }
 
-            public bool IsGenericDefinition
-            {
-                get
-                {
-                    foreach (ITypeSymbol ta in UnderlyingSymbol.TypeArguments)
-                    {
-                        if (!ta.IsGenericArgument())
-                            return false;
-                    }
-                    return true;
-                }
-            }
+            private bool? FIsGenericDefinition;
+            public bool IsGenericDefinition => FIsGenericDefinition ??= !UnderlyingSymbol
+                .TypeParameters
+                .Some(static tp => !SymbolEqualityComparer.Default.Equals(tp.OriginalDefinition, tp));
 
             private IGenericMethodInfo? FGenericDefinition;
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.ConvertAr(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
+
+            private IEnumerable<IGenericConstraint> GetConstraints()
+            {
+                foreach (ITypeParameterSymbol ga in UnderlyingSymbol.TypeParameters)
+                {
+                    IGenericConstraint? constraint = SymbolGenericConstraint.CreateFrom(ga, Compilation);
+                    if (constraint is not null)
+                        yield return constraint;
+                }
+            }
+
+            private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
+            public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= !IsGenericDefinition
+                ? Array.Empty<IGenericConstraint>()
+                : ImmutableList
+                    .Create<IGenericConstraint>()
+                    .AddRange(GetConstraints());
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

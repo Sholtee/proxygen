@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -44,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b)
+        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
         /// </code>
         /// </summary>
         #if DEBUG
@@ -105,57 +106,66 @@ namespace Solti.Utils.Proxy.Internals
                         return parameter;
                     })
                 )
-            );
-
-            if (method is IGenericMethodInfo genericMethod) result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
-            (
-                typeParameterList: TypeParameterList
-                (
-                    parameters: genericMethod
-                        .GenericArguments
-                        .ToSyntaxList
-                        (
-                            type => TypeParameter
-                            (
-                                ResolveType(type).ToFullString()
-                            )
-                        )
-                )
-            );
-
-            //
-            // Interface implementaciokat mindig expliciten deklaraljuk
-            //
-
-            if (method.DeclaringType.IsInterface) result = result.WithExplicitInterfaceSpecifier
+            )
+            .WithExplicitInterfaceSpecifier
             (
                 explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
             );
 
-            //
-            // Kulonben a lathatosagnak meg kell egyeznie
-            //
-
-            else 
+            if (method is IGenericMethodInfo genericMethod)
             {
-                List<SyntaxKind> modifiers = new(); // lehet tobb is ("internal protected" pl)
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Public))
-                    modifiers.Add(SyntaxKind.PublicKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Protected))
-                    modifiers.Add(SyntaxKind.ProtectedKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Internal))
-                    modifiers.Add(SyntaxKind.InternalKeyword);
-
-                if (method.AccessModifiers.HasFlag(AccessModifiers.Private)) // private protected
-                    modifiers.Add(SyntaxKind.PrivateKeyword);
-
-                result = result.WithModifiers
+                result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
                 (
-                    TokenList(modifiers.Convert(Token))
+                    typeParameterList: TypeParameterList
+                    (
+                        parameters: genericMethod
+                            .GenericArguments
+                            .ToSyntaxList
+                            (
+                                type => TypeParameter
+                                (
+                                    ResolveType(type).ToFullString()
+                                )
+                            )
+                    )
                 );
+
+                if (genericMethod.IsGenericDefinition)
+                {
+                    result = result.WithConstraintClauses
+                    (
+                        List
+                        (
+                            genericMethod.GenericConstraints.ConvertAr
+                            (
+                                constraint => TypeParameterConstraintClause
+                                (
+                                    IdentifierName
+                                    (
+                                        constraint.Target.Name  // T, T, etc
+                                    )
+                                )
+                                .WithConstraints
+                                (
+                                    GetContraints(constraint).ToSyntaxList()
+                                ),
+                                drop: constraint => !GetContraints(constraint).Some()
+                            )
+                        )
+                    );
+
+                    static IEnumerable<TypeParameterConstraintSyntax> GetContraints(IGenericConstraint constraint)
+                    {
+                        //
+                        // Explicit interface implementations must not specify type constraits
+                        //
+
+                        if (constraint.Struct)
+                            yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                        if (constraint.Reference)
+                            yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+                    }
+                }
             }
 
             if (forceInlining) result = result.WithAttributeLists

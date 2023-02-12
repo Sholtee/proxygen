@@ -138,6 +138,22 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     ";
                 yield return
                     @"
+                    using System;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IGenericInterfaceHavingConstraint, InterfaceInterceptor<IGenericInterfaceHavingConstraint>>))]
+
+                    public interface IGenericInterfaceHavingConstraint
+                    {
+                        void Foo<T>() where T : class, IDisposable;
+                        void Bar<T, TT>() where T: new() where TT : struct;
+                    }
+                    ";
+                yield return
+                    @"
                     using System.Collections;
 
                     using Solti.Utils.Proxy;
@@ -165,6 +181,28 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     {
                         internal void Foo() {} // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
                     } 
+                    ";
+                yield return
+                    @"
+                    using System;
+
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DuckGenerator<IGenericInterfaceHavingConstraint, GenericImplHavingConstraint>))]
+
+                    public interface IGenericInterfaceHavingConstraint
+                    {
+                        void Foo<T>() where T : class, IDisposable;
+                        void Bar<T, TT>() where T: new() where TT : struct;
+                    }
+
+                    public class GenericImplHavingConstraint
+                    {
+                        public void Foo<T>() where T : class, IDisposable {}
+                        public void Bar<T, TT>() where T: new() where TT : struct {}
+                    }
                     ";
             }
         }

@@ -261,11 +261,6 @@ namespace Solti.Utils.Proxy.Internals
             return $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
-        public static bool IsGenericArgument(this ITypeSymbol src) => src
-            .ContainingType?
-            .TypeArguments
-            .Some(ta => SymbolEqualityComparer.Default.Equals(ta, src)) is true;
-
         //
         // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
         // mar nem beagyazott tipus.

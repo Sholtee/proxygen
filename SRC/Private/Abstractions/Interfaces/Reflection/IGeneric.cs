@@ -25,5 +25,9 @@ namespace Solti.Utils.Proxy.Internals
         /// Returns the explicitly declared generic arguments (e.g.: in case of <i>Generic{T}.Nested{TT}</i> this property returns <i>TT</i> for the nested type).
         /// </summary>
         IReadOnlyList<ITypeInfo> GenericArguments { get; }
+        /// <summary>
+        /// A list of <see cref="IGenericConstraint"/> objects.
+        /// </summary>
+        IReadOnlyList<IGenericConstraint> GenericConstraints { get; }
     }
 }

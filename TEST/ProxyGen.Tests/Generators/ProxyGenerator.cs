@@ -100,6 +100,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void GeneratedProxy_ShouldWorkWithGenerics() =>
             Assert.DoesNotThrowAsync(() => ProxyGenerator<IList<List<object>>, InterfaceInterceptor<IList<List<object>>>>.ActivateAsync(Tuple.Create((IList<List<object>>) new List<List<object>>())));
 
+        public interface IMyGenericInterfaceHavingConstraint
+        {
+            void Foo<T>() where T : class, IDisposable;
+            void Bar<T, TT>() where T: new() where TT : struct;
+        }
+
+        [Test]
+        public void GeneratedProxy_ShouldWorkWithGenericsHavingConstraint() =>
+            Assert.DoesNotThrowAsync(() => ProxyGenerator<IMyGenericInterfaceHavingConstraint, InterfaceInterceptor<IMyGenericInterfaceHavingConstraint>>.ActivateAsync(Tuple.Create((IMyGenericInterfaceHavingConstraint) null)));
+
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithOverloadedProperties()
         {

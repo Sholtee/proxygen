@@ -72,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     public void Foo(T para) {}
                 }
             ",
-            false
+            true
         )]
         [TestCase
         (
@@ -148,6 +148,51 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 }
             ",
             true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    public void Foo<T>(T a, int b) where T: new() {}
+                }
+
+                class ClassB 
+                {
+                    public void Foo<TT>(TT a, int b) where TT: new() {}
+                }
+            ",
+            true
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    public void Foo<T>(T a, int b) where T: new() {}
+                }
+
+                class ClassB 
+                {
+                    public void Foo<TT>(TT a, int b) {}
+                }
+            ",
+            false
+        )]
+        [TestCase
+        (
+            @"
+                class ClassA
+                {
+                    public void Foo<T>(T a, int b) where T: new() {}
+                }
+
+                class ClassB 
+                {
+                    public void Foo<T>(T a, int b) where T: struct {}
+                }
+            ",
+            false
         )]
         [TestCase
         (

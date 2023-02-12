@@ -76,7 +76,8 @@ namespace Solti.Utils.Proxy.Internals
                 ? ResolveMethodContext
                 (
                     ResolveInvokeTarget(method),
-                    genericMethod.GenericArguments
+                    genericMethod.GenericArguments,
+                    genericMethod.GenericConstraints
                 )
                 : ResolveMethodContext
                 (
