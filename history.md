@@ -142,4 +142,7 @@
   - *breaking*: Dropped `GeneratedClass` class
   - *done*: Some minor code alignment
 - 8.0.1:
-  - *fixed*: Typo in `MethodContext` class (I consider it as a fix instead of breaking change).
+  - *fixed*: Typo in `MethodContext` class (I consider it as a fix instead of breaking change)
+- 8.1.0:
+  - *introduce*: Generic constraint support
+  - *done*: Using static delegates in the generated proxy classes (which involves performance benefits)
