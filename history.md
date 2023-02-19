@@ -135,7 +135,7 @@
   - *improved:* Proxy activator (now it is part of the generated class, no expression compilation required)
 - 8.0.0-preview1:
   - *breaking*: `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMember|InterfaceMethod`
-  - *introduce*: `InterfaceInterceptor<TInterface, TTarget>` class
+  - *introduced*: `InterfaceInterceptor<TInterface, TTarget>` class
   - *updated:* Roslyn to v4.3
   - *done:* Run tests against `net7.0`
 - 8.0.0:
@@ -144,5 +144,5 @@
 - 8.0.1:
   - *fixed*: Typo in `MethodContext` class (I consider it as a fix instead of breaking change)
 - 8.1.0:
-  - *introduce*: Generic constraint support
+  - *introduced*: Generic constraint support
   - *done*: Using static delegates in the generated proxy classes (which involves performance benefits)
