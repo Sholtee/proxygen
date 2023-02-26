@@ -146,3 +146,5 @@
 - 8.1.0:
   - *introduced*: Generic constraint support
   - *done*: Using static delegates in the generated proxy classes (which involves performance benefits)
+- 8.1.1:
+  - *fixed*: Possible `NullReferenceException` when trying to initialize configuration
