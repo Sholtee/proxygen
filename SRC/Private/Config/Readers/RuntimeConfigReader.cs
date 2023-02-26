@@ -4,14 +4,17 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.IO;
-using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class RuntimeConfigReader : IConfigReader
     {
-        public string BasePath { get; } = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        //
+        // Assembly.GetEntryAssembly() can be NULL in certain circumstances so
+        // use BaseDirecrtory instead
+        //
+
+        public string BasePath { get; } = AppDomain.CurrentDomain.BaseDirectory;
 
         public string? ReadValue(string name) => AppContext.GetData($"ProxyGen.{name}") as string;
     }
