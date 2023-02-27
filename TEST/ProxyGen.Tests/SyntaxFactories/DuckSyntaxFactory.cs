@@ -204,8 +204,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             //
 
             string[]
-                lines1 = src1.Split(Environment.NewLine).OrderBy(l => l).ToArray(),
-                lines2 = src2.Split(Environment.NewLine).OrderBy(l => l).ToArray();
+                lines1 = src1.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray(),
+                lines2 = src2.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray();
 
             Assert.That(lines1.Length, Is.EqualTo(lines2.Length));
             Assert.That(lines1.SequenceEqual(lines2));

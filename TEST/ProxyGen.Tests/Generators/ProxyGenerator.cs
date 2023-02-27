@@ -589,6 +589,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 .Any(m => m.ReturnType.IsByRef || m.GetParameters()
                     .Any(p => p.ParameterType.IsByRefLike)))
 #endif
+#if NET472
+            .Where(iface => !iface.Name.StartsWith("_"))
+#endif
             ;
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
@@ -613,7 +616,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(File.Exists(cacheFile));
         }
 
-        [Test]
+        [
+            Test
+#if NET472
+            , Ignore(".NET Framework cannot load assembly targeting .NET Core")
+#endif
+        ]
         public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             Generator generator = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.Instance;
@@ -676,7 +684,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             void Foo(Span<int> para);
         }
 
-        [Test]
+        [
+            Test
+#if NET472
+            , Ignore("Ref structures are not supported in .NET Framework")
+#endif
+        ]
         public void ProxyGenerator_ShouldThrowOnRefStructs() =>
             Assert.Throws<NotSupportedException>(() => ProxyGenerator<IRefStructUsage, InterfaceInterceptor<IRefStructUsage>>.GetGeneratedType());
     }

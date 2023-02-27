@@ -239,7 +239,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(File.Exists(cacheFile));
         }
 
-        [Test]
+        [
+            Test
+#if NET472
+            , Ignore(".NET Framework cannot load assembly targeting .NET Core")
+#endif
+        ]
         public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             Generator generator = DuckGenerator<IGeneric<object>, Generic<object>>.Instance;
@@ -253,7 +258,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
+            .Values
+            .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) })
+#if NET472
+            .Where(iface => !iface.Name.StartsWith("_"))
+#endif
+            ;
 
         [TestCaseSource(nameof(RandomInterfaces))]
         public void DuckGenerator_ShouldWorkWith(Type iface) =>
