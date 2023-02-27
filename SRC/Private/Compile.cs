@@ -33,12 +33,18 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                string tpa = (string) AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES");
-
-                return GetFilteredPlatformAssemblies
-                (
-                    tpa.Split(Path.PathSeparator)
-                );
+                return AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string tpa
+                    ? GetFilteredPlatformAssemblies
+                    (
+                        tpa.Split(Path.PathSeparator)
+                    )
+                    : GetFilteredPlatformAssemblies // .NET Framework 4.X
+                    (
+                        Directory.GetFiles
+                        (
+                            Path.GetDirectoryName(typeof(object).Assembly.Location)
+                        )
+                    );
             }
 
             IEnumerable<MetadataReference> GetFilteredPlatformAssemblies(IEnumerable<string> allAssemblies)
