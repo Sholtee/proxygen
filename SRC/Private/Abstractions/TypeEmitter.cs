@@ -4,12 +4,10 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.Loader;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -22,8 +20,6 @@ namespace Solti.Utils.Proxy.Internals
     /// <remarks>Static methods of this type are thread safe while instance methods are NOT.</remarks>
     public abstract record TypeEmitter
     {
-        private static AssemblyLoadContext AssemblyLoader { get; } = AssemblyLoadContext.Default;
-
         private static void RunInitializers(Assembly assembly)
         {
             //
@@ -78,11 +74,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     RunInitializers
                     (
-                        //
-                        // Will throw if the assembly already loaded.
-                        //
-
-                        AssemblyLoader.LoadFromAssemblyPath(cacheFile)
+                        Assembly.LoadFile(cacheFile)
                     );
 
                     return GetInstanceFromCache(className, throwOnMissing: true)!;
@@ -126,11 +118,7 @@ namespace Solti.Utils.Proxy.Internals
 
             RunInitializers
             (
-                //
-                // Will throw if the assembly already loaded.
-                //
-
-                AssemblyLoader.LoadFromStream(asm)
+                Assembly.Load(asm.ToArray())
             );
 
             return GetInstanceFromCache(className, throwOnMissing: true)!;
