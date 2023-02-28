@@ -67,7 +67,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.ProxyGenerator<System.Collections.Generic.IList<int>, Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>>"));
         }
 
-        [Test]
+        [
+            Test
+#if NET472
+            , Ignore("AppContext.SetData() not supported in .NET Framework")
+#endif
+        ]
         public void LogException_ShouldCreateALogFileForTheGivenException()
         {
             //
@@ -79,14 +84,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
             {
                 typeof(AppContext).InvokeMember
                 (
-                    "SetData", // netcore 2.x-ben van 3.x-ben nincs
+                    "SetData",
                     BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod,
                     null,
                     null,
                     new object[]
                     {
                         "ProxyGen.LogDump",
-                        Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "..", "Logs")
+                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "Logs")
                     }
                 );
 

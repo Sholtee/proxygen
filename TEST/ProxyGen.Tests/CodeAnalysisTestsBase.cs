@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -70,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 customConfig
             );
 
-            return AssemblyLoadContext.Default.LoadFromStream(asm);
+            return Assembly.Load(asm.ToArray());
         }
 
         public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));

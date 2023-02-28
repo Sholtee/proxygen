@@ -314,7 +314,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void GetDebugString_ShouldReturnThePrettifiedDebugStringOfTheType() 
         {
             ITypeSymbol type = CreateCompilation(string.Empty).GetTypeByMetadataName(typeof(IList<>).FullName);
-            Assert.That(type.GetDebugString(eol: "\n"), Is.EqualTo(File.ReadAllText("ListDbg.txt")));
+            Assert.That(type.GetDebugString(eol: "\n"), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ListDbg.txt"))));
         }
     }
 }

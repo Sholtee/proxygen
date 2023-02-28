@@ -25,7 +25,6 @@
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.3.*" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.*" />
   </ItemGroup>
 
   <ItemGroup>
