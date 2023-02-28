@@ -25,27 +25,30 @@ namespace Solti.Utils.Proxy.Internals
         internal static IEnumerable<MetadataReference> GetPlatformAssemblies(string? platformAsmsDir, IEnumerable<string> platformAsms)
         {
             if (!string.IsNullOrEmpty(platformAsmsDir) && Directory.Exists(platformAsmsDir))
-            {
                 return GetFilteredPlatformAssemblies
                 (
-                    Directory.EnumerateFiles(platformAsmsDir, "*.dll", SearchOption.TopDirectoryOnly)
+                    EnumerateDlls(platformAsmsDir!)
                 );
-            }
-            else
-            {
-                return AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string tpa
-                    ? GetFilteredPlatformAssemblies
-                    (
-                        tpa.Split(Path.PathSeparator)
-                    )
-                    : GetFilteredPlatformAssemblies // .NET Framework 4.X
-                    (
-                        Directory.GetFiles
-                        (
-                            Path.GetDirectoryName(typeof(object).Assembly.Location)
-                        )
-                    );
-            }
+
+            if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string tpa)
+                return GetFilteredPlatformAssemblies
+                (
+                    tpa.Split(Path.PathSeparator)
+                );
+
+            //
+            // .NET Framework 4.X
+            //
+
+            return GetFilteredPlatformAssemblies 
+            (
+                EnumerateDlls
+                (
+                    Path.GetDirectoryName(typeof(object).Assembly.Location)
+                )
+            );
+
+            static IEnumerable<string> EnumerateDlls(string path) => Directory.EnumerateFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
 
             IEnumerable<MetadataReference> GetFilteredPlatformAssemblies(IEnumerable<string> allAssemblies)
             {
