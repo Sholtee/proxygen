@@ -77,6 +77,9 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter)
                 return src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
 
+            if (src.ElementType is null != that.ElementType is null)
+                return false;
+
             if (src.ElementType is not null)
                 //
                 // Tombbel v mutatoval van dolgunk. A QualifiedName property-t itt nem vizsgalhatjuk
