@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.IO;
 
 using Microsoft.CodeAnalysis;
@@ -25,7 +26,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 factory.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(),
                 Is.EqualTo
                 (
-                    File.ReadAllText("ModuleInitializerAttribute.txt").Replace("{version}", typeof(ModuleInitializerSyntaxFactory).Assembly.GetName().Version.ToString())          
+                    File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ModuleInitializerAttribute.txt")).Replace("{version}", typeof(ModuleInitializerSyntaxFactory).Assembly.GetName().Version.ToString())          
                 )
             );
         }

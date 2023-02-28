@@ -128,7 +128,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
-            Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText("CallbackSrc.txt")));
+            Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CallbackSrc.txt"))));
         }
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
@@ -156,7 +156,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             SyntaxList<MemberDeclarationSyntax> methods = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
 
-            Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(para.File))));
+            Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, para.File)))));
         }
 
         [Test]
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             SyntaxList<MemberDeclarationSyntax> props = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("PropSrc.txt"))));
+            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 null
             ).ResolveProperties(GetDummyClass(), null).Members;
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("IndexerSrc.txt"))));
+            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt")))));
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             SyntaxList<MemberDeclarationSyntax> evts = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
 
-            Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText("EventSrc.txt"))));
+            Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
         }
 
         [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Module, "ClsSrcModule.txt")]
@@ -206,7 +206,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 Is.EqualTo
                 (
                     File
-                        .ReadAllText(fileName)
+                        .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName))
                         .Replace("\r", string.Empty)
                         .Replace("{version}", typeof(ProxyGenerator<,>)
                             .Assembly

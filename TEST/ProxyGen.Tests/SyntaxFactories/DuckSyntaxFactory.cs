@@ -137,7 +137,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 Is.EqualTo
                 (
                     File
-                        .ReadAllText("DuckClsSrc.txt")
+                        .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DuckClsSrc.txt"))
                         .Replace("\r", string.Empty)
                         .Replace("{version}", typeof(DuckGenerator<,>)
                             .Assembly
