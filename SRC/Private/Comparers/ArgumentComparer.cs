@@ -15,6 +15,15 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class ArgumentComparer : ComparerBase<ArgumentComparer, Type>
     {
+        public override bool Equals(Type x, Type y)
+        {
+            string
+                name1 = x.FullName ?? x.Name,
+                name2 = y.FullName ?? y.Name;
+
+            return name1.Equals(name2, StringComparison.OrdinalIgnoreCase);
+        }
+
         //
         // Generikus argumentumnak nincs teljes neve ezert a lenti sor jol kezeli a fenti
         // problemat.
