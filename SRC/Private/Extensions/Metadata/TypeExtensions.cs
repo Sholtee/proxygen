@@ -346,5 +346,17 @@ namespace Solti.Utils.Proxy.Internals
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
             #pragma warning restore CA2201
         };
+
+        public static RefType GetRefType(this Type src) => src switch
+        {
+            _ when
+            #if NETSTANDARD2_1_OR_GREATER
+                src.IsByRefLike ||
+            #endif
+                src.GetCustomAttributes().Some(static ca => ca.GetType().FullName?.Equals("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.OrdinalIgnoreCase) is true) => RefType.Ref, // ref struct
+            _ when src.IsPointer => RefType.Pointer,
+            _ when src.IsArray => RefType.Array,
+            _ => RefType.None
+        };
     }
 }

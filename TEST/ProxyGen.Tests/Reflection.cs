@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void AssemblyInfo_FriendshipTest(object asm) =>
             Assert.That(((IAssemblyInfo) asm).IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
-        [Test]
+        [Test, Parallelizable(ParallelScope.All)]
         public void TypeInfo_AbstractionTest([Values(
             typeof(void), 
             typeof(object), 
@@ -63,9 +63,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(nint[]),
             typeof(DateTime),
             typeof(List<>),
-#if NETCOREAPP
-            typeof(Span<int>), // ref struct
-#endif
+            typeof(Span<int>),
+            typeof(ReadOnlySpan<int>),
             typeof(List<object>), 
             typeof(NestedGeneric<>), 
             typeof(NestedGeneric<List<string>>), 
@@ -106,9 +105,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     return;
                 }
 
-                if (!processed.Add(t1.Name))
-                    return;
-
                 Assert.AreEqual(t1.Name, t2.Name);
                 Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
@@ -121,6 +117,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.RefType, t2.RefType);
                 Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
+
+                if (!processed.Add(t1.Name) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
+                    return;
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
                 AssertEqualsT(t1.ElementType, t2.ElementType);
@@ -153,12 +152,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
                     .Methods
-                    .OrderBy(m => m.AccessModifiers)
-                    .ThenBy(m => m.IsStatic)
-                    .ThenBy(m => m.Name)
+                    .OrderBy(m => m.Name)
+                    .ThenBy(m => m.AccessModifiers)
+                    .ThenBy(m => m.IsStatic)     
                     .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.QualifiedName ?? p.Type.Name)))
-                    .ThenBy(m => m.ReturnValue.Type.QualifiedName ?? m.ReturnValue.Type.Name);
+                    .ThenBy(m => string.Join("_", m.Parameters.Select(p => p.Type.Name)))
+                    .ThenBy(m => m.ReturnValue.Type.Name);
 
                 IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
                     .Properties
@@ -220,12 +219,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(m1.Name, m2.Name);
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
+#if !NETFRAMEWORK  // .NET Framework sometimes marks non-virtual methods as "final"
                 Assert.AreEqual(m1.IsFinal, m2.IsFinal);
+#endif
                 Assert.AreEqual(m1.IsStatic, m2.IsStatic);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
 
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
-                AssertSequenceEqualsT(m1.DeclaringInterfaces, m2.DeclaringInterfaces);
+                AssertSequenceEqualsT(m1.DeclaringInterfaces.OrderBy(i => i.Name).ToArray(), m2.DeclaringInterfaces.OrderBy(i => i.Name).ToArray());
                 AssertSequenceEqualsP(m1.Parameters, m2.Parameters);
                 AssertEqualsMP(m1.ReturnValue, m2.ReturnValue);
 

@@ -12,36 +12,15 @@ namespace Solti.Utils.Proxy.Internals
     {
         private PropertyInfo UnderlyingProperty { get; }
 
-        //
-        // Privat property metodusok leszarmazott tipusban nem lathatok
-        //
-
-        private PropertyInfo? FUnderlyingOriginalProperty;
-        private PropertyInfo UnderlyingOriginalProperty
-        {
-            get
-            {
-                if (FUnderlyingOriginalProperty is null)
-                {
-                    MethodInfo backingMethod = UnderlyingProperty.GetMethod ?? UnderlyingProperty.SetMethod;
-
-                    FUnderlyingOriginalProperty = UnderlyingProperty
-                        .DeclaringType
-                        .GetProperty
-                        (
-                            UnderlyingProperty.Name,
-                            (backingMethod.IsStatic ? BindingFlags.Static : BindingFlags.Instance) | (backingMethod.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic)
-                        );
-                }
-                return FUnderlyingOriginalProperty;
-            }
-        }
-
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingOriginalProperty.GetMethod is not null ? MetadataMethodInfo.CreateFrom(UnderlyingOriginalProperty.GetMethod) : null;
+        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingProperty.GetMethod is not null
+            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
+            : null;
 
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingOriginalProperty.SetMethod is not null ? MetadataMethodInfo.CreateFrom(UnderlyingOriginalProperty.SetMethod) : null;
+        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingProperty.SetMethod is not null
+            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
+            : null;
 
         public string Name => UnderlyingProperty.StrippedName();
 

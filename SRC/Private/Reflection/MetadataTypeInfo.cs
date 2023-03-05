@@ -69,15 +69,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
-        public RefType RefType => UnderlyingType switch
-        {
-#if NETSTANDARD2_1_OR_GREATER
-            _ when UnderlyingType.IsByRefLike => RefType.Ref, // ref struct
-#endif
-            _ when UnderlyingType.IsPointer => RefType.Pointer,
-            _ when UnderlyingType.IsArray => RefType.Array,
-            _ => RefType.None
-        };
+        public RefType RefType => UnderlyingType.GetRefType();
 
         private ITypeInfo? FElementType;
         public ITypeInfo? ElementType
