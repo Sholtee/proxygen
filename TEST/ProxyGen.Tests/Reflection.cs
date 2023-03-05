@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -60,9 +61,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(int*),
             typeof(nint),
             typeof(nint[]),
-            typeof(DateTime), 
+            typeof(DateTime),
             typeof(List<>),
+#if NETCOREAPP
             typeof(Span<int>), // ref struct
+#endif
             typeof(List<object>), 
             typeof(NestedGeneric<>), 
             typeof(NestedGeneric<List<string>>), 
@@ -86,19 +89,25 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
-            var processed = new HashSet<string>();
+            var processed = new HashSet<string>
+            {
+#if NETCOREAPP3_1
+                "NonRandomizedStringEqualityComparer"
+#endif
+            };
 
             AssertEqualsT(type1, type2);
 
             void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
             {
-                if (t1 == null || t2 == null) 
+                if (t1 == null || t2 == null)
                 {
                     Assert.AreSame(t1, t2);
                     return;
                 }
 
-                if (!processed.Add(t1.Name)) return;
+                if (!processed.Add(t1.Name))
+                    return;
 
                 Assert.AreEqual(t1.Name, t2.Name);
                 Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
@@ -114,15 +123,15 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
-                AssertEqualsT(type1.ElementType, type2.ElementType);
-                AssertEqualsT(type1.EnclosingType, type2.EnclosingType);
-                AssertEqualsT(type1.BaseType, type2.BaseType);
-                AssertEqualsN(type1.ContainingMember, type2.ContainingMember);
-                AssertSequenceEqualsT(type1.Interfaces.OrderBy(i => i.Name).ToArray(), type2.Interfaces.OrderBy(i => i.Name).ToArray());
-                AssertSequenceEqualsM(OrderCtors(type1).ToArray(), OrderCtors(type2).ToArray());
-                AssertSequenceEqualsM(OrderMethods(type1).ToArray(), OrderMethods(type2).ToArray());
-                AssertSequenceEqualsPr(OrderProperties(type1).ToArray(), OrderProperties(type2).ToArray());
-                AssertSequenceEqualsE(type1.Events.OrderBy(e => e.Name).ToArray(), type2.Events.OrderBy(e => e.Name).ToArray());
+                AssertEqualsT(t1.ElementType, t2.ElementType);
+                AssertEqualsT(t1.EnclosingType, t2.EnclosingType);
+                AssertEqualsT(t1.BaseType, t2.BaseType);
+                AssertEqualsN(t1.ContainingMember, t2.ContainingMember);
+                AssertSequenceEqualsT(t1.Interfaces.OrderBy(i => i.Name).ToArray(), t2.Interfaces.OrderBy(i => i.Name).ToArray());
+                AssertSequenceEqualsM(OrderCtors(t1).ToArray(), OrderCtors(t2).ToArray());
+                AssertSequenceEqualsM(OrderMethods(t1).ToArray(), OrderMethods(t2).ToArray());
+                AssertSequenceEqualsPr(OrderProperties(t1).ToArray(), OrderProperties(t2).ToArray());
+                AssertSequenceEqualsE(t1.Events.OrderBy(e => e.Name).ToArray(), t2.Events.OrderBy(e => e.Name).ToArray());
 
                 IGenericTypeInfo
                     gt1 = t1 as IGenericTypeInfo,
@@ -323,10 +332,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(SystemTypes)), Parallelizable]
         public void TypeInfo_AbstractionTestAgainstSystemType(Type t)
         {
-#if NETCOREAPP3_1
-            if (t.Name.Contains("NonRandomizedStringEqualityComparer"))
-                Assert.Ignore("Needs investigation");
-#endif
             TypeInfo_AbstractionTest(t);
         }
 

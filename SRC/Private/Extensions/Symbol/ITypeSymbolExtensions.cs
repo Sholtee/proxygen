@@ -34,6 +34,10 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.IndexOf(src.TypeKind) >= 0;
 
+        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => !src.IsGenericParameter()
+            ? src.ContainingType
+            : null;
+
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
             //

@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         [
             Test
-#if NET472
+#if NETFRAMEWORK
             , Ignore("AppContext.SetData() not supported in .NET Framework")
 #endif
         ]

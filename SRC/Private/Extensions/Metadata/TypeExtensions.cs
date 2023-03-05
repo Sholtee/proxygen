@@ -28,11 +28,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static string GetFriendlyName(this Type src)
         {
-            if (src.IsByRef)
-                return src.GetElementType()!.GetFriendlyName();
-
-            if (src.IsGenericType)
-                src = src.GetGenericTypeDefinition();
+            if (src.GetInnermostElementType()?.IsGenericType is true)
+                src = src.GetGenericDefinition();
 
             return TypeNameReplacer.Replace
             (
@@ -43,15 +40,38 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        public static Type GetGenericDefinition(this Type src)  // works with GenericType<TConcrete>[] too
+        {
+            if (src.IsArray)
+            {
+                int rank = src.GetArrayRank();
+                src = src.GetElementType().GetGenericDefinition();
+                return src.MakeArrayType(rank);
+            }
+
+            if (src.IsByRef)
+            {
+                src = src.GetElementType().GetGenericDefinition();
+                return src.MakeByRefType();
+            }
+
+            if (src.IsPointer)
+            {
+                src = src.GetElementType().GetGenericDefinition();
+                return src.MakePointerType();
+            }
+
+            return src.GetGenericTypeDefinition();
+        }
+
         public static string? GetQualifiedName(this Type src) 
         {
-            if (src.HasElementType)
-                return src.GetElementType()!.GetQualifiedName();
+            src = src.GetInnermostElementType() ?? src;
 
             if (src.IsGenericType)
-                src = src.GetGenericTypeDefinition();
+                src = src.GetGenericDefinition();
 
-            return src.FullName?.TrimEnd('&');
+            return src.FullName;
         }
 
         public static Type? GetInnermostElementType(this Type src) 
@@ -186,6 +206,9 @@ namespace Solti.Utils.Proxy.Internals
             Func<TMember, MethodInfo?> getOverriddenMethod, 
             bool includeStatic) where TMember: MemberInfo
         {
+            if (src.IsGenericParameter)
+                yield break;
+
             BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
 
             //
@@ -249,15 +272,23 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
-            for (Type? baseType = type.BaseType; baseType is not null; baseType = baseType.BaseType)
+            for (Type? baseType = type.GetBaseType(); baseType is not null; baseType = baseType.GetBaseType())
                 yield return baseType;
         }
+
+        public static IEnumerable<Type> GetAllInterfaces(this Type type) => !type.IsGenericParameter
+            ? type.GetInterfaces()
+            : Array.Empty<Type>();
+
+        public static Type? GetBaseType(this Type src) => !src.IsGenericParameter
+            ? src.BaseType
+            : null;
 
         public static IEnumerable<Type> GetHierarchy(this Type src)
         {
             yield return src;
 
-            foreach (Type t in src.IsInterface ? src.GetInterfaces() : src.GetBaseTypes())
+            foreach (Type t in src.IsInterface ? src.GetAllInterfaces() : src.GetBaseTypes())
             {
                 yield return t;
             }

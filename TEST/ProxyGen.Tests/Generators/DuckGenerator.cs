@@ -241,7 +241,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [
             Test
-#if NET472
+#if NETFRAMEWORK
             , Ignore(".NET Framework cannot load assembly targeting .NET Core")
 #endif
         ]
@@ -261,7 +261,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
             .Values
             .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) })
-#if NET472
+#if NETFRAMEWORK
             .Where(iface => !iface.Name.StartsWith("_"))
 #endif
             ;

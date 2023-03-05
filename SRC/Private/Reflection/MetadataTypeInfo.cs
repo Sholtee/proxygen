@@ -58,11 +58,13 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
-        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType.GetInterfaces().ConvertAr(CreateFrom);
+        public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
+            .GetAllInterfaces()
+            .ConvertAr(CreateFrom);
 
         private ITypeInfo? FBaseType;
-        public ITypeInfo? BaseType => UnderlyingType.BaseType is not null
-            ? FBaseType ??= CreateFrom(UnderlyingType.BaseType)
+        public ITypeInfo? BaseType => UnderlyingType.GetBaseType() is not null
+            ? FBaseType ??= CreateFrom(UnderlyingType.GetBaseType()!)
             : null;
 
         public virtual string Name => UnderlyingType.GetFriendlyName();

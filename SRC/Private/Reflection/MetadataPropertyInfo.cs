@@ -17,9 +17,25 @@ namespace Solti.Utils.Proxy.Internals
         //
 
         private PropertyInfo? FUnderlyingOriginalProperty;
-        private PropertyInfo UnderlyingOriginalProperty => FUnderlyingOriginalProperty ??= UnderlyingProperty
-            .DeclaringType
-            .GetProperty(UnderlyingProperty.Name, BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+        private PropertyInfo UnderlyingOriginalProperty
+        {
+            get
+            {
+                if (FUnderlyingOriginalProperty is null)
+                {
+                    MethodInfo backingMethod = UnderlyingProperty.GetMethod ?? UnderlyingProperty.SetMethod;
+
+                    FUnderlyingOriginalProperty = UnderlyingProperty
+                        .DeclaringType
+                        .GetProperty
+                        (
+                            UnderlyingProperty.Name,
+                            (backingMethod.IsStatic ? BindingFlags.Static : BindingFlags.Instance) | (backingMethod.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic)
+                        );
+                }
+                return FUnderlyingOriginalProperty;
+            }
+        }
 
         private IMethodInfo? FGetMethod;
         public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingOriginalProperty.GetMethod is not null ? MetadataMethodInfo.CreateFrom(UnderlyingOriginalProperty.GetMethod) : null;

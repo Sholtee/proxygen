@@ -589,7 +589,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 .Any(m => m.ReturnType.IsByRef || m.GetParameters()
                     .Any(p => p.ParameterType.IsByRefLike)))
 #endif
-#if NET472
+#if NETFRAMEWORK
             .Where(iface => !iface.Name.StartsWith("_"))
 #endif
             ;
@@ -618,7 +618,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [
             Test
-#if NET472
+#if NETFRAMEWORK
             , Ignore(".NET Framework cannot load assembly targeting .NET Core")
 #endif
         ]
@@ -686,7 +686,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [
             Test
-#if NET472
+#if NETFRAMEWORK
             , Ignore("Ref structures are not supported in .NET Framework")
 #endif
         ]

@@ -96,8 +96,8 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private ITypeInfo? FEnclosingType;
-        public ITypeInfo? EnclosingType => UnderlyingSymbol.ContainingType is not null
-            ? FEnclosingType ??= CreateFrom(UnderlyingSymbol.ContainingType, Compilation)
+        public ITypeInfo? EnclosingType => UnderlyingSymbol.GetEnclosingType() is not null
+            ? FEnclosingType ??= CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation)
             : null;
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
@@ -155,12 +155,24 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsAbstract => UnderlyingSymbol.IsAbstract;
 
         private IHasName? FContainingMember;
-        public IHasName? ContainingMember => FContainingMember ??= UnderlyingSymbol.ContainingSymbol switch 
+        public IHasName? ContainingMember
         {
-            IMethodSymbol method => SymbolMethodInfo.CreateFrom(method, Compilation),
-            ITypeSymbol type => SymbolTypeInfo.CreateFrom(type, Compilation),
-            _ => null
-        };
+            get
+            {
+                if (FContainingMember is null)
+                {
+                    ITypeSymbol concreteType = UnderlyingSymbol.GetElementType(recurse: true) ?? UnderlyingSymbol;
+
+                    FContainingMember = concreteType.ContainingSymbol switch
+                    {
+                        IMethodSymbol method => SymbolMethodInfo.CreateFrom(method, Compilation),
+                        ITypeSymbol type => SymbolTypeInfo.CreateFrom(type, Compilation),
+                        _ => null
+                    };
+                }
+                return FContainingMember;
+            }
+        }
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 

@@ -53,15 +53,11 @@ namespace Solti.Utils.Proxy.Internals
             return ParameterKind.None;
 
             bool IsReadOnly() =>
-#if NETSTANDARD2_0
                 //
                 // "IsReadOnlyAttribute" csak netstandard2.1-tol kezdve publikus.
                 //
-                src.GetCustomAttributes().Some(static attr => attr.GetType().FullName.Equals("System.Runtime.CompilerServices.IsReadOnlyAttribute", StringComparison.OrdinalIgnoreCase))
-#else
-                src.GetCustomAttribute<System.Runtime.CompilerServices.IsReadOnlyAttribute>() is not null
-#endif          
-                ;
+
+                src.GetCustomAttributes().Some(static attr => attr.GetType().FullName.Equals("System.Runtime.CompilerServices.IsReadOnlyAttribute", StringComparison.OrdinalIgnoreCase));
         }
     }
 }
