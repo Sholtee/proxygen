@@ -211,7 +211,19 @@ namespace Solti.Utils.Proxy.Internals
             if (src.IsGenericParameter)
                 yield break;
 
-            BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
+            BindingFlags flags = 
+                BindingFlags.Public |
+
+                //
+                // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
+                // privatot nem, viszont az explicit implementaciok privat tagok... 
+                //
+
+                //BindingFlags.FlattenHierarchy |
+
+                BindingFlags.NonPublic |
+                BindingFlags.Instance |
+                BindingFlags.DeclaredOnly;
 
             //
             // NET6_0-tol kezdve lehet statikusokat deklaralni interface-eken is
@@ -232,14 +244,6 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                //
-                // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
-                // privatot nem, viszont az explicit implementaciok privat tagok... 
-                //
-
-                //flags |= BindingFlags.FlattenHierarchy;
-                flags |= BindingFlags.NonPublic;
-
                 HashSet<MethodInfo> overriddenMethods = new();
 
                 //

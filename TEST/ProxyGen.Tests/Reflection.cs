@@ -63,6 +63,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             };
         }
 
+        //[TestCase("System.Collections.Generic.IInternalStringEqualityComparer, System.Private.CoreLib, Version=5.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")]
+        public void TypeInfo_AbstractionTest(string type) => TypeInfo_AbstractionTest(Type.GetType(type, throwOnError: true));
+
         [Test]
         public void TypeInfo_AbstractionTest([Values(
             typeof(void), 
