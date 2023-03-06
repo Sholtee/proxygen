@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                 if (src.IsIn && IsReadOnly()) // siman src.IsIn nem eleg
                     return ParameterKind.In;
 
-                if (src.IsOut)
+                if (!src.IsIn && src.IsOut)
                     return ParameterKind.Out;
 
                 return ParameterKind.Ref;

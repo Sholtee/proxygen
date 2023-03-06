@@ -110,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals
         //
 
         private static bool ShouldSkip(MethodInfo m) =>
-            m.Name == "Finalize" || // destructor
+            (m.DeclaringType.IsClass && m.Name == "Finalize") || // destructor
             (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
             (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
             (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]

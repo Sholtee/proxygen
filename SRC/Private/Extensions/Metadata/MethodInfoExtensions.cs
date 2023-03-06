@@ -84,12 +84,22 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        //
-        // GetBaseDefinition() nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
-        //
-
         public static MethodInfo? GetOverriddenMethod(this MethodInfo method)
         {
+            /*
+            if (method.IsVirtual)
+            {
+                MethodInfo overriddenMethod = method.GetBaseDefinition();
+                return overriddenMethod != method
+                    ? overriddenMethod
+                    : null;
+            }
+            */
+
+            //
+            // GetBaseDefinition() nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
+            //
+
             Type[] paramz = method
                 .GetParameters()
                 .ConvertAr(static p => p.ParameterType);

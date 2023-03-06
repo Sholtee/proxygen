@@ -50,7 +50,20 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void AssemblyInfo_FriendshipTest(object asm) =>
             Assert.That(((IAssemblyInfo) asm).IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
-        [Test, Parallelizable(ParallelScope.All)]
+        private HashSet<string> FProcessedTypes;
+
+        [OneTimeSetUp]
+        public void SetupFixture()
+        {
+            FProcessedTypes = new HashSet<string>
+            {
+                #if NETCOREAPP3_1
+                "NonRandomizedStringEqualityComparer"
+                #endif
+            };
+        }
+
+        [Test]
         public void TypeInfo_AbstractionTest([Values(
             typeof(void), 
             typeof(object), 
@@ -88,13 +101,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
-            var processed = new HashSet<string>
-            {
-#if NETCOREAPP3_1
-                "NonRandomizedStringEqualityComparer"
-#endif
-            };
-
             AssertEqualsT(type1, type2);
 
             void AssertEqualsT(ITypeInfo t1, ITypeInfo t2) 
@@ -118,7 +124,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
 
-                if (!processed.Add(t1.Name) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
+                if (!FProcessedTypes.Add(t1.Name) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
                     return;
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
