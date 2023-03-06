@@ -34,9 +34,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.IndexOf(src.TypeKind) >= 0;
 
-        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => !src.IsGenericParameter()
-            ? src.ContainingType
-            : null;
+        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src)
+        {
+            src = src.GetElementType(recurse: true) ?? src;
+
+            return !src.IsGenericParameter()
+                ? src.ContainingType
+                : null;
+        }
 
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
@@ -275,14 +280,16 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsGenericParameter(this ITypeSymbol src)
         {
-            src = src.GetElementType(recurse: true) ?? src;
-
+            src = src.GetElementType(recurse: true) ?? src;     
+            /*
             return src.ContainingSymbol switch
             {
                 IMethodSymbol method => method.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
                 INamedTypeSymbol type => type.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
                 _ => false
             };
+            */
+            return src.TypeKind is TypeKind.TypeParameter;
         }
 
         public static string GetQualifiedMetadataName(this ITypeSymbol src)
@@ -419,13 +426,16 @@ namespace Solti.Utils.Proxy.Internals
             {
                 foreach (ITypeSymbol ta in namedType.TypeArguments)
                 {
+                    if (ta.IsGenericParameter())
+                        continue;
+
                     AccessModifiers gaAm = ta.GetAccessModifiers();
                     if (gaAm < am)
                         am = gaAm;
                 }
             }
 
-            if (src.ContainingType is not null)
+            if (!src.IsGenericParameter() && src.ContainingType is not null)
             {
                 AccessModifiers ctAm = src.ContainingType.GetAccessModifiers();
                 if (ctAm < am)

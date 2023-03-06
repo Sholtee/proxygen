@@ -166,7 +166,7 @@ namespace Solti.Utils.Proxy.Internals
                     FContainingMember = concreteType.ContainingSymbol switch
                     {
                         IMethodSymbol method => SymbolMethodInfo.CreateFrom(method, Compilation),
-                        ITypeSymbol type => SymbolTypeInfo.CreateFrom(type, Compilation),
+                        _ when UnderlyingSymbol.GetEnclosingType() is not null => SymbolTypeInfo.CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation),
                         _ => null
                     };
                 }

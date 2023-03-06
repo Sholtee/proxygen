@@ -88,6 +88,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static Type? GetEnclosingType(this Type src) 
         {
+            src = src.GetInnermostElementType() ?? src;
+
             if (src.IsGenericParameter)
                 return null;
 
@@ -335,11 +337,6 @@ namespace Solti.Utils.Proxy.Internals
 
             AccessModifiers am = src switch
             {
-                //
-                // Mi van ha a korul zart tipus publikus viszont a korul zaro maga nem (lasd IsVisible)?
-                // Ezt most en onkenyesen akkor publikusnak veszem
-                //
-
                 _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
                 _ when src.IsNestedFamily => AccessModifiers.Protected,
                 _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
@@ -363,6 +360,14 @@ namespace Solti.Utils.Proxy.Internals
                     if (gaAm < am)
                         am = gaAm;
                 }
+            }
+
+            Type? enclosingType = src.GetEnclosingType();
+            if (enclosingType is not null)
+            {
+                AccessModifiers etAm = enclosingType.GetAccessModifiers();
+                if (etAm < am)
+                    am = etAm;
             }
 
             return am;

@@ -166,7 +166,7 @@ namespace Solti.Utils.Proxy.Internals
                     FContainingMember = concreteType switch
                     {
                         _ when concreteType.IsGenericParameter /*kulonben a DeclaringMethod megbaszodik*/ && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
-                        _ when /*Ez lehet T es nested is*/ concreteType.DeclaringType is not null => MetadataTypeInfo.CreateFrom(concreteType.DeclaringType),
+                        _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
                         _ => null
                     };
                 }

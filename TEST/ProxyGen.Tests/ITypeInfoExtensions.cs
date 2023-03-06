@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     public void Foo(TT para) {}
                 }
             ",
-            false
+            true
         )]
         [TestCase
         (
