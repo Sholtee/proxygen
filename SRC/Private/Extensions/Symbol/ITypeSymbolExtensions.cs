@@ -419,8 +419,17 @@ namespace Solti.Utils.Proxy.Internals
             {
                 foreach (ITypeSymbol ta in namedType.TypeArguments)
                 {
-                    am = (AccessModifiers) Math.Min((int) am, (int) ta.GetAccessModifiers());
+                    AccessModifiers gaAm = ta.GetAccessModifiers();
+                    if (gaAm < am)
+                        am = gaAm;
                 }
+            }
+
+            if (src.ContainingType is not null)
+            {
+                AccessModifiers ctAm = src.ContainingType.GetAccessModifiers();
+                if (ctAm < am)
+                    am = ctAm;
             }
 
             return am;

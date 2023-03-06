@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             FProcessedTypes = new HashSet<string>
             {
                 #if NETCOREAPP3_1
-                "NonRandomizedStringEqualityComparer"
+                "System.Collections.Generic.NonRandomizedStringEqualityComparer"
                 #endif
             };
         }
@@ -162,7 +162,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .ThenBy(m => m.AccessModifiers)
                     .ThenBy(m => m.IsStatic)     
                     .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
-                    .ThenBy(m => string.Join("_", m.Parameters.Select(p => p.Type.Name)))
+                    .ThenBy(m => string.Join("_", m.Parameters.Select(p => $"{p.Type.Name}_{p.Type.RefType}")))
                     .ThenBy(m => m.ReturnValue.Type.Name);
 
                 IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t

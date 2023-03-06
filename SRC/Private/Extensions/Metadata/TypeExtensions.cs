@@ -117,7 +117,7 @@ namespace Solti.Utils.Proxy.Internals
             // mar nem beagyazott tipus.
             //
 
-            src.GetInnermostElementType()?.IsNested ?? src.IsNested;
+            (src.GetInnermostElementType() ?? src).IsNested;
 
         public static bool IsClass(this Type src) => !src.IsGenericParameter && src.IsClass;
 
@@ -329,23 +329,44 @@ namespace Solti.Utils.Proxy.Internals
             } 
         }
 
-        public static AccessModifiers GetAccessModifiers(this Type src) => (src = src.HasElementType ? src.GetInnermostElementType()! : src) switch
+        public static AccessModifiers GetAccessModifiers(this Type src)
         {
+            src = src.GetInnermostElementType() ?? src;
+
+            AccessModifiers am = src switch
+            {
+                //
+                // Mi van ha a korul zart tipus publikus viszont a korul zaro maga nem (lasd IsVisible)?
+                // Ezt most en onkenyesen akkor publikusnak veszem
+                //
+
+                _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
+                _ when src.IsNestedFamily => AccessModifiers.Protected,
+                _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
+                _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
+                _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
+                _ when src.IsNestedPrivate => AccessModifiers.Private,
+                #pragma warning disable CA2201 // In theory we should never reach here.
+                _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
+                #pragma warning restore CA2201
+            };
+
             //
-            // Mi van ha a korul zart tipus publikus viszont a korul zaro maga nem (lasd IsVisible)?
-            // Ezt most en onkenyesen akkor publikusnak veszem
+            // Generic arguments may impact the visibility.
             //
 
-            _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
-            _ when src.IsNestedFamily => AccessModifiers.Protected,
-            _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
-            _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
-            _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
-            _ when src.IsNestedPrivate => AccessModifiers.Private,
-            #pragma warning disable CA2201 // In theory we should never reach here.
-            _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-            #pragma warning restore CA2201
-        };
+            if (src.IsConstructedGenericType)
+            {
+                foreach (Type ga in src.GetGenericArguments())
+                {
+                    AccessModifiers gaAm = ga.GetAccessModifiers();
+                    if (gaAm < am)
+                        am = gaAm;
+                }
+            }
+
+            return am;
+        }
 
         public static RefType GetRefType(this Type src) => src switch
         {
