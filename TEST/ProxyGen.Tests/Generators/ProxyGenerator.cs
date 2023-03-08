@@ -14,7 +14,12 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 
-[assembly: InternalsVisibleTo("Proxy_5C3FC6431B4D81D670187842F42EDDDE")]
+[assembly: 
+    InternalsVisibleTo("Proxy_5C3FC6431B4D81D670187842F42EDDDE")
+#if NET5_0_OR_GREATER
+    , InternalsVisibleTo("Proxy_70691AD41E6056EFB4D10D70BD1E48C2")
+#endif
+]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {

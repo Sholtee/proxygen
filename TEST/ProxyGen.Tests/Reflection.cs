@@ -57,13 +57,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             FProcessedTypes = new HashSet<string>
             {
-                #if NETCOREAPP3_1
+#if NETCOREAPP3_1
                 "System.Collections.Generic.NonRandomizedStringEqualityComparer"
-                #endif
+#endif
+#if NET6_0
+                "System.UIntPtr"
+#endif
             };
         }
 
-        //[TestCase("System.Collections.Generic.IInternalStringEqualityComparer, System.Private.CoreLib, Version=5.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")]
+       // [TestCase("System.UIntPtr, System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")]
         public void TypeInfo_AbstractionTest(string type) => TypeInfo_AbstractionTest(Type.GetType(type, throwOnError: true));
 
         [Test]

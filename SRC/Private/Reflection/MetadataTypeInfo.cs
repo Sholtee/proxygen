@@ -130,15 +130,9 @@ namespace Solti.Utils.Proxy.Internals
             .ConvertAr(MetadataMethodInfo.CreateFrom, ShouldSkip);
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
-        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType.IsArray
-            //
-            // A tomb egy geci specialis allatfaj: fordito generalja hozza a konstruktorokat -> futas idoben mar leteznek forditaskor meg nem
-            //
-
-            ? Array.Empty<IConstructorInfo>()
-            : UnderlyingType
-                .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-                .ConvertAr(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor), static ctor => ctor.GetAccessModifiers() is AccessModifiers.Private);
+        public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
+                .GetDeclaredConstructors()
+                .ConvertAr(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor));
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{QualifiedName}, {UnderlyingType.Assembly}"

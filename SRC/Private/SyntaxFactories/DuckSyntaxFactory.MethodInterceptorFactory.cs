@@ -19,7 +19,11 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
-                if (ifaceMethod.IsSpecial)
+                //
+                // Starting from .NET Core 5.0 interfacce methods may have visibility
+                //
+
+                if (ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
 
                 IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods, SignatureEquals);

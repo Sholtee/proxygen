@@ -22,19 +22,23 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo met in InterfaceType.Methods)
+            foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
-                if (AlreadyImplemented(met) || met.IsSpecial)
+                //
+                // Starting from .NET Core 5.0 interfacce methods may have visibility
+                //
+
+                if (AlreadyImplemented(ifaceMethod) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
 
                 //
                 // "ref" visszateres nem tamogatott.
                 //
 
-                if (met.ReturnValue.Kind >= ParameterKind.Ref)
+                if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
                     throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
 
-                cls = ResolveMethod(cls, context, met);
+                cls = ResolveMethod(cls, context, ifaceMethod);
             }
 
             return cls;

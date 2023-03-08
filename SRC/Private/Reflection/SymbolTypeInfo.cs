@@ -125,26 +125,10 @@ namespace Solti.Utils.Proxy.Internals
             .ListMethods(includeStatic: true)
             .ConvertAr(m => SymbolMethodInfo.CreateFrom(m, Compilation), static m => !m.IsClassMethod());
 
-        private static readonly IReadOnlyList<MethodKind> Ctors = new[] 
-        {
-            MethodKind.Constructor, MethodKind.StaticConstructor
-        };
-
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
-            //
-            // Ne ListMembers()-t hasznaljunk mert az osok konstruktoraira nincs szukseg (kiveve parameter nelkuli amennyiben az osben nincs felulirva)
-            //
-
-            .GetMembers()
-            .ConvertAr
-            (
-                m => (IConstructorInfo) SymbolMethodInfo.CreateFrom((IMethodSymbol) m, Compilation),
-                m => m is not IMethodSymbol ctor || 
-                    Ctors.IndexOf(ctor.MethodKind) is null ||
-                    ctor.GetAccessModifiers() is AccessModifiers.Private || 
-                    ctor.IsImplicitlyDeclared
-            );
+            .GetConstructors()
+            .ConvertAr(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation));
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
@@ -165,7 +149,17 @@ namespace Solti.Utils.Proxy.Internals
 
                     FContainingMember = concreteType.ContainingSymbol switch
                     {
-                        IMethodSymbol method => SymbolMethodInfo.CreateFrom(method, Compilation),
+                        IMethodSymbol method => SymbolMethodInfo.CreateFrom
+                        (
+                            //
+                            // Mimic the way how reflection works...
+                            //
+
+                            IsGenericParameter && method.IsGenericMethod
+                                ? method.OriginalDefinition
+                                : method,
+                            Compilation
+                        ),
                         _ when UnderlyingSymbol.GetEnclosingType() is not null => SymbolTypeInfo.CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation),
                         _ => null
                     };

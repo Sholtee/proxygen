@@ -244,6 +244,26 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        private static readonly IReadOnlyList<MethodKind> Ctors = new[]
+        {
+            MethodKind.Constructor, MethodKind.StaticConstructor
+        };
+
+        public static IEnumerable<IMethodSymbol> GetConstructors(this ITypeSymbol src)
+        {
+            //
+            // Don't use ListMembersInternal() here as we don't need ctros from the ancestors.
+            //
+
+            foreach (ISymbol m in src.GetMembers())
+            {
+                if (m is not IMethodSymbol ctor || Ctors.IndexOf(ctor.MethodKind) is null || ctor.GetAccessModifiers() is AccessModifiers.Private || ctor.IsImplicitlyDeclared)
+                    continue;
+
+                yield return ctor;
+            }
+        }
+
         public static ITypeSymbol? GetElementType(this ITypeSymbol src, bool recurse = false)
         {
             ITypeSymbol? prev = null;
