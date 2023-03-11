@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+#if !LEGACY_COMPILER
 using System.Collections.Immutable;
 using System.Threading;
 
@@ -12,7 +13,10 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class ProxyEmbedder_RoslynV4 : ProxyEmbedderBase, IIncrementalGenerator
+    #pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
+    [Generator(LanguageNames.CSharp)]
+    #pragma warning restore CS3016
+    internal sealed class ProxyEmbedder : ProxyEmbedderBase, IIncrementalGenerator
     {
         private static bool IsEmbedGeneratedTypeAttribute(SyntaxNode node, CancellationToken cancellation)
         {
@@ -83,5 +87,6 @@ namespace Solti.Utils.Proxy.Internals
                 }
             );
         }
-    }
+    }  
 }
+#endif

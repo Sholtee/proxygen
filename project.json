@@ -1,5 +1,6 @@
 {
   "bin": "\\BIN",
+  "variants": ["ROSLYN_LEGACY", "ROSLYN_LATEST"],
   "solution": "\\ProxyGen.sln",
   "app": "\\SRC\\ProxyGen.csproj",
   "vendor": "\\Vendor",

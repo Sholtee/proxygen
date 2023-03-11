@@ -210,6 +210,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName))
                         .Replace("\r", string.Empty)
+#if LEGACY_COMPILER
+                        .Replace(") :", "):")
+#endif
                         .Replace("{version}", typeof(ProxyGenerator<,>)
                             .Assembly
                             .GetName()

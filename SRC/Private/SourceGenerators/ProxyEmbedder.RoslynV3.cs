@@ -3,8 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+#if LEGACY_COMPILER
 using System.Collections.Generic;
-using System.Diagnostics;
 
 using Microsoft.CodeAnalysis;
 
@@ -12,7 +12,10 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Attributes;
 
-    internal class ProxyEmbedder_RoslynV3 : ProxyEmbedderBase, ISourceGenerator
+    #pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
+    [Generator(LanguageNames.CSharp)]
+    #pragma warning restore CS3016
+    internal sealed class ProxyEmbedder : ProxyEmbedderBase, ISourceGenerator
     {
         internal static IEnumerable<INamedTypeSymbol> GetAOTGenerators(Compilation compilation)
         {
@@ -24,14 +27,14 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (AttributeData attr in compilation.Assembly.GetAttributes())
             {
-                if (SymbolEqualityComparer.Equals(attr.AttributeClass, egta))
-                {
-                    Debug.Assert(attr.ConstructorArguments.Length is 1);
+                if (!SymbolEqualityComparer.Equals(attr.AttributeClass, egta))
+                    continue;
 
-                    INamedTypeSymbol generator = (INamedTypeSymbol) attr.ConstructorArguments[0].Value!;
-                    if (returnedGenerators.Add(generator))
-                        yield return generator;
-                }
+                if (attr.ConstructorArguments.Length is not 1 || attr.ConstructorArguments[0].Value is not INamedTypeSymbol generator)
+                    continue;
+
+                if (returnedGenerators.Add(generator))
+                    yield return generator;
             }
         }
 
@@ -55,3 +58,4 @@ namespace Solti.Utils.Proxy.Internals
         );
     }
 }
+#endif

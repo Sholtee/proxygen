@@ -33,10 +33,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     result.Add(type.FullName, ssg);
                 }
-                catch
-                {
-                    // Don't throw in initialization phase
-                }
+                catch {} // Don't throw in initialization phase
             }
 
             return result;

@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp3.1;net5.0;net6.0;net7.0</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Variant)' != 'ROSLYN_LEGACY'">$(TargetFrameworks);net5.0;net6.0;net7.0</TargetFrameworks>
 	<CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
@@ -9,9 +10,10 @@
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
-    <OutputPath>..\..\BIN\$(Configuration)</OutputPath>
+    <OutputPath>..\..\BIN\$(Configuration)\$(Variant)</OutputPath>
     <OutputType>Library</OutputType>
     <Configurations>Debug</Configurations>
+    <DefineConstants Condition="'$(Variant)' == 'ROSLYN_LEGACY'">LEGACY_COMPILER</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,8 +25,16 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Variant)' != 'ROSLYN_LEGACY'">
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.3.*" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Variant)' == 'ROSLYN_LEGACY'">
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="3.11.*" />
   </ItemGroup>
 
   <ItemGroup>

@@ -75,9 +75,7 @@ namespace Solti.Utils.Proxy.Internals
                     // Jump to the next generator
                     //
                 }
-                #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
                 catch (Exception e)
-                #pragma warning restore CA1031
                 {
                     ReportError(e, location);
                 }
@@ -96,9 +94,7 @@ namespace Solti.Utils.Proxy.Internals
                         ExtendWith(chunk, Location.None);
                     }
                 }
-                #pragma warning disable CA1031 // We want to report all non symbol related exceptions.
                 catch (Exception e)
-                #pragma warning restore CA1031
                 {
                     ReportError(e, Location.None);
                 }

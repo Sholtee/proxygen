@@ -139,6 +139,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DuckClsSrc.txt"))
                         .Replace("\r", string.Empty)
+#if LEGACY_COMPILER
+                        .Replace(") :", "):")
+#endif
                         .Replace("{version}", typeof(DuckGenerator<,>)
                             .Assembly
                             .GetName()
