@@ -1,7 +1,7 @@
 {
 	"metadata": [{
 		"src": [{
-			"src": "../BIN/Debug/netstandard2.1",
+			"src": "../BIN/Debug/ROSLYN_LATEST/netstandard2.1",
 			"files": [ "*.dll" ]
 		}],
 		"dest": "../BIN/DOC",
