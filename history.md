@@ -148,3 +148,7 @@
   - *done*: Using static delegates in the generated proxy classes (which involves performance benefits)
 - 8.1.1:
   - *fixed*: Possible `NullReferenceException` when trying to initialize configuration
+- 8.2.0:
+  - *fixed*: Couple of reflection related bugs
+  - *introduced*: .NET Framework support
+  - *introduced*: Roslyn v3 (legacy) variant
