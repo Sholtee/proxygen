@@ -18,6 +18,15 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class MemberInfoExtensions
     {
+
+        private static readonly Regex
+            //
+            // The name of explicit implementation is in the form of "Namespace.Interface.Tag"
+            //
+
+            FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline),
+            FGetPrefix = new("^(get|set|add|remove)_", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+
         private static MemberInfo DoExtractFrom(LambdaExpression expr) 
         {
             Expression body = expr.Body;
@@ -81,28 +90,30 @@ namespace Solti.Utils.Proxy.Internals
 
             if (method.IsSpecialName)
             {
-                member = method.StrippedName() switch
+                Match prefix = FGetPrefix.Match(method.StrippedName());
+
+                if (prefix.Success && prefix.Groups.Count > 1)
                 {
-                    ['g' or 'G', 'e' or 'E', 't' or 'T', '_', ..] or ['s' or 'S', 'e' or 'E', 't' or 'T', '_', ..] => declaringType
-                        .GetProperties(bindingFlags)
-                        .Single(prop => prop.SetMethod == method || prop.GetMethod == method)!,
-                    ['a' or 'A', 'd' or 'D', 'd' or 'D', '_', ..] or ['r' or 'R', 'e' or 'E', 'm' or 'M', 'o' or 'O', 'v' or 'V', 'e' or 'E', '_', ..] => declaringType
-                        .GetEvents(bindingFlags)
-                        .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method)!,
-                    _ => null
-                };
+                    member = prefix.Groups[1].Value.ToLower() switch
+                    {
+                        "get" or "set" => declaringType
+                            .GetProperties(bindingFlags)
+                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method, throwOnEmpty: false)!,
+
+                        "add" or "remove" => declaringType
+                            .GetEvents(bindingFlags)
+                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method, throwOnEmpty: false)!,
+
+                        _ => null
+                    };
+                }
+
                 if (member is null)
                     Trace.TraceWarning($"Unsupported special method: {method}");
             }
 
             return member ?? method;
         }
-
-        //
-        // Explicit implementacional a nev "Nevter.Interface.Tag" formaban van
-        //
-
-        private static readonly Regex FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         public static string StrippedName(this MemberInfo self) => FStripper.Match(self.Name).Value;
     }

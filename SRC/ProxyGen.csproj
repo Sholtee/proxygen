@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-	<PackageReference Include="IndexRange" Version="1.*" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" Condition="'$(Variant)' != 'ROSLYN_LEGACY'"/>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.*" Condition="'$(Variant)' == 'ROSLYN_LEGACY'"/>
     <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="7.*">
@@ -38,7 +37,6 @@
     </PackageReference>
     <PackageReference Include="Mono.Reflection" Version="2.*" />
     <PackageReference Include="Solti.Utils.Primitives" Version="8.*" />
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.*" />
   </ItemGroup>
 
   <ItemGroup>
