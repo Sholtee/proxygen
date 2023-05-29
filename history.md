@@ -152,3 +152,5 @@
   - *fixed*: Couple of reflection related bugs
   - *introduced*: .NET Framework support
   - *introduced*: Roslyn v3 (legacy) variant
+- 8.2.1:
+  - *done:* Number of dependencies has been reduced by 2

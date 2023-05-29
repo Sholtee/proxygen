@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Denes Solti</Authors>
-    <Version>8.2.0</Version>
+    <Version>8.2.1</Version>
     <Version Condition="'$(Variant)' == 'ROSLYN_LEGACY'">$(Version)-RoslynV3</Version>
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
