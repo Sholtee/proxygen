@@ -5,19 +5,21 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Primitives;
-
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
-    public abstract record Generator: TypeEmitter
+    public abstract class Generator: TypeEmitter
     {
+        private static readonly ConcurrentDictionary<Generator, Task<Type>> FFactoryCache = new(GeneratorComparer.Instance);
+        private static readonly ConcurrentDictionary<Generator, Task<Func<object?, object>>> FActivatorCache = new(GeneratorComparer.Instance);
+
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
             //
@@ -29,23 +31,27 @@ namespace Solti.Utils.Proxy.Internals
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
 
+        /// <summary>
+        /// Createsa new <see cref="Generator"/> instance.
+        /// </summary>
+        protected Generator(object id) => Id = id;
+
         //
-        // Mivel a Task minden metodusa szal biztos (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety) ezert nem
-        // gond ha ugyanazon a peldanyon osztozunk.
+        // Since all Task methods are thread safe (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety)
+        // we can cache in this method.
         //
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal() => CacheSlim.GetOrAdd
+        internal Task<Type> GetGeneratedTypeAsyncInternal() => FFactoryCache.GetOrAdd
         (
             //
-            // Ha ket generatornak azonos a hash-e akkor ugyanazt a tipust is generaljak.
+            // Generators havnig the same Id emit the same output, too.
             //
 
             this,
             static self => Task<Type>.Factory.StartNew
             (
                 //
-                // Megszakitast itt nem adhatunk at mivel az a factoryaba agyazodna -> Ha egyszer
-                // megszakitasra kerul a fuggveny onnantol soha tobbet nem lehetne hivni.
+                // Since the returned task is cached, we cannot cancel it.
                 //
 
                 static self => ((Generator) self).Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default),
@@ -53,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        internal Task<Func<object?, object>> GetActivatorAsyncInternal() => CacheSlim.GetOrAdd
+        internal Task<Func<object?, object>> GetActivatorAsyncInternal() => FActivatorCache.GetOrAdd
         (
             this,
             async static self => ProxyActivator.Create
@@ -63,6 +69,11 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         #region Public
+        /// <summary>
+        /// Unique generator id. Generators emitting the same output should have the same id.
+        /// </summary>
+        public object Id { get; }
+
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>

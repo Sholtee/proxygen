@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
     /// Compiles SyntaxFactory outputs to materialized <see cref="Type"/>s.
     /// </summary>
     /// <remarks>Static methods of this type are thread safe while instance methods are NOT.</remarks>
-    public abstract record TypeEmitter
+    public abstract class TypeEmitter
     {
         private static void RunInitializers(Assembly assembly)
         {
