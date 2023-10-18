@@ -67,66 +67,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.#ctor
   fullName: Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator
   nameWithType: DuckGenerator.DuckGenerator
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.{Clone}$
-  name: <Clone>$()
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator__Clone__
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.{Clone}$
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.<Clone>$()
-  nameWithType: DuckGenerator.<Clone>$()
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.{Clone}$*
-  name: <Clone>$
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator__Clone___
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.{Clone}$
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.<Clone>$
-  nameWithType: DuckGenerator.<Clone>$
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_EqualityContract
-  commentId: P:Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract
-  nameWithType: DuckGenerator.EqualityContract
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract*
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_EqualityContract_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.EqualityContract
-  nameWithType: DuckGenerator.EqualityContract
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Generators.DuckGenerator)
-  name: Equals(DuckGenerator)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Equals_Solti_Utils_Proxy_Generators_DuckGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Generators.DuckGenerator)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Generators.DuckGenerator)
-  nameWithType: DuckGenerator.Equals(DuckGenerator)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  name: Equals(Generator)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Equals_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: DuckGenerator.Equals(Generator)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(System.Object)
-  name: Equals(Object)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Equals_System_Object_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.Equals(System.Object)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equals(System.Object)
-  nameWithType: DuckGenerator.Equals(Object)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Equals*
-  name: Equals
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Equals_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Equals
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equals
-  nameWithType: DuckGenerator.Equals
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
-  name: GetHashCode()
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode()
-  nameWithType: DuckGenerator.GetHashCode()
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode*
-  name: GetHashCode
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_GetHashCode_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.GetHashCode
-  nameWithType: DuckGenerator.GetHashCode
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
   name: Interface
   href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Interface
@@ -139,42 +79,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Interface
   fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
   nameWithType: DuckGenerator.Interface
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.op_Equality(Solti.Utils.Proxy.Generators.DuckGenerator,Solti.Utils.Proxy.Generators.DuckGenerator)
-  name: Equality(DuckGenerator, DuckGenerator)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_op_Equality_Solti_Utils_Proxy_Generators_DuckGenerator_Solti_Utils_Proxy_Generators_DuckGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.op_Equality(Solti.Utils.Proxy.Generators.DuckGenerator,Solti.Utils.Proxy.Generators.DuckGenerator)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equality(Solti.Utils.Proxy.Generators.DuckGenerator, Solti.Utils.Proxy.Generators.DuckGenerator)
-  nameWithType: DuckGenerator.Equality(DuckGenerator, DuckGenerator)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.op_Equality*
-  name: Equality
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_op_Equality_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.op_Equality
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Equality
-  nameWithType: DuckGenerator.Equality
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.op_Inequality(Solti.Utils.Proxy.Generators.DuckGenerator,Solti.Utils.Proxy.Generators.DuckGenerator)
-  name: Inequality(DuckGenerator, DuckGenerator)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_op_Inequality_Solti_Utils_Proxy_Generators_DuckGenerator_Solti_Utils_Proxy_Generators_DuckGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.op_Inequality(Solti.Utils.Proxy.Generators.DuckGenerator,Solti.Utils.Proxy.Generators.DuckGenerator)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Inequality(Solti.Utils.Proxy.Generators.DuckGenerator, Solti.Utils.Proxy.Generators.DuckGenerator)
-  nameWithType: DuckGenerator.Inequality(DuckGenerator, DuckGenerator)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.op_Inequality*
-  name: Inequality
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_op_Inequality_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.op_Inequality
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Inequality
-  nameWithType: DuckGenerator.Inequality
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers(System.Text.StringBuilder)
-  name: PrintMembers(StringBuilder)
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_PrintMembers_System_Text_StringBuilder_
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers(System.Text.StringBuilder)
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers(System.Text.StringBuilder)
-  nameWithType: DuckGenerator.PrintMembers(StringBuilder)
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers*
-  name: PrintMembers
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_PrintMembers_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.PrintMembers
-  nameWithType: DuckGenerator.PrintMembers
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator.Target
   name: Target
   href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Target
@@ -187,18 +91,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Target
   fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Target
   nameWithType: DuckGenerator.Target
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.ToString
-  name: ToString()
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_ToString
-  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.ToString
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.ToString()
-  nameWithType: DuckGenerator.ToString()
-- uid: Solti.Utils.Proxy.Generators.DuckGenerator.ToString*
-  name: ToString
-  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_ToString_
-  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.ToString
-  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.ToString
-  nameWithType: DuckGenerator.ToString
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator`2
   name: DuckGenerator<TInterface, TTarget>
   href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html
@@ -258,66 +150,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor
   fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator
   nameWithType: ProxyGenerator.ProxyGenerator
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.{Clone}$
-  name: <Clone>$()
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__Clone__
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.{Clone}$
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.<Clone>$()
-  nameWithType: ProxyGenerator.<Clone>$()
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.{Clone}$*
-  name: <Clone>$
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__Clone___
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.{Clone}$
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.<Clone>$
-  nameWithType: ProxyGenerator.<Clone>$
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_EqualityContract
-  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract
-  nameWithType: ProxyGenerator.EqualityContract
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract*
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_EqualityContract_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.EqualityContract
-  nameWithType: ProxyGenerator.EqualityContract
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Generators.ProxyGenerator)
-  name: Equals(ProxyGenerator)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Equals_Solti_Utils_Proxy_Generators_ProxyGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Generators.ProxyGenerator)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Generators.ProxyGenerator)
-  nameWithType: ProxyGenerator.Equals(ProxyGenerator)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  name: Equals(Generator)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Equals_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: ProxyGenerator.Equals(Generator)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(System.Object)
-  name: Equals(Object)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Equals_System_Object_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(System.Object)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals(System.Object)
-  nameWithType: ProxyGenerator.Equals(Object)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals*
-  name: Equals
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Equals_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Equals
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equals
-  nameWithType: ProxyGenerator.Equals
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
-  name: GetHashCode()
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_GetHashCode
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode()
-  nameWithType: ProxyGenerator.GetHashCode()
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode*
-  name: GetHashCode
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_GetHashCode_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.GetHashCode
-  nameWithType: ProxyGenerator.GetHashCode
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
   name: Interceptor
   href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor
@@ -342,54 +174,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
   fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
   nameWithType: ProxyGenerator.Interface
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.op_Equality(Solti.Utils.Proxy.Generators.ProxyGenerator,Solti.Utils.Proxy.Generators.ProxyGenerator)
-  name: Equality(ProxyGenerator, ProxyGenerator)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_op_Equality_Solti_Utils_Proxy_Generators_ProxyGenerator_Solti_Utils_Proxy_Generators_ProxyGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.op_Equality(Solti.Utils.Proxy.Generators.ProxyGenerator,Solti.Utils.Proxy.Generators.ProxyGenerator)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equality(Solti.Utils.Proxy.Generators.ProxyGenerator, Solti.Utils.Proxy.Generators.ProxyGenerator)
-  nameWithType: ProxyGenerator.Equality(ProxyGenerator, ProxyGenerator)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.op_Equality*
-  name: Equality
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_op_Equality_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.op_Equality
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Equality
-  nameWithType: ProxyGenerator.Equality
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.op_Inequality(Solti.Utils.Proxy.Generators.ProxyGenerator,Solti.Utils.Proxy.Generators.ProxyGenerator)
-  name: Inequality(ProxyGenerator, ProxyGenerator)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_op_Inequality_Solti_Utils_Proxy_Generators_ProxyGenerator_Solti_Utils_Proxy_Generators_ProxyGenerator_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.op_Inequality(Solti.Utils.Proxy.Generators.ProxyGenerator,Solti.Utils.Proxy.Generators.ProxyGenerator)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Inequality(Solti.Utils.Proxy.Generators.ProxyGenerator, Solti.Utils.Proxy.Generators.ProxyGenerator)
-  nameWithType: ProxyGenerator.Inequality(ProxyGenerator, ProxyGenerator)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.op_Inequality*
-  name: Inequality
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_op_Inequality_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.op_Inequality
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Inequality
-  nameWithType: ProxyGenerator.Inequality
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers(System.Text.StringBuilder)
-  name: PrintMembers(StringBuilder)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_PrintMembers_System_Text_StringBuilder_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers(System.Text.StringBuilder)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers(System.Text.StringBuilder)
-  nameWithType: ProxyGenerator.PrintMembers(StringBuilder)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers*
-  name: PrintMembers
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_PrintMembers_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.PrintMembers
-  nameWithType: ProxyGenerator.PrintMembers
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.ToString
-  name: ToString()
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_ToString
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.ToString
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ToString()
-  nameWithType: ProxyGenerator.ToString()
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.ToString*
-  name: ToString
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_ToString_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.ToString
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ToString
-  nameWithType: ProxyGenerator.ToString
 - uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2
   name: ProxyGenerator<TInterface, TInterceptor>
   href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html
@@ -582,36 +366,18 @@ references:
   commentId: T:Solti.Utils.Proxy.Internals.Generator
   fullName: Solti.Utils.Proxy.Internals.Generator
   nameWithType: Generator
-- uid: Solti.Utils.Proxy.Internals.Generator.#ctor
-  name: Generator()
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.#ctor
-  fullName: Solti.Utils.Proxy.Internals.Generator.Generator()
-  nameWithType: Generator.Generator()
-- uid: Solti.Utils.Proxy.Internals.Generator.#ctor(Solti.Utils.Proxy.Internals.Generator)
-  name: Generator(Generator)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.#ctor(Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Generator(Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: Generator.Generator(Generator)
+- uid: Solti.Utils.Proxy.Internals.Generator.#ctor(System.Object)
+  name: Generator(Object)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor_System_Object_
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.#ctor(System.Object)
+  fullName: Solti.Utils.Proxy.Internals.Generator.Generator(System.Object)
+  nameWithType: Generator.Generator(Object)
 - uid: Solti.Utils.Proxy.Internals.Generator.#ctor*
   name: Generator
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__ctor_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.#ctor
   fullName: Solti.Utils.Proxy.Internals.Generator.Generator
   nameWithType: Generator.Generator
-- uid: Solti.Utils.Proxy.Internals.Generator.{Clone}$
-  name: <Clone>$()
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__Clone__
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.{Clone}$
-  fullName: Solti.Utils.Proxy.Internals.Generator.<Clone>$()
-  nameWithType: Generator.<Clone>$()
-- uid: Solti.Utils.Proxy.Internals.Generator.{Clone}$*
-  name: <Clone>$
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator__Clone___
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.{Clone}$
-  fullName: Solti.Utils.Proxy.Internals.Generator.<Clone>$
-  nameWithType: Generator.<Clone>$
 - uid: Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)
   name: Activate(ITuple)
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_System_Runtime_CompilerServices_ITuple_
@@ -636,42 +402,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.ActivateAsync
   fullName: Solti.Utils.Proxy.Internals.Generator.ActivateAsync
   nameWithType: Generator.ActivateAsync
-- uid: Solti.Utils.Proxy.Internals.Generator.EqualityContract
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_EqualityContract
-  commentId: P:Solti.Utils.Proxy.Internals.Generator.EqualityContract
-  fullName: Solti.Utils.Proxy.Internals.Generator.EqualityContract
-  nameWithType: Generator.EqualityContract
-- uid: Solti.Utils.Proxy.Internals.Generator.EqualityContract*
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_EqualityContract_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.EqualityContract
-  fullName: Solti.Utils.Proxy.Internals.Generator.EqualityContract
-  nameWithType: Generator.EqualityContract
-- uid: Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  name: Equals(Generator)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: Generator.Equals(Generator)
-- uid: Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  name: Equals(TypeEmitter)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_Solti_Utils_Proxy_Internals_TypeEmitter_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  nameWithType: Generator.Equals(TypeEmitter)
-- uid: Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
-  name: Equals(Object)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_System_Object_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equals(System.Object)
-  nameWithType: Generator.Equals(Object)
-- uid: Solti.Utils.Proxy.Internals.Generator.Equals*
-  name: Equals
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Equals_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.Equals
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equals
-  nameWithType: Generator.Equals
 - uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   name: GetGeneratedType()
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType
@@ -696,66 +426,18 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync
   fullName: Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync
   nameWithType: Generator.GetGeneratedTypeAsync
-- uid: Solti.Utils.Proxy.Internals.Generator.GetHashCode
-  name: GetHashCode()
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetHashCode
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.GetHashCode
-  fullName: Solti.Utils.Proxy.Internals.Generator.GetHashCode()
-  nameWithType: Generator.GetHashCode()
-- uid: Solti.Utils.Proxy.Internals.Generator.GetHashCode*
-  name: GetHashCode
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetHashCode_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GetHashCode
-  fullName: Solti.Utils.Proxy.Internals.Generator.GetHashCode
-  nameWithType: Generator.GetHashCode
-- uid: Solti.Utils.Proxy.Internals.Generator.op_Equality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)
-  name: Equality(Generator, Generator)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_op_Equality_Solti_Utils_Proxy_Internals_Generator_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.op_Equality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equality(Solti.Utils.Proxy.Internals.Generator, Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: Generator.Equality(Generator, Generator)
-- uid: Solti.Utils.Proxy.Internals.Generator.op_Equality*
-  name: Equality
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_op_Equality_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.op_Equality
-  fullName: Solti.Utils.Proxy.Internals.Generator.Equality
-  nameWithType: Generator.Equality
-- uid: Solti.Utils.Proxy.Internals.Generator.op_Inequality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)
-  name: Inequality(Generator, Generator)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_op_Inequality_Solti_Utils_Proxy_Internals_Generator_Solti_Utils_Proxy_Internals_Generator_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.op_Inequality(Solti.Utils.Proxy.Internals.Generator,Solti.Utils.Proxy.Internals.Generator)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Inequality(Solti.Utils.Proxy.Internals.Generator, Solti.Utils.Proxy.Internals.Generator)
-  nameWithType: Generator.Inequality(Generator, Generator)
-- uid: Solti.Utils.Proxy.Internals.Generator.op_Inequality*
-  name: Inequality
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_op_Inequality_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.op_Inequality
-  fullName: Solti.Utils.Proxy.Internals.Generator.Inequality
-  nameWithType: Generator.Inequality
-- uid: Solti.Utils.Proxy.Internals.Generator.PrintMembers(System.Text.StringBuilder)
-  name: PrintMembers(StringBuilder)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_PrintMembers_System_Text_StringBuilder_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.PrintMembers(System.Text.StringBuilder)
-  fullName: Solti.Utils.Proxy.Internals.Generator.PrintMembers(System.Text.StringBuilder)
-  nameWithType: Generator.PrintMembers(StringBuilder)
-- uid: Solti.Utils.Proxy.Internals.Generator.PrintMembers*
-  name: PrintMembers
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_PrintMembers_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.PrintMembers
-  fullName: Solti.Utils.Proxy.Internals.Generator.PrintMembers
-  nameWithType: Generator.PrintMembers
-- uid: Solti.Utils.Proxy.Internals.Generator.ToString
-  name: ToString()
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ToString
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.ToString
-  fullName: Solti.Utils.Proxy.Internals.Generator.ToString()
-  nameWithType: Generator.ToString()
-- uid: Solti.Utils.Proxy.Internals.Generator.ToString*
-  name: ToString
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ToString_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.ToString
-  fullName: Solti.Utils.Proxy.Internals.Generator.ToString
-  nameWithType: Generator.ToString
+- uid: Solti.Utils.Proxy.Internals.Generator.Id
+  name: Id
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Id
+  commentId: P:Solti.Utils.Proxy.Internals.Generator.Id
+  fullName: Solti.Utils.Proxy.Internals.Generator.Id
+  nameWithType: Generator.Id
+- uid: Solti.Utils.Proxy.Internals.Generator.Id*
+  name: Id
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Id_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.Id
+  fullName: Solti.Utils.Proxy.Internals.Generator.Id
+  nameWithType: Generator.Id
 - uid: Solti.Utils.Proxy.Internals.Generator`2
   name: Generator<TInterface, TDescendant>
   href: Solti.Utils.Proxy.Internals.Generator-2.html
@@ -969,120 +651,12 @@ references:
   commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.#ctor
   fullName: Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter()
   nameWithType: TypeEmitter.TypeEmitter()
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.#ctor(Solti.Utils.Proxy.Internals.TypeEmitter)
-  name: TypeEmitter(TypeEmitter)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter__ctor_Solti_Utils_Proxy_Internals_TypeEmitter_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.#ctor(Solti.Utils.Proxy.Internals.TypeEmitter)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter(Solti.Utils.Proxy.Internals.TypeEmitter)
-  nameWithType: TypeEmitter.TypeEmitter(TypeEmitter)
 - uid: Solti.Utils.Proxy.Internals.TypeEmitter.#ctor*
   name: TypeEmitter
   href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter__ctor_
   commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.#ctor
   fullName: Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter
   nameWithType: TypeEmitter.TypeEmitter
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.{Clone}$
-  name: <Clone>$()
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter__Clone__
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.{Clone}$
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.<Clone>$()
-  nameWithType: TypeEmitter.<Clone>$()
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.{Clone}$*
-  name: <Clone>$
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter__Clone___
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.{Clone}$
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.<Clone>$
-  nameWithType: TypeEmitter.<Clone>$
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_EqualityContract
-  commentId: P:Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract
-  nameWithType: TypeEmitter.EqualityContract
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract*
-  name: EqualityContract
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_EqualityContract_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.EqualityContract
-  nameWithType: TypeEmitter.EqualityContract
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  name: Equals(TypeEmitter)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_Equals_Solti_Utils_Proxy_Internals_TypeEmitter_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Equals(Solti.Utils.Proxy.Internals.TypeEmitter)
-  nameWithType: TypeEmitter.Equals(TypeEmitter)
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.Equals(System.Object)
-  name: Equals(Object)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_Equals_System_Object_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.Equals(System.Object)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Equals(System.Object)
-  nameWithType: TypeEmitter.Equals(Object)
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.Equals*
-  name: Equals
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_Equals_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.Equals
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Equals
-  nameWithType: TypeEmitter.Equals
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode
-  name: GetHashCode()
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_GetHashCode
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode()
-  nameWithType: TypeEmitter.GetHashCode()
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode*
-  name: GetHashCode
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_GetHashCode_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.GetHashCode
-  nameWithType: TypeEmitter.GetHashCode
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.op_Equality(Solti.Utils.Proxy.Internals.TypeEmitter,Solti.Utils.Proxy.Internals.TypeEmitter)
-  name: Equality(TypeEmitter, TypeEmitter)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_op_Equality_Solti_Utils_Proxy_Internals_TypeEmitter_Solti_Utils_Proxy_Internals_TypeEmitter_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.op_Equality(Solti.Utils.Proxy.Internals.TypeEmitter,Solti.Utils.Proxy.Internals.TypeEmitter)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Equality(Solti.Utils.Proxy.Internals.TypeEmitter, Solti.Utils.Proxy.Internals.TypeEmitter)
-  nameWithType: TypeEmitter.Equality(TypeEmitter, TypeEmitter)
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.op_Equality*
-  name: Equality
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_op_Equality_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.op_Equality
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Equality
-  nameWithType: TypeEmitter.Equality
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.op_Inequality(Solti.Utils.Proxy.Internals.TypeEmitter,Solti.Utils.Proxy.Internals.TypeEmitter)
-  name: Inequality(TypeEmitter, TypeEmitter)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_op_Inequality_Solti_Utils_Proxy_Internals_TypeEmitter_Solti_Utils_Proxy_Internals_TypeEmitter_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.op_Inequality(Solti.Utils.Proxy.Internals.TypeEmitter,Solti.Utils.Proxy.Internals.TypeEmitter)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Inequality(Solti.Utils.Proxy.Internals.TypeEmitter, Solti.Utils.Proxy.Internals.TypeEmitter)
-  nameWithType: TypeEmitter.Inequality(TypeEmitter, TypeEmitter)
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.op_Inequality*
-  name: Inequality
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_op_Inequality_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.op_Inequality
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.Inequality
-  nameWithType: TypeEmitter.Inequality
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers(System.Text.StringBuilder)
-  name: PrintMembers(StringBuilder)
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_PrintMembers_System_Text_StringBuilder_
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers(System.Text.StringBuilder)
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers(System.Text.StringBuilder)
-  nameWithType: TypeEmitter.PrintMembers(StringBuilder)
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers*
-  name: PrintMembers
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_PrintMembers_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.PrintMembers
-  nameWithType: TypeEmitter.PrintMembers
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.ToString
-  name: ToString()
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_ToString
-  commentId: M:Solti.Utils.Proxy.Internals.TypeEmitter.ToString
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.ToString()
-  nameWithType: TypeEmitter.ToString()
-- uid: Solti.Utils.Proxy.Internals.TypeEmitter.ToString*
-  name: ToString
-  href: Solti.Utils.Proxy.Internals.TypeEmitter.html#Solti_Utils_Proxy_Internals_TypeEmitter_ToString_
-  commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.ToString
-  fullName: Solti.Utils.Proxy.Internals.TypeEmitter.ToString
-  nameWithType: TypeEmitter.ToString
 - uid: Solti.Utils.Proxy.InvocationContext
   name: InvocationContext
   href: Solti.Utils.Proxy.InvocationContext.html
