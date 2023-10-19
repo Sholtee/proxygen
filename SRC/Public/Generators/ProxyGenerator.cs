@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Generators
         public ProxyGenerator(Type iface, Type interceptor): base(id: new { iface, interceptor})
         {
             //
-            // Nem kell itt tulzasba vinni a validalast, generalaskor ugy is elhasal majd a rendszer ha vmi gond van
+            // The rest of validation is done in compile phase.
             //
 
             Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));

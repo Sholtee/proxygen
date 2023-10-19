@@ -17,11 +17,11 @@ namespace Solti.Utils.Proxy.Internals
         //
         // https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/specifying-fully-qualified-type-names
         //
-        // "&": referencia szerinti parameter
-        // "*": mutato parameter
-        // "`d": generikus tipus ahol "d" egesz szam
-        // "[T, TT]": generikus parameterek
-        // "[<PropName_1>xXx, <PropName_2>xXx]": anonim oljektum property-k
+        // "&": by ref parameter
+        // "*": pointer
+        // "`d": generic type where "d" is an integer
+        // "[T, TT]": generic parameter
+        // "[<PropName_1>xXx, <PropName_2>xXx]": props belong to an anon object
         //
 
         private static readonly Regex TypeNameReplacer = new(@"\&|\*|`\d+(\[[\w,<>]+\])?", RegexOptions.Compiled);
@@ -98,9 +98,8 @@ namespace Solti.Utils.Proxy.Internals
                 return null;
 
             //
-            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
-            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
-            // Ami azert lassuk be igy eleg szopas.
+            // "Cica<T>.Mica<TT>.Kutya" counts as generic, too: In open form it is returned as Cica<T>.Mica<TT>.Kutya<T, TT>
+            // while in closed as "Cica<T>.Mica<TT>.Kutya<TConcrete1, TConcrete2>".
             //
 
             int gaCount = enclosingType.GetGenericArguments().Length;
@@ -115,15 +114,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsNested(this Type src) =>
             //
-            // GetInnermostElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
-            // mar nem beagyazott tipus.
+            // Types (for instance arrays) derived from embedded types are not embedded anymore.
             //
 
             (src.GetInnermostElementType() ?? src).IsNested;
 
         public static bool IsClass(this Type src) => !src.IsGenericParameter && src.IsClass;
 
-        public static bool IsAbstract(this Type src) => src.IsAbstract && !src.IsSealed; // statikus osztalyok IL szinten "sealed abstract"-k
+        public static bool IsAbstract(this Type src) => src.IsAbstract && !src.IsSealed; // IL representation of static classes are "sealed abstract"
 
         public static IEnumerable<MethodInfo> ListMethods(this Type src, bool includeStatic = false, bool skipSpecial = true)
         {
@@ -156,7 +154,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // A nagyobb lathatosagut tekintjuk mervadonak
+            // Higher visibility has the precedence
             //
 
             static MethodInfo GetUnderlyingMethod(PropertyInfo prop)
@@ -184,7 +182,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // A nagyobb lathatosagut tekintjuk mervadonak
+            // Higher visibility has the precedence
             //
 
             static MethodInfo GetUnderlyingMethod(EventInfo evt)
@@ -215,8 +213,8 @@ namespace Solti.Utils.Proxy.Internals
                 BindingFlags.Public |
 
                 //
-                // A BindingFlags.FlattenHierarchy csak a publikus es vedett tagokat adja vissza az os osztalyokbol,
-                // privatot nem, viszont az explicit implementaciok privat tagok... 
+                // BindingFlags.FlattenHierarchy will return public and protected members only. Unfortunatelly
+                // explicit implementations are private
                 //
 
                 //BindingFlags.FlattenHierarchy |
@@ -226,7 +224,7 @@ namespace Solti.Utils.Proxy.Internals
                 BindingFlags.DeclaredOnly;
 
             //
-            // NET6_0-tol kezdve lehet statikusokat deklaralni interface-eken is
+            // As of NET6_0 we may declare static members on interfaces
             //
 
             if (includeStatic)
@@ -247,7 +245,7 @@ namespace Solti.Utils.Proxy.Internals
                 HashSet<MethodInfo> overriddenMethods = new();
 
                 //
-                // Sorrend fontos, a leszarmazottol haladunk az os fele
+                // Order matters: we're processing the hierarchy towards the ancestor
                 //
 
                 foreach (Type t in src.GetHierarchy())
@@ -265,8 +263,7 @@ namespace Solti.Utils.Proxy.Internals
                             continue;
 
                         //
-                        // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
-                        // jok vagyunk.
+                        // If it was not yielded before (due to "new" or "override") and not private then we are fine.
                         //
 
                         if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
@@ -323,9 +320,8 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             //
-            // "Cica<T>.Mica<TT>.Kutya" is generikusnak minosul: Generikus formaban Cica<T>.Mica<TT>.Kutya<T, TT>
-            // mig tipizaltan "Cica<T>.Mica<T>.Kutya<TConcrete1, TConcrete2>".
-            // Ami azert lassuk be igy eleg szopas.
+            // "Cica<T>.Mica<TT>.Kutya" counts as generic, too: In open form it is returned as Cica<T>.Mica<TT>.Kutya<T, TT>
+            // while in closed as "Cica<T>.Mica<TT>.Kutya<TConcrete1, TConcrete2>".
             //
 
             IReadOnlyList<Type> 
@@ -338,7 +334,7 @@ namespace Solti.Utils.Proxy.Internals
                 for (Type? parent = src; (parent = parent!.DeclaringType) is not null;)
                 {
                     //
-                    // Ha "parent" nem generikus akkor a GetGenericArguments() ures tombot ad vissza
+                    // GetGenericArguments() may return empty array if "parent" is not generic
                     //
 
                     if (parent.GetGenericArguments().Some(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))

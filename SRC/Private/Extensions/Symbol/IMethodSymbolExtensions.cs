@@ -23,11 +23,11 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.Public => AccessModifiers.Public,
             Accessibility.Private when /*src.MethodKind is MethodKind.ExplicitInterfaceImplementation*/ src.GetImplementedInterfaceMethods().Some() =>
                 //
-                // NET6_0-tol interface-nek lehet absztrakt statikus tagja:
+                // Since NET6_0 interfaces may have satic abstract members:
                 // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
                 //
-                // Es -bar ez sehol nincs dokumentalva- de ugy tunik h ha a tag nyilt-generikus akkor a
-                // generalt IL-ben nem fog szerepelni -> Az ilyen tagokat privatnak tekintjuk
+                // It's undocumented but seems these members won't be present in IL if they are open generics.
+                // We treat such members private
                 //
 
                 src.IsStatic && src.TypeArguments.Some()
@@ -87,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
-            if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // nem vagom a MethodKind mi a faszert nem lehet bitmaszk
+            if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // why not bitmask?
                 src = src.GetImplementedInterfaceMethods().Single()!;
 
             return SpecialMethods.Some(mk => mk == src.MethodKind) ||
@@ -120,7 +120,7 @@ namespace Solti.Utils.Proxy.Internals
             (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
 
         //
-        // OverriddenMethod nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
+        // OverriddenMethod won't work in case of "new" override.
         //
 
         public static IMethodSymbol? GetOverriddenMethod(this IMethodSymbol src)

@@ -78,7 +78,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<ITypeSymbol> GetParents(this ITypeSymbol src) 
         {
-            src = src.GetElementType(recurse: true) ?? src; // tombnek pl nincs tartalmazo tipusa, mig a tomb elemnek van
+            src = src.GetElementType(recurse: true) ?? src; // Array has no containing type but array item does
 
             for (ITypeSymbol parent = src; (parent = parent!.ContainingType) is not null;)
             {
@@ -140,7 +140,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // A nagyobb lathatosagut tekintjuk mervadonak
+            // Higher visibility has the precendence
             //
 
             static IMethodSymbol GetUnderlyingMethod(IPropertySymbol prop)
@@ -167,7 +167,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // A nagyobb lathatosagut tekintjuk mervadonak
+            // Higher visibility has the precendence
             //
 
             static IMethodSymbol GetUnderlyingMethod(IEventSymbol evt)
@@ -204,7 +204,7 @@ namespace Solti.Utils.Proxy.Internals
             else
             {
                 //
-                // TODO: IMethodSymbolComparer-t irni
+                // TODO: implement IMethodSymbolComparer
                 //
 
                 #pragma warning disable RS1024 // Compare symbols correctly
@@ -212,7 +212,7 @@ namespace Solti.Utils.Proxy.Internals
                 #pragma warning restore RS1024
 
                 //
-                // Sorrend szamit: a leszarmazottaktol haladunk az os fele
+                // Order matters: we're processing the hierarchy towards the ancestor
                 //
 
                 foreach (ITypeSymbol t in src.GetHierarchy())
@@ -232,8 +232,7 @@ namespace Solti.Utils.Proxy.Internals
                                 continue;
 
                             //
-                            // Ha meg korabban nem volt visszaadva ("new", "override" miatt) es nem is privat akkor
-                            // jok vagyunk.
+                            // If it was not yielded before (due to "new" or "override") and not private then we are fine.
                             //
 
                             if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
@@ -280,7 +279,7 @@ namespace Solti.Utils.Proxy.Internals
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
             //
-            // Tombnek es mutatonak nincs tartalmazo szerelvenye.
+            // Arrays and pointers have no contaning assembly
             //
 
             IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly ?? src.ContainingAssembly;
@@ -291,8 +290,8 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         //
-        // GetElementType()-os csoda azert kell mert beagyazott tipusbol kepzett (pl) tomb
-        // mar nem beagyazott tipus.
+        // Types (for instance arrays) derived from embedded types are no longer embedded. That's why this
+        // GetElementType() magic.
         //
 
         public static bool IsNested(this ITypeSymbol src) => 
@@ -318,7 +317,7 @@ namespace Solti.Utils.Proxy.Internals
 
             StringBuilder sb = new();
 
-            INamespaceSymbol? ns = elementType?.ContainingNamespace ?? src.ContainingNamespace;  // tombnek, mutatonak nincs tartalmazo nevtere forditaskor
+            INamespaceSymbol? ns = elementType?.ContainingNamespace ?? src.ContainingNamespace;  // Pointers and arrays have no containing namespace in compile time
 
             if (ns is not null && !ns.IsGlobalNamespace)
             {
@@ -339,7 +338,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 string name = !string.IsNullOrEmpty(type.Name)
                     ? type.Name // tupple es nullable eseten is helyes nevet ad vissza
-                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly)); // "atlagos" tipusoknal a Name ures
+                    : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly));
 
                 return type is INamedTypeSymbol named && named.IsGenericType()
                     ? $"{name}`{named.Arity}"
@@ -350,10 +349,10 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<ITypeSymbol> GetAllInterfaces(this ITypeSymbol src) 
         {
             //
-            // AllInterfaces-ben egy generikus interface szerepelhet tobbszor ha a tipus argumentumok csak a Nullable
-            // ertekukben ternek el:
+            // AllInterfaces may contain the same closed geneic interface more times if the generic arguments are
+            // differ in Nullable annotations only:
             //
-            // interface IA: IB, IC<string> {}, interface IB: IC<string?> -> ekkor IC<string> ketszer fog szerepelni
+            // interface IA: IB, IC<string> {}, interface IB: IC<string?> -> IC<string> will be returned twice
             //
 
             #pragma warning disable RS1024 // Compare symbols correctly
@@ -370,7 +369,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         static ta => !ta.IsValueType
                             //
-                            // Nullable megjeloles eltavolitasa ( int? -> Nullable<int>, object? -> [Nullable] object)
+                            // Drop nullable annotation (int? -> Nullable<int>, object? -> [Nullable] object)
                             //
 
                             ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)

@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     internal static class ISymbolExtensions
     {
         //
-        // Explicit implementacional a nev "Interface.Tag" formaban van
+        // In case of explicit implementation the name is in form of "Interface.Tag"
         //
 
         private static readonly Regex FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);

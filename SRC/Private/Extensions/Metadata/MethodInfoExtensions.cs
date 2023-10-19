@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -97,7 +96,7 @@ namespace Solti.Utils.Proxy.Internals
             */
 
             //
-            // GetBaseDefinition() nem mukodik ha nem virtualis metodust irtunk felul (lasd "new" kulcsszo).
+            // GetBaseDefinition() won't work for "new" override.
             //
 
             Type[] paramz = method
@@ -121,10 +120,10 @@ namespace Solti.Utils.Proxy.Internals
                 if (overriddenMethod is not null)
                 {
                     //
-                    // A default binder nem a pontos szignaturara keres hanem a kompatibilisre, ami baszottul
-                    // nagy kulonbseg: pl typeof(Object).GetMethod("Equals", new[] { typeof(Akarmi) }) sose null,
-                    // hisz az Object.Equals(object) barmivel hivhato (tehat azt kapjuk vissza).
-                    // Na mar most, az kurva elet hogy en nem irok sajat bindert u h +1 check
+                    // The default binder searches for COMPATIBLE not exact signature match [for instance
+                    // typeof(Object).GetMethod("Equals", new[] { typeof(/*Any type*/) }) is never null]
+                    //
+                    // I won't create a custom binder so +1 check...
                     //
 
                     ParameterInfo[] overriddenParamz = overriddenMethod.GetParameters();

@@ -13,8 +13,8 @@ namespace Solti.Utils.Proxy.Internals
         public static ParameterKind GetParameterKind(this ParameterInfo src)
         {
             //
-            // Visszateresunk van? Vizsgalathoz ne az IsRetVal-t hasznaljuk mert az 
-            // mindig false (netcore3.0)
+            // IsRetval is quirky under netcore3.0 so determine if we have a return
+            // value by position
             //
 
             if (src.Position is -1) return src switch
@@ -25,16 +25,16 @@ namespace Solti.Utils.Proxy.Internals
             };
 
             //
-            // "Normal" parameterunk van
+            // We have a "regular" parameter
             //
 
             if (src.ParameterType.IsByRef)
             {
                 //
-                // Innentol "native by ref" (pl. IntPtr) nem jatszik.
+                // "native by ref" (e.g. IntPtr) is out of play from here.
                 //
 
-                if (src.IsIn && IsReadOnly()) // siman src.IsIn nem eleg
+                if (src.IsIn && IsReadOnly()) // src.IsIn is not enough
                     return ParameterKind.In;
 
                 if (!src.IsIn && src.IsOut)
@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
-            // "params" es referencia szerinti parameter atadas egymast kizaroak.
+            // "params" and by ref parameters are mutually exclusives.
             //
 
             if (src.GetCustomAttribute<ParamArrayAttribute>() != null) 
@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
                 .Some
                 (
                     //
-                    // "IsReadOnlyAttribute" csak netstandard2.1-tol kezdve publikus.
+                    // "IsReadOnlyAttribute" is public since netstandard2.1.
                     //
 
                     static attr => attr

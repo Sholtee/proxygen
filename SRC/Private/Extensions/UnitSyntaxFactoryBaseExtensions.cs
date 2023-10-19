@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
                         log.AutoFlush = true;
                         unit
                             .NormalizeWhitespace(eol: Environment.NewLine)
-                            .WriteTo(log); // nincs overload ami tamogatna a megszakitast
+                            .WriteTo(log); // "WriteTo() has no overload having "cancellation" parameter
                     }
 
                     if (src.ReferenceCollector is not null)

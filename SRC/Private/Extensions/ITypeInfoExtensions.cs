@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
     internal static class ITypeInfoExtensions
     {
         //
-        // A "GUID" property generikus tipus lezart es nyitott valtozatanal ugyanaz
+        // Generic arguments have no impact on "GUID" property
         //
 
         public static string GetMD5HashCode(this ITypeInfo src) => GetMD5HashCode(types: src);
@@ -82,8 +82,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.ElementType is not null)
                 //
-                // Tombbel v mutatoval van dolgunk. A QualifiedName property-t itt nem vizsgalhatjuk
-                // mert mindket esetben NULL lesz.
+                // Arrays and pointers have no QualifiedName property.
                 //
 
                 return
@@ -94,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
                 return false;
 
             //
-            // Ha a nevuk ugyanaz akkor az aritasuk is
+            // Qualified name contains the arity, too so we don't need to double check that
             //
 
             if (src is IGenericTypeInfo genericSrc)
@@ -185,7 +184,7 @@ namespace Solti.Utils.Proxy.Internals
             else
             {
                 //
-                // Tombot es mutatot nem lehet lekerdezni nev alapjan
+                // Array and pointer cannot be queried by name
                 //
 
                 switch (src.RefType)
@@ -198,8 +197,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
 
                 //
-                // A GetTypeByMetadataName() nem mukodik lezart generikusokra, de ez nem is gond
-                // mert a QualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
+                // QualifiedName doesn't reflect generic arguments so can be used together with GetTypeByMetadataName()
                 //
 
                 symbol = compilation.GetTypeByMetadataName(src.QualifiedName ?? throw new NotSupportedException());
@@ -209,7 +207,7 @@ namespace Solti.Utils.Proxy.Internals
                     TypeLoadException ex = new(string.Format(Resources.Culture, Resources.TYPE_NOT_FOUND, src.QualifiedName));
 
                     //
-                    // SourceGenerator-ba nem lehet beleDEBUGolni ezert...
+                    // It's hard to debug a source generator so...
                     //
 
                     ex.Data["containingAsm"] = src.DeclaringAssembly?.Name;
@@ -234,7 +232,7 @@ namespace Solti.Utils.Proxy.Internals
         public static Type ToMetadata(this ITypeInfo src)
         {
             //
-            // Az AssemblyQualifiedName a nyilt generikus tipushoz tartozo nevet adja vissza
+            // QualifiedName doesn't reflect generic arguments so can be used together with GetType()
             //
 
             Type queried = Type.GetType(src.AssemblyQualifiedName, throwOnError: true);
