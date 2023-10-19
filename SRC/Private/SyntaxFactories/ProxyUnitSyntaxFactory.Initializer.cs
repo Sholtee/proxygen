@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -63,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            (MethodInfo) MemberInfoExtensions.ExtractFrom(() => LoadedTypes.Register(null!))
+                            MethodInfoExtensions.ExtractFrom<object>(_ => LoadedTypes.Register(null!))
                         ),
                         target: null,
                         castTargetTo: null,

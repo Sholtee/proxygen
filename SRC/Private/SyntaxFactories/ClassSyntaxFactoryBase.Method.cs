@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 

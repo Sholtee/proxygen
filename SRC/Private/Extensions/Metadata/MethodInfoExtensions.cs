@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -143,5 +144,14 @@ namespace Solti.Utils.Proxy.Internals
             }
             return null;
         }
+
+        //
+        // Similar logic is provided by Solti.Utils.Primitives, too. But we don't want to ship
+        // that library with our source generator, so reimplement it.
+        // I know Solti.Utils.Primitives is among the dependencies but it is not required to 
+        // ship as long as the source generator logic not using it.
+        //
+
+        public static MethodInfo ExtractFrom<T>(Expression<Action<T>> expression) => ((MethodCallExpression) expression.Body).Method;
     }
 }

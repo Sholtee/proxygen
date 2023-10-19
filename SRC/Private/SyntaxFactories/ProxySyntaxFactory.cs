@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -81,15 +80,14 @@ namespace Solti.Utils.Proxy.Internals
             InterceptorType = interceptorType;
             TargetType = baseInterceptor!.GenericArguments[1];
 
+            IMethodInfo invoke = MetadataMethodInfo.CreateFrom
+            (
+                MethodInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!))
+            );
+
             Invoke = InterceptorType.Methods.Single
             (
-                static met => met.SignatureEquals
-                (
-                    MetadataMethodInfo.CreateFrom
-                    (
-                        (MethodInfo) MemberInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!))
-                    )
-                )
+                met => met.SignatureEquals(invoke)
             )!;
         }
 
