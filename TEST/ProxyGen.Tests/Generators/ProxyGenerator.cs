@@ -25,6 +25,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 {
     using Generators;
     using Internals;
+    using Primitives;
     using Proxy.Tests.External;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
@@ -236,7 +237,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.Add(default))));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
@@ -253,9 +254,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<IList<int>>(lst => lst.Add(100))));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<List<int>>(lst => lst.Add(100))));
+            Assert.That(context.TargetMethod, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
             Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
         }
 
@@ -283,7 +284,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom(() => proxy.GenericMethod(100))));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
             Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
@@ -303,9 +304,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<IMyInterfceHavingGenericMethod>(iface => iface.GenericMethod(100))));
+            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfceHavingGenericMethod>(iface => iface.GenericMethod(100))));
             Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(MemberInfoExtensions.ExtractFrom<MyInterfceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
+            Assert.That(context.TargetMethod, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
             Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
         }
 
@@ -325,7 +326,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
-            PropertyInfo prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom(() => proxy.Count);
+            PropertyInfo prop = PropertyInfoExtractor.Extract(() => proxy.Count);
 
             Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.InterfaceMember, Is.EqualTo(prop));
@@ -349,12 +350,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
-            PropertyInfo prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom<IList<int>>(lst => lst.Count);
+            PropertyInfo prop = PropertyInfoExtractor.Extract<IList<int>, int>(lst => lst.Count);
 
             Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.InterfaceMember, Is.EqualTo(prop));
 
-            prop = (PropertyInfo)MemberInfoExtensions.ExtractFrom<List<int>>(lst => lst.Count);
+            prop = PropertyInfoExtractor.Extract<List<int>, int>(lst => lst.Count);
 
             Assert.That(context.TargetMethod, Is.EqualTo(prop.GetMethod));
             Assert.That(context.TargetMember, Is.EqualTo(prop));

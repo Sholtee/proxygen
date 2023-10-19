@@ -12,14 +12,16 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
+    using Primitives;
+
     [TestFixture]
     public class MethodBaseExtensionsTests
     {
         public static (MethodInfo Method, IEnumerable<Type> DeclaringTypes)[] Methods = new []
         {
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.Add(default, default)), (IEnumerable<Type>) new[] {typeof(IDictionary<string, object>) }),
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<MyDictionary<string, object>>(d => d.Add(default, default)), new[] {typeof(IDictionary<string, object>) }), // leszarmazott
-            ((MethodInfo) MemberInfoExtensions.ExtractFrom<Dictionary<string, object>>(d => d.GetHashCode()), Array.Empty<Type>()),
+            (MethodInfoExtractor.Extract<Dictionary<string, object>>(d => d.Add(default, default)), (IEnumerable<Type>) new[] {typeof(IDictionary<string, object>) }),
+            (MethodInfoExtractor.Extract<MyDictionary<string, object>>(d => d.Add(default, default)), new[] {typeof(IDictionary<string, object>) }), // leszarmazott
+            (MethodInfoExtractor.Extract< Dictionary<string, object>>(d => d.GetHashCode()), Array.Empty<Type>()),
         };
 
         [TestCaseSource(nameof(Methods))]

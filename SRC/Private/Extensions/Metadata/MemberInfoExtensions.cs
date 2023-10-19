@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline),
-            FGetPrefix = new("^(?:get|set|add|remove)_", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            FGetPrefix = new("^(get|set|add|remove)_", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
         //
         // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832

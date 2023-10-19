@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 
@@ -16,6 +15,8 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
+    using Primitives;
+
     [TestFixture]
     public sealed class TypeExtensionsTests
     {
@@ -24,8 +25,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             MethodInfo[] methods = typeof(IEnumerable<string>).ListMethods().ToArray();
             Assert.That(methods.Length, Is.EqualTo(2));
-            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable<string>>(i => i.GetEnumerator())));
-            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IEnumerable>(i => i.GetEnumerator())));
+            Assert.That(methods.Contains(MethodInfoExtractor.Extract<IEnumerable<string>>(i => i.GetEnumerator())));
+            Assert.That(methods.Contains(MethodInfoExtractor.Extract<IEnumerable>(i => i.GetEnumerator())));
         }
 
         [Test]
@@ -33,8 +34,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             PropertyInfo[] properties = typeof(IEnumerator<string>).ListProperties().ToArray();
             Assert.That(properties.Length, Is.EqualTo(2));
-            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator<string>>(i => i.Current)));
-            Assert.That(properties.Contains((PropertyInfo)MemberInfoExtensions.ExtractFrom<IEnumerator>(i => i.Current)));
+            Assert.That(properties.Contains(PropertyInfoExtractor.Extract<IEnumerator<string>, string>(i => i.Current)));
+            Assert.That(properties.Contains(PropertyInfoExtractor.Extract<IEnumerator, object>(i => i.Current)));
         }
 
         [Test]
@@ -87,9 +88,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             MethodInfo[] methods = typeof(IGrandChild).ListMethods().ToArray();
 
             Assert.That(methods.Length, Is.EqualTo(3));
-            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IParent>(i => i.Foo())));
-            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IChild>(i => i.Bar())));
-            Assert.That(methods.Contains((MethodInfo) MemberInfoExtensions.ExtractFrom<IGrandChild>(i => i.Baz())));
+            Assert.That(methods.Contains(MethodInfoExtractor.Extract<IParent>(i => i.Foo())));
+            Assert.That(methods.Contains(MethodInfoExtractor.Extract<IChild>(i => i.Bar())));
+            Assert.That(methods.Contains(MethodInfoExtractor.Extract<IGrandChild>(i => i.Baz())));
         }
 
         private interface IIFace : IA, IB { }
@@ -143,14 +144,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase(typeof(object), "System.Object")]
         [TestCase(typeof(List<>), "System.Collections.Generic.List")] // generic
         [TestCase(typeof(IParent), "IParent")] // nested
-        public void GetFriendlyName_ShouldBeautifyTheTypeName(Type type, string expected) => Assert.AreEqual(expected, type.GetFriendlyName());
+        public void GetFriendlyName_ShouldBeautifyTheTypeName(Type type, string expected) => Assert.AreEqual(expected, Internals.TypeExtensions.GetFriendlyName(type));
 
         [Test]
         public void GetFriendlyName_ShouldHandleRefTypes()
         {
             Type refType = typeof(Class).GetMethod(nameof(Class.RefMethod)).ReturnType; // System.Int32&
 
-            Assert.AreEqual("System.Int32", refType.GetFriendlyName());
+            Assert.AreEqual("System.Int32", Internals.TypeExtensions.GetFriendlyName(refType));
         }
 
         [Test]
