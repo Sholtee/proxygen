@@ -25,6 +25,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.*" />
     <PackageReference Include="NunitXml.TestLogger" Version="2.*" />
+    <PackageReference Include="Solti.Utils.Primitives" Version="8.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Variant)' != 'ROSLYN_LEGACY'">
