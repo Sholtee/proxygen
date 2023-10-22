@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Attributes
             if (generator is null)
                 throw new ArgumentNullException(nameof(generator));
 
-            if (!generator.GetBaseTypes().Any(static @base => @base.IsGenericType && @base.GetGenericTypeDefinition().FullName == typeof(Generator<,>).FullName))
+            if (!generator.GetBaseTypes().Any(static @base => @base.IsConstructedGenericType && @base.GetGenericTypeDefinition().FullName == typeof(Generator<,>).FullName))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(generator));
 
             Generator = generator;
