@@ -15,10 +15,17 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
-    public abstract class Generator: TypeEmitter
+    public abstract class Generator : TypeEmitter
     {
-        private static readonly ConcurrentDictionary<Generator, Task<Type>> FFactoryCache = new(GeneratorComparer.Instance);
-        private static readonly ConcurrentDictionary<Generator, Task<Func<object?, object>>> FActivatorCache = new(GeneratorComparer.Instance);
+        private sealed class GeneratorContext
+        {
+            public Type? GeneratedType { get; set; }
+
+            public SemaphoreSlim Lock { get; } = new(1, 1);
+        }
+
+        private static readonly ConcurrentDictionary<object, GeneratorContext> FContextCache = new();
+        private static readonly ConcurrentDictionary<object, Func<object?, object>> FActivatorCache = new();
 
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
@@ -32,41 +39,42 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// Createsa new <see cref="Generator"/> instance.
+        /// Creates a new <see cref="Generator"/> instance.
         /// </summary>
         protected Generator(object id) => Id = id;
 
-        //
-        // Since all Task methods are thread safe (https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0#thread-safety)
-        // we can cache in this method.
-        //
+        internal Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
+        {
+            GeneratorContext context = FContextCache.GetOrAdd(Id, static _ => new GeneratorContext());
+            if (context.GeneratedType is not null)
+                return Task.FromResult(context.GeneratedType);
 
-        internal Task<Type> GetGeneratedTypeAsyncInternal() => FFactoryCache.GetOrAdd
-        (
-            //
-            // Generators havnig the same Id emit the same output, too.
-            //
-
-            this,
-            static self => Task<Type>.Factory.StartNew
+            return Task<Type>.Factory.StartNew
             (
-                //
-                // Since the returned task is cached, we cannot cancel it.
-                //
+                () =>
+                {
+                    context.Lock.Wait(cancellation);
+                    try
+                    {
+                        context.GeneratedType ??= Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
+                    }
+                    finally
+                    {
+                        context.Lock.Release();
+                    }
+                    return context.GeneratedType;
+                },
+                cancellation
+            );
+        }
 
-                static self => ((Generator) self).Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, default),
-                self
-            )
-        );
+        internal async Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
+        {
+            if (FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
+                return activator;
 
-        internal Task<Func<object?, object>> GetActivatorAsyncInternal() => FActivatorCache.GetOrAdd
-        (
-            this,
-            async static self => ProxyActivator.Create
-            (
-                await self.GetGeneratedTypeAsyncInternal()
-            ) 
-        );
+            return FActivatorCache[Id] = ProxyActivator.Create(await GetGeneratedTypeAsyncInternal(cancellation));
+        }
 
         #region Public
         /// <summary>
@@ -78,13 +86,13 @@ namespace Solti.Utils.Proxy.Internals
         /// Gets the generated <see cref="Type"/> asynchronously .
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal().AsCancellable(cancellation);
+        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal(cancellation);
 
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Type GetGeneratedType() => GetGeneratedTypeAsyncInternal()
+        public Type GetGeneratedType() => GetGeneratedTypeAsync()
             .GetAwaiter()
             .GetResult();
 
@@ -99,7 +107,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default) =>
         #endif
-            (await GetActivatorAsyncInternal().AsCancellable(cancellation)).Invoke(tuple);
+            (await GetActivatorAsyncInternal(cancellation)).Invoke(tuple);
 
         /// <summary>
         /// Creates an instance of the generated type.
@@ -111,7 +119,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public object Activate(object? tuple) =>
         #endif
-            GetActivatorAsyncInternal()
+            GetActivatorAsyncInternal(default)
             .GetAwaiter()
             .GetResult()
             .Invoke(tuple);
