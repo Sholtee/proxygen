@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Linq;
+
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -20,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
                 //
-                // Starting from .NET Core 5.0 interfacce methods may have visibility
+                // Starting from .NET Core 5.0 interface methods may have visibility
                 //
 
                 if (ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
@@ -29,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
                 IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods, SignatureEquals);
 
                 //
-                // Ellenorizzuk h a metodus lathato e a legeneralando szerelvenyunk szamara.
+                // Check if the method is visible.
                 //
 
                 Visibility.Check(targetMethod, ContainingAssembly);
@@ -58,21 +60,17 @@ namespace Solti.Utils.Proxy.Internals
         {
             IMethodInfo ifaceMethod = (IMethodInfo) context;
 
-            //
-            // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface generikusok
-            // maskepp vannak elnvezve.
-            //
-
             ExpressionSyntax invocation = InvokeMethod
             (
                 ifaceMethod,
                 MemberAccess(null, Target),
                 castTargetTo: targetMethod.AccessModifiers is AccessModifiers.Explicit
-                    ? targetMethod.DeclaringInterfaces.Single() // explicit metodushoz biztosan csak egy deklaralo interface tartozik
+                    ? targetMethod.DeclaringInterfaces.Single() // explicit methods cannot implement more than one interface
                     : null,
                 arguments: ifaceMethod
                     .Parameters
-                    .ConvertAr(static para => para.Name)
+                    .Select(static para => para.Name)
+                    .ToArray()
             );
 
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)

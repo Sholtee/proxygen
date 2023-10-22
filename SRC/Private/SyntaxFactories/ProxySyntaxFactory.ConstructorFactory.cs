@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Linq;
+
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -51,8 +53,8 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 InterceptorType.Properties.Single
                                 (
-                                    prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
-                                )!,
+                                    static prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
+                                ),
                                 target: null,
                                 castTargetTo: null
                             ),

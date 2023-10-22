@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -30,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return NamespaceDeclaration
             (
-                new[] { "System", "Runtime", "CompilerServices" }.Convert(IdentifierName).Qualify()
+                new[] { "System", "Runtime", "CompilerServices" }.Select(IdentifierName).Qualify()
             )
             .WithNamespaceKeyword
             (

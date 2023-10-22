@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -35,7 +36,10 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         private IReadOnlyList<IParameterInfo>? FParameters;
-        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol.Parameters.ConvertAr(p => SymbolParameterInfo.CreateFrom(p, Compilation));
+        public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol
+            .Parameters
+            .Select(p => SymbolParameterInfo.CreateFrom(p, Compilation))
+            .ToImmutableList();
 
         private IParameterInfo? FReturnValue;
         public IParameterInfo ReturnValue => FReturnValue ??= UnderlyingSymbol.MethodKind != MethodKind.Constructor
@@ -51,7 +55,10 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
         private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
-        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol.GetDeclaringInterfaces().ConvertAr(di => SymbolTypeInfo.CreateFrom(di, Compilation));
+        public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol
+            .GetDeclaringInterfaces()
+            .Select(di => SymbolTypeInfo.CreateFrom(di, Compilation))
+            .ToImmutableList();
 
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
@@ -72,13 +79,16 @@ namespace Solti.Utils.Proxy.Internals
             private bool? FIsGenericDefinition;
             public bool IsGenericDefinition => FIsGenericDefinition ??= !UnderlyingSymbol
                 .TypeParameters
-                .Some(static tp => !SymbolEqualityComparer.Default.Equals(tp.OriginalDefinition, tp));
+                .Any(static tp => !SymbolEqualityComparer.Default.Equals(tp.OriginalDefinition, tp));
 
             private IGenericMethodInfo? FGenericDefinition;
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
-            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol.TypeArguments.ConvertAr(ta => SymbolTypeInfo.CreateFrom(ta, Compilation));
+            public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
+                .TypeArguments
+                .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
+                .ToImmutableList();
 
             private IEnumerable<IGenericConstraint> GetConstraints()
             {

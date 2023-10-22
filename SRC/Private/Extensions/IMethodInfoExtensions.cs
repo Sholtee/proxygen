@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Linq;
+
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class IMethodInfoExtensions
@@ -29,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
                     return false;
 
                 foreach (IGenericConstraint srcConstraint in genericSrc.GenericConstraints)
-                    if (!genericThat.GenericConstraints.Some(srcConstraint.EqualsTo))
+                    if (!genericThat.GenericConstraints.Any(srcConstraint.EqualsTo))
                         return false;
             }
 

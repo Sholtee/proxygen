@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using Microsoft.CodeAnalysis;
@@ -57,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
             // nint[,] => System.IntPtr[,]
             //
 
-            _ when src is IArrayTypeSymbol array => $"{array.ElementType.GetFriendlyName()}[{(array.Rank - 1).Times(static () => ',').Join()}]",
+            _ when src is IArrayTypeSymbol array => $"{array.ElementType.GetFriendlyName()}[{new string(Enumerable.Repeat(',', array.Rank - 1).ToArray())}]",
             _ => src.ToDisplayString
             (
                 new SymbolDisplayFormat
@@ -74,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
             src.ConstructedFrom?.SpecialType is SpecialType.System_Nullable_T &&
             !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src);
 
-        public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Some();
+        public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Any();
 
         public static IEnumerable<ITypeSymbol> GetParents(this ITypeSymbol src) 
         {
@@ -121,11 +122,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             if (skipSpecial)
-                methods = methods.Convert
-                (
-                    static m => m,
-                    static m => m.IsSpecial()
-                );
+                methods = methods.Where(static m => !m.IsSpecial());
 
             return methods;
         }
@@ -251,12 +248,12 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<IMethodSymbol> GetConstructors(this ITypeSymbol src)
         {
             //
-            // Don't use ListMembersInternal() here as we don't need ctros from the ancestors.
+            // Don't use ListMembersInternal() here as we don't need ctors from the ancestors.
             //
 
             foreach (ISymbol m in src.GetMembers())
             {
-                if (m is not IMethodSymbol ctor || Ctors.IndexOf(ctor.MethodKind) is null || ctor.GetAccessModifiers() is AccessModifiers.Private || ctor.IsImplicitlyDeclared)
+                if (m is not IMethodSymbol ctor || Ctors.IndexOf(ctor.MethodKind) < 0 || ctor.GetAccessModifiers() is AccessModifiers.Private || ctor.IsImplicitlyDeclared)
                     continue;
 
                 yield return ctor;
@@ -365,16 +362,19 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (iface.IsGenericType())
                 {
-                    ITypeSymbol[] tas = iface.TypeArguments.ConvertAr
-                    (
-                        static ta => !ta.IsValueType
-                            //
-                            // Drop nullable annotation (int? -> Nullable<int>, object? -> [Nullable] object)
-                            //
+                    ITypeSymbol[] tas = iface
+                        .TypeArguments
+                        .Select
+                        (
+                            static ta => !ta.IsValueType
+                                //
+                                // Drop nullable annotation (int? -> Nullable<int>, object? -> [Nullable] object)
+                                //
 
-                            ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
-                            : ta
-                    );
+                                ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
+                                : ta
+                        )
+                        .ToArray();
 
                     iface = iface.OriginalDefinition.Construct(tas);
                 }
@@ -405,12 +405,12 @@ namespace Solti.Utils.Proxy.Internals
                 bases.Add(src.BaseType);
             bases.AddRange(src.AllInterfaces);
 
-            if (bases.Some())
-                sb.Append($": {string.Join(", ", bases.Convert(@base => @base.ToDisplayString(fmt)))}");
+            if (bases.Any())
+                sb.Append($": {string.Join(", ", bases.Select(@base => @base.ToDisplayString(fmt)))}");
 
             sb.Append($"{eol}{{");
 
-            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Convert(static m => m, static m => m.IsSpecial()))
+            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Where(static m => !m.IsSpecial()))
                 sb.Append($"{eol}  {method.ToDisplayString(fmt)};");
 
             foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))

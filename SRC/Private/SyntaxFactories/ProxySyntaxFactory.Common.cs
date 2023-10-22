@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -26,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         static string EnsureUnused(string name, IEnumerable<IParameterInfo> parameters) 
         {
-            while (parameters.Some(param => param.Name == name))
+            while (parameters.Any(param => param.Name == name))
             {
                 name = $"_{name}";
             }
@@ -40,10 +41,6 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         static string EnsureUnused(string name, IMethodInfo method) => EnsureUnused(name, method.Parameters);
 
-        //
-        // Az interceptor altal mar implementalt interface-ek ne szerepeljenek a proxy deklaracioban.
-        //
-
         #if DEBUG
         internal
         #else
@@ -51,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         bool AlreadyImplemented(IMemberInfo member) => InterceptorType
             .Interfaces
-            .Some(iface => iface.EqualsTo(member.DeclaringType));
+            .Any(iface => iface.EqualsTo(member.DeclaringType));
 
         /// <summary>
         /// <code>
@@ -77,22 +74,25 @@ namespace Solti.Utils.Proxy.Internals
                 EnsureUnused("args", paramz),
                 ResolveArray<object>
                 (
-                    paramz.ConvertAr
+                    paramz.Select
                     (
-                        param => (ExpressionSyntax) (param.Kind switch
-                        {
-                            _ when param.Type.RefType is RefType.Ref =>
-                                //
-                                // "ref struct" cast-olhato oljektumma
-                                //
+                        param => (ExpressionSyntax) 
+                        (
+                            param.Kind switch
+                            {
+                                _ when param.Type.RefType is RefType.Ref =>
+                                    //
+                                    // "ref struct" cast-olhato oljektumma
+                                    //
 
-                                throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
-                            ParameterKind.Out => DefaultExpression
-                            (
-                                ResolveType(param.Type)
-                            ),
-                            _ => IdentifierName(param.Name)
-                        })
+                                    throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
+                                ParameterKind.Out => DefaultExpression
+                                (
+                                    ResolveType(param.Type)
+                                ),
+                                _ => IdentifierName(param.Name)
+                            }
+                        )
                     )
                 )
             );
@@ -164,35 +164,38 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        LocalDeclarationStatementSyntax[] ResolveInvokeTargetLocals(ParameterSyntax argsArray, IMethodInfo method) => method.Parameters.ConvertAr
-        (
-            (p, i) => ResolveLocal
+        LocalDeclarationStatementSyntax[] ResolveInvokeTargetLocals(ParameterSyntax argsArray, IMethodInfo method) => method
+            .Parameters
+            .Select
             (
-                p.Type,
-                $"_{p.Name}", // statikus metodusban kerulnek felhasznalasra -> nem kell EnsureUnused(), csak "target" es "args"-al akadhatna ossze
-                p.Kind is ParameterKind.Out ? null : CastExpression
+                (p, i) => ResolveLocal
                 (
-                    type: ResolveType(p.Type),
-                    expression: ElementAccessExpression
+                    p.Type,
+                    $"_{p.Name}", // statikus metodusban kerulnek felhasznalasra -> nem kell EnsureUnused(), csak "target" es "args"-al akadhatna ossze
+                    p.Kind is ParameterKind.Out ? null : CastExpression
                     (
-                        IdentifierName(argsArray.Identifier)
-                    )
-                    .WithArgumentList
-                    (
-                        argumentList: BracketedArgumentList
+                        type: ResolveType(p.Type),
+                        expression: ElementAccessExpression
                         (
-                            SingletonSeparatedList
+                            IdentifierName(argsArray.Identifier)
+                        )
+                        .WithArgumentList
+                        (
+                            argumentList: BracketedArgumentList
                             (
-                                Argument
+                                SingletonSeparatedList
                                 (
-                                    LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))
+                                    Argument
+                                    (
+                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))
+                                    )
                                 )
                             )
                         )
                     )
                 )
             )
-        );
+            .ToArray();
 
         /// <summary>
         /// <code>
@@ -369,7 +372,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 List
                 (
-                    constraints.ConvertAr
+                    constraints.Select
                     (
                         constraint => TypeParameterConstraintClause
                         (

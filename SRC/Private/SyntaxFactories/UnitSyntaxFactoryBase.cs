@@ -6,6 +6,7 @@
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
@@ -49,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
                 ResolveUnitMembers(context, cancellation)
             );
 
-            if (members.Some() && OutputType is OutputType.Unit)
+            if (members.Any() && OutputType is OutputType.Unit)
             {
                 members[0] = members[0] switch
                 {
@@ -114,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation) => ResolveClasses(context, cancellation).Convert // TODO: take and return the unit being assembled
+        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation) => ResolveClasses(context, cancellation).Select // TODO: take and return the unit being assembled
         (
             cls => cls.WithAttributeLists
             (

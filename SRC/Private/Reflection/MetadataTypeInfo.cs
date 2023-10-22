@@ -5,6 +5,8 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -25,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
             return underlyingType switch
             {
                 _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
-                _ when underlyingType.GetOwnGenericArguments().Some() => new MetadataGenericTypeInfo(underlyingType),
+                _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
                 _ => new MetadataTypeInfo(underlyingType)
             };
         }
@@ -60,7 +62,8 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
             .GetAllInterfaces()
-            .ConvertAr(CreateFrom);
+            .Select(CreateFrom)
+            .ToImmutableList();
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingType.GetBaseType() is not null
@@ -98,12 +101,14 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
-            .ConvertAr(MetadataPropertyInfo.CreateFrom);
+            .Select(MetadataPropertyInfo.CreateFrom)
+            .ToImmutableList();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
-            .ConvertAr(MetadataEventInfo.CreateFrom);
+            .Select(MetadataEventInfo.CreateFrom)
+            .ToImmutableList();
 
         //
         // Ezeket a metodusok forditas idoben nem leteznek igy a SymbolTypeInfo-ban sem fognak szerepelni.
@@ -127,12 +132,15 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
-            .ConvertAr(MetadataMethodInfo.CreateFrom, ShouldSkip);
+            .Where(meth => !ShouldSkip(meth))
+            .Select(MetadataMethodInfo.CreateFrom)
+            .ToImmutableList();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
                 .GetDeclaredConstructors()
-                .ConvertAr(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor));
+                .Select(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor))
+                .ToImmutableList();
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
             ? $"{QualifiedName}, {UnderlyingType.Assembly}"
@@ -190,7 +198,8 @@ namespace Solti.Utils.Proxy.Internals
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()
-                .ConvertAr(CreateFrom);
+                .Select(CreateFrom)
+                .ToImmutableList();
 
             public override string Name => !UnderlyingType.IsGenericType || UnderlyingType.IsGenericTypeDefinition // FIXME: Type.GetFriendlyName() lezart generikusokat nem eszi meg (igaz elvileg nem is kell hivjuk lezart generikusra)
                 ? base.Name

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -135,28 +136,30 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         List
                         (
-                            genericMethod.GenericConstraints.ConvertAr
-                            (
-                                constraint => TypeParameterConstraintClause
+                            genericMethod
+                                .GenericConstraints
+                                .Where(static constraint => GetConstraints(constraint).Any())
+                                .Select
                                 (
-                                    IdentifierName
+                                    constraint => TypeParameterConstraintClause
                                     (
-                                        constraint.Target.Name  // T, T, etc
+                                        IdentifierName
+                                        (
+                                            constraint.Target.Name  // T, T, etc
+                                        )
+                                    )
+                                    .WithConstraints
+                                    (
+                                        GetConstraints(constraint).ToSyntaxList()
                                     )
                                 )
-                                .WithConstraints
-                                (
-                                    GetContraints(constraint).ToSyntaxList()
-                                ),
-                                drop: constraint => !GetContraints(constraint).Some()
-                            )
                         )
                     );
 
-                    static IEnumerable<TypeParameterConstraintSyntax> GetContraints(IGenericConstraint constraint)
+                    static IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
                     {
                         //
-                        // Explicit interface implementations must not specify type constraits
+                        // Explicit interface implementations must not specify type constraints
                         //
 
                         if (constraint.Struct)
@@ -244,13 +247,15 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target,
                 castTargetTo,
-                arguments: paramz.ConvertAr
-                (
-                    (param, i) => Argument
+                arguments: paramz
+                    .Select
                     (
-                        expression: IdentifierName(arguments[i])
+                        (param, i) => Argument
+                        (
+                            expression: IdentifierName(arguments[i])
+                        )
                     )
-                )
+                    .ToArray()
             );
         }
     

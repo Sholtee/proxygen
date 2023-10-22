@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -54,7 +55,7 @@ namespace Solti.Utils.Proxy.Internals
 
             bool IsReadOnly() => src
                 .GetCustomAttributes()
-                .Some
+                .Any
                 (
                     //
                     // "IsReadOnlyAttribute" is public since netstandard2.1.

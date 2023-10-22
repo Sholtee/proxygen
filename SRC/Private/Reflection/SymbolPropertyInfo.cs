@@ -4,7 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
-
+using System.Collections.Immutable;
+using System.Linq;
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -34,7 +35,10 @@ namespace Solti.Utils.Proxy.Internals
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
         private IReadOnlyList<IParameterInfo>? FIndices;
-        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingSymbol.Parameters.ConvertAr(p => SymbolParameterInfo.CreateFrom(p, Compilation));
+        public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingSymbol
+            .Parameters
+            .Select(p => SymbolParameterInfo.CreateFrom(p, Compilation))
+            .ToImmutableList();
 
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 

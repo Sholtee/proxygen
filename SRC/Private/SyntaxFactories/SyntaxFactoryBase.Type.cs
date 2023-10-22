@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type.IsNested)
             {
-                names[0] = CreateTypeName(parts.Single()!);
+                names[0] = CreateTypeName(parts.Single());
             }
             else
             {
@@ -43,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                 names[names.Length - 1] = CreateTypeName(parts[parts.Length - 1]);
 
                 //
-                // Ez jol kezeli azt az esetet is ha a tipus nincs nevter alatt
+                // This handles types having no namespace properly
                 //
 
                 if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
@@ -73,9 +74,9 @@ namespace Solti.Utils.Proxy.Internals
         protected TypeSyntax ResolveType(ITypeInfo type) 
         {
             //
-            // Ez ne  a switch-ben legyen mert az AddType()-ot nem akarjuk hivni int[]-re v int*-ra
+            // We don't want to invoke AddType() on int[] or int*
             //
-            // TODO: FIXME: itt "type.RefType > RefType.None"-ra kene vizsgalni
+            // TODO: FIXME: We should check if "type.RefType > RefType.None"
             //
 
             if (type.ElementType is not null && type is not IArrayTypeInfo)

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 
@@ -42,14 +43,13 @@ namespace Solti.Utils.Proxy.Internals
             TargetType = targetType;
 
             //
-            // BaseType beszerzeset nem tudjuk szebben megoldani mivel nem tudjuk h "targetType" mogott meta-adat vagy
-            // szimbolum van.
+            // We don't know if BaseType should be backed by either Symbol or Metadata.
             //
 
             BaseType = ((IGenericTypeInfo) proxygenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
-                .Single(static prop => prop.Name == nameof(DuckBase<object>.Target))!;
+                .Single(static prop => prop.Name == nameof(DuckBase<object>.Target));
         }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
@@ -77,23 +77,20 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected override string ResolveClassName(object context) =>
-            //
-            // Az uj tipust egyertelmuen az interface es cel tipus hatarozza meg
-            //
-
             $"Duck_{ITypeInfoExtensions.GetMD5HashCode(InterfaceType, TargetType)}";
 
         protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
             TMember[] possibleTargets = targetMembers
-              .ConvertAr(static targetMember => targetMember, targetMember => !signatureEquals(targetMember, ifaceMember));
+              .Where(targetMember => signatureEquals(targetMember, ifaceMember))
+              .ToArray();
 
-            if (!possibleTargets.Some())
+            if (!possibleTargets.Any())
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
 
             //
-            // Lehet tobb implementacio is pl.:
-            // "List<T>: ICollection<T>, IList" ahol IList nem ICollection<T> ose es mindkettonek van ReadOnly tulajdonsaga.
+            // There might be multiple implementation:
+            // "List<T>: ICollection<T>, IList" [both ICollection<T> and IList has ReadOnly property].
             //
 
             if (possibleTargets.Length > 1)

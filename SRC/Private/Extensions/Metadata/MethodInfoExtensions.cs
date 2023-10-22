@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -21,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsFamilyOrAssembly => AccessModifiers.Protected | AccessModifiers.Internal,
             _ when src.IsFamilyAndAssembly => AccessModifiers.Protected | AccessModifiers.Private,
             _ when src.IsPublic => AccessModifiers.Public,
-            _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Some() => AccessModifiers.Explicit,
+            _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
             _ when src.IsPrivate => AccessModifiers.Private,
             #pragma warning disable CA2201 // In theory we should never reach here.
             _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
@@ -45,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<Type>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Convert(static m => m.ReflectedType);
+                .Select(static m => m.ReflectedType);
 
         public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
         {
@@ -57,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             //
-            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // As of C# 11 interfaces may have static abstract methods... We don't deal with
             // the implementors.
             //
 
@@ -102,7 +103,8 @@ namespace Solti.Utils.Proxy.Internals
 
             Type[] paramz = method
                 .GetParameters()
-                .ConvertAr(static p => p.ParameterType);
+                .Select(static p => p.ParameterType)
+                .ToArray();
 
             foreach (Type baseType in method.ReflectedType.GetBaseTypes())
             {

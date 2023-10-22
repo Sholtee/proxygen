@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -90,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: units.Convert(static unit => CSharpSyntaxTree.Create(unit)),
+                syntaxTrees: units.Select(static unit => CSharpSyntaxTree.Create(unit)),
                 references: PlatformAssemblies.Union(references),
                 options: new CSharpCompilationOptions
                 (
@@ -117,17 +118,24 @@ namespace Solti.Utils.Proxy.Internals
                         Environment.NewLine,
                         compilation
                             .SyntaxTrees
-                            .Convert(static unit => unit
-                                .GetCompilationUnitRoot()
-                                .NormalizeWhitespace(eol: Environment.NewLine)
-                                .ToFullString())
+                            .Select
+                            (
+                                static unit => unit
+                                    .GetCompilationUnitRoot()
+                                    .NormalizeWhitespace(eol: Environment.NewLine)
+                                    .ToFullString()
+                            )
                     );
 
                     string[]
                         failures = result
                             .Diagnostics
-                            .ConvertAr(static d => d.ToString(), static d => d.Severity is not DiagnosticSeverity.Error),
-                        refs = references.ConvertAr(static r => r.Display!);
+                            .Where(static d => d.Severity is DiagnosticSeverity.Error)
+                            .Select(static d => d.ToString())
+                            .ToArray(),
+                        refs = references
+                            .Select(static r => r.Display!)
+                            .ToArray();
 
                     InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 

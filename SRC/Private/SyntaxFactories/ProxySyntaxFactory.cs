@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -61,11 +62,11 @@ namespace Solti.Utils.Proxy.Internals
 
             string baseInterceptorName = typeof(InterfaceInterceptor<,>).FullName;
 
-            IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?) 
+            IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?)
             (
                 interceptorType.QualifiedName == baseInterceptorName
                     ? interceptorType
-                    : interceptorType.GetBaseTypes().Single(ic => ic.QualifiedName == baseInterceptorName, throwOnEmpty: false)
+                    : interceptorType.GetBaseTypes().SingleOrDefault(ic => ic.QualifiedName == baseInterceptorName)
             );
 
             bool validInterceptor =

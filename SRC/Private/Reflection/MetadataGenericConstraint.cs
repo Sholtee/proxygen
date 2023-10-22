@@ -5,6 +5,8 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -16,24 +18,24 @@ namespace Solti.Utils.Proxy.Internals
             Struct = genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint);
             DefaultConstructor = !Struct && genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint);
             Reference = genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint);
-            ConstraintTypes = genericArgument.GetGenericParameterConstraints().ConvertAr
-            (
-                MetadataTypeInfo.CreateFrom,
-                
+            ConstraintTypes = genericArgument
+                .GetGenericParameterConstraints()
+
                 //
                 // We don't want a
                 //     "where TT : struct, global::System.ValueType"
                 //
 
-                drop: t => t == typeof(ValueType) && Struct
-            );
+                .Where(t => t != typeof(ValueType) || !Struct)
+                .Select(MetadataTypeInfo.CreateFrom)
+                .ToImmutableList();
             Target = MetadataTypeInfo.CreateFrom(genericArgument);
         }
 
         public static IGenericConstraint? CreateFrom(Type genericArgument)
         {
             MetadataGenericConstraint result = new(genericArgument);
-            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Some()
+            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Any()
                 ? null
                 : result;
         }

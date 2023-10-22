@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -58,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining)
                 );
 
-            return !accessors.Some() ? result : result.WithAccessorList
+            return !accessors.Any() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (

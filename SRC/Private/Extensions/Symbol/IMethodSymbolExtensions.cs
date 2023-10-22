@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -21,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
             Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
             Accessibility.Public => AccessModifiers.Public,
-            Accessibility.Private when /*src.MethodKind is MethodKind.ExplicitInterfaceImplementation*/ src.GetImplementedInterfaceMethods().Some() =>
+            Accessibility.Private when /*src.MethodKind is MethodKind.ExplicitInterfaceImplementation*/ src.GetImplementedInterfaceMethods().Any() =>
                 //
                 // Since NET6_0 interfaces may have satic abstract members:
                 // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
@@ -30,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
                 // We treat such members private
                 //
 
-                src.IsStatic && src.TypeArguments.Some()
+                src.IsStatic && src.TypeArguments.Any()
                     ? AccessModifiers.Private
                     : AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
@@ -43,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
             ? Array.Empty<INamedTypeSymbol>()
             : src
                 .GetImplementedInterfaceMethods()
-                .Convert(static m => m.ContainingType);
+                .Select(static m => m.ContainingType);
 
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
@@ -88,9 +89,9 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // why not bitmask?
-                src = src.GetImplementedInterfaceMethods().Single()!;
+                src = src.GetImplementedInterfaceMethods().Single();
 
-            return SpecialMethods.Some(mk => mk == src.MethodKind) ||
+            return SpecialMethods.Any(mk => mk == src.MethodKind) ||
                 //
                 // Starting from C# 11 interfaces may have static abstract methods.
                 //
@@ -108,16 +109,16 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Conversion // explicit, implicit
         };
 
-        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Some(mk => mk == src.MethodKind);
+        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Any(mk => mk == src.MethodKind);
 
         public static bool IsFinal(this IMethodSymbol src) => 
             src.IsSealed ||
 
             //
-            // The compiler makes method sealed virtual if it implements some insterface method.
+            // The compiler makes method sealed virtual if it implements some interface method.
             //
 
-            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Some());
+            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Any());
 
         //
         // OverriddenMethod won't work in case of "new" override.
@@ -131,7 +132,7 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach(INamedTypeSymbol baseType in src.ContainingType.GetBaseTypes())
             {
-                IMethodSymbol? baseMethod = GetBaseMethods(baseType).Single(throwOnEmpty: false);
+                IMethodSymbol? baseMethod = GetBaseMethods(baseType).SingleOrDefault();
                 if (baseMethod is not null)
                     return baseMethod;
             }

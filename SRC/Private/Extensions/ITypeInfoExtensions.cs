@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -164,8 +165,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsAccessibleFrom(this ITypeInfo src, ITypeInfo type) =>
             type.EqualsTo(src) ||
-            type.Interfaces.Some(iface => iface.EqualsTo(src)) ||
-            type.GetBaseTypes().Some(baseType => baseType.EqualsTo(src));
+            type.Interfaces.Any(iface => iface.EqualsTo(src)) ||
+            type.GetBaseTypes().Any(baseType => baseType.EqualsTo(src));
 
         public static ITypeSymbol ToSymbol(this ITypeInfo src, Compilation compilation)
         {
@@ -179,7 +180,7 @@ namespace Solti.Utils.Proxy.Internals
                     .EnclosingType
                     .ToSymbol(compilation)
                     .GetTypeMembers(src.Name, arity)
-                    .Single()!;
+                    .Single();
             }
             else
             {
@@ -211,7 +212,7 @@ namespace Solti.Utils.Proxy.Internals
                     //
 
                     ex.Data["containingAsm"] = src.DeclaringAssembly?.Name;
-                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Convert(static @ref => @ref.Display));
+                    ex.Data["references"] = string.Join($",{Environment.NewLine}", compilation.References.Select(static @ref => @ref.Display));
 
                     throw ex;
                 }
@@ -221,7 +222,8 @@ namespace Solti.Utils.Proxy.Internals
             {
                 ITypeSymbol[] gaSymbols = generic
                     .GenericArguments
-                    .ConvertAr(ga => ToSymbol(ga, compilation));
+                    .Select(ga => ToSymbol(ga, compilation))
+                    .ToArray();
 
                 return symbol.Construct(gaSymbols);
             }
@@ -251,7 +253,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 ReadGenericArguments(src, gas);
 
-                return queried.MakeGenericType(gas.ConvertAr(static ga => ga));
+                return queried.MakeGenericType(gas.ToArray());
 
                 static void ReadGenericArguments(ITypeInfo src, IList<Type> gas)
                 {

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -116,7 +117,7 @@ namespace Solti.Utils.Proxy.Internals
                     accessContext,
                     ResolveIdentifierName
                     (
-                        (FieldDeclarationSyntax) ((ClassDeclarationSyntax) methodCtx).Members.Single()!
+                        (FieldDeclarationSyntax) ((ClassDeclarationSyntax) methodCtx).Members.Single()
                     )
                 );
 
@@ -192,7 +193,7 @@ namespace Solti.Utils.Proxy.Internals
             int i = 0;
             foreach (IParameterInfo param in method.Parameters)
             {
-                if (ByRefs.Some(x => x == param.Kind))
+                if (ByRefs.Any(x => x == param.Kind))
                 {
                     yield return ExpressionStatement
                     (
@@ -244,7 +245,7 @@ namespace Solti.Utils.Proxy.Internals
             int i = 0;
             foreach (IParameterInfo param in method.Parameters)
             {
-                if (ByRefs.Some(x => x == param.Kind))
+                if (ByRefs.Any(x => x == param.Kind))
                 {
                     yield return ExpressionStatement
                     (
@@ -312,7 +313,7 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target: IdentifierName(target.Identifier),
                 castTargetTo: method.DeclaringType,
-                arguments: locals.ConvertAr(ResolveArgument)
+                arguments: locals.Select(ResolveArgument).ToArray()
             );
 
             IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method, args, locals);

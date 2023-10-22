@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -134,11 +135,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             if (skipSpecial)
-                methods = methods.Convert
-                (
-                    static m => m,
-                    static m => m.IsSpecial()
-                );
+                methods = methods.Where(static m => !m.IsSpecial());
 
             return methods;
         }
@@ -337,7 +334,7 @@ namespace Solti.Utils.Proxy.Internals
                     // GetGenericArguments() may return empty array if "parent" is not generic
                     //
 
-                    if (parent.GetGenericArguments().Some(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))
+                    if (parent.GetGenericArguments().Any(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))
                     {
                         own = false;
                         break;
@@ -396,7 +393,7 @@ namespace Solti.Utils.Proxy.Internals
             #if NETSTANDARD2_1_OR_GREATER
                 src.IsByRefLike ||
             #endif
-                src.GetCustomAttributes().Some(static ca => ca.GetType().FullName?.Equals("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.OrdinalIgnoreCase) is true) => RefType.Ref, // ref struct
+                src.GetCustomAttributes().Any(static ca => ca.GetType().FullName?.Equals("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.OrdinalIgnoreCase) is true) => RefType.Ref, // ref struct
             _ when src.IsPointer => RefType.Pointer,
             _ when src.IsArray => RefType.Array,
             _ => RefType.None

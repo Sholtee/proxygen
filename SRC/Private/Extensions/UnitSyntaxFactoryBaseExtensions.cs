@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -59,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
                                     src
                                         .ReferenceCollector
                                         .References
-                                        .Convert(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
+                                        .Select(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
                                 ),
                                 cancellation: cancellation
                             );

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -43,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
             }
 
-            if (!aotGenerators.Some())
+            if (!aotGenerators.Any())
                 return;
 
             IConfigReader configReader = new AnalyzerConfigReader(configOptions);

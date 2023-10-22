@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -123,7 +124,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls.AddMembers
             (
-                ifaceProperty.Indices.Some()
+                ifaceProperty.Indices.Any()
                     ? ResolveIndexer
                     (
                         property: ifaceProperty,

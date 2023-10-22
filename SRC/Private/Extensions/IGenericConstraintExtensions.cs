@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Linq;
+
 namespace Solti.Utils.Proxy.Internals
 {
     internal static class IGenericConstraintExtensions
@@ -13,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
                 return false;
 
             foreach (ITypeInfo c1 in @this.ConstraintTypes)
-                if (!that.ConstraintTypes.Some(c1.EqualsTo))
+                if (!that.ConstraintTypes.Any(c1.EqualsTo))
                     return false;
 
             return 

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -88,7 +89,7 @@ namespace Solti.Utils.Proxy.Internals
                                         property,
                                         IdentifierName(target.Identifier),
                                         castTargetTo: property.DeclaringType,
-                                        indices: locals.Convert(ResolveArgument)
+                                        indices: locals.Select(ResolveArgument)
                                     )
                                 )
                             )
@@ -148,11 +149,9 @@ namespace Solti.Utils.Proxy.Internals
                                             property,
                                             IdentifierName(target.Identifier),
                                             castTargetTo: property.DeclaringType,
-                                            indices: locals.Convert
-                                            (
-                                                static (local, _) => ResolveArgument(local),
-                                                (_, i) => i == locals.Count - 1
-                                            )
+                                            indices: locals
+                                                .Take(locals.Count - 1)
+                                                .Select(ResolveArgument)
                                         ),
                                         right: ResolveIdentifierName(locals[locals.Count - 1])
                                     )
@@ -197,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
 
             members.Add
             (
-                property.Indices.Some() 
+                property.Indices.Any() 
                     ? ResolveIndexer(property, get, set, false)
                     : ResolveProperty(property, get, set, false)
             );

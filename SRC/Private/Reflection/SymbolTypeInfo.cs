@@ -5,6 +5,8 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
@@ -29,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             return typeSymbol switch
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-                INamedTypeSymbol named when named.TypeArguments.Some() /*ne IsGenericType legyen*/ => new SymbolGenericTypeInfo(named, compilation),
+                INamedTypeSymbol named when named.TypeArguments.Any() /*IsGenericType*/ => new SymbolGenericTypeInfo(named, compilation),
 
                 //
                 // NET6_0 workaround
@@ -103,7 +105,8 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .GetAllInterfaces()
-            .ConvertAr(ti => CreateFrom(ti, Compilation));
+            .Select(ti => CreateFrom(ti, Compilation))
+            .ToImmutableList();
 
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
@@ -113,22 +116,27 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
-            .ConvertAr(p => SymbolPropertyInfo.CreateFrom(p, Compilation));
+            .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
+            .ToImmutableList();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
-            .ConvertAr(evt => SymbolEventInfo.CreateFrom(evt, Compilation));
+            .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
+            .ToImmutableList();
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
-            .ConvertAr(m => SymbolMethodInfo.CreateFrom(m, Compilation), static m => !m.IsClassMethod());
+            .Where(IMethodSymbolExtensions.IsClassMethod)
+            .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
+            .ToImmutableList();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             .GetConstructors()
-            .ConvertAr(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation));
+            .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
+            .ToImmutableList();
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
@@ -201,7 +209,8 @@ namespace Solti.Utils.Proxy.Internals
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
-                .ConvertAr(ti => CreateFrom(ti, Compilation));
+                .Select(ti => CreateFrom(ti, Compilation))
+                .ToImmutableList();
 
             public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
 

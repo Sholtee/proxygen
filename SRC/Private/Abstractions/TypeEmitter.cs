@@ -5,7 +5,9 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -50,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
 
             ProxyUnitSyntaxFactory mainUnit = CreateMainUnit(asmName, referenceCollector);
 
-            string className = mainUnit.DefinedClasses.Single()!; // TODO: support multiple defined classes
+            string className = mainUnit.DefinedClasses.Single(); // FIXME: DefinedClasses may hold more than one item
 
             //
             // 1) Type already loaded (for e.g. in case of embedded types)
@@ -102,16 +104,15 @@ namespace Solti.Utils.Proxy.Internals
 
             using Stream asm = Compile.ToAssembly
             (
-                units.ConvertAr
-                (
-                    unit => unit.ResolveUnitAndDump(cancellation)
-                ),
+                units
+                    .Select(unit => unit.ResolveUnitAndDump(cancellation))
+                    .ToImmutableList(),
                 mainUnit.ContainingAssembly,
                 cacheFile,
-                referenceCollector.References.ConvertAr
-                (
-                    static asm => MetadataReference.CreateFromFile(asm.Location!)
-                ),
+                referenceCollector
+                    .References
+                    .Select(static asm => MetadataReference.CreateFromFile(asm.Location!))
+                    .ToImmutableList(),
                 customConfig: null,
                 cancellation
             );

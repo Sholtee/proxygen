@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             property, 
             target, 
             castTargetTo, 
-            property.Indices.Convert(param => Argument(IdentifierName(param.Name)))
+            property.Indices.Select(param => Argument(IdentifierName(param.Name)))
         );
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.Indices.Some()
+        protected ExpressionSyntax PropertyAccess(IPropertyInfo property, ExpressionSyntax? target, ITypeInfo? castTargetTo = null, IEnumerable<ArgumentSyntax>? indices = null) => !property.Indices.Any()
             ? MemberAccess
             (
                 target,
@@ -102,7 +103,7 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
                 );
 
-            return !accessors.Some() ? result : result.WithAccessorList
+            return !accessors.Any() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (
@@ -126,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals
         protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
         {
             Debug.Assert(property.DeclaringType.IsInterface);
-            Debug.Assert(property.Indices.Some());
+            Debug.Assert(property.Indices.Any());
 
             IndexerDeclarationSyntax result = IndexerDeclaration
             (
@@ -171,7 +172,7 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
                 );
 
-            return !accessors.Some() ? result : result.WithAccessorList
+            return !accessors.Any() ? result : result.WithAccessorList
             (
                 accessorList: AccessorList
                 (

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text.RegularExpressions;
@@ -35,11 +36,9 @@ namespace Solti.Utils.Proxy.Internals
             MethodInfo method = accessor
                 .Method
                 .GetInstructions()
-                .ConvertAr
-                (
-                    convert: static instruction => (MethodInfo) instruction.Operand,
-                    drop: static instruction => instruction.OpCode != OpCodes.Callvirt
-                )[callIndex];
+                .Where(static instruction => instruction.OpCode == OpCodes.Callvirt)
+                .Select(static instruction => (MethodInfo) instruction.Operand)
+                .ElementAt(callIndex);
 
             return new ExtendedMemberInfo
             (
@@ -68,11 +67,11 @@ namespace Solti.Utils.Proxy.Internals
                     {
                         "get" or "set" => declaringType
                             .GetProperties(bindingFlags)
-                            .Single(prop => prop.SetMethod == method || prop.GetMethod == method, throwOnEmpty: false)!,
+                            .SingleOrDefault(prop => prop.SetMethod == method || prop.GetMethod == method),
 
                         "add" or "remove" => declaringType
                             .GetEvents(bindingFlags)
-                            .Single(evt => evt.AddMethod == method || evt.RemoveMethod == method, throwOnEmpty: false)!,
+                            .SingleOrDefault(evt => evt.AddMethod == method || evt.RemoveMethod == method),
 
                         _ => null
                     };

@@ -3,8 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -56,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ArrayCreationExpressionSyntax ResolveArray(ITypeInfo elementType, params ExpressionSyntax[] elements) => ArrayCreationExpression
+        protected ArrayCreationExpressionSyntax ResolveArray(ITypeInfo elementType, IEnumerable<ExpressionSyntax> elements) => ArrayCreationExpression
         (
             type: ArrayType
             (
@@ -70,7 +71,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         SingletonSeparatedList
                         (
-                            elements.Some() ? OmittedArraySizeExpression() : (ExpressionSyntax) LiteralExpression
+                            elements.Any() ? OmittedArraySizeExpression() : (ExpressionSyntax) LiteralExpression
                             (
                                 SyntaxKind.NumericLiteralExpression,
                                 Literal(0)
@@ -79,7 +80,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 )
             ),
-            initializer: !elements.Some() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
+            initializer: !elements.Any() ? null : InitializerExpression(SyntaxKind.ArrayInitializerExpression).WithExpressions
             (
                 expressions: elements.ToSyntaxList()
             )
@@ -93,7 +94,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ArrayCreationExpressionSyntax ResolveArray<T>(params ExpressionSyntax[] elements) => ResolveArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
+        protected ArrayCreationExpressionSyntax ResolveArray<T>(IEnumerable<ExpressionSyntax> elements) => ResolveArray(MetadataTypeInfo.CreateFrom(typeof(T)), elements);
 
         /// <summary>
         /// <code>
@@ -114,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static IdentifierNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single()!.Identifier);
+        protected static IdentifierNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
         #if DEBUG
         internal
