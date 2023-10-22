@@ -10,6 +10,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -21,7 +22,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
 {
     using Attributes;
     using Properties;
+    using Primitives;
     using Proxy.Tests.EmbeddedTypes;
+    using Proxy.Tests;
 
     public interface IMyService { }
 
@@ -523,6 +526,68 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 .Invoke(null, null);
 
             Assert.That(generatedType.Assembly, Is.EqualTo(typeof(EmbeddedTypeExposer).Assembly));
+        }
+
+        public static IEnumerable<string> RandomInterfaces => RandomInterfaces<object>
+            .Values
+#if NET6_0_OR_GREATER
+            // ref return values not supported
+            .Except(new[] { typeof(ISpanFormattable) })
+#endif
+            .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
+
+        [TestCaseSource(nameof(RandomInterfaces))]
+        public void ProxyGeneration_AgainstRandomInterfaces(string iface)
+        {
+            Compilation compilation = CreateCompilation
+            (
+                @$"
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<{iface}, InterfaceInterceptor<{iface}>>))]
+
+                ",
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CreateDriver(null);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
+        }
+
+        public static IEnumerable<string> RandomInterfaces2 => RandomInterfaces<object>
+            .Values
+            // ambiguous match
+            .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2), typeof(IEnumerator<object>) })
+            .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
+
+        [TestCaseSource(nameof(RandomInterfaces2))]
+        public void DuckGeneration_AgainstRandomInterfaces(string iface)
+        {
+            Compilation compilation = CreateCompilation
+            (
+                @$"
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DuckGenerator<{iface}, {iface}>))]
+
+                ",
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CreateDriver(null);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
         }
     }
 }
