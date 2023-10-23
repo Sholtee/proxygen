@@ -15,22 +15,42 @@ namespace Solti.Utils.Proxy.Tests
         {
             get
             {
-                foreach (Type iface in typeof(object)
-                    .Assembly
-                    .GetExportedTypes()
-                    .Where(t => t.IsInterface))
+                foreach
+                (
+                    Type iface in typeof(object)
+                        .Assembly
+                        .GetExportedTypes()
+                        .Where(t => t.IsInterface)
+                )
                 {
-                    if (iface.ContainsGenericParameters)
+                    Type result = iface;
+
+                    if (result.ContainsGenericParameters)
                     {
-                        Type[] gas = iface.GetGenericArguments();
+                        Type[] gas = result.GetGenericArguments();
 
-                        if (!gas.Any(ga => ga.GetGenericParameterConstraints().Any()))
-                            yield return iface.MakeGenericType(Enumerable.Repeat(typeof(T), gas.Length).ToArray());
+                        if (gas.Any(ga => ga.GetGenericParameterConstraints().Any()))
+                            continue;
+#if NET8_0_OR_GREATER
+                        try
+#endif
+                        {
+                            result = result.MakeGenericType(Enumerable.Repeat(typeof(T), gas.Length).ToArray());
+                        }
+#if NET8_0_OR_GREATER
+                        //
+                        // GetGenericParameterConstraints() under .NET8.0 returns an empty array for some types having
+                        // self-referencing constraint (IClass<T> where T: IClass). Seems a .NET bug...
+                        //
 
-                        continue;
+                        catch (ArgumentException)
+                        {
+                            continue;
+                        }
+#endif
                     }
 
-                    yield return iface;
+                    yield return result;
                 }
             }
         }

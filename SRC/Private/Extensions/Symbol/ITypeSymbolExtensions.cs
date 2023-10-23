@@ -137,7 +137,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // Higher visibility has the precendence
+            // Higher visibility has the precedence
             //
 
             static IMethodSymbol GetUnderlyingMethod(IPropertySymbol prop)
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             //
-            // Higher visibility has the precendence
+            // Higher visibility has the precedence
             //
 
             static IMethodSymbol GetUnderlyingMethod(IEventSymbol evt)

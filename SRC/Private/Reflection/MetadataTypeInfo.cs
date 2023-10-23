@@ -24,6 +24,9 @@ namespace Solti.Utils.Proxy.Internals
                 underlyingType = underlyingType.GetElementType();
             }
 
+            if (underlyingType.IsFunctionPointer())
+                underlyingType = typeof(IntPtr);
+
             return underlyingType switch
             {
                 _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),

@@ -534,6 +534,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
             // ref return values not supported
             .Except(new[] { typeof(ISpanFormattable) })
 #endif
+#if NET8_0_OR_GREATER
+            // ref return values not supported
+            .Except(new[] { typeof(IUtf8SpanFormattable) })
+#endif
             .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
 
         [TestCaseSource(nameof(RandomInterfaces))]

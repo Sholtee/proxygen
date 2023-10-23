@@ -22,9 +22,9 @@ namespace Solti.Utils.Proxy.Internals
             Accessibility.ProtectedOrInternal => AccessModifiers.Protected | AccessModifiers.Internal,
             Accessibility.ProtectedAndInternal => AccessModifiers.Protected | AccessModifiers.Private,
             Accessibility.Public => AccessModifiers.Public,
-            Accessibility.Private when /*src.MethodKind is MethodKind.ExplicitInterfaceImplementation*/ src.GetImplementedInterfaceMethods().Any() =>
+            Accessibility.Private when src.GetImplementedInterfaceMethods().Any() =>
                 //
-                // Since NET6_0 interfaces may have satic abstract members:
+                // Since NET6_0 interfaces may have static abstract members:
                 // https://docs.microsoft.com/en-us/dotnet/core/compatibility/core-libraries/6.0/static-abstract-interface-methods
                 //
                 // It's undocumented but seems these members won't be present in IL if they are open generics.
@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
         {
             //
-            // As of C# 11 interfaces may have satic abstract methods... We don't deal with
+            // As of C# 11 interfaces may have static abstract methods... We don't deal with
             // the implementors.
             //
 
@@ -88,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsSpecial(this IMethodSymbol src) // slow
         {
-            if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation) // why not bitmask?
+            if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation && !src.ContainingType.IsInterface())
                 src = src.GetImplementedInterfaceMethods().Single();
 
             return SpecialMethods.Any(mk => mk == src.MethodKind) ||

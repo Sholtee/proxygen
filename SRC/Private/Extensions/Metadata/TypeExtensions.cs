@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
@@ -398,5 +399,24 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsArray => RefType.Array,
             _ => RefType.None
         };
+
+        //
+        // IsFunctionPointer is available in net8.0+ only
+        //
+
+        private static Func<Type, bool> GetIsFunctionPointerCore()
+        {
+            PropertyInfo? prop = typeof(Type).GetProperty("IsFunctionPointer");
+            ParameterExpression type = Expression.Parameter(typeof(Type), nameof(type));
+            return Expression.Lambda<Func<Type, bool>>
+            (
+                body: prop is null ? Expression.Constant(false) : Expression.Property(type, prop),
+                type
+            ).Compile();
+        }
+
+        private static readonly Func<Type, bool> FIsFunctionPointerCore = GetIsFunctionPointerCore();
+
+        public static bool IsFunctionPointer(this Type src) => FIsFunctionPointerCore(src);
     }
 }
