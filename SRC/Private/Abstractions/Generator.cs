@@ -45,6 +45,8 @@ namespace Solti.Utils.Proxy.Internals
 
         internal Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
         {
+            cancellation.ThrowIfCancellationRequested();
+
             GeneratorContext context = FContextCache.GetOrAdd(Id, static _ => new GeneratorContext());
             if (context.GeneratedType is not null)
                 return Task.FromResult(context.GeneratedType);
@@ -68,12 +70,18 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        internal async Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
+        internal Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
         {
-            if (FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
-                return activator;
+            cancellation.ThrowIfCancellationRequested();
 
-            return FActivatorCache[Id] = ProxyActivator.Create(await GetGeneratedTypeAsyncInternal(cancellation));
+            return FActivatorCache.TryGetValue(Id, out Func<object?, object> activator)
+                ? Task.FromResult(activator)
+                : Create();
+
+            async Task<Func<object?, object>> Create()
+            {
+                return FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsyncInternal(cancellation)));
+            }
         }
 
         #region Public
