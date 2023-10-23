@@ -16,10 +16,8 @@ namespace Solti.Utils.Proxy.Internals
         public AnalyzerConfigReader(AnalyzerConfigOptions configOptions) => ConfigOptions = configOptions;
 
         //
-        // Ugy tunik h a CompilerVisibleProperty (lasd ProxyGen.NET.targets) miatt ha az adott build property neve
-        // ismert a TryGetValue() mindenkepp igazzal ter vissza meg akkor is ha a tulajdonsag nincs definialva 
-        // sem -p kapcsoloval sem a csproj-ban.
-        // Ilyenkor az ertek ures karakterlanc lesz (ami a csproj mappajara mutat, az nekunk nyilvan nem jo).
+        // It seems due to the CompilerVisibleProperty (see ProxyGen.NET.targets) if the name of a particular build
+        // property is known, the TryGetValue() will return true even if the property is not defined.
         //
 
         private string? ReadValueInternal(string name) => ConfigOptions.TryGetValue($"build_property.{name}", out string? value) && !string.IsNullOrEmpty(value)

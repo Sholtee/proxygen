@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         //
         // Assembly.GetEntryAssembly() can be NULL in certain circumstances so
-        // use BaseDirecrtory instead
+        // use BaseDirectory instead
         //
 
         public string BasePath { get; } = AppDomain.CurrentDomain.BaseDirectory;

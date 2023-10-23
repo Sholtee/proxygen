@@ -18,7 +18,6 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class MemberInfoExtensions
     {
-
         private static readonly Regex
             //
             // The name of explicit implementation is in the form of "Namespace.Interface.Tag"

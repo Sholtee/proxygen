@@ -4,13 +4,11 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
     //
-    // Sajat comparer azert kell mert pl List<T> es IList<T> eseten typeof(List<T>).GetGenericArguments[0] != typeof(IList<T>).GetGenericArguments[0] 
-    // testzoleges "T"-re.
+    // Custom comparer required as (for instance) typeof(List<>).GetGenericArguments()[0] != typeof(IList<>).GetGenericArguments()[0]
     //
 
     internal sealed class ArgumentComparer : ComparerBase<ArgumentComparer, Type>
@@ -25,11 +23,9 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         //
-        // Generikus argumentumnak nincs teljes neve ezert a lenti sor jol kezeli a fenti
-        // problemat.
+        // Generic arguments don't have FullName
         //
 
-        [SuppressMessage("Globalization", "CA1307: Specify StringComparison", Justification = "Type names are not localized.")]
         public override int GetHashCode(Type obj) => (obj.FullName ?? obj.Name).GetHashCode();
     }
 }
