@@ -17,6 +17,7 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     public abstract class Generator : TypeEmitter
     {
+        #region Private
         private sealed class GeneratorContext
         {
             public Type? GeneratedType { get; set; }
@@ -38,12 +39,7 @@ namespace Solti.Utils.Proxy.Internals
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
 
-        /// <summary>
-        /// Creates a new <see cref="Generator"/> instance.
-        /// </summary>
-        protected Generator(object id) => Id = id;
-
-        internal Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
+        private Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
         {
             cancellation.ThrowIfCancellationRequested();
 
@@ -70,7 +66,7 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        internal Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
+        private Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
         {
             cancellation.ThrowIfCancellationRequested();
 
@@ -83,6 +79,12 @@ namespace Solti.Utils.Proxy.Internals
                 return FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsyncInternal(cancellation)));
             }
         }
+        #endregion
+
+        /// <summary>
+        /// Creates a new <see cref="Generator"/> instance.
+        /// </summary>
+        protected Generator(object id) => Id = id;
 
         #region Public
         /// <summary>
