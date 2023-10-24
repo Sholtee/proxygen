@@ -231,10 +231,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(m1.Name, m2.Name);
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
-#if !NETFRAMEWORK  // .NET Framework sometimes marks non-virtual methods as "final"
-                Assert.AreEqual(m1.IsFinal, m2.IsFinal);
-#endif
                 Assert.AreEqual(m1.IsStatic, m2.IsStatic);
+                Assert.AreEqual(m1.IsAbstract, m2.IsAbstract);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
 
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
@@ -261,6 +259,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(p1.Name, p2.Name);
                 Assert.AreEqual(p1.IsStatic, p2.IsStatic);
+                Assert.AreEqual(p1.IsAbstract, p2.IsAbstract);
 
                 AssertEqualsT(p1.Type, p2.Type);
                 AssertEqualsT(p1.DeclaringType, p2.DeclaringType);
@@ -279,6 +278,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(e1.Name, e2.Name);
                 Assert.AreEqual(e1.IsStatic, e2.IsStatic);
+                Assert.AreEqual(e1.IsAbstract, e2.IsAbstract);
 
                 AssertEqualsT(e1.Type, e2.Type);
                 AssertEqualsT(e1.DeclaringType, e2.DeclaringType);

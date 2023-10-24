@@ -226,6 +226,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             .Tests
             .RandomInterfaces<string>
             .Values
+#if NET8_0_OR_GREATER
+            .Except(new[] { typeof(IParsable<string>), typeof(ISpanParsable<string>) })
+#endif
 #if NET6_0_OR_GREATER
             .Where(t => !t.GetMethods(BindingFlags.Instance | BindingFlags.Public).Any(m => m.GetParameters().Any(p => p.ParameterType.IsByRefLike)))
 #endif

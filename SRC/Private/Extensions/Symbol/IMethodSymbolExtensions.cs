@@ -86,17 +86,12 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Conversion // explicit, implicit
         };
 
-        public static bool IsSpecial(this IMethodSymbol src) // slow
+        public static bool IsSpecial(this IMethodSymbol src)
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation && !src.ContainingType.IsInterface())
                 src = src.GetImplementedInterfaceMethods().Single();
 
-            return SpecialMethods.Any(mk => mk == src.MethodKind) ||
-                //
-                // Starting from C# 11 interfaces may have static abstract methods.
-                //
-
-                (src.IsStatic && src.IsAbstract);
+            return SpecialMethods.Any(mk => mk == src.MethodKind);
         }
 
         private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
@@ -110,15 +105,6 @@ namespace Solti.Utils.Proxy.Internals
         };
 
         public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Any(mk => mk == src.MethodKind);
-
-        public static bool IsFinal(this IMethodSymbol src) => 
-            src.IsSealed ||
-
-            //
-            // The compiler makes method sealed virtual if it implements some interface method.
-            //
-
-            (!src.IsVirtual && !src.IsAbstract && !src.IsOverride && src.GetImplementedInterfaceMethods(inspectOverrides: false).Any());
 
         //
         // OverriddenMethod won't work in case of "new" override.

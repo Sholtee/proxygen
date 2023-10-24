@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             return typeSymbol switch
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-                INamedTypeSymbol named when named.TypeArguments.Any() /*IsGenericType*/ => new SymbolGenericTypeInfo(named, compilation),
+                INamedTypeSymbol named when named.TypeArguments.Any() => new SymbolGenericTypeInfo(named, compilation),
 
                 //
                 // NET6_0 workaround

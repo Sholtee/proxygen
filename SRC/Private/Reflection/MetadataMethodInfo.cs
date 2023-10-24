@@ -48,11 +48,11 @@ namespace Solti.Utils.Proxy.Internals
 
             public bool IsStatic => UnderlyingMethod.IsStatic;
 
-            public bool IsSpecial => UnderlyingMethod.IsSpecial();
+            public bool IsSpecial => UnderlyingMethod.IsSpecialName;
+
+            public bool IsAbstract => UnderlyingMethod.IsAbstract;
 
             public AccessModifiers AccessModifiers => UnderlyingMethod.GetAccessModifiers();
-
-            public bool IsFinal => UnderlyingMethod.IsFinal();
 
             public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderlyingMethod.Equals(that.UnderlyingMethod);
 
@@ -99,10 +99,8 @@ namespace Solti.Utils.Proxy.Internals
 
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
             public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= !IsGenericDefinition
-                ? Array.Empty<IGenericConstraint>()
-                : ImmutableList
-                    .Create<IGenericConstraint>()
-                    .AddRange(GetConstraints());
+                ? ImmutableList.Create<IGenericConstraint>()
+                : GetConstraints().ToImmutableList();
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

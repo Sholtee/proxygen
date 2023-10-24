@@ -261,6 +261,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
             .Values
             .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) })
+#if NET8_0_OR_GREATER
+            .Except(new[] { typeof(IParsable<string>), typeof(ISpanParsable<string>) })
+#endif
 #if NETFRAMEWORK
             .Where(iface => !iface.Name.StartsWith("_"))
 #endif
@@ -277,5 +280,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void DuckGenerator_ShouldAssembleTheProxyOnce2() =>
             Assert.AreSame(DuckGenerator<IQueryable, IQueryable>.GetGeneratedType(), new DuckGenerator(typeof(IQueryable), typeof(IQueryable)).GetGeneratedType());
+
+#if NET8_0_OR_GREATER
+        [Test]
+        public void DuckGenerator_ShouldThrowInStaticAbstractMember() =>
+            Assert.Throws<NotSupportedException>(() => new DuckGenerator(typeof(IUtf8SpanParsable<int>), typeof(IUtf8SpanParsable<int>)).GetGeneratedType());
+#endif
     }
 }

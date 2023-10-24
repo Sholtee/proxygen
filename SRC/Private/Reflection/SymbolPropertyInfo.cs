@@ -42,6 +42,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 
+        public bool IsAbstract => (GetMethod ?? SetMethod!).IsAbstract;
+
         private SymbolPropertyInfo(IPropertySymbol prop, Compilation compilation)
         {
             UnderlyingSymbol = prop;

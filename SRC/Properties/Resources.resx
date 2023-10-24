@@ -120,6 +120,9 @@
   <data name="ABSTRACT_INTERCEPTOR" xml:space="preserve">
     <value>The interceptor can not be abstract.</value>
   </data>
+  <data name="ABSTRACT_STATIC_NOT_SUPPORTED" xml:space="preserve">
+    <value>Abstract-static interface members are not supported.</value>
+  </data>
   <data name="AMBIGUOUS_MATCH" xml:space="preserve">
     <value>Ambiguous match for member: {0}</value>
   </data>

@@ -27,6 +27,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsStatic => (AddMethod ?? RemoveMethod!).IsStatic;
 
+        public bool IsAbstract => (AddMethod ?? RemoveMethod!).IsAbstract;
+
         private MetadataEventInfo(EventInfo evt) => UnderlyingEvent = evt;
 
         public static IEventInfo CreateFrom(EventInfo evt) => new MetadataEventInfo(evt);

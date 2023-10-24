@@ -70,6 +70,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Abstract-static interface members are not supported..
+        /// </summary>
+        internal static string ABSTRACT_STATIC_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("ABSTRACT_STATIC_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ambiguous match for member: {0}.
         /// </summary>
         internal static string AMBIGUOUS_MATCH {

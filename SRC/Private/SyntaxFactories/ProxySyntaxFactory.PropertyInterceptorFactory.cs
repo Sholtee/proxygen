@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,6 +14,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ProxySyntaxFactory
     {
         #if DEBUG
@@ -24,6 +27,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (AlreadyImplemented(prop))
                     continue;
+
+                //
+                // Starting from .NET7.0 interfaces may have abstract static members
+                //
+
+                if (prop.IsAbstract && prop.IsStatic)
+                    throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
                 cls = ResolveProperty(cls, context, prop);
             }

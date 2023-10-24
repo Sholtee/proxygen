@@ -26,14 +26,21 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
             {
                 //
-                // Starting from .NET Core 5.0 interfacce methods may have visibility
+                // Starting from .NET Core 5.0 interface methods may have visibility
                 //
 
                 if (AlreadyImplemented(ifaceMethod) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
 
                 //
-                // "ref" visszateres nem tamogatott.
+                // Starting from .NET7.0 interfaces may have abstract static members
+                //
+
+                if (ifaceMethod.IsAbstract && ifaceMethod.IsStatic)
+                    throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
+
+                //
+                // "ref return" not supported
                 //
 
                 if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)

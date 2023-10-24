@@ -29,19 +29,6 @@ namespace Solti.Utils.Proxy.Internals
             #pragma warning restore CA2201
         };
 
-        public static bool IsSpecial(this MethodBase src) =>
-            src.IsSpecialName ||
-
-            //
-            // Starting from C# 11 interfaces may have static abstract methods.
-            //
-
-            (src.IsStatic && src.IsAbstract);
-
-        public static bool IsFinal(this MethodBase src) =>
-            src.IsFinal ||
-            src.GetAccessModifiers() is AccessModifiers.Explicit;
-
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface
             ? Array.Empty<Type>()
             : src

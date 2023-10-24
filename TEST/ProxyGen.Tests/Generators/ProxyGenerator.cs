@@ -386,7 +386,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperEventInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperEventInfo_ClassTarget()
         {
             IEventSource proxy = await ProxyGenerator<IEventSource, InterceptorPersistingContext<IEventSource, EventSource>>.ActivateAsync(Tuple.Create(new EventSource()));
 
@@ -589,6 +589,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
             .Values
+#if NET8_0_OR_GREATER
+            .Except(new[] { typeof(IParsable<string>), typeof(ISpanParsable<string>) })
+#endif
 #if NET5_0_OR_GREATER
             .Where(iface => !iface
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public)

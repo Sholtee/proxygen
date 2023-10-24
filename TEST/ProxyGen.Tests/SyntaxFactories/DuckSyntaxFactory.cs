@@ -155,7 +155,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveProperty_ShouldThrowOnAmbiguousImplementation() =>
             Assert.Throws<AmbiguousMatchException>(() => CreateGenerator<IList<int>, List<int>>().ResolveProperties(GetDummyClass(), default));
 
-        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>.Values.Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
+        public static IEnumerable<Type> RandomInterfaces => Proxy.Tests.RandomInterfaces<string>
+            .Values
+#if NET8_0_OR_GREATER
+            .Except(new[] { typeof(IParsable<string>), typeof(ISpanParsable<string>) })
+#endif
+            .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2) });
 
         [Test]
         public void ResolveUnit_ShouldReturnTheSameValidSourceInCaseOfSymbolAndMetadata([ValueSource(nameof(RandomInterfaces))] Type type, [Values(OutputType.Module, OutputType.Unit)] int outputType)

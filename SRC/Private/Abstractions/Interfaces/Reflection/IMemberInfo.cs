@@ -9,5 +9,6 @@ namespace Solti.Utils.Proxy.Internals
     {
         ITypeInfo DeclaringType { get; }
         bool IsStatic { get; }
+        bool IsAbstract { get; }
     }
 }

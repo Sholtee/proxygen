@@ -136,7 +136,7 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             if (skipSpecial)
-                methods = methods.Where(static m => !m.IsSpecial());
+                methods = methods.Where(static m => !m.IsSpecialName);
 
             return methods;
         }

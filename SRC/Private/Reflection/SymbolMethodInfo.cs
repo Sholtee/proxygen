@@ -49,6 +49,8 @@ namespace Solti.Utils.Proxy.Internals
         private bool? FIsSpecial;
         public bool IsSpecial => FIsSpecial ??= UnderlyingSymbol.IsSpecial();
 
+        public bool IsAbstract => UnderlyingSymbol.IsAbstract;
+
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
         private ITypeInfo? FDeclaringType;
@@ -63,8 +65,6 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsStatic => UnderlyingSymbol.IsStatic;
 
         public string Name => UnderlyingSymbol.StrippedName();
-
-        public bool IsFinal => UnderlyingSymbol.IsFinal();
 
         public override bool Equals(object obj) => obj is SymbolMethodInfo that && SymbolEqualityComparer.Default.Equals(that.UnderlyingSymbol, UnderlyingSymbol);
 
@@ -102,10 +102,8 @@ namespace Solti.Utils.Proxy.Internals
 
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
             public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= !IsGenericDefinition
-                ? Array.Empty<IGenericConstraint>()
-                : ImmutableList
-                    .Create<IGenericConstraint>()
-                    .AddRange(GetConstraints());
+                ? ImmutableList.Create<IGenericConstraint>()
+                : GetConstraints().ToImmutableList();
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
         }

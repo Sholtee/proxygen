@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo targetType, 
             string? containingAssembly,
             OutputType outputType,
-            IAssemblyInfo proxygenAsm,
+            IAssemblyInfo proxyGenAsm,
             ReferenceCollector? referenceCollector = null,
             LanguageVersion languageVersion = LanguageVersion.Latest
             ): base(outputType, containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}", referenceCollector, languageVersion) 
@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
             // We don't know if BaseType should be backed by either Symbol or Metadata.
             //
 
-            BaseType = ((IGenericTypeInfo) proxygenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
+            BaseType = ((IGenericTypeInfo) proxyGenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
             Target = BaseType
                 .Properties
                 .Single(static prop => prop.Name == nameof(DuckBase<object>.Target));
@@ -81,6 +81,13 @@ namespace Solti.Utils.Proxy.Internals
 
         protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
+            //
+            // Starting from .NET7.0 interfaces may have abstract static members
+            //
+
+            if (ifaceMember.IsAbstract && ifaceMember.IsStatic)
+                throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
+
             TMember[] possibleTargets = targetMembers
               .Where(targetMember => signatureEquals(targetMember, ifaceMember))
               .ToArray();
