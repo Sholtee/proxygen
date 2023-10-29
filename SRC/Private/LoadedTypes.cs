@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
@@ -13,14 +12,15 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Contains the loaded proxy <see cref="Type"/>s
     /// </summary>
-    public static class LoadedTypes
+    public static class LoadedTypes  // this class is referenced by the generated proxies so it must be public
     {
         private static readonly ConcurrentDictionary<string, Type> FStore = new();
 
         /// <summary>
-        /// The values.
+        /// Tries to grab the proxy <see cref="Type"/> by its name.
         /// </summary>
-        public static IReadOnlyDictionary<string, Type> Values => FStore;
+        public static bool TryGet(string name, out Type type) =>
+            FStore.TryGetValue(name ?? throw new ArgumentNullException(nameof(name)), out type);
 
         /// <summary>
         /// Registers a new <see cref="Type"/>

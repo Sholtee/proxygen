@@ -1,3 +1,4 @@
 Solti.Utils.Proxy.Internals.Generator.Generator(object! id) -> void
 Solti.Utils.Proxy.Internals.Generator.Id.get -> object!
 Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter() -> void
+static Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(string! name, out System.Type! type) -> bool

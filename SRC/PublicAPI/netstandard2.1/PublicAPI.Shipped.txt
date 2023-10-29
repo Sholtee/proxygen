@@ -56,5 +56,4 @@ static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGenerat
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Instance.get -> Solti.Utils.Proxy.Internals.Generator!
 static Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Value.get -> System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>!
 static Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type! instance) -> void
-static Solti.Utils.Proxy.Internals.LoadedTypes.Values.get -> System.Collections.Generic.IReadOnlyDictionary<string!, System.Type!>!
 virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InvocationContext! context) -> object?
