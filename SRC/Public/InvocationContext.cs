@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy
     public class InvocationContext : MethodContext
     {
 #if DEBUG
-        internal InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, null)
+        internal InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, 0, null)
             => Args = args ?? throw new ArgumentNullException(nameof(args));
 #endif
         /// <summary>

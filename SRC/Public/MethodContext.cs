@@ -22,13 +22,11 @@ namespace Solti.Utils.Proxy
         /// </summary>
         /// <remarks>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</remarks>
         #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public MethodContext(Func<object, object?[], object?> dispatch, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
+        public MethodContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
         #pragma warning restore CS8618
         {
-            if (dispatch is null)
-                throw new ArgumentNullException(nameof(dispatch));
-
-            ExtendedMemberInfo ifaceMember = MemberInfoExtensions.ExtractFrom(dispatch);
+            ExtendedMemberInfo ifaceMember = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
+            Debug.Assert(ifaceMember.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
 
             InterfaceMember = ifaceMember.Member;
             InterfaceMethod = ifaceMember.Method;
@@ -43,13 +41,9 @@ namespace Solti.Utils.Proxy
 
                     TargetMethod = targetmethod;
                     TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
+                    return;
                 }
-                else
-                    //
-                    // Leave TargetXxX set to NULL instead of throwing as this method is being called in initializers.
-                    // 
-
-                    Trace.TraceWarning($"Cannot get target method for: {InterfaceMethod}");
+                Debug.Assert(false, $"Cannot get target method for: {InterfaceMethod}");
             }
             else
             {

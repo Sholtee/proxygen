@@ -46,7 +46,6 @@ Solti.Utils.Proxy.MethodContext.Dispatch.get -> System.Func<object!, object?[]!,
 Solti.Utils.Proxy.MethodContext.InterfaceMember.get -> System.Reflection.MemberInfo!
 Solti.Utils.Proxy.MethodContext.InterfaceMethod.get -> System.Reflection.MethodInfo!
 Solti.Utils.Proxy.MethodContext.MethodContext(Solti.Utils.Proxy.MethodContext! src) -> void
-Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<object!, object?[]!, object?>! dispatch, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>? mappings) -> void
 Solti.Utils.Proxy.MethodContext.TargetMethod.get -> System.Reflection.MethodInfo!
 Solti.Utils.Proxy.MethodContext.TargetMember.get -> System.Reflection.MemberInfo!
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate(System.Runtime.CompilerServices.ITuple? tuple) -> TInterface

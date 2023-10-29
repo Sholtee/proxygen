@@ -46,13 +46,13 @@ namespace Solti.Utils.Proxy.Internals
         /// private static readonly MethodContext FxXx = new MethodContext(static (ITarget target, object[] args) =>  
         /// {                                                                                                 
         ///     return target.Prop;                                                                           
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                          
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                          
         /// private static readonly MethodContext FyYy = new MethodContext(static (ITarget target, object[] args) =>  
         /// {                                                                                                
         ///     TValue _value = (TValue) args[0];                                                             
         ///     target.Prop = _value;                                                                         
         ///     return null;                                                                                   
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                            
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                            
         /// TResult IInterface.Prop                                                                          
         /// {                                                                                                 
         ///     get                                                                                            
@@ -73,6 +73,12 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property)
         {
+            //
+            // For now, we only have call-index of 0
+            //
+
+            const int CALL_INDEX = 0;
+
             List<MemberDeclarationSyntax> members = new();
 
             BlockSyntax?
@@ -105,7 +111,8 @@ namespace Solti.Utils.Proxy.Internals
                             )
 
                         )
-                    )
+                    ),
+                    CALL_INDEX
                 );
                 members.Add(getCtx);
 
@@ -172,7 +179,8 @@ namespace Solti.Utils.Proxy.Internals
                                 ReturnNull()
                             );
                         }
-                    )
+                    ),
+                    CALL_INDEX
                 );
                 members.Add(setCtx);
 

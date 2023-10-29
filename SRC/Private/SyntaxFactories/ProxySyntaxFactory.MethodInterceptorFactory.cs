@@ -65,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     args[1] = (System.Object) cb_b;                                                                  
         ///     args[2] = (System.Object) cb_c;                                                                     
         ///     return result;                                                                                       
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                   
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                   
         ///                                                                                                          
         /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)            
         /// {                                                                                                     
@@ -84,16 +84,24 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method)
         {
+            //
+            // For now, we only have call-index of 0
+            //
+
+            const int CALL_INDEX = 0;
+
             MemberDeclarationSyntax methodCtx = method is IGenericMethodInfo genericMethod
                 ? ResolveMethodContext
                 (
                     ResolveInvokeTarget(method),
+                    CALL_INDEX,
                     genericMethod.GenericArguments,
                     genericMethod.GenericConstraints
                 )
                 : ResolveMethodContext
                 (
-                    ResolveInvokeTarget(method)
+                    ResolveInvokeTarget(method),
+                    CALL_INDEX
                 );
 
             return cls.AddMembers

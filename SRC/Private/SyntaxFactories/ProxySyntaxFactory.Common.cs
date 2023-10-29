@@ -300,7 +300,7 @@ namespace Solti.Utils.Proxy.Internals
         ///     System.String cb_b;                                                                     
         ///     TT cb_c = (TT) args[2];                                                                    
         ///     ...                                                                                    
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);
         /// </code>
         /// </summary>
         #if DEBUG
@@ -308,12 +308,20 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda) => ResolveStaticGlobal<MethodContext>
+        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<MethodContext>
         (
             $"F{lambda.GetMD5HashCode()}",
             ResolveObject<MethodContext>
             (
                 Argument(lambda),
+                Argument
+                (
+                    LiteralExpression
+                    (
+                        SyntaxKind.NumericLiteralExpression,
+                        Literal(callIndex)
+                    )
+                ),
                 Argument
                 (
                     ResolveInterfaceMap()
@@ -331,7 +339,7 @@ namespace Solti.Utils.Proxy.Internals
         ///         System.String cb_b;                                                                      
         ///         T1 cb_c = (T1) args[2];                                                                 
         ///         ...                                                                                     
-        ///     }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                
+        ///     }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                
         /// }
         /// </code>
         /// </summary>
@@ -340,7 +348,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, IEnumerable<ITypeInfo> genericArguments, IEnumerable<IGenericConstraint> constraints)
+        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex, IEnumerable<ITypeInfo> genericArguments, IEnumerable<IGenericConstraint> constraints)
         {
             return ClassDeclaration
             (
@@ -396,6 +404,14 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveObject<MethodContext>
                     (
                         Argument(lambda),
+                        Argument
+                        (
+                            LiteralExpression
+                            (
+                                SyntaxKind.NumericLiteralExpression,
+                                Literal(callIndex)
+                            )
+                        ),
                         Argument
                         (
                             ResolveInterfaceMap()

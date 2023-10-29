@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Cached interface mappings. Intended for private use only.
     /// </summary>
-    public static class InterfaceMap<TInterface, TImplementation>
+    public static class InterfaceMap<TInterface, TImplementation> // this class is referenced by the generated proxies so it must be public
         where TInterface: class
         where TImplementation: TInterface
     {

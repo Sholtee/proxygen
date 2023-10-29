@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
         //
 
-        public static ExtendedMemberInfo ExtractFrom(Delegate accessor, int callIndex = 0)
+        public static ExtendedMemberInfo ExtractFrom(Delegate accessor, int callIndex)
         {
             MethodInfo method = accessor
                 .Method

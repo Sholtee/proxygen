@@ -47,13 +47,13 @@ namespace Solti.Utils.Proxy.Internals
         ///     EventType _value = (EventType) args[0];                                                      
         ///     Target.Event += _value;                                                                      
         ///     return null;                                                                                  
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                              
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                              
         /// private static readonly MethodContext FYyY = new MethodContext((ITarget target, object[] args) => 
         /// {                                                                                                 
         ///     EventType _value = (EventType) args[0];                                                      
         ///     Target.Event -= _value;                                                                       
         ///     return null;                                                                                 
-        /// }, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                             
+        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                             
         /// event EventType IInterface.Event                                                                  
         /// {                                                                                                 
         ///     add                                                                                          
@@ -69,11 +69,17 @@ namespace Solti.Utils.Proxy.Internals
         /// }
         /// </code>
         /// </summary>
-#if DEBUG
+        #if DEBUG
         internal
-#endif
+        #endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt)
         {
+            //
+            // For now, we only have call-index of 0
+            //
+
+            const int CALL_INDEX = 0;
+
             List<MemberDeclarationSyntax> members = new();
 
             BlockSyntax?
@@ -141,7 +147,8 @@ namespace Solti.Utils.Proxy.Internals
                             ReturnNull()
                         );
                     }
-                )
+                ),
+                CALL_INDEX
             );
 
             IEnumerable<StatementSyntax> BuildBody(bool add, IMethodInfo method, FieldDeclarationSyntax fld)
