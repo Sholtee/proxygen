@@ -730,15 +730,15 @@ references:
   commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(Solti.Utils.Proxy.MethodContext)
   fullName: Solti.Utils.Proxy.MethodContext.MethodContext(Solti.Utils.Proxy.MethodContext)
   nameWithType: MethodContext.MethodContext(MethodContext)
-- uid: Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
-  name: MethodContext(Func<Object, Object[], Object>, IReadOnlyDictionary<MethodInfo, MethodInfo>)
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo__
-  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
-  name.vb: MethodContext(Func(Of Object, Object(), Object), IReadOnlyDictionary(Of MethodInfo, MethodInfo))
-  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<System.Object, System.Object[], System.Object>, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo, System.Reflection.MethodInfo>)
-  fullName.vb: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func(Of System.Object, System.Object(), System.Object), System.Collections.Generic.IReadOnlyDictionary(Of System.Reflection.MethodInfo, System.Reflection.MethodInfo))
-  nameWithType: MethodContext.MethodContext(Func<Object, Object[], Object>, IReadOnlyDictionary<MethodInfo, MethodInfo>)
-  nameWithType.vb: MethodContext.MethodContext(Func(Of Object, Object(), Object), IReadOnlyDictionary(Of MethodInfo, MethodInfo))
+- uid: Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
+  name: MethodContext(Func<Object, Object[], Object>, Int32, IReadOnlyDictionary<MethodInfo, MethodInfo>)
+  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Int32_System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo__
+  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
+  name.vb: MethodContext(Func(Of Object, Object(), Object), Int32, IReadOnlyDictionary(Of MethodInfo, MethodInfo))
+  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<System.Object, System.Object[], System.Object>, System.Int32, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo, System.Reflection.MethodInfo>)
+  fullName.vb: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func(Of System.Object, System.Object(), System.Object), System.Int32, System.Collections.Generic.IReadOnlyDictionary(Of System.Reflection.MethodInfo, System.Reflection.MethodInfo))
+  nameWithType: MethodContext.MethodContext(Func<Object, Object[], Object>, Int32, IReadOnlyDictionary<MethodInfo, MethodInfo>)
+  nameWithType.vb: MethodContext.MethodContext(Func(Of Object, Object(), Object), Int32, IReadOnlyDictionary(Of MethodInfo, MethodInfo))
 - uid: Solti.Utils.Proxy.MethodContext.#ctor*
   name: MethodContext
   href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_

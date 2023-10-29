@@ -86,13 +86,13 @@
     </tbody>
   </table>
   <a id="Solti_Utils_Proxy_MethodContext__ctor_" data-uid="Solti.Utils.Proxy.MethodContext.#ctor*"></a>
-  <h4 id="Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo__" data-uid="Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})">MethodContext(Func&lt;Object, Object[], Object&gt;, IReadOnlyDictionary&lt;MethodInfo, MethodInfo&gt;)</h4>
+  <h4 id="Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Int32_System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo__" data-uid="Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})">MethodContext(Func&lt;Object, Object[], Object&gt;, Int32, IReadOnlyDictionary&lt;MethodInfo, MethodInfo&gt;)</h4>
   <div class="markdown level1 summary"><p>Creates a new <a class="xref" href="Solti.Utils.Proxy.MethodContext.html">MethodContext</a> instance.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public MethodContext(Func&lt;object, object[], object&gt; dispatch, IReadOnlyDictionary&lt;MethodInfo, MethodInfo&gt; mappings)</code></pre>
+    <pre><code class="lang-csharp hljs">public MethodContext(Func&lt;object, object[], object&gt; dispatch, int callIndex, IReadOnlyDictionary&lt;MethodInfo, MethodInfo&gt; mappings)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -110,13 +110,18 @@
         <td></td>
       </tr>
       <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">Int32</a></td>
+        <td><span class="parametername">callIndex</span></td>
+        <td></td>
+      </tr>
+      <tr>
         <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlydictionary-2">IReadOnlyDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.reflection.methodinfo">MethodInfo</a>&gt;</td>
         <td><span class="parametername">mappings</span></td>
         <td></td>
       </tr>
     </tbody>
   </table>
-  <h5 id="Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo___remarks">Remarks</h5>
+  <h5 id="Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Int32_System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo___remarks">Remarks</h5>
   <div class="markdown level1 remarks"><p>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</p>
 </div>
   <h3 id="properties">Properties
