@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
             src.ResolveUnitAndDump(cancellation)
         );
 
-        public static string GetHint(this UnitSyntaxFactoryBase src) => $"{src.DefinedClasses.Single()}.cs";
+        public static string GetHint(this UnitSyntaxFactoryBase src) => $"{src.ExposedClass}.cs";
 
         public static CompilationUnitSyntax ResolveUnitAndDump(this UnitSyntaxFactoryBase src, CancellationToken cancellation) 
         {

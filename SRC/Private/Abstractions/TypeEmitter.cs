@@ -52,13 +52,11 @@ namespace Solti.Utils.Proxy.Internals
 
             ProxyUnitSyntaxFactory mainUnit = CreateMainUnit(asmName, referenceCollector);
 
-            string className = mainUnit.DefinedClasses.Single(); // FIXME: DefinedClasses may hold more than one item
-
             //
             // 1) Type already loaded (for e.g. in case of embedded types)
             //
 
-            Type? type = GetInstanceFromCache(className, throwOnMissing: false);
+            Type? type = GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: false);
             if (type is not null)
                 return type;
 
@@ -79,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
                         Assembly.LoadFile(cacheFile)
                     );
 
-                    return GetInstanceFromCache(className, throwOnMissing: true)!;
+                    return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
                 }
 
                 //
@@ -122,7 +120,7 @@ namespace Solti.Utils.Proxy.Internals
                 Assembly.Load(asm.ToArray())
             );
 
-            return GetInstanceFromCache(className, throwOnMissing: true)!;
+            return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
         }
 #if DEBUG
         internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;

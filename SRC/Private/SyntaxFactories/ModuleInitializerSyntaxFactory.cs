@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
         {
         }
 
-        public override IReadOnlyCollection<string> DefinedClasses { get; } = new string[] { nameof(ModuleInitializerAttribute) };
+        public override string ExposedClass { get; } = nameof(ModuleInitializerAttribute);
 
         #if DEBUG
         internal

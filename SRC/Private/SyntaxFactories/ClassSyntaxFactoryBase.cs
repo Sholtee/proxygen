@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -56,6 +57,9 @@ namespace Solti.Utils.Proxy.Internals
             return ResolveMembers(cls, context, cancellation);
         }
 
+        #if DEBUG
+        internal
+        #endif
         protected virtual IEnumerable<Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>> MemberResolvers
         {
             get
@@ -70,15 +74,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation)
+        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => MemberResolvers.Aggregate(cls, (cls, resolver) =>
         {
-            foreach (Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax> resolver in MemberResolvers)
-            {
-                cancellation.ThrowIfCancellationRequested();
-                cls = resolver(cls, context);
-            }
-            return cls;
-        }
+            cancellation.ThrowIfCancellationRequested();
+            return resolver(cls, context);
+        });
 
         #if DEBUG
         internal

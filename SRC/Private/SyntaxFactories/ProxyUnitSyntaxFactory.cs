@@ -22,11 +22,11 @@ namespace Solti.Utils.Proxy.Internals
         // Proxy egyseg mindig csak egy osztalyt definial
         //
 
-        public override IReadOnlyCollection<string> DefinedClasses => new string[]
-        {
-            ResolveClassName(null!)
-        };
+        public override string ExposedClass => ResolveClassName(null!);
 
+        #if DEBUG
+        internal
+        #endif
         protected override IEnumerable<Func<ClassDeclarationSyntax, object, ClassDeclarationSyntax>> MemberResolvers
         {
             get

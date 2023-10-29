@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public OutputType OutputType { get; }
 
-        public abstract IReadOnlyCollection<string> DefinedClasses { get; }
+        public abstract string ExposedClass { get; }
 
         public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
