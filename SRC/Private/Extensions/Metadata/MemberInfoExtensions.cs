@@ -4,6 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -23,8 +25,7 @@ namespace Solti.Utils.Proxy.Internals
             // The name of explicit implementation is in the form of "Namespace.Interface.Tag"
             //
 
-            FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline),
-            FGetPrefix = new("^(get|set|add|remove)_", RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            FStripper = new("([\\w]+)$", RegexOptions.Compiled | RegexOptions.Singleline);
 
         //
         // Can't extract setters from expressions: https://docs.microsoft.com/en-us/dotnet/csharp/misc/cs0832
@@ -46,41 +47,49 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<MethodInfo, MemberInfo>> FMethodMemberBindings = new();
+
         public static MemberInfo ExtractFrom(MethodInfo method)
         {
-            Type declaringType = method.DeclaringType;
-
-            BindingFlags bindingFlags = declaringType.IsInterface
-                ? BindingFlags.Instance | BindingFlags.Public
-                : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
-
-            MemberInfo? member = null;
-
             if (method.IsSpecialName)
             {
-                Match prefix = FGetPrefix.Match(method.StrippedName());
-
-                if (prefix.Success && prefix.Groups.Count > 1)
+                IReadOnlyDictionary<MethodInfo, MemberInfo> bindings = FMethodMemberBindings.GetOrAdd(method.DeclaringType, static t =>
                 {
-                    member = prefix.Groups[1].Value.ToLower() switch
+                    BindingFlags flags = t.IsInterface
+                        ? BindingFlags.Instance | BindingFlags.Public
+                        : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
+
+                    Dictionary<MethodInfo, MemberInfo> bindings = new();
+
+                    foreach (MemberInfo member in t.GetMembers(flags))
                     {
-                        "get" or "set" => declaringType
-                            .GetProperties(bindingFlags)
-                            .SingleOrDefault(prop => prop.SetMethod == method || prop.GetMethod == method),
+                        switch (member)
+                        {
+                            case PropertyInfo prop:
+                                if (prop.GetMethod is not null)
+                                    bindings.Add(prop.GetMethod, member);
+                                if (prop.SetMethod is not null)
+                                    bindings.Add(prop.SetMethod, member);
+                                break;
+                            case EventInfo evt:
+                                if (evt.AddMethod is not null)
+                                    bindings.Add(evt.AddMethod, member);
+                                if (evt.RemoveMethod is not null)
+                                    bindings.Add(evt.RemoveMethod, member);
+                                break;
+                        }
+                    }
 
-                        "add" or "remove" => declaringType
-                            .GetEvents(bindingFlags)
-                            .SingleOrDefault(evt => evt.AddMethod == method || evt.RemoveMethod == method),
+                    return bindings;
+                });
 
-                        _ => null
-                    };
-                }
+                if (bindings.TryGetValue(method, out MemberInfo member))
+                    return member;
 
-                if (member is null)
-                    Trace.TraceWarning($"Unsupported special method: {method}");
+                Debug.Assert(false, $"Member could not be determined for method: {method}");
             }
 
-            return member ?? method;
+            return method;
         }
 
         public static string StrippedName(this MemberInfo self) => FStripper.Match(self.Name).Value;
