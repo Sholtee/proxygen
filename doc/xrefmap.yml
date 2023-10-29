@@ -627,18 +627,21 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.LoadedTypes.Register
   fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Register
   nameWithType: LoadedTypes.Register
-- uid: Solti.Utils.Proxy.Internals.LoadedTypes.Values
-  name: Values
-  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_Values
-  commentId: P:Solti.Utils.Proxy.Internals.LoadedTypes.Values
-  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Values
-  nameWithType: LoadedTypes.Values
-- uid: Solti.Utils.Proxy.Internals.LoadedTypes.Values*
-  name: Values
-  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_Values_
-  commentId: Overload:Solti.Utils.Proxy.Internals.LoadedTypes.Values
-  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Values
-  nameWithType: LoadedTypes.Values
+- uid: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String,System.Type@)
+  name: TryGet(String, out Type)
+  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_TryGet_System_String_System_Type__
+  commentId: M:Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String,System.Type@)
+  name.vb: TryGet(String, ByRef Type)
+  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String, out System.Type)
+  fullName.vb: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String, ByRef System.Type)
+  nameWithType: LoadedTypes.TryGet(String, out Type)
+  nameWithType.vb: LoadedTypes.TryGet(String, ByRef Type)
+- uid: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet*
+  name: TryGet
+  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_TryGet_
+  commentId: Overload:Solti.Utils.Proxy.Internals.LoadedTypes.TryGet
+  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet
+  nameWithType: LoadedTypes.TryGet
 - uid: Solti.Utils.Proxy.Internals.TypeEmitter
   name: TypeEmitter
   href: Solti.Utils.Proxy.Internals.TypeEmitter.html
