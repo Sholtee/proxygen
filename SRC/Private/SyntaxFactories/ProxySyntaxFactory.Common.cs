@@ -82,7 +82,7 @@ namespace Solti.Utils.Proxy.Internals
                             {
                                 _ when param.Type.RefType is RefType.Ref =>
                                     //
-                                    // "ref struct" cast-olhato oljektumma
+                                    // We cannot cast "ref struct"s to objects
                                     //
 
                                     throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
@@ -171,7 +171,7 @@ namespace Solti.Utils.Proxy.Internals
                 (p, i) => ResolveLocal
                 (
                     p.Type,
-                    $"_{p.Name}", // statikus metodusban kerulnek felhasznalasra -> nem kell EnsureUnused(), csak "target" es "args"-al akadhatna ossze
+                    $"_{p.Name}", // will be utilized in static method -> EnsureUnused() not necessary
                     p.Kind is ParameterKind.Out ? null : CastExpression
                     (
                         type: ResolveType(p.Type),
@@ -187,7 +187,7 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     Argument
                                     (
-                                        LiteralExpression(SyntaxKind.NumericLiteralExpression, Literal(i))
+                                        i.AsLiteral()
                                     )
                                 )
                             )
@@ -316,11 +316,7 @@ namespace Solti.Utils.Proxy.Internals
                 Argument(lambda),
                 Argument
                 (
-                    LiteralExpression
-                    (
-                        SyntaxKind.NumericLiteralExpression,
-                        Literal(callIndex)
-                    )
+                    callIndex.AsLiteral()
                 ),
                 Argument
                 (
@@ -406,11 +402,7 @@ namespace Solti.Utils.Proxy.Internals
                         Argument(lambda),
                         Argument
                         (
-                            LiteralExpression
-                            (
-                                SyntaxKind.NumericLiteralExpression,
-                                Literal(callIndex)
-                            )
+                            callIndex.AsLiteral()
                         ),
                         Argument
                         (

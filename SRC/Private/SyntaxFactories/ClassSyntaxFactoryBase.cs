@@ -33,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
                 modifiers: TokenList
                 (
                     //
-                    // Az osztaly ne publikus legyen h "internal" lathatosagu tipusokat is hasznalhassunk
+                    // Define our generated class as internal to let us use internal members, too
                     //
 
                     Token(SyntaxKind.InternalKeyword),

@@ -196,7 +196,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     foreach (ITypeSymbol ta in UnderlyingSymbol.TypeArguments)
                     {
-                        if (!ta.IsGenericParameter()) // "UnderlyingSymbol.IsUnboundGenericType" baszik mukodni
+                        if (!ta.IsGenericParameter()) // "UnderlyingSymbol.IsUnboundGenericType" can't work
                             return false;
                     }
 

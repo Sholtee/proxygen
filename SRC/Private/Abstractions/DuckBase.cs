@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Defines the base class for duck typing.
+    /// Defines the base class for ducks.
     /// </summary>
     /// <typeparam name="T">The target type.</typeparam>
     [SuppressMessage("Design", "CA1012:Abstract types should not have public constructors", Justification = "Proxygenerator needs public constructor")]

@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Generators
         public ProxyGenerator(Type iface, Type interceptor): base(id: new { iface, interceptor})
         {
             //
-            // The rest of validation is done in compile phase.
+            // The rest of validation is done in the compile phase.
             //
 
             Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));

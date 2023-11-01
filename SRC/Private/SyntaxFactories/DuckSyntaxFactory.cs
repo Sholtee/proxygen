@@ -26,15 +26,23 @@ namespace Solti.Utils.Proxy.Internals
 
         public IPropertyInfo Target { get; }
 
-        public DuckSyntaxFactory(
+        public DuckSyntaxFactory
+        (
             ITypeInfo interfaceType,
             ITypeInfo targetType, 
             string? containingAssembly,
             OutputType outputType,
             IAssemblyInfo proxyGenAsm,
             ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest
-            ): base(outputType, containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}", referenceCollector, languageVersion) 
+            LanguageVersion languageVersion = LanguageVersion.Latest   
+        )
+        : base
+        (
+            outputType,
+            containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}",
+            referenceCollector,
+            languageVersion
+        ) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -43,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
             TargetType = targetType;
 
             //
-            // We don't know if BaseType should be backed by either Symbol or Metadata.
+            // We don't know if BaseType should be backed by Symbol or Metadata, so grab it from proxyGenAsm.
             //
 
             BaseType = ((IGenericTypeInfo) proxyGenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
@@ -96,7 +104,7 @@ namespace Solti.Utils.Proxy.Internals
                 throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
 
             //
-            // There might be multiple implementation:
+            // There might be multiple implementations:
             // "List<T>: ICollection<T>, IList" [both ICollection<T> and IList has ReadOnly property].
             //
 

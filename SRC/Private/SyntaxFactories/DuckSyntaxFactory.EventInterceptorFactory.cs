@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
                 IEventInfo targetEvt = GetTargetMember(ifaceEvt, TargetType.Events, SignatureEquals);
 
                 //
-                // Ellenorizzuk h az esemeny lathato e a legeneralando szerelvenyunk szamara.
+                // Check the visibility
                 //
 
                 Visibility.Check
@@ -83,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
             IMethodInfo accessor = targetEvt.AddMethod ?? targetEvt.RemoveMethod!;
 
             ITypeInfo? castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
-                ? accessor.DeclaringInterfaces.Single() // explicit esemenyhez biztosan csak egy deklaralo interface tartozik
+                ? accessor.DeclaringInterfaces.Single() // Explicit event can have exactly one declaring interface
                 : null;
 
             return cls.AddMembers

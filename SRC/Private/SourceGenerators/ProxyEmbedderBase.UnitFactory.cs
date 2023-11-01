@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
             if (miaSym is not null)
             {
                 //
-                // ModuleInitializerAttribute-t mi magunk is deklaralhatunk, ezert a bonyolult vizsgalat.
+                // ModuleInitializerAttribute might be defined by te user, too.
                 //
 
                 if (miaSym.DeclaredAccessibility is Accessibility.Public)

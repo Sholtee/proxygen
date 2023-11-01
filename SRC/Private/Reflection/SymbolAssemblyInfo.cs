@@ -36,7 +36,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.Assembly))
                     //
-                    // Az epp forditas alatt levo szerelvenynek meg tuti nincs eleresi utvonala
+                    // Assembly being compiled doesn't have path
                     //
 
                     return null;
@@ -46,8 +46,7 @@ namespace Solti.Utils.Proxy.Internals
                     if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
                     {
                         //
-                        // Ha a Compilation GeneratorExecutionContext-bol jon es nem teljes ujraforditas
-                        // van akkor a MetadataReference.Display nem biztos h eleresi utvonal
+                        // MetadataReference.Display is not necessarily a path
                         //
 
                         return !string.IsNullOrEmpty(reference.Display) && File.Exists(reference.Display)
@@ -60,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public bool IsDynamic => false; // forditas idoben nem lehet dinamikus ASM hivatkozva
+        public bool IsDynamic => false; // We cannot reference dynamic ASMs during build
 
         public string Name => UnderlyingSymbol.Identity.ToString();
 

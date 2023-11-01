@@ -43,13 +43,22 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override string ResolveClassName(object context) => $"Proxy_{InterceptorType.GetMD5HashCode()}";
 
-        public ProxySyntaxFactory(
+        public ProxySyntaxFactory
+        (
             ITypeInfo interfaceType,
             ITypeInfo interceptorType,
             string? containingAssembly,
             OutputType outputType,
             ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest): base(outputType, containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}", referenceCollector, languageVersion) 
+            LanguageVersion languageVersion = LanguageVersion.Latest
+        )
+        : base
+        (
+            outputType,
+            containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}",
+            referenceCollector,
+            languageVersion
+        ) 
         {
             if (!interfaceType.IsInterface)
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));

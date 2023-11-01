@@ -145,11 +145,7 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         Argument
                                         (
-                                            LiteralExpression
-                                            (
-                                                SyntaxKind.StringLiteralExpression,
-                                                Literal(Resources.CTOR_NOT_FOUND)
-                                            )
+                                            Resources.CTOR_NOT_FOUND.AsLiteral()
                                         )
                                     )
                                 )

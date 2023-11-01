@@ -114,7 +114,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (method is IGenericMethodInfo genericMethod)
             {
-                result = result.WithTypeParameterList // kulon legyen kulonben lesz egy ures "<>"
+                result = result.WithTypeParameterList
                 (
                     typeParameterList: TypeParameterList
                     (
@@ -262,11 +262,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context);
+        protected virtual ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method);
+        protected virtual ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => cls;
     }
 }

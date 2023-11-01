@@ -102,45 +102,5 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected override string ResolveClassName(object context) => nameof(ModuleInitializerAttribute);
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => cls;
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property) => cls;
     }
 }

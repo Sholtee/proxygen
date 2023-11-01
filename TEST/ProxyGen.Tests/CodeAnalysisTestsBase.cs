@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 {
                     CSharpSyntaxTree.ParseText(src, new CSharpParseOptions(languageVersion))
                 },
-                Internals.Compile.PlatformAssemblies.Concat
+                Internals.Compile.GetPlatformAssemblies(null, TargetFramework.Instance.PlatformAssemblies).Concat
                 (
                     additionalReferences
                         .Append(typeof(object).Assembly.Location)
@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 new CompilationUnitSyntax[] { CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot() },
                 Guid.NewGuid().ToString(),
                 null,
-                Internals.Compile.PlatformAssemblies.Concat
+                Internals.Compile.GetPlatformAssemblies(null, TargetFramework.Instance.PlatformAssemblies).Concat
                 (
                     additionalReferences.Append(typeof(object).Assembly).Select
                     (

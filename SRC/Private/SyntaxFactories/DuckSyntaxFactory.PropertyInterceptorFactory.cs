@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
                 IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType.Properties, SignatureEquals);
 
                 //
-                // Ellenorizzuk h a property lathato e a legeneralando szerelvenyunk szamara.
+                // Check if the property is visible
                 //
 
                 Visibility.Check
@@ -48,8 +48,7 @@ namespace Solti.Utils.Proxy.Internals
                     return false;
 
                 //
-                // Megengedjuk azt az esetet ha az interface pl csak irhato de a target engedelyezne
-                // az olvasast is.
+                // We allow the implementation to declare a getter or setter that is not required by the interface.
                 //
 
                 if (ifaceProp.GetMethod is not null)
@@ -89,8 +88,7 @@ namespace Solti.Utils.Proxy.Internals
             IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 
             //
-            // Ne a "targetProperty"-n hivjuk h akkor is jol mukodjunk ha az interface indexerenek
-            // maskepp vannak elnvezve a parameterei.
+            // Invoke the interface property to make sure that all indexer parameter names will match.
             //
 
             ExpressionSyntax propertyAccess = PropertyAccess
@@ -98,13 +96,12 @@ namespace Solti.Utils.Proxy.Internals
                 ifaceProperty,
                 MemberAccess(null, Target),
                 castTargetTo: accessor.AccessModifiers is AccessModifiers.Explicit
-                    ? accessor.DeclaringInterfaces.Single() // explicit tulajdonsaghoz biztosan csak egy deklaralo interface tartozik
+                    ? accessor.DeclaringInterfaces.Single() // Explicit properties belong to exactly one interface definition
                     : null
             );
 
             //
-            // Nem gond ha mondjuk az interface property-nek nincs gettere, akkor a "getBody"
-            // figyelmen kivul lesz hagyva.
+            // Accessors not defined on the interface will be ignored.
             //
 
             ArrowExpressionClauseSyntax

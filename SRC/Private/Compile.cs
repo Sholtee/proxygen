@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -25,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         internal static IEnumerable<MetadataReference> GetPlatformAssemblies(string? platformAsmsDir, IEnumerable<string> platformAsms)
         {
-            if (!string.IsNullOrEmpty(platformAsmsDir) && Directory.Exists(platformAsmsDir))
+            if (Directory.Exists(platformAsmsDir))  // Directory.Exists() returns False on NULL 
                 return GetFilteredPlatformAssemblies
                 (
                     EnumerateDlls(platformAsmsDir!)
@@ -38,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
 
             //
-            // .NET Framework 4.X
+            // .NET Framework 4.X support
             //
 
             return GetFilteredPlatformAssemblies 
@@ -64,22 +63,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static readonly Lazy<ImmutableHashSet<MetadataReference>> FPlatformAssemblies = new
-        (
-            static () => ImmutableHashSet.CreateRange
-            (
-                MetadataReferenceComparer.Instance,
-                GetPlatformAssemblies
-                (
-                    TargetFramework.Instance.PlatformAssembliesDir,
-                    TargetFramework.Instance.PlatformAssemblies
-                )
-            ),
-            LazyThreadSafetyMode.ExecutionAndPublication
-        );
-
-        public static ImmutableHashSet<MetadataReference> PlatformAssemblies => FPlatformAssemblies.Value;
-
         public static Stream ToAssembly(
             IReadOnlyCollection<CompilationUnitSyntax> units,
             string asmName,
@@ -92,7 +75,15 @@ namespace Solti.Utils.Proxy.Internals
             (
                 assemblyName: asmName,
                 syntaxTrees: units.Select(static unit => CSharpSyntaxTree.Create(unit)),
-                references: PlatformAssemblies.Union(references),
+                references: references.Union
+                (              
+                    GetPlatformAssemblies
+                    (
+                        TargetFramework.Instance.PlatformAssembliesDir,
+                        TargetFramework.Instance.PlatformAssemblies
+                    ),
+                    MetadataReferenceComparer.Instance
+                ),
                 options: new CSharpCompilationOptions
                 (
                     outputKind: OutputKind.DynamicallyLinkedLibrary,
@@ -133,7 +124,8 @@ namespace Solti.Utils.Proxy.Internals
                             .Where(static d => d.Severity is DiagnosticSeverity.Error)
                             .Select(static d => d.ToString())
                             .ToArray(),
-                        refs = references
+                        refs = compilation
+                            .References
                             .Select(static r => r.Display!)
                             .ToArray();
 

@@ -41,11 +41,11 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
-            // "Private", "Explicit" mellett mas nem szerepelhet -> nem kell HasFlag()
+            // Here the visibility can be either "Private" or "Explicit" -> HasFlag() not required
             //
 
             if (am is AccessModifiers.Explicit)
-                return; // meg ha cast-olni is kell hozza de lathato
+                return; // The method is visible after a type-cast
 
             if (am is AccessModifiers.Private)
                 throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Internals
                 return;
 
             //
-            // Tomb es mutato tipusnal az elem tipusat kell vizsgaljuk
+            // In case of array/pointer types we have to inspect the element type
             //
 
             if (type.ElementType is not null)
@@ -107,7 +107,7 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
-            // Generikusnal a generikus parametereket
+            // In case of generics we have to inspect all the generic arguments, too
             //
 
             if (type is IGenericTypeInfo genericType)

@@ -9,7 +9,7 @@ namespace Solti.Utils.Proxy.Internals
     internal enum RefType 
     {
         None = 0,
-        Ref, // A Type.IsByRef-nek nincs megfeleloje az INamedTypeInfo-ban (lasd: PassingByReference_ShouldNotAffectTheParameterType test) ezert csak pl "ref struct"-ra igaz
+        Ref, // Type.IsByRef has no counterpart in INamedTypeInfo (see: PassingByReference_ShouldNotAffectTheParameterType test) so this flag is applied on "ref struct"s only
         Pointer,
         Array
     }

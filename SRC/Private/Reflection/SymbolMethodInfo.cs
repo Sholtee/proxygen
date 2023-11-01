@@ -105,7 +105,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? ImmutableList.Create<IGenericConstraint>()
                 : GetConstraints().ToImmutableList();
 
-            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // Nincs ra szukseg
+            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // we don't need this
         }
     }
 }

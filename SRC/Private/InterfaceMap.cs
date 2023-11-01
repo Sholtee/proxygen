@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -27,18 +26,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 for (int i = 0; i < mapping.InterfaceMethods.Length; i++)
                 {
-                    try
-                    {
-                        dict.Add(mapping.InterfaceMethods[i], mapping.TargetMethods[i]);
-                    }
-                    catch (Exception ex)
-                    {
-                        //
-                        // We dont wanna a TypeInitializationException to be thrown so eat the exception
-                        //
-
-                        Trace.TraceWarning($"Cannot register mapping (${mapping.InterfaceMethods[i].Name}): {ex.Message}");
-                    }
+                    dict.Add(mapping.InterfaceMethods[i], mapping.TargetMethods[i]);
                 }
             }
 

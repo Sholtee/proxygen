@@ -71,11 +71,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         SingletonSeparatedList
                         (
-                            elements.Any() ? OmittedArraySizeExpression() : (ExpressionSyntax) LiteralExpression
-                            (
-                                SyntaxKind.NumericLiteralExpression,
-                                Literal(0)
-                            )
+                            elements.Any() ? OmittedArraySizeExpression() : (ExpressionSyntax) 0.AsLiteral()
                         )
                     )
                 )

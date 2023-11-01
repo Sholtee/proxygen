@@ -14,8 +14,8 @@ namespace Solti.Utils.Proxy.Internals
     internal abstract partial class ProxyEmbedderBase
     {
         //
-        // A SourceGenerator a leheto legkevesebb fuggoseget kell hivatkozza (mivel azokat mind hivatkozni kell
-        // a Roslyn szamara is), ezert a primitiv naplozas.
+        // SourceGenerator should reference as few dependencies as possible since dependencies must be bundled
+        // to our sourcegenerator package. That's the reason behind this primitive logging
         //
 
         internal protected static string? LogException(Exception ex, in CancellationToken cancellation)

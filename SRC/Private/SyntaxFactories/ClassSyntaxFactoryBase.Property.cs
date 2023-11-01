@@ -184,11 +184,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context);
+        protected virtual ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property);
+        protected virtual ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property) => cls;
     }
 }

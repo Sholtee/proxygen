@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             if (src is IGenericMethodInfo genericSrc && that is IGenericMethodInfo genericThat)
             {
                 //
-                // Since the arity check there is not need for further validations.
+                // Due to the arity check there is no need for further validations.
                 //
 
                 if (genericSrc.GenericConstraints.Count != genericThat.GenericConstraints.Count)
@@ -49,7 +49,7 @@ namespace Solti.Utils.Proxy.Internals
                 ParamCount = m.Parameters.Count,
 
                 //
-                // ClassA.Foo<T>() != ClassB.Foo<T, TT>() meg akkor sem ha nem nyitott generikusak
+                // ClassA.Foo<T>() != ClassB.Foo<T, TT>()
                 //
 
                 Arity = (m as IGenericMethodInfo)?.GenericArguments.Count ?? -1, // new {xXx = (int?) 0} == new {xXx = (int?) null}

@@ -78,11 +78,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context);
+        protected virtual ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor);
+        protected virtual ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls;
     }
 }

@@ -91,11 +91,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context);
+        protected virtual ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context) => cls;
 
         #if DEBUG
         internal
         #endif
-        protected abstract ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt);
+        protected virtual ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt) => cls;
     }
 }

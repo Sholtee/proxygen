@@ -18,10 +18,6 @@ namespace Solti.Utils.Proxy.Internals
 
         public string ContainingAssembly { get; }
 
-        //
-        // Proxy egyseg mindig csak egy osztalyt definial
-        //
-
         public override string ExposedClass => ResolveClassName(null!);
 
         #if DEBUG

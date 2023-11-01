@@ -20,12 +20,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase
     {
-        private static LiteralExpressionSyntax AsLiteral(string param) => LiteralExpression
-        (
-            SyntaxKind.StringLiteralExpression,
-            Literal(param)
-        );
-
         private static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
         (
             attributes.ToSyntaxList()
@@ -37,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation); // TODO: take and return the unit being assembled
+        protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
         public OutputType OutputType { get; }
 
@@ -68,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
                         cls.AttributeLists.Replace
                         (
                             //
-                            // A ResolveUnitMembers() miatt tuti mindig vannak attributumok
+                            // Due to ResolveUnitMembers(), we always have attributes
                             //
 
                             cls.AttributeLists[0],
@@ -88,7 +82,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 static SyntaxTriviaList DisableWarnings(SyntaxToken token) =>
                     //
-                    // Az osszes fordito figyelmeztetes kikapcsolasa:
+                    // Disable all compiler warnings:
                     // https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning
                     //
 
@@ -115,7 +109,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation) => ResolveClasses(context, cancellation).Select // TODO: take and return the unit being assembled
+        protected virtual IEnumerable<MemberDeclarationSyntax> ResolveUnitMembers(object context, CancellationToken cancellation) => ResolveClasses(context, cancellation).Select
         (
             cls => cls.WithAttributeLists
             (
@@ -129,19 +123,17 @@ namespace Solti.Utils.Proxy.Internals
 
                         ResolveAttribute<GeneratedCodeAttribute>
                         (
-                            AsLiteral("ProxyGen.NET"),
-                            AsLiteral
-                            (
-                                GetType()
-                                    .Assembly
-                                    .GetName()
-                                    .Version
-                                    .ToString()
-                            )
+                            "ProxyGen.NET".AsLiteral(),
+                            GetType()
+                                .Assembly
+                                .GetName()
+                                .Version
+                                .ToString()
+                                .AsLiteral()
                         ),
 
                         //
-                        // Ezek pedig szerepelnek az xXx.Designer.cs-ben
+                        // See xXx.Designer.cs
                         //
 
                         ResolveAttribute<DebuggerNonUserCodeAttribute>(),

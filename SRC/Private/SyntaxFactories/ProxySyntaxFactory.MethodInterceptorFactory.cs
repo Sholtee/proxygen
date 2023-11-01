@@ -40,7 +40,7 @@ namespace Solti.Utils.Proxy.Internals
                     throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
                 //
-                // "ref return" not supported
+                // "ref return"s not supported
                 //
 
                 if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
@@ -227,11 +227,7 @@ namespace Solti.Utils.Proxy.Internals
                                         (
                                             Argument
                                             (
-                                                LiteralExpression
-                                                (
-                                                    SyntaxKind.NumericLiteralExpression,
-                                                    Literal(i)
-                                                )
+                                                i.AsLiteral()
                                             )
                                         )
                                     )
@@ -279,11 +275,7 @@ namespace Solti.Utils.Proxy.Internals
                                     (
                                         Argument
                                         (
-                                            LiteralExpression
-                                            (
-                                                SyntaxKind.NumericLiteralExpression,
-                                                Literal(i)
-                                            )
+                                            i.AsLiteral()
                                         )
                                     )
                                 )

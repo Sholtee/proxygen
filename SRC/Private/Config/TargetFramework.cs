@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -18,8 +19,10 @@ namespace Solti.Utils.Proxy.Internals
         {
             PlatformAssembliesDir = GetPath(configReader, nameof(PlatformAssembliesDir));
             PlatformAssemblies = configReader
-                .ReadValue(nameof(PlatformAssemblies))
-                ?.Split(';') ?? new string[] { "netstandard.dll", "System.Runtime.dll" };
+                .ReadValue(nameof(PlatformAssemblies))?
+                .Split(';')
+                .Select(static asm => asm.Trim())
+                .ToArray() ?? new string[] { "netstandard.dll", "System.Runtime.dll" };
         }
 
         protected override void InitWithDefaults() => Init(new RuntimeConfigReader());

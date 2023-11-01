@@ -11,9 +11,9 @@ namespace Solti.Utils.Proxy.Internals
     {
         protected override void Init(IConfigReader configReader)
         {
-            DebugGenerator  = ReadBool(nameof(DebugGenerator));
-
-            bool ReadBool(string name) => configReader.ReadValue(name)?.Equals(true.ToString(), StringComparison.OrdinalIgnoreCase) == true;
+            DebugGenerator = configReader
+                .ReadValue(nameof(DebugGenerator))?
+                .Equals(true.ToString(), StringComparison.OrdinalIgnoreCase) == true;
         }
 
         public bool DebugGenerator { get; private set; }

@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
             if (genericType?.IsGenericDefinition is true)
                 return;
 
-            if (!FTypes.Add(type)) // korkoros referencia fix
+            if (!FTypes.Add(type)) // circular reference fix
                 return;
 
             IAssemblyInfo? asm = type.DeclaringAssembly;
@@ -41,28 +41,28 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             //
-            // Az os (osztaly) szerepelhet masik szerelvenyben.
+            // The base can be provided by a different assembly.
             //
 
             if (type.BaseType is not null)
                 AddType(type.BaseType);
 
             //
-            // Befoglalo tipus(ok) generikus parameterei szarmazhatnak masik szerelvenybol
+            // The generic parameters of enclosing type(s) may come from a different assembly.
             //
 
             if (type.EnclosingType is not null)
                 AddType(type.EnclosingType);
 
             //
-            // Generikus parameterek szerepelhetnek masik szerelvenyben.
+            // Generic parameters may come from a differentassembly.
             //
 
             if (genericType is not null)
                 AddTypesFrom(genericType.GenericArguments);
 
             //
-            // "os" interface-ek szarmazhatnak masik szerelvenybol.
+            // Interfeces may be also defined in a different assembly.
             //
 
             AddTypesFrom(type.Interfaces);

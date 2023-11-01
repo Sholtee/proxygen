@@ -119,7 +119,7 @@ namespace Solti.Utils.Proxy.Internals
             return src.ContainingMember switch
             {
                 IGenericTypeInfo type => GetIndex(src, type),
-                IGenericMethodInfo method => GetIndex(src, method) * -1,  // ha a parameter metoduson van definialva akkor negativ szam
+                IGenericMethodInfo method => GetIndex(src, method) * -1,  // return a negative value for parameters defined on methods
                 _ => 0
             };
 

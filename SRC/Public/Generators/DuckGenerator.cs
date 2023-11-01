@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Generators
         public DuckGenerator(Type iface, Type target): base(id: new { iface, target })
         {
             //
-            // The rest of validation is done in compile phase.
+            // The rest of validation is done in the compile phase.
             //
 
             Target = target ?? throw new ArgumentNullException(nameof(target));

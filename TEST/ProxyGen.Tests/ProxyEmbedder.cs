@@ -460,7 +460,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                         "
                     )
                 },
-                Internals.Compile.PlatformAssemblies.Concat
+                Internals.Compile.GetPlatformAssemblies(null, TargetFramework.Instance.PlatformAssemblies).Concat
                 (
                     new[]
                     {

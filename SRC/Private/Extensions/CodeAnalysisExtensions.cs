@@ -97,5 +97,17 @@ namespace Solti.Utils.Proxy.Internals
 
             return sb.ToString();
         }
+
+        public static LiteralExpressionSyntax AsLiteral(this string param) => LiteralExpression
+        (
+            SyntaxKind.StringLiteralExpression,
+            Literal(param)
+        );
+
+        public static LiteralExpressionSyntax AsLiteral(this int param) => LiteralExpression
+        (
+            SyntaxKind.NumericLiteralExpression,
+            Literal(param)
+        );
     }
 }
