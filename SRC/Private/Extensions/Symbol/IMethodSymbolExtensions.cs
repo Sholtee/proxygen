@@ -57,6 +57,8 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             INamedTypeSymbol containingType = src.ContainingType;
+            if (containingType.IsInterface())
+                yield break;
 
             foreach (ITypeSymbol iface in containingType.GetAllInterfaces())
             {

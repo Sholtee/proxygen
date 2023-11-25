@@ -37,19 +37,16 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
         {
-            if (src is not MethodInfo method)
-                yield break; // ctor
-
-            Type reflectedType = src.ReflectedType;
-            if (reflectedType.IsInterface)
-                yield break;
-
             //
             // As of C# 11 interfaces may have static abstract methods... We don't deal with
             // the implementors.
             //
 
-            if (src.IsStatic)
+            if (src.IsStatic || src is not MethodInfo method /*ctor*/)
+                yield break;
+
+            Type reflectedType = src.ReflectedType;
+            if (reflectedType.IsInterface)
                 yield break;
 
             foreach (Type iface in reflectedType.GetInterfaces())

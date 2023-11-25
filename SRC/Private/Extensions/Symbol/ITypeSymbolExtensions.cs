@@ -346,7 +346,7 @@ namespace Solti.Utils.Proxy.Internals
         public static IEnumerable<ITypeSymbol> GetAllInterfaces(this ITypeSymbol src) 
         {
             //
-            // AllInterfaces may contain the same closed geneic interface more times if the generic arguments are
+            // AllInterfaces may contain the same closed generic interface more times if the generic arguments are
             // differ in Nullable annotations only:
             //
             // interface IA: IB, IC<string> {}, interface IB: IC<string?> -> IC<string> will be returned twice
