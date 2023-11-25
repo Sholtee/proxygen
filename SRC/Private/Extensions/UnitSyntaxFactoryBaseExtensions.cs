@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -33,35 +34,38 @@ namespace Solti.Utils.Proxy.Internals
             {
                 string hint = src.GetHint();
 
-                StreamWriter log;
-
                 Directory.CreateDirectory(sourceDump);
 
-                using (log = File.CreateText(Path.Combine(sourceDump, hint)))
-                {
-                    log.AutoFlush = true;
-                    unit
-                        .NormalizeWhitespace(eol: Environment.NewLine)
-                        .WriteTo(log); // "WriteTo() has no overload having "cancellation" parameter
-                }
+                Log(Path.Combine(sourceDump, hint), unit.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(), cancellation);
 
                 if (src.ReferenceCollector is not null)
                 {
-                    using (log = File.CreateText(Path.Combine(sourceDump, $"{hint}.references")))
-                    {
-                        log.AutoFlush = true;
-                        log.Write
+                    Log
+                    (
+                        Path.Combine(sourceDump, $"{hint}.references"),
+                        string.Join
                         (
-                            string.Join
-                            (
-                                Environment.NewLine,
-                                src
-                                    .ReferenceCollector
-                                    .References
-                                    .Select(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
-                            ),
-                            cancellation: cancellation
-                        );
+                            Environment.NewLine,
+                            src
+                                .ReferenceCollector
+                                .References
+                                .Select(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")
+                        ),
+                        cancellation
+                    );
+                }
+
+                static void Log(string file, string data, CancellationToken cancellation)
+                {
+                    try
+                    {
+                        using StreamWriter log = File.CreateText(file);
+                        log.AutoFlush = true;
+                        log.Write(data, cancellation: cancellation);
+                    }
+                    catch (IOException ex)
+                    {
+                        Trace.TraceWarning($"File ({file}) could not be dumped: ${ex.Message}");
                     }
                 }
             }

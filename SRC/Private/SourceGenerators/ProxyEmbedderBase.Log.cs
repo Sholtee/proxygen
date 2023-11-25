@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -23,12 +24,12 @@ namespace Solti.Utils.Proxy.Internals
             string? logDump = WorkingDirectories.Instance.LogDump;
             if (logDump is not null)
             {
+                string logFile = Path.Combine(logDump, $"ProxyGen_{Guid.NewGuid()}.log");
+
+                Directory.CreateDirectory(logDump);
+
                 try
                 {
-                    Directory.CreateDirectory(logDump);
-
-                    string logFile = Path.Combine(logDump, $"ProxyGen_{Guid.NewGuid()}.log");
-
                     using StreamWriter log = File.CreateText(logFile);
                     log.AutoFlush = true;
 
@@ -45,7 +46,10 @@ namespace Solti.Utils.Proxy.Internals
 
                     return logFile;
                 }
-                catch {}
+                catch (IOException exc)
+                {
+                    Trace.TraceWarning($"File ({logFile}) could not be dumped: ${exc.Message}");
+                }
             }
             return null;
         }
