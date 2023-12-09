@@ -38,11 +38,11 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <pre><code class="lang-ini">
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Redstone5)
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.5122 (1809/October2018Update/Redstone5)
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
-.NET Core SDK=7.0.100
-  [Host]     : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
-  Job-JFTCRD : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
+.NET Core SDK=8.0.100
+  [Host]     : .NET Core 8.0.0 (CoreCLR 8.0.23.53103, CoreFX 8.0.23.53103), X64 RyuJIT
+  Job-GAKGBO : .NET Core 8.0.0 (CoreCLR 8.0.23.53103, CoreFX 8.0.23.53103), X64 RyuJIT
 
 InvocationCount=30000  RunStrategy=Throughput  
 </code></pre><table>
@@ -62,36 +62,36 @@ InvocationCount=30000  RunStrategy=Throughput
 <tbody>
 <tr>
 <td>AssemblingProxyType</td>
-<td style="text-align:right">25,177.11 ns</td>
-<td style="text-align:right">1,810.091 ns</td>
-<td style="text-align:right">5,337.095 ns</td>
-<td style="text-align:right">26,393.57 ns</td>
+<td style="text-align:right">18,737.41 ns</td>
+<td style="text-align:right">1,878.612 ns</td>
+<td style="text-align:right">5,539.129 ns</td>
+<td style="text-align:right">16,998.63 ns</td>
 <td style="text-align:right">0.3333</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">6193 B</td>
+<td style="text-align:right">6393 B</td>
 </tr>
 <tr>
 <td>GetGeneratedType</td>
-<td style="text-align:right">52.26 ns</td>
-<td style="text-align:right">4.764 ns</td>
-<td style="text-align:right">14.047 ns</td>
-<td style="text-align:right">43.20 ns</td>
-<td style="text-align:right">0.0020</td>
+<td style="text-align:right">49.42 ns</td>
+<td style="text-align:right">0.893 ns</td>
+<td style="text-align:right">0.792 ns</td>
+<td style="text-align:right">49.33 ns</td>
+<td style="text-align:right">0.0060</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">40 B</td>
+<td style="text-align:right">112 B</td>
 </tr>
 <tr>
 <td>Activate</td>
-<td style="text-align:right">60.56 ns</td>
-<td style="text-align:right">1.095 ns</td>
-<td style="text-align:right">1.860 ns</td>
-<td style="text-align:right">60.56 ns</td>
-<td style="text-align:right">0.0047</td>
+<td style="text-align:right">53.98 ns</td>
+<td style="text-align:right">1.033 ns</td>
+<td style="text-align:right">2.494 ns</td>
+<td style="text-align:right">53.51 ns</td>
+<td style="text-align:right">0.0080</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
-<td style="text-align:right">88 B</td>
+<td style="text-align:right">152 B</td>
 </tr>
 </tbody>
 </table>

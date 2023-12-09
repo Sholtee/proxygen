@@ -38,11 +38,11 @@
             <article class="content wrap" id="_content" data-uid="">
 
 <pre><code class="lang-ini">
-BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.2366 (1809/October2018Update/Redstone5)
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.17763.5122 (1809/October2018Update/Redstone5)
 Intel Xeon CPU E5-2697 v3 2.60GHz, 1 CPU, 2 logical cores and 1 physical core
-.NET Core SDK=7.0.100
-  [Host]     : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
-  Job-BGAUUR : .NET Core 7.0.0 (CoreCLR 7.0.22.51805, CoreFX 7.0.22.51805), X64 RyuJIT
+.NET Core SDK=8.0.100
+  [Host]     : .NET Core 8.0.0 (CoreCLR 8.0.23.53103, CoreFX 8.0.23.53103), X64 RyuJIT
+  Job-SMBFNT : .NET Core 8.0.0 (CoreCLR 8.0.23.53103, CoreFX 8.0.23.53103), X64 RyuJIT
 
 InvocationCount=5000000  RunStrategy=Throughput  
 </code></pre><table>
@@ -52,6 +52,7 @@ InvocationCount=5000000  RunStrategy=Throughput
 <th style="text-align:right">Mean</th>
 <th style="text-align:right">Error</th>
 <th style="text-align:right">StdDev</th>
+<th style="text-align:right">Median</th>
 <th style="text-align:right">Ratio</th>
 <th style="text-align:right">RatioSD</th>
 <th style="text-align:right">Gen 0</th>
@@ -63,9 +64,10 @@ InvocationCount=5000000  RunStrategy=Throughput
 <tbody>
 <tr>
 <td>NoDuck</td>
-<td style="text-align:right">4.675 ns</td>
-<td style="text-align:right">0.1204 ns</td>
-<td style="text-align:right">0.2108 ns</td>
+<td style="text-align:right">4.002 ns</td>
+<td style="text-align:right">0.0700 ns</td>
+<td style="text-align:right">0.0886 ns</td>
+<td style="text-align:right">3.962 ns</td>
 <td style="text-align:right">1.00</td>
 <td style="text-align:right">0.00</td>
 <td style="text-align:right">-</td>
@@ -75,11 +77,12 @@ InvocationCount=5000000  RunStrategy=Throughput
 </tr>
 <tr>
 <td>Duck</td>
-<td style="text-align:right">5.713 ns</td>
-<td style="text-align:right">0.1500 ns</td>
-<td style="text-align:right">0.1950 ns</td>
-<td style="text-align:right">1.23</td>
-<td style="text-align:right">0.06</td>
+<td style="text-align:right">4.542 ns</td>
+<td style="text-align:right">0.2113 ns</td>
+<td style="text-align:right">0.6131 ns</td>
+<td style="text-align:right">4.179 ns</td>
+<td style="text-align:right">1.34</td>
+<td style="text-align:right">0.07</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
 <td style="text-align:right">-</td>
