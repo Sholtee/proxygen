@@ -1,7 +1,7 @@
 # ProxyGen.NET [![Build status](https://ci.appveyor.com/api/projects/status/caw7qqtf5tbaa1fq/branch/master?svg=true)](https://ci.appveyor.com/project/Sholtee/proxygen/branch/master) ![AppVeyor tests](https://img.shields.io/appveyor/tests/sholtee/proxygen/master) [![Coverage Status](https://coveralls.io/repos/github/Sholtee/proxygen/badge.svg?branch=master)](https://coveralls.io/github/Sholtee/proxygen?branch=master) [![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/proxygen.net)](https://www.nuget.org/packages/proxygen.net) ![GitHub last commit (branch)](https://img.shields.io/github/last-commit/sholtee/proxygen/master)
 > .NET proxy generator powered by [Roslyn](https://github.com/dotnet/roslyn )
 
-**This documentation refers the version 8.X of the library**
+**This documentation refers the version 9.X of the library**
 ## Purposes
 This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for interface interception and [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
 ### To hook into interface method calls:
@@ -164,10 +164,12 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
   - As proxy embedder has been reimplemented using the [v2](https://github.com/dotnet/roslyn/blob/main/docs/features/incremental-generators.md ) Source Generator API, this feature now requires VS 2022
 - 7.X
   - `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMember|InterfaceMethod`
+- 8.X
+  - `Generator`s are demoted to `class`. To compare `Generator` instances use the their `Id` property.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
 - [Version History](https://github.com/Sholtee/proxygen/blob/master/history.md )
 
 ## Supported frameworks
-This project currently targets *.NET Standard* 2.0 and 2.1.
+This project currently targets `netstandard2.0` as well as `netstandard2.1` and had been tested against `net472`, `netcoreapp3.1`, `net5.0`, `net6.0`, `net7.0` and `net8.0`.

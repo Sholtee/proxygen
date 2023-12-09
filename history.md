@@ -137,7 +137,7 @@
   - *breaking*: `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMember|InterfaceMethod`
   - *introduced*: `InterfaceInterceptor<TInterface, TTarget>` class
   - *updated:* Roslyn to v4.3
-  - *done:* Run tests against `net7.0`
+  - *done:* Tested against `net7.0`
 - 8.0.0:
   - *breaking*: Dropped `GeneratedClass` class
   - *done*: Some minor code alignment
@@ -154,3 +154,7 @@
   - *introduced*: Roslyn v3 (legacy) variant
 - 8.2.1:
   - *done:* Number of dependencies has been reduced by 2
+- 9.0.0:
+  - *improved:* Cancellation in `asnyc` `Generator` methods
+  - *done:* Tested against `net8.0`, related fixes
+  - *breaking:* `Generator`s are demoted to `class`
