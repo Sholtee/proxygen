@@ -165,7 +165,7 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
 - 7.X
   - `InterfaceInterceptor<TInterface>.Member|Method` has been renamed to `InterfaceMember|InterfaceMethod`
 - 8.X
-  - `Generator`s have been demoted to `class`. To compare `Generator` instances use the their `Id` property.
+  - `Generator`s have been demoted to `class`. To compare `Generator` instances use their `Id` property.
 ## Resources
 - [API Docs](https://sholtee.github.io/proxygen )
 - [Benchmark Results](https://sholtee.github.io/proxygen/perf )
