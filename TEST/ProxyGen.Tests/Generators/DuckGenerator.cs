@@ -286,5 +286,24 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void DuckGenerator_ShouldThrowInStaticAbstractMember() =>
             Assert.Throws<NotSupportedException>(() => new DuckGenerator(typeof(IUtf8SpanParsable<int>), typeof(IUtf8SpanParsable<int>)).GetGeneratedType());
 #endif
+
+        public interface IBase
+        {
+            void Foo();
+        }
+
+        public interface IDescendant : IBase
+        {
+            new void Foo();
+        }
+
+        public class MockDescendant
+        {
+            public void Foo() { }
+        }
+
+        [Test]
+        public void DuckGenerator_ShouldHandleOverrides() =>
+            Assert.DoesNotThrow(() => DuckGenerator<IDescendant, MockDescendant>.Activate(Tuple.Create(new MockDescendant())));
     }
 }
