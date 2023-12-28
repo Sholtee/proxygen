@@ -56,16 +56,37 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ```
 3. Enjoy
 
-Note that the *target* can access its most outer enclosing proxy. To achieve this it just has to implement the `IProxyAccess<IMyInterface>` interface:
-```csharp
-using Solti.Utils.Proxy;
+Remarks:
+- The *target* can access its most outer enclosing proxy. To achieve this it just has to implement the `IProxyAccess<IMyInterface>` interface:
+  ```csharp
+  using Solti.Utils.Proxy;
 
-public class MyClass : IMyInterface, IProxyAccess<IMyInterface>
-{
-    ...
-    public IMyInterface Proxy { get; set; }
-}
-```
+  public class MyClass : IMyInterface, IProxyAccess<IMyInterface>
+  {
+      ...
+      public IMyInterface Proxy { get; set; }
+  }
+  ```
+- Starting from v9.1 partial interface implementations are also supported:
+  ```csharp
+  using Solti.Utils.Proxy;
+
+  public interface IMyInterface
+  {
+      void Intercepted();
+      void NotInterceptred();
+  } 
+
+  public class MyInterceptor: InterfaceInterceptor<IMyInterface>
+  {
+      public void NotInterceptred() {...}
+
+      // will be triggered by Intercepted() only as NotInterceptred() has it's own implementation
+      public override object Invoke(InvocationContext context) {...}
+
+      ...
+  }
+  ```
 
 For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/master/TEST/ProxyGen.Tests/Generators/ProxyGenerator.cs ) or [that](https://github.com/Sholtee/injector#decorating-services ).
 ### To create ducks:
@@ -73,7 +94,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/m
   ```csharp
   public class TargetClass // does not implement IDuck
   {
-    public void Foo(){...}
+    public void Foo() {...}
   }
   ...
   public interface IDuck 

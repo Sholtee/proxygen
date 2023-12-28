@@ -158,3 +158,5 @@
   - *improved:* Cancellation in `asnyc` `Generator` methods
   - *done:* Tested against `net8.0`, related fixes
   - *breaking:* `Generator`s are demoted to `class`
+- 9.1.0:
+  - *introduced:* Partial interface implementation support
