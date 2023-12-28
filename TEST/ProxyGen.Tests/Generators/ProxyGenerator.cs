@@ -720,6 +720,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public int NotHooked(int val) => val;
 
+            internal int Hooked(in int val) => val;  // this won't be treated as implementation since it's not public
+
             public override object Invoke(InvocationContext context)
             {
                 return 1986;

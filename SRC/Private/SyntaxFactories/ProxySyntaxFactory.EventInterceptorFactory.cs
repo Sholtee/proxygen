@@ -33,13 +33,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (ifaceEvent.AddMethod is not null)
                 {
-                    if (targetEvent.AddMethod?.SignatureEquals(ifaceEvent.AddMethod, ignoreVisibility: true) is not true)
+                    if (targetEvent.AddMethod?.SignatureEquals(ifaceEvent.AddMethod) is not true)
                         return false;
                 }
 
                 if (ifaceEvent.RemoveMethod is not null)
                 {
-                    if (targetEvent.RemoveMethod?.SignatureEquals(ifaceEvent.RemoveMethod, ignoreVisibility: true) is not true)
+                    if (targetEvent.RemoveMethod?.SignatureEquals(ifaceEvent.RemoveMethod) is not true)
                         return false;
                 }
 

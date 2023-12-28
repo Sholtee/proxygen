@@ -39,13 +39,13 @@ namespace Solti.Utils.Proxy.Internals
 
                 if (ifaceProp.GetMethod is not null)
                 {
-                    if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true) is not true)
+                    if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod) is not true)
                         return false;
                 }
 
                 if (ifaceProp.SetMethod is not null)
                 {
-                    if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true) is not true)
+                    if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod) is not true)
                         return false;
                 }
 
