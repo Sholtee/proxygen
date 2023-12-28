@@ -1,5 +1,0 @@
-Solti.Utils.Proxy.Internals.Generator.Generator(object! id) -> void
-Solti.Utils.Proxy.Internals.Generator.Id.get -> object!
-Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter() -> void
-Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<object!, object?[]!, object?>! dispatch, int callIndex, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>? mappings) -> void
-static Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(string! name, out System.Type! type) -> bool
