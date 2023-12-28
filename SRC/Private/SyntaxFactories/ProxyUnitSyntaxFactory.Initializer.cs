@@ -64,9 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             MethodInfoExtensions.ExtractFrom<object>(_ => LoadedTypes.Register(null!))
                         ),
-                        target: null,
-                        castTargetTo: null,
-                        Argument
+                        arguments: Argument
                         (
                             TypeOfExpression
                             (

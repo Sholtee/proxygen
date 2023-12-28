@@ -135,9 +135,7 @@ namespace Solti.Utils.Proxy.Internals
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
                     Invoke,
-                    target: null,
-                    castTargetTo: null,
-                    Argument
+                    arguments: Argument
                     (
                         ResolveObject<InvocationContext>
                         (
