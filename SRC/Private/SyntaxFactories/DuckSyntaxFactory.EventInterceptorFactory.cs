@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -40,12 +39,8 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls;
 
-            [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
-            static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
+            static bool SignatureEquals(IEventInfo targetEvent, IEventInfo ifaceEvent)
             {
-                if (targetMember is not IEventInfo targetEvent || ifaceMember is not IEventInfo ifaceEvent)
-                    return false;
-
                 if (ifaceEvent.AddMethod is not null)
                 {
                     if (targetEvent.AddMethod?.SignatureEquals(ifaceEvent.AddMethod, ignoreVisibility: true) is not true)

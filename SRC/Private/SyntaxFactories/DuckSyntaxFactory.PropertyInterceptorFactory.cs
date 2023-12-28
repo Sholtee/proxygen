@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -41,12 +40,8 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls;
 
-            [SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "There is not dead code.")]
-            static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember)
+            static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
             {
-                if (targetMember is not IPropertyInfo targetProp || ifaceMember is not IPropertyInfo ifaceProp)
-                    return false;
-
                 //
                 // We allow the implementation to declare a getter or setter that is not required by the interface.
                 //

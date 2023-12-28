@@ -41,9 +41,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls;
 
-            static bool SignatureEquals(IMemberInfo targetMember, IMemberInfo ifaceMember) =>
-                targetMember is IMethodInfo targetMethod &&
-                ifaceMember is IMethodInfo ifaceMethod &&
+            static bool SignatureEquals(IMethodInfo targetMethod, IMethodInfo ifaceMethod) =>
                 targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true);
         }
 

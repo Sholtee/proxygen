@@ -87,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
         protected override string ResolveClassName(object context) =>
             $"Duck_{ITypeInfoExtensions.GetMD5HashCode(InterfaceType, TargetType)}";
 
-        protected static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
+        private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
             //
             // Starting from .NET7.0 interfaces may have abstract static members
@@ -96,22 +96,22 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMember.IsAbstract && ifaceMember.IsStatic)
                 throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
-            TMember[] possibleTargets = targetMembers
+            IReadOnlyList<TMember> possibleTargets = targetMembers
               .Where(targetMember => signatureEquals(targetMember, ifaceMember))
-              .ToArray();
+              .ToList();
 
-            if (!possibleTargets.Any())
-                throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name));
+            return possibleTargets.Count switch
+            {
+                0 => throw new MissingMemberException(string.Format(Resources.Culture, Resources.MISSING_IMPLEMENTATION, ifaceMember.Name)),
+                1 => possibleTargets[0],
 
-            //
-            // There might be multiple implementations:
-            // "List<T>: ICollection<T>, IList" [both ICollection<T> and IList has ReadOnly property].
-            //
+                //
+                // There might be multiple implementations:
+                // "List<T>: ICollection<T>, IList" [both ICollection<T> and IList has ReadOnly property].
+                //
 
-            if (possibleTargets.Length > 1)
-                throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.Name));
-
-            return possibleTargets[0];
+                _ => throw new AmbiguousMatchException(string.Format(Resources.Culture, Resources.AMBIGUOUS_MATCH, ifaceMember.Name))
+            };
         }
     }
 }
