@@ -14,8 +14,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class ProxySyntaxFactory
     {
         #if DEBUG
@@ -25,20 +23,34 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IPropertyInfo prop in InterfaceType.Properties)
             {
-                if (AlreadyImplemented(prop))
+                if (AlreadyImplemented(prop, InterceptorType.Properties, SignatureEquals))
                     continue;
-
-                //
-                // Starting from .NET7.0 interfaces may have abstract static members
-                //
-
-                if (prop.IsAbstract && prop.IsStatic)
-                    throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
                 cls = ResolveProperty(cls, context, prop);
             }
 
             return cls;
+
+            static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
+            {
+                //
+                // We allow the implementation to declare a getter or setter that is not required by the interface.
+                //
+
+                if (ifaceProp.GetMethod is not null)
+                {
+                    if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod, ignoreVisibility: true) is not true)
+                        return false;
+                }
+
+                if (ifaceProp.SetMethod is not null)
+                {
+                    if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod, ignoreVisibility: true) is not true)
+                        return false;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>

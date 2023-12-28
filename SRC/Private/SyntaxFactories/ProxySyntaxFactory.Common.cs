@@ -46,9 +46,19 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        bool AlreadyImplemented(IMemberInfo member) => InterceptorType
-            .Interfaces
-            .Any(iface => iface.EqualsTo(member.DeclaringType));
+        bool AlreadyImplemented<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
+        {
+            //
+            // Starting from .NET7.0 interfaces may have abstract static members
+            //
+
+            if (ifaceMember.IsAbstract && ifaceMember.IsStatic)
+                throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
+
+            return
+                InterceptorType.Interfaces.Any(iface => iface.EqualsTo(ifaceMember.DeclaringType)) ||
+                targetMembers.Any(targetMember => signatureEquals(targetMember, ifaceMember));
+        }
 
         /// <summary>
         /// <code>

@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int NotHooked(int val);
         }
 
-        public class MyInterfaceProxy : InterfaceInterceptor<IMyInterface>
+        public class MyInterceptor : InterfaceInterceptor<IMyInterface>
         {
             public override object Invoke(InvocationContext context)
             {
@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 return base.Invoke(context);
             }
 
-            public MyInterfaceProxy(IMyInterface target) : base(target)
+            public MyInterceptor(IMyInterface target) : base(target)
             {
             }
         }
@@ -66,14 +66,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldHook()
         {
-            IMyInterface proxy = await ProxyGenerator<IMyInterface, MyInterfaceProxy>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass()));
+            IMyInterface proxy = await ProxyGenerator<IMyInterface, MyInterceptor>.ActivateAsync(Tuple.Create((IMyInterface) new MyClass()));
 
             Assert.That(proxy.NotHooked(1), Is.EqualTo(1));
             Assert.That(proxy.Hooked(1), Is.EqualTo(1986));
         }
 
         [Test]
-        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => ProxyGenerator<IMyInterface, MyInterfaceProxy>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass())))));
+        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => ProxyGenerator<IMyInterface, MyInterceptor>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass())))));
 
         [Test]
         public async Task GeneratedProxy_MayBeThreadSafe()
@@ -715,5 +715,28 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public void ProxyGenerator_ShouldHandleOverrides() =>
             Assert.DoesNotThrow(() => ProxyGenerator<IDescendant, InterfaceInterceptor<IDescendant>>.GetGeneratedType());
+
+        public class InterceptorHavingPartialImplementation : InterfaceInterceptor<IMyInterface>
+        {
+            public int NotHooked(int val) => val;
+
+            public override object Invoke(InvocationContext context)
+            {
+                return 1986;
+            }
+
+            public InterceptorHavingPartialImplementation() : base(null)
+            {
+            }
+        }
+
+        [Test]
+        public void ProxyGenerator_ShouldSupportPartialImplementations()
+        {
+            IMyInterface proxy = ProxyGenerator<IMyInterface, InterceptorHavingPartialImplementation>.Activate(null);
+
+            Assert.That(proxy.Hooked(1990), Is.EqualTo(1986));
+            Assert.That(proxy.NotHooked(1990), Is.EqualTo(1990));
+        }
     }
 }

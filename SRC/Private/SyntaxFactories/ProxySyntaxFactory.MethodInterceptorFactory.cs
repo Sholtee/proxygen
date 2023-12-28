@@ -29,15 +29,8 @@ namespace Solti.Utils.Proxy.Internals
                 // Starting from .NET Core 5.0 interface methods may have visibility
                 //
 
-                if (AlreadyImplemented(ifaceMethod) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
+                if (AlreadyImplemented(ifaceMethod, InterceptorType.Methods, SignatureEquals) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
-
-                //
-                // Starting from .NET7.0 interfaces may have abstract static members
-                //
-
-                if (ifaceMethod.IsAbstract && ifaceMethod.IsStatic)
-                    throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
                 //
                 // "ref return"s not supported
@@ -50,6 +43,9 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             return cls;
+
+            static bool SignatureEquals(IMethodInfo targetMethod, IMethodInfo ifaceMethod) =>
+                targetMethod.SignatureEquals(ifaceMethod);
         }
 
         /// <summary>

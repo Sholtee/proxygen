@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,8 +12,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class ProxySyntaxFactory
     {
         #if DEBUG
@@ -24,20 +21,30 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IEventInfo evt in InterfaceType.Events)
             {
-                if (AlreadyImplemented(evt))
+                if (AlreadyImplemented(evt, InterceptorType.Events, SignatureEquals))
                     continue;
-
-                //
-                // Starting from .NET7.0 interfaces may have abstract static members
-                //
-
-                if (evt.IsAbstract && evt.IsStatic)
-                    throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
                 cls = ResolveEvent(cls, context, evt);
             }
 
             return cls;
+
+            static bool SignatureEquals(IEventInfo targetEvent, IEventInfo ifaceEvent)
+            {
+                if (ifaceEvent.AddMethod is not null)
+                {
+                    if (targetEvent.AddMethod?.SignatureEquals(ifaceEvent.AddMethod, ignoreVisibility: true) is not true)
+                        return false;
+                }
+
+                if (ifaceEvent.RemoveMethod is not null)
+                {
+                    if (targetEvent.RemoveMethod?.SignatureEquals(ifaceEvent.RemoveMethod, ignoreVisibility: true) is not true)
+                        return false;
+                }
+
+                return true;
+            }
         }
 
         /// <summary>
