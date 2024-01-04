@@ -81,7 +81,7 @@ Remarks:
   {
       public void NotInterceptred() {...}
 
-      // will be triggered by Intercepted() only as NotInterceptred() has it's own implementation
+      // will be triggered by Intercepted() only as NotInterceptred() has its own implementation
       public override object Invoke(InvocationContext context) {...}
 
       ...
