@@ -127,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals
                             sizes: array
                                 .Rank
                                 .Times(OmittedArraySizeExpression)
-                                .ToSyntaxList(arSize => (ExpressionSyntax) arSize)
+                                .ToSyntaxList(static arSize => (ExpressionSyntax) arSize)
                         )
                     )
                 );
