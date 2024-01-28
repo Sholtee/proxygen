@@ -141,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                                 .Where(static constraint => GetConstraints(constraint).Any())
                                 .Select
                                 (
-                                    constraint => TypeParameterConstraintClause
+                                    static constraint => TypeParameterConstraintClause
                                     (
                                         IdentifierName
                                         (

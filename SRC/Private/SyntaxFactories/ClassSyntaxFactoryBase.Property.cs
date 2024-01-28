@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             property, 
             target, 
             castTargetTo, 
-            property.Indices.Select(param => Argument(IdentifierName(param.Name)))
+            property.Indices.Select(static param => Argument(IdentifierName(param.Name)))
         );
 
         /// <summary>

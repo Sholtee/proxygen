@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         paramz.ToSyntaxList
                         (
-                            param => Argument
+                            static param => Argument
                             (
                                 expression: IdentifierName(param.Name)
                             )
