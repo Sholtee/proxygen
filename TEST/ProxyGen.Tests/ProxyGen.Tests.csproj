@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net472;netcoreapp3.1</TargetFrameworks>
-    <TargetFrameworks Condition="'$(Variant)' != 'ROSLYN_LEGACY'">$(TargetFrameworks);net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Variant)' != 'ROSLYN_LEGACY'">$(TargetFrameworks);net6.0;net7.0;net8.0</TargetFrameworks>
 	<CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
