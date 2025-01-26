@@ -59,6 +59,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
 #if NETCOREAPP3_1
                 "System.Collections.Generic.NonRandomizedStringEqualityComparer"
 #endif
+#if NET6_0
+                "System.UIntPtr"
+#endif
             };
         }
 
