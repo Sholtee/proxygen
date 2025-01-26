@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -49,17 +50,20 @@ namespace Solti.Utils.Proxy.Internals.Tests
         public void AssemblyInfo_FriendshipTest(object asm) =>
             Assert.That(((IAssemblyInfo) asm).IsFriend(typeof(ReflectionTests).Assembly.GetName().Name));
 
-        private HashSet<string> FProcessedTypes;
+        private ConcurrentDictionary<string, object> FProcessedTypes;
 
         [OneTimeSetUp]
         public void SetupFixture()
         {
-            FProcessedTypes = new HashSet<string>
-            {
+            FProcessedTypes = new
+            (
+                new Dictionary<string, object>
+                {
 #if NET6_0
-                "System.UIntPtr"
+                    {"System.UIntPtr", null}
 #endif
-            };
+                }
+            );
         }
 
         [Test]
@@ -123,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
                 Assert.AreEqual(t1.IsVoid, t2.IsVoid);
 
-                if (!FProcessedTypes.Add(t1.Name) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
+                if (!FProcessedTypes.TryAdd(t1.Name, null) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
                     return;
 
                 AssertEqualsA(t1.DeclaringAssembly, t2.DeclaringAssembly);
