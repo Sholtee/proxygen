@@ -55,10 +55,18 @@ namespace Solti.Utils.Proxy.Internals
             _ when src is IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
 
             //
+            // delegate*<T, TT> => TRetVal(T, TT)
+            //
+
+            _ when src is IFunctionPointerTypeSymbol functionPointer =>
+                $"{functionPointer.Signature.ReturnType.GetFriendlyName()}({string.Join(", ", functionPointer.Signature.Parameters.Select(static p => p.Type.GetFriendlyName()))})",
+
+            //
             // nint[,] => System.IntPtr[,]
             //
 
-            _ when src is IArrayTypeSymbol array => $"{array.ElementType.GetFriendlyName()}[{new string(Enumerable.Repeat(',', array.Rank - 1).ToArray())}]",
+            _ when src is IArrayTypeSymbol array =>
+                $"{array.ElementType.GetFriendlyName()}[{new string(Enumerable.Repeat(',', array.Rank - 1).ToArray())}]",
             _ => src.ToDisplayString
             (
                 new SymbolDisplayFormat
@@ -264,7 +272,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             ITypeSymbol? prev = null;
 
-            for (ITypeSymbol? current = src; (current = (current as IArrayTypeSymbol)?.ElementType ?? (current as IPointerTypeSymbol)?.PointedAtType) != null;)
+            for (ITypeSymbol? current = src; (current = (current as IArrayTypeSymbol)?.ElementType ?? (current as IPointerTypeSymbol)?.PointedAtType) is not null;)
             {
                 if (!recurse) return current;
                 prev = current;
@@ -276,7 +284,7 @@ namespace Solti.Utils.Proxy.Internals
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
             //
-            // Arrays and pointers have no contaning assembly
+            // Arrays and pointers have no containing assembly
             //
 
             IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly ?? src.ContainingAssembly;
@@ -308,9 +316,11 @@ namespace Solti.Utils.Proxy.Internals
             return src.TypeKind is TypeKind.TypeParameter;
         }
 
-        public static string GetQualifiedMetadataName(this ITypeSymbol src)
+        public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
             ITypeSymbol? elementType = src.GetElementType(recurse: true);
+            if (elementType is IFunctionPointerTypeSymbol)
+                return null;
 
             StringBuilder sb = new();
 
@@ -441,27 +451,37 @@ namespace Solti.Utils.Proxy.Internals
                 #pragma warning restore CA2201
             };
 
-            if (src is INamedTypeSymbol namedType)
+            switch (src)
             {
-                foreach (ITypeSymbol ta in namedType.TypeArguments)
-                {
-                    if (ta.IsGenericParameter())
-                        continue;
+                case INamedTypeSymbol namedType:
+                    foreach (ITypeSymbol ta in namedType.TypeArguments)
+                    {
+                        if (ta.IsGenericParameter())
+                            continue;
 
-                    AccessModifiers gaAm = ta.GetAccessModifiers();
-                    if (gaAm < am)
-                        am = gaAm;
-                }
+                        UpdateAm(ta);
+                    }
+                    break;
+
+                case IFunctionPointerTypeSymbol fn:
+                    foreach (ITypeSymbol pt in fn.Signature.Parameters.Select(static p => p.Type))
+                    {
+                        UpdateAm(pt);
+                    }
+                    break;
             }
 
             if (!src.IsGenericParameter() && src.ContainingType is not null)
-            {
-                AccessModifiers ctAm = src.ContainingType.GetAccessModifiers();
-                if (ctAm < am)
-                    am = ctAm;
-            }
+                UpdateAm(src.ContainingType);
 
             return am;
+
+            void UpdateAm(ITypeSymbol t)
+            {
+                AccessModifiers @new = t.GetAccessModifiers();
+                if (@new < am)
+                    am = @new;
+            }
         }
     }
 }

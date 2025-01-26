@@ -55,14 +55,14 @@ namespace Solti.Utils.Proxy.Internals
                 AddType(type.EnclosingType);
 
             //
-            // Generic parameters may come from a differentassembly.
+            // Generic parameters may come from different assemblies.
             //
 
             if (genericType is not null)
                 AddTypesFrom(genericType.GenericArguments);
 
             //
-            // Interfeces may be also defined in a different assembly.
+            // Interfaces may be also defined in a different assembly.
             //
 
             AddTypesFrom(type.Interfaces);

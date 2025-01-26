@@ -211,7 +211,7 @@ namespace Solti.Utils.Proxy.Internals
                 BindingFlags.Public |
 
                 //
-                // BindingFlags.FlattenHierarchy will return public and protected members only. Unfortunatelly
+                // BindingFlags.FlattenHierarchy will return public and protected members only. Unfortunately
                 // explicit implementations are private
                 //
 

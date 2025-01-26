@@ -60,14 +60,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 #if NETCOREAPP3_1
                 "System.Collections.Generic.NonRandomizedStringEqualityComparer"
 #endif
-#if NET6_0
-                "System.UIntPtr"
-#endif
             };
         }
-
-       // [TestCase("System.UIntPtr, System.Private.CoreLib, Version=6.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")]
-        public void TypeInfo_AbstractionTest(string type) => TypeInfo_AbstractionTest(Type.GetType(type, throwOnError: true));
 
         [Test]
         public void TypeInfo_AbstractionTest([Values(
