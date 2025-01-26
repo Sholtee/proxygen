@@ -56,9 +56,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             FProcessedTypes = new HashSet<string>
             {
-#if NETCOREAPP3_1
-                "System.Collections.Generic.NonRandomizedStringEqualityComparer"
-#endif
 #if NET6_0
                 "System.UIntPtr"
 #endif
