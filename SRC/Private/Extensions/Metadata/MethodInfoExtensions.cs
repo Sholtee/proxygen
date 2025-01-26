@@ -96,8 +96,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     method.Name,
                     bindingAttr:
-                        BindingFlags.DeclaredOnly |
-                        (method.IsPublic ? BindingFlags.Public : BindingFlags.NonPublic) |
+                        BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic |
                         (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance),
                     binder: null,
                     callConvention: method.CallingConvention,

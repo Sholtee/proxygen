@@ -1,7 +1,7 @@
 # ProxyGen.NET Version History
 - 1.0.0: First non preview release
 - 1.1.0:
-  - *added:* `ProxyGenerator` accepts intercetors having more than one public constructor
+  - *added:* `ProxyGenerator` accepts interceptors having more than one public constructor
 - 1.1.1:
   - *added:* Anonymous type support
   - *fixed:* Malformed assmebly names (in certain circumstances)
@@ -13,7 +13,7 @@
   - *fixed:* Misinterpreted "ref" modifier (in certain circumstances)
   - *fixed:* Proxy generation failed on interface methods having parameter names that were used internally
   - *fixed:* Proxy generation failed on interface methods having by ref array parameter
-  - *done:* `ProxyGenerator` tested aganist all the public interfaces found in *mscorlib.dll*
+  - *done:* `ProxyGenerator` tested against all the public interfaces found in *mscorlib.dll*
 - 2.0.1:
   - *done:* Remove internal classes that can be referenced from "Solti.Utils.Primitives"
 - 2.0.2:
@@ -82,7 +82,7 @@
   - *fixed:* Embedded type resolution issue
 - 4.0.0-preview8:
   - *fixed:* Missing reference issue
-  - *imporved:* Syntax factory performance
+  - *improved:* Syntax factory performance
 - 4.0.0:
   - *done:* Some code cosmetics
 - 4.0.1:
@@ -117,7 +117,7 @@
   - *fixed:* Performance issue of generated proxy
 - 7.0.0-preview1:
   - *breaking:* Dropped `InvocationContext.InvokeTarget` property
-  - *improved:* Significantly imporved performance
+  - *improved:* Significantly improved performance
 - 7.0.0-preview2:
   - *improved:* More performant generated code
   - *introduced:* `MethodContext` class
@@ -160,3 +160,5 @@
   - *breaking:* `Generator`s are demoted to `class`
 - 9.1.0:
   - *introduced:* Partial interface implementation support
+- 9.1.1:
+  - *done:* Tested against `net9.0`, related fixes

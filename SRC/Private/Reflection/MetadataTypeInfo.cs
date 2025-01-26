@@ -185,19 +185,10 @@ namespace Solti.Utils.Proxy.Internals
         {
             public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
 
-            public bool IsGenericDefinition
-            {
-                get
-                {
-                    foreach (Type ga in UnderlyingType.GetGenericArguments())
-                    {
-                        if (!ga.IsGenericParameter)
-                            return false;
-                    }
-                    return true;
-                }
-            
-            }
+            public bool IsGenericDefinition => UnderlyingType
+                .GetGenericArguments()
+                .Any(static ga => ga.IsGenericParameter);
+
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()

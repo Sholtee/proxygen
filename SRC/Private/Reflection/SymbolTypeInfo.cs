@@ -53,9 +53,19 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (FDeclaringAssembly is null)
                 {
-                    IAssemblySymbol? asm = UnderlyingSymbol.GetElementType(recurse: true)?.ContainingAssembly ?? UnderlyingSymbol.ContainingAssembly;
-                    if (asm != null) 
+                    ITypeSymbol? elementType = UnderlyingSymbol.GetElementType(recurse: true);
+
+                    IAssemblySymbol? asm = elementType?.ContainingAssembly ?? UnderlyingSymbol.ContainingAssembly;
+
+                    if (asm is not null)
                         FDeclaringAssembly = SymbolAssemblyInfo.CreateFrom(asm, Compilation);
+
+                    else if (asm is null && elementType is IFunctionPointerTypeSymbol)
+                        FDeclaringAssembly = CreateFrom
+                        (
+                            Compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
+                            Compilation
+                        ).DeclaringAssembly;                      
                 }
                 return FDeclaringAssembly;
             }
@@ -190,19 +200,14 @@ namespace Solti.Utils.Proxy.Internals
 
             public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
-            public bool IsGenericDefinition
-            {
-                get
-                {
-                    foreach (ITypeSymbol ta in UnderlyingSymbol.TypeArguments)
-                    {
-                        if (!ta.IsGenericParameter()) // "UnderlyingSymbol.IsUnboundGenericType" can't work
-                            return false;
-                    }
+            //
+            // "UnderlyingSymbol.IsUnboundGenericType" doesn't work
+            //
 
-                    return true;
-                }
-            }
+            public bool IsGenericDefinition => UnderlyingSymbol
+                .TypeArguments
+                .Any(static ta => ta.IsGenericParameter());
+
             private IGenericTypeInfo? FGenericDefinition;
             public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= (IGenericTypeInfo) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 

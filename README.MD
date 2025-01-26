@@ -130,7 +130,7 @@ This library can be used as a [source generator](https://devblogs.microsoft.com/
 [assembly: EmbedGeneratedType(typeof(DuckGenerator<IMyInterface, MyClass>))]
 
 ```
-The `xXxGenerator.GetGeneratedType()` method returns the embedded type if it is present in the assembly in which the `GetGeneratedType()` was called. Since all the time consumig operations already happened in compile time, requesting embedded types can singificantly improve the performance.
+The `xXxGenerator.GetGeneratedType()` method returns the embedded type if it is present in the assembly in which the `GetGeneratedType()` was called. Since all the time consuming operations already happened in compile time, requesting embedded types can singificantly improve the performance.
 
 Note that:
 - Open generics are not supported.
@@ -193,4 +193,4 @@ The output should look like [this](https://github.com/Sholtee/proxygen/blob/mast
 - [Version History](https://github.com/Sholtee/proxygen/blob/master/history.md )
 
 ## Supported frameworks
-This project currently targets `netstandard2.0` as well as `netstandard2.1` and had been tested against `net472`, `netcoreapp3.1`, `net5.0`, `net6.0`, `net7.0` and `net8.0`.
+This project currently targets `netstandard2.0` as well as `netstandard2.1` and had been tested against `net472`, `netcoreapp3.1`, `net5.0`, `net6.0`, `net7.0`, `net8.0` and `net9.0`.
