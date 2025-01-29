@@ -34,13 +34,13 @@ namespace Solti.Utils.Proxy
 
             if (mappings is not null)
             {
-                if (mappings.TryGetValue(InterfaceMethod.IsGenericMethod ? InterfaceMethod.GetGenericMethodDefinition() : InterfaceMethod, out MethodInfo targetmethod))
+                if (mappings.TryGetValue(InterfaceMethod.IsGenericMethod ? InterfaceMethod.GetGenericMethodDefinition() : InterfaceMethod, out MethodInfo targetMethod))
                 {
-                    if (targetmethod.IsGenericMethod)
-                        targetmethod = targetmethod.MakeGenericMethod(InterfaceMethod.GetGenericArguments());
+                    if (targetMethod.IsGenericMethod)
+                        targetMethod = targetMethod.MakeGenericMethod(InterfaceMethod.GetGenericArguments());
 
-                    TargetMethod = targetmethod;
-                    TargetMember = MemberInfoExtensions.ExtractFrom(targetmethod);
+                    TargetMethod = targetMethod;
+                    TargetMember = MemberInfoExtensions.ExtractFrom(targetMethod);
                     return;
                 }
                 Debug.Assert(false, $"Cannot get target method for: {InterfaceMethod}");
