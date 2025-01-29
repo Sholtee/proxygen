@@ -17,7 +17,7 @@ internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Util
         add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         remove => this.Target.Event -= value; }
 
-    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
         switch (tuple)
         {

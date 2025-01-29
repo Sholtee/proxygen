@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// public static readonly Func&lt;object, object&gt; __Activator = tuple =>
+        /// public static readonly Func&lt;object, object&gt; __Activator = static tuple =>
         /// {
         ///    switch (tuple)
         ///    {
@@ -66,6 +66,13 @@ namespace Solti.Utils.Proxy.Internals
                                         Parameter
                                         (
                                             Identifier(tuple)
+                                        )
+                                    )
+                                    .WithModifiers
+                                    (
+                                        TokenList
+                                        (
+                                            Token(SyntaxKind.StaticKeyword)
                                         )
                                     )
                                     .WithBlock

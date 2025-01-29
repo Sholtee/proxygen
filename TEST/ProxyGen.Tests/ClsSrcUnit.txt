@@ -93,7 +93,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         }
     }
 
-    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
         switch (tuple)
         {
