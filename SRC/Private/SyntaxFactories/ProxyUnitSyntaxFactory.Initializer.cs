@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            MethodInfoExtensions.ExtractFrom<object>(_ => LoadedTypes.Register(null!))
+                            MethodInfoExtensions.ExtractFrom<object>(static _ => LoadedTypes.Register(null!))
                         ),
                         arguments: Argument
                         (
