@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals
 
             IMethodInfo invoke = MetadataMethodInfo.CreateFrom
             (
-                MethodInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(ic => ic.Invoke(default!))
+                MethodInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(static ic => ic.Invoke(default!))
             );
 
             Invoke = InterceptorType.Methods.Single
