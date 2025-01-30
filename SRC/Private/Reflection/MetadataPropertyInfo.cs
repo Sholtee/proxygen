@@ -42,6 +42,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => (GetMethod ?? SetMethod!).IsAbstract;
 
+        public bool IsVirtual => (GetMethod ?? SetMethod!).IsVirtual;
+
         private MetadataPropertyInfo(PropertyInfo prop) => UnderlyingProperty = prop;
 
         public static IPropertyInfo CreateFrom(PropertyInfo prop) => new MetadataPropertyInfo(prop);

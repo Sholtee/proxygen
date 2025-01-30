@@ -136,5 +136,8 @@ namespace Solti.Utils.Proxy.Internals
         //
 
         public static MethodInfo ExtractFrom<T>(Expression<Action<T>> expression) => ((MethodCallExpression) expression.Body).Method;
+
+        public static bool IsVirtual(this MethodBase method) =>
+            method.IsVirtual && !method.IsFinal && !method.ReflectedType.IsInterface;
     }
 }

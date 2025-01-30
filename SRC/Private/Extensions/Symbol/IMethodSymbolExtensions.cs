@@ -156,5 +156,8 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
         }
+
+        public static bool IsVirtual(this IMethodSymbol src) =>
+            (src.IsVirtual || src.IsAbstract || (src.OverriddenMethod is not null && !src.IsSealed)) && !src.ContainingType.IsInterface();
     }
 }

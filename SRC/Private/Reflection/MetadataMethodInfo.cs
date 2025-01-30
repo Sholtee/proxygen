@@ -52,6 +52,8 @@ namespace Solti.Utils.Proxy.Internals
 
             public bool IsAbstract => UnderlyingMethod.IsAbstract;
 
+            public bool IsVirtual => UnderlyingMethod.IsVirtual();
+
             public AccessModifiers AccessModifiers => UnderlyingMethod.GetAccessModifiers();
 
             public override bool Equals(object obj) => obj is MetadataMethodBase<T> that && UnderlyingMethod.Equals(that.UnderlyingMethod);

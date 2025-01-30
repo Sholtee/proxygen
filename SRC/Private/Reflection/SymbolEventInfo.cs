@@ -31,6 +31,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => (AddMethod ?? RemoveMethod!).IsAbstract;
 
+        public bool IsVirtual => (AddMethod ?? RemoveMethod!).IsVirtual;
+
         private SymbolEventInfo(IEventSymbol evt, Compilation compilation)
         {
             UnderlyingSymbol = evt;

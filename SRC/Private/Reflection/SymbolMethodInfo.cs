@@ -51,6 +51,8 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => UnderlyingSymbol.IsAbstract;
 
+        public bool IsVirtual => UnderlyingSymbol.IsVirtual();
+
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
         private ITypeInfo? FDeclaringType;

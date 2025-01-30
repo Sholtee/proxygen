@@ -198,7 +198,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
 
                 //
-                // QualifiedName doesn't reflect generic arguments so can be used together with GetTypeByMetadataName()
+                // QualifiedName doesn't reflect generic arguments so it can be passed to GetTypeByMetadataName()
                 //
 
                 symbol = compilation.GetTypeByMetadataName(src.QualifiedName ?? throw new NotSupportedException());
