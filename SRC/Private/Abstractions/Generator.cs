@@ -38,8 +38,24 @@ namespace Solti.Utils.Proxy.Internals
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
+        #endregion
 
-        private async Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
+        /// <summary>
+        /// Creates a new <see cref="Generator"/> instance.
+        /// </summary>
+        protected Generator(object id) => Id = id;
+
+        #region Public
+        /// <summary>
+        /// Unique generator id. Generators emitting the same output should have the same id.
+        /// </summary>
+        public object Id { get; }
+
+        /// <summary>
+        /// Gets the generated <see cref="Type"/> asynchronously .
+        /// </summary>
+        /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
+        public async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
         {
             cancellation.ThrowIfCancellationRequested();
 
@@ -61,38 +77,6 @@ namespace Solti.Utils.Proxy.Internals
             return context.GeneratedType;
         }
 
-        private Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)
-        {
-            cancellation.ThrowIfCancellationRequested();
-
-            return FActivatorCache.TryGetValue(Id, out Func<object?, object> activator)
-                ? Task.FromResult(activator)
-                : Create();
-
-            async Task<Func<object?, object>> Create()
-            {
-                return FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsyncInternal(cancellation)));
-            }
-        }
-        #endregion
-
-        /// <summary>
-        /// Creates a new <see cref="Generator"/> instance.
-        /// </summary>
-        protected Generator(object id) => Id = id;
-
-        #region Public
-        /// <summary>
-        /// Unique generator id. Generators emitting the same output should have the same id.
-        /// </summary>
-        public object Id { get; }
-
-        /// <summary>
-        /// Gets the generated <see cref="Type"/> asynchronously .
-        /// </summary>
-        /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
-        public Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default) => GetGeneratedTypeAsyncInternal(cancellation);
-
         /// <summary>
         /// Gets the generated <see cref="Type"/>.
         /// </summary>
@@ -108,12 +92,21 @@ namespace Solti.Utils.Proxy.Internals
         /// <param name="cancellation">Token to cancel the operation.</param>
         /// <returns>The just activated instance.</returns>
         #if NETSTANDARD2_1_OR_GREATER
-        public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default) =>
+        public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default)
         #else
-        public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default) =>
+        public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default)
         #endif
-            (await GetActivatorAsyncInternal(cancellation)).Invoke(tuple);
+        {
+            cancellation.ThrowIfCancellationRequested();
 
+            if (!FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
+            {
+                activator = FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsync(cancellation)));
+            }
+
+            return activator(tuple);
+        }
+            
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
@@ -124,10 +117,9 @@ namespace Solti.Utils.Proxy.Internals
         #else
         public object Activate(object? tuple) =>
         #endif
-            GetActivatorAsyncInternal(default)
+            ActivateAsync(tuple)
             .GetAwaiter()
-            .GetResult()
-            .Invoke(tuple);
+            .GetResult();
         #endregion
     }
 }
