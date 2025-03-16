@@ -12,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     internal abstract class ConfigBase<TDescendant> where TDescendant : ConfigBase<TDescendant>, new()
     {
         //
-        // It seems not documented if SourceGenerators can run parallel or not, so lets assume
+        // It seems not documented whether SourceGenerators can run parallel or not, so lets assume
         // they can -> ThreadLocal
         //
 
