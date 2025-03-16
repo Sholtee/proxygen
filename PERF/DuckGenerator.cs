@@ -26,7 +26,9 @@ namespace Solti.Utils.Proxy.Perf
         [Benchmark]
         public void AssemblingProxyType() => DuckGenerator<IInterface, Implementation>
             .Instance
-            .Emit(Guid.NewGuid().ToString(), default, default);
+            .EmitAsync(Guid.NewGuid().ToString(), default, default)
+            .GetAwaiter()
+            .GetResult();
 
         [Benchmark(OperationsPerInvoke = OPERATIONS_PER_INVOKE)]
         public void GetGeneratedType()

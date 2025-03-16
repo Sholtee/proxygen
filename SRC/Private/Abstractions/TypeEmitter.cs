@@ -11,6 +11,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
 
@@ -46,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
 
-        internal Type Emit(string? asmName, string? asmCacheDir, CancellationToken cancellation)
+        internal Task<Type> EmitAsync(string? asmName, string? asmCacheDir, CancellationToken cancellation)
         {
             ReferenceCollector referenceCollector = new();
 
@@ -58,69 +59,72 @@ namespace Solti.Utils.Proxy.Internals
 
             Type? type = GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: false);
             if (type is not null)
-                return type;
+                return Task.FromResult(type);
 
-            //
-            // 2) If the assembly physically stored, try to load it from the cache directory.
-            // 
-
-            string? cacheFile = null;
-
-            if (!string.IsNullOrEmpty(asmCacheDir))
+            return Task<Type>.Factory.StartNew(() =>
             {
-                cacheFile = Path.Combine(asmCacheDir, $"{mainUnit.ContainingAssembly}.dll");
+                //
+                // 2) If the assembly physically stored, try to load it from the cache directory.
+                // 
 
-                if (File.Exists(cacheFile))
+                string? cacheFile = null;
+
+                if (!string.IsNullOrEmpty(asmCacheDir))
                 {
-                    RunInitializers
-                    (
-                        Assembly.LoadFile(cacheFile)
-                    );
+                    cacheFile = Path.Combine(asmCacheDir, $"{mainUnit.ContainingAssembly}.dll");
 
-                    return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
+                    if (File.Exists(cacheFile))
+                    {
+                        RunInitializers
+                        (
+                            Assembly.LoadFile(cacheFile)
+                        );
+
+                        return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
+                    }
+
+                    //
+                    // Couldn't find the assembly, in the next step we will compile it. Make sure the
+                    // cache directory exits.
+                    //
+
+                    Directory.CreateDirectory(asmCacheDir);
                 }
 
                 //
-                // Couldn't find the assembly, in the next step we will compile it. Make sure the
-                // cache directory exits.
+                // 3) Compile the assembly from the scratch.
                 //
 
-                Directory.CreateDirectory(asmCacheDir);
-            }
+                List<UnitSyntaxFactoryBase> units = new
+                (
+                    CreateChunks(referenceCollector)
+                )
+                {
+                    mainUnit
+                };
 
-            //
-            // 3) Compile the assembly from the scratch.
-            //
+                using Stream asm = Compile.ToAssembly
+                (
+                    units
+                        .Select(unit => unit.ResolveUnitAndDump(cancellation))
+                        .ToImmutableList(),
+                    mainUnit.ContainingAssembly,
+                    cacheFile,
+                    referenceCollector
+                        .References
+                        .Select(static asm => MetadataReference.CreateFromFile(asm.Location!))
+                        .ToImmutableList(),
+                    customConfig: null,
+                    cancellation
+                );
 
-            List<UnitSyntaxFactoryBase> units = new
-            (
-                CreateChunks(referenceCollector)
-            )
-            {
-                mainUnit
-            };
+                RunInitializers
+                (
+                    Assembly.Load(asm.ToArray())
+                );
 
-            using Stream asm = Compile.ToAssembly
-            (
-                units
-                    .Select(unit => unit.ResolveUnitAndDump(cancellation))
-                    .ToImmutableList(),
-                mainUnit.ContainingAssembly,
-                cacheFile,
-                referenceCollector
-                    .References
-                    .Select(static asm => MetadataReference.CreateFromFile(asm.Location!))
-                    .ToImmutableList(),
-                customConfig: null,
-                cancellation
-            );
-
-            RunInitializers
-            (
-                Assembly.Load(asm.ToArray())
-            );
-
-            return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
+                return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
+            }, cancellation);
         }
 #if DEBUG
         internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;

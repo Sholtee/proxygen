@@ -620,7 +620,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.Emit(default, tmpDir, default);
+            generator.EmitAsync(default, tmpDir, default).GetAwaiter().GetResult();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -631,7 +631,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             , Ignore(".NET Framework cannot load assembly targeting .NET Core")
 #endif
         ]
-        public void ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        public async Task ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             Generator generator = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.Instance;
 
@@ -639,7 +639,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
-            Type gt = generator.Emit(default, cacheDir, default);
+            Type gt = await generator.EmitAsync(default, cacheDir, default);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

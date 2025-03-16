@@ -39,31 +39,26 @@ namespace Solti.Utils.Proxy.Internals
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
 
-        private Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
+        private async Task<Type> GetGeneratedTypeAsyncInternal(CancellationToken cancellation)
         {
             cancellation.ThrowIfCancellationRequested();
 
             GeneratorContext context = FContextCache.GetOrAdd(Id, static _ => new GeneratorContext());
             if (context.GeneratedType is not null)
-                return Task.FromResult(context.GeneratedType);
+                return context.GeneratedType;
 
-            return Task<Type>.Factory.StartNew
-            (
-                () =>
-                {
-                    context.Lock.Wait(cancellation);
-                    try
-                    {
-                        context.GeneratedType ??= Emit(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
-                    }
-                    finally
-                    {
-                        context.Lock.Release();
-                    }
-                    return context.GeneratedType;
-                },
-                cancellation
-            );
+            await context.Lock.WaitAsync(cancellation);
+
+            try
+            {
+                context.GeneratedType ??= await EmitAsync(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
+            }
+            finally
+            {
+                context.Lock.Release();
+            }
+
+            return context.GeneratedType;
         }
 
         private Task<Func<object?, object>> GetActivatorAsyncInternal(CancellationToken cancellation)

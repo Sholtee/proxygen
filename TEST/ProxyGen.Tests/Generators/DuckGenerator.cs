@@ -234,7 +234,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.Emit(default, tmpDir, default);
+            generator.EmitAsync(default, tmpDir, default).GetAwaiter().GetResult();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -245,7 +245,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             , Ignore(".NET Framework cannot load assembly targeting .NET Core")
 #endif
         ]
-        public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        public async Task DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             Generator generator = DuckGenerator<IGeneric<object>, Generic<object>>.Instance;
             
@@ -253,7 +253,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
-            Type gt = generator.Emit(default, cacheDir, default);
+            Type gt = await generator.EmitAsync(default, cacheDir, default);
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
