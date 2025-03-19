@@ -17,6 +17,8 @@ namespace Solti.Utils.Proxy.Internals
 
     internal partial class ProxySyntaxFactory: ProxyUnitSyntaxFactory
     {
+        private static string ResolveClassName(ITypeInfo interceptorType) => $"Proxy_{interceptorType.GetMD5HashCode()}";
+
         public ITypeInfo InterfaceType { get; }
 
         public ITypeInfo InterceptorType { get; }
@@ -41,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) => $"Proxy_{InterceptorType.GetMD5HashCode()}";
+        protected override string ResolveClassName(object context) => ResolveClassName(InterceptorType);
 
         public ProxySyntaxFactory
         (
@@ -55,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         : base
         (
             outputType,
-            containingAssembly ?? $"Proxy_{interceptorType.GetMD5HashCode()}",
+            containingAssembly ?? ResolveClassName(interceptorType),
             referenceCollector,
             languageVersion
         ) 

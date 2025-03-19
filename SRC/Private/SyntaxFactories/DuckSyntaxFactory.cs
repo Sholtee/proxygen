@@ -18,6 +18,9 @@ namespace Solti.Utils.Proxy.Internals
 
     internal partial class DuckSyntaxFactory : ProxyUnitSyntaxFactory
     {
+        private static string ResolveClassName(ITypeInfo interfaceType, ITypeInfo targetType) =>
+            $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}";
+
         public ITypeInfo InterfaceType { get; }
 
         public ITypeInfo TargetType { get; }
@@ -39,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         : base
         (
             outputType,
-            containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}",
+            containingAssembly ?? ResolveClassName(interfaceType, targetType),
             referenceCollector,
             languageVersion
         ) 
@@ -84,8 +87,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) =>
-            $"Duck_{ITypeInfoExtensions.GetMD5HashCode(InterfaceType, TargetType)}";
+        protected override string ResolveClassName(object context) => ResolveClassName(InterfaceType, TargetType);
 
         private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
