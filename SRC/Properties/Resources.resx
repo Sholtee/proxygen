@@ -159,6 +159,9 @@
   <data name="NOT_AN_INTERFACE" xml:space="preserve">
     <value>The type must be an interface.</value>
   </data>
+  <data name="NOT_A_CLASS" xml:space="preserve">
+    <value>The parameter must be a class.</value>
+  </data>
   <data name="NOT_A_GENERATOR" xml:space="preserve">
     <value>The parameter must be a Generator descendant.</value>
   </data>
@@ -169,7 +172,10 @@
     <value>The target is NULL.</value>
   </data>
   <data name="SEALED_INTERCEPTOR" xml:space="preserve">
-    <value>The interceptor can not be sealed.</value>
+    <value>The interceptor cannot be sealed.</value>
+  </data>
+  <data name="SEALED_TARGET" xml:space="preserve">
+    <value>Target class cannot be sealed.</value>
   </data>
   <data name="TYPE_NOT_FOUND" xml:space="preserve">
     <value>The type "{0}" can not be found.</value>

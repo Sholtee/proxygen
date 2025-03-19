@@ -178,6 +178,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The parameter must be a class..
+        /// </summary>
+        internal static string NOT_A_CLASS {
+            get {
+                return ResourceManager.GetString("NOT_A_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The parameter must be a Generator descendant..
         /// </summary>
         internal static string NOT_A_GENERATOR {
@@ -214,11 +223,20 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The interceptor can not be sealed..
+        ///   Looks up a localized string similar to The interceptor cannot be sealed..
         /// </summary>
         internal static string SEALED_INTERCEPTOR {
             get {
                 return ResourceManager.GetString("SEALED_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target class cannot be sealed..
+        /// </summary>
+        internal static string SEALED_TARGET {
+            get {
+                return ResourceManager.GetString("SEALED_TARGET", resourceCulture);
             }
         }
         
