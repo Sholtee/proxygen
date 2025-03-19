@@ -16,8 +16,6 @@ using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed record ExtendedMemberInfo(MethodInfo Method, MemberInfo Member);
-
     internal static class MemberInfoExtensions
     {
         private static readonly Regex

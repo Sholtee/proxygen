@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Tests
 
             InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            MethodInfo met = (MethodInfo) cntx.InterfaceMember;
+            MethodInfo met = cntx.InterfaceMember.Method;
             Assert.That(met.Name, Is.EqualTo(nameof(IList.Clear)));
         }
 
@@ -52,9 +52,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember;
+            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
-            Assert.That(cntx.InterfaceMethod, Is.EqualTo(prop.SetMethod));
+            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.SetMethod));
         }
 
         [Test]
@@ -68,9 +68,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember;
+            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
-            Assert.That(cntx.InterfaceMethod, Is.EqualTo(prop.SetMethod));
+            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.SetMethod));
         }
 
         [Test]
@@ -83,9 +83,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember;
+            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
-            Assert.That(cntx.InterfaceMethod, Is.EqualTo(prop.GetMethod));
+            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
         }
 
         [Test]
@@ -99,9 +99,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            EventInfo evt = (EventInfo) cntx.InterfaceMember;
+            EventInfo evt = (EventInfo) cntx.InterfaceMember.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));
-            Assert.That(cntx.InterfaceMethod, Is.EqualTo(evt.AddMethod));
+            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
         }
     }
 }

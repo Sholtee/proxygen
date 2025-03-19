@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public override object Invoke(InvocationContext context)
             {
-                if (context.InterfaceMethod.Name == nameof(Target.Hooked)) return 1986;
+                if (context.InterfaceMember.Method.Name == nameof(Target.Hooked)) return 1986;
                 return base.Invoke(context);
             }
 
@@ -227,7 +227,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperMethodInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperMethodInfo_InterfaceTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, IList<int>>>.ActivateAsync(Tuple.Create((IList<int>)new List<int>()));
             proxy.Add(100);
@@ -237,14 +237,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
-            Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Method));
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperMethodInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperMethodInfo_ClassTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, List<int>>>.ActivateAsync(Tuple.Create(new List<int>()));
             proxy.Add(100);
@@ -254,64 +254,64 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
-            Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
-            Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.TargetMember.Method));
         }
 
-        public interface IMyInterfceHavingGenericMethod
+        public interface IMyInterfaceHavingGenericMethod
         {
             T GenericMethod<T>(T val);
         }
 
-        public sealed class MyInterfceHavingGenericMethodImpl : IMyInterfceHavingGenericMethod
+        public sealed class MyInterfaceHavingGenericMethodImpl : IMyInterfaceHavingGenericMethod
         {
             public T GenericMethod<T>(T val) => val;
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperGenericMethodInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperGenericMethodInfo_InterfaceTarget()
         {
-            IMyInterfceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfceHavingGenericMethod, InterceptorPersistingContext<IMyInterfceHavingGenericMethod, IMyInterfceHavingGenericMethod>>.ActivateAsync
+            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod>>.ActivateAsync
             (
-                Tuple.Create((IMyInterfceHavingGenericMethod)new MyInterfceHavingGenericMethodImpl())
+                Tuple.Create((IMyInterfaceHavingGenericMethod)new MyInterfaceHavingGenericMethodImpl())
             );
             proxy.GenericMethod(100);
 
-            InterceptorPersistingContext<IMyInterfceHavingGenericMethod, IMyInterfceHavingGenericMethod> interceptor = (InterceptorPersistingContext<IMyInterfceHavingGenericMethod, IMyInterfceHavingGenericMethod>)proxy;
+            InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod>)proxy;
             InvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
-            Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMethod));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Method));
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperGenericMethodInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperGenericMethodInfo_ClassTarget()
         {
-            IMyInterfceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfceHavingGenericMethod, InterceptorPersistingContext<IMyInterfceHavingGenericMethod, MyInterfceHavingGenericMethodImpl>>.ActivateAsync
+            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl>>.ActivateAsync
             (
-                Tuple.Create(new MyInterfceHavingGenericMethodImpl())
+                Tuple.Create(new MyInterfaceHavingGenericMethodImpl())
             );
             proxy.GenericMethod(100);
 
-            InterceptorPersistingContext<IMyInterfceHavingGenericMethod, MyInterfceHavingGenericMethodImpl> interceptor = (InterceptorPersistingContext<IMyInterfceHavingGenericMethod, MyInterfceHavingGenericMethodImpl>)proxy;
+            InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl>)proxy;
             InvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMethod, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfceHavingGenericMethod>(iface => iface.GenericMethod(100))));
-            Assert.That(context.InterfaceMember, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMethod, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
-            Assert.That(context.TargetMember, Is.EqualTo(context.TargetMethod));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfaceHavingGenericMethod>(iface => iface.GenericMethod(100))));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfaceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.TargetMember.Method));
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperPropertyInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperPropertyInfo_InterfaceTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, IList<int>>>.ActivateAsync(Tuple.Create((IList<int>)new List<int>()));
 
@@ -328,14 +328,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             PropertyInfo prop = PropertyInfoExtractor.Extract(() => proxy.Count);
 
-            Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.InterfaceMember, Is.EqualTo(prop));
-            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMember));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(prop));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Member));
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperPropertyInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperPropertyInfo_ClassTarget()
         {
             IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, List<int>>>.ActivateAsync(Tuple.Create(new List<int>()));
 
@@ -352,17 +352,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             PropertyInfo prop = PropertyInfoExtractor.Extract<IList<int>, int>(lst => lst.Count);
 
-            Assert.That(context.InterfaceMethod, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.InterfaceMember, Is.EqualTo(prop));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(prop));
 
             prop = PropertyInfoExtractor.Extract<List<int>, int>(lst => lst.Count);
 
-            Assert.That(context.TargetMethod, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(prop));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(prop));
         }
 
         [Test]
-        public async Task GeneratredProxy_ShouldPassTheProperEventInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperEventInfo_InterfaceTarget()
         {
             IEventSource proxy = await ProxyGenerator<IEventSource, InterceptorPersistingContext<IEventSource, IEventSource>>.ActivateAsync(Tuple.Create((IEventSource)new EventSource()));
 
@@ -379,10 +379,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             EventInfo evt = typeof(IEventSource).GetEvent("Event");
 
-            Assert.That(context.InterfaceMethod, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.InterfaceMember, Is.EqualTo(evt));
-            Assert.That(context.TargetMethod, Is.EqualTo(context.InterfaceMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(context.InterfaceMember));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(evt));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Member));
         }
 
         [Test]
@@ -402,20 +402,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args.Length, Is.EqualTo(1));
 
             EventInfo evt = typeof(IEventSource).GetEvent("Event");
-            Assert.That(context.InterfaceMethod, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.InterfaceMember, Is.EqualTo(evt));
+            Assert.That(context.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.InterfaceMember.Member, Is.EqualTo(evt));
 
             evt = typeof(EventSource).GetEvent("Event");
-            Assert.That(context.TargetMethod, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.TargetMember, Is.EqualTo(context.TargetMember));
+            Assert.That(context.TargetMember.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.TargetMember.Member, Is.EqualTo(evt));
         }
 
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithGenericMethods()
         {
-            IMyInterfceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfceHavingGenericMethod, InterfaceInterceptor<IMyInterfceHavingGenericMethod>>.ActivateAsync
+            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterfaceInterceptor<IMyInterfaceHavingGenericMethod>>.ActivateAsync
             (
-                Tuple.Create((IMyInterfceHavingGenericMethod)new MyInterfceHavingGenericMethodImpl())
+                Tuple.Create((IMyInterfaceHavingGenericMethod)new MyInterfaceHavingGenericMethodImpl())
             );
 
             Assert.That(proxy.GenericMethod(10), Is.EqualTo(10));

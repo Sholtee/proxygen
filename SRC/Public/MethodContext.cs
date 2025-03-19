@@ -13,6 +13,13 @@ namespace Solti.Utils.Proxy
     using Internals;
 
     /// <summary>
+    /// Member info containing the backing method
+    /// </summary>
+    /// <param name="Method">The method represented by the <see cref="Member"/></param>
+    /// <param name="Member">The original member</param>
+    public sealed record ExtendedMemberInfo(MethodInfo Method, MemberInfo Member);
+
+    /// <summary>
     /// Describes a method context.
     /// </summary>
     public class MethodContext 
@@ -25,29 +32,25 @@ namespace Solti.Utils.Proxy
         public MethodContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
         #pragma warning restore CS8618
         {
-            ExtendedMemberInfo ifaceMember = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
-            Debug.Assert(ifaceMember.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
+            InterfaceMember = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
+            Debug.Assert(InterfaceMember.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
 
-            InterfaceMember = ifaceMember.Member;
-            InterfaceMethod = ifaceMember.Method;
             Dispatch = dispatch;
 
             if (mappings is not null)
             {
-                if (mappings.TryGetValue(InterfaceMethod.IsGenericMethod ? InterfaceMethod.GetGenericMethodDefinition() : InterfaceMethod, out MethodInfo targetMethod))
+                if (mappings.TryGetValue(InterfaceMember.Method.IsGenericMethod ? InterfaceMember.Method.GetGenericMethodDefinition() : InterfaceMember.Method, out MethodInfo targetMethod))
                 {
                     if (targetMethod.IsGenericMethod)
-                        targetMethod = targetMethod.MakeGenericMethod(InterfaceMethod.GetGenericArguments());
+                        targetMethod = targetMethod.MakeGenericMethod(InterfaceMember.Method.GetGenericArguments());
 
-                    TargetMethod = targetMethod;
-                    TargetMember = MemberInfoExtensions.ExtractFrom(targetMethod);
+                    TargetMember = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
                     return;
                 }
-                Debug.Assert(false, $"Cannot get target method for: {InterfaceMethod}");
+                Debug.Assert(false, $"Cannot get target method for: {InterfaceMember.Method}");
             }
             else
             {
-                TargetMethod = InterfaceMethod;
                 TargetMember = InterfaceMember;
             }
         }
@@ -61,31 +64,19 @@ namespace Solti.Utils.Proxy
                 throw new ArgumentNullException(nameof(src));
 
             InterfaceMember = src.InterfaceMember;
-            InterfaceMethod = src.InterfaceMethod;
             TargetMember    = src.TargetMember;
-            TargetMethod    = src.TargetMethod;
             Dispatch        = src.Dispatch;
         }
 
         /// <summary>
-        /// The concrete method behind the <see cref="InterfaceMember"/>.
-        /// </summary>
-        public MethodInfo InterfaceMethod { get; }
-
-        /// <summary>
         /// The member (property, event or method) that is being invoked.
         /// </summary>
-        public MemberInfo InterfaceMember { get; }
-
-        /// <summary>
-        /// The concrete method behind the <see cref="TargetMember"/>.
-        /// </summary>
-        public MethodInfo TargetMethod { get; }
+        public ExtendedMemberInfo InterfaceMember { get; }
 
         /// <summary>
         /// The member (property, event or method) that is being targeted.
         /// </summary>
-        public MemberInfo TargetMember { get; }
+        public ExtendedMemberInfo TargetMember { get; }
 
         /// <summary>
         /// Gets the dispatcher function.

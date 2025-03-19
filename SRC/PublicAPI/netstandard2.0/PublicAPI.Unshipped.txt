@@ -1,0 +1,8 @@
+Solti.Utils.Proxy.ExtendedMemberInfo
+Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo! Method, System.Reflection.MemberInfo! Member) -> void
+Solti.Utils.Proxy.ExtendedMemberInfo.Member.get -> System.Reflection.MemberInfo!
+Solti.Utils.Proxy.ExtendedMemberInfo.Member.init -> void
+Solti.Utils.Proxy.ExtendedMemberInfo.Method.get -> System.Reflection.MethodInfo!
+Solti.Utils.Proxy.ExtendedMemberInfo.Method.init -> void
+Solti.Utils.Proxy.MethodContext.InterfaceMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.MethodContext.TargetMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
