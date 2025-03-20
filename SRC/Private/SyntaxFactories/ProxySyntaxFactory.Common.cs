@@ -209,7 +209,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// satic (object target, object[] args) =>   
+        /// static (object target, object[] args) =>   
         /// {                                             
         ///     System.Int32 cb_a = (System.Int32) args[0]; 
         ///     System.String cb_b;                   
@@ -397,7 +397,7 @@ namespace Solti.Utils.Proxy.Internals
                         )
                         .WithConstraints
                         (
-                            GetContraints(constraint).ToSyntaxList()
+                            GetConstraints(constraint).ToSyntaxList()
                         )
                     )
                 )
@@ -423,7 +423,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            IEnumerable<TypeParameterConstraintSyntax> GetContraints(IGenericConstraint constraint)
+            IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
             {
                 if (constraint.Struct)
                     yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
