@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactory.cs                                                         *
+* InterfaceProxySyntaxFactory.cs                                                *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory: ProxyUnitSyntaxFactory
+    internal partial class InterfaceProxySyntaxFactory: ProxyUnitSyntaxFactory
     {
         private static string ResolveClassName(ITypeInfo interceptorType) => $"Proxy_{interceptorType.GetMD5HashCode()}";
 
@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override string ResolveClassName(object context) => ResolveClassName(InterceptorType);
 
-        public ProxySyntaxFactory
+        public InterfaceProxySyntaxFactory
         (
             ITypeInfo interfaceType,
             ITypeInfo interceptorType,

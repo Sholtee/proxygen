@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactory.Common.cs                                                  *
+* InterfaceProxySyntaxFactory.Common.cs                                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ProxySyntaxFactory
+    internal partial class InterfaceProxySyntaxFactory
     {
         #if DEBUG
         internal

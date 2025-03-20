@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactory.PropertyInterceptorFactory.cs                              *
+* InterfaceProxySyntaxFactory.PropertyInterceptorFactory.cs                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -14,7 +14,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class ProxySyntaxFactory
+    internal partial class InterfaceProxySyntaxFactory
     {
         #if DEBUG
         internal

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxySyntaxFactory.cs                                                         *
+* InterfaceProxySyntaxFactory.cs                                                *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using static Internals.Tests.CodeAnalysisTestsBase;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
-    public sealed class ProxySyntaxFactoryTests : SyntaxFactoryTestsBase
+    public sealed class InterfaceProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         private static ClassDeclarationSyntax GetDummyClass() => ClassDeclaration("Dummy");
 
@@ -43,16 +43,16 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (Bar, "global::System.Object[] args = new global::System.Object[0];")
         };
 
-        private static ProxySyntaxFactory CreateGenerator(Type iface, Type interceptor, OutputType outputType) => new ProxySyntaxFactory
+        private static InterfaceProxySyntaxFactory CreateGenerator(Type iface, Type interceptor, OutputType outputType) => new InterfaceProxySyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(iface),
             MetadataTypeInfo.CreateFrom(interceptor),
-            typeof(ProxySyntaxFactoryTests).Assembly.GetName().Name,
+            typeof(InterfaceProxySyntaxFactoryTests).Assembly.GetName().Name,
             outputType,
             null
         );
 
-        private static ProxySyntaxFactory CreateGenerator<TInterface, TInterceptor>(OutputType outputType) => CreateGenerator(typeof(TInterface), typeof(TInterceptor), outputType);
+        private static InterfaceProxySyntaxFactory CreateGenerator<TInterface, TInterceptor>(OutputType outputType) => CreateGenerator(typeof(TInterface), typeof(TInterceptor), outputType);
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             IReadOnlyList<ExpressionStatementSyntax> assignments = gen.AssignByRefParameters
             (
@@ -76,7 +76,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void LocalArgs_ShouldBeDeclaredForEachArgument()
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = gen.ResolveInvokeTargetLocals
             (
@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ReassignArgsArray_ShouldCopyByRefArgumentsBack()
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             ParameterSyntax args = Parameter
             (
@@ -126,7 +126,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveInvokeTarget_ShouldCreateTheProperMethod()
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CallbackSrc.txt"))));
         }
@@ -140,7 +140,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(ReturnTypes))]
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para)
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
@@ -170,7 +170,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = new ProxySyntaxFactory
+            SyntaxList<MemberDeclarationSyntax> props = new InterfaceProxySyntaxFactory
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
@@ -197,7 +197,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 #endif
         public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, Type interceptor, int outputType, string fileName)
         {
-            ProxySyntaxFactory gen = CreateGenerator(iface, interceptor, (OutputType) outputType);
+            InterfaceProxySyntaxFactory gen = CreateGenerator(iface, interceptor, (OutputType) outputType);
 
             Assert.That
             (
@@ -255,8 +255,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 interceptor1 = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>)),
                 interceptor2 = (IGenericTypeInfo) SymbolTypeInfo.CreateFrom(compilation.GetTypeByMetadataName(typeof(InterfaceInterceptor<>).FullName), compilation);
 
-            ProxySyntaxFactory
-                fact1 = new ProxySyntaxFactory
+            InterfaceProxySyntaxFactory
+                fact1 = new InterfaceProxySyntaxFactory
                 (
                     type1, 
                     interceptor1.Close(type1), 
@@ -264,7 +264,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     (OutputType) outputType,
                     new ReferenceCollector()
                 ),
-                fact2 = new ProxySyntaxFactory
+                fact2 = new InterfaceProxySyntaxFactory
                 (
                     type2, 
                     interceptor2.Close(type2), 
@@ -292,7 +292,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void Factory_CanBeCancelled()
         {
-            ProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
             using (CancellationTokenSource cancellation = new CancellationTokenSource())
             {
