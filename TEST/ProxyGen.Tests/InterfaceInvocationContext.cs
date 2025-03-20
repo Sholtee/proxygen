@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* InvocationContext.cs                                                          *
+* InterfaceInvocationContext.cs                                                 *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -13,7 +13,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Tests
 {
     [TestFixture]
-    public class InvocationContextTests
+    public class InterfaceInvocationContextTests
     {
         private interface IBase 
         {
@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
+            InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
             MethodInfo met = cntx.InterfaceMember.Method;
             Assert.That(met.Name, Is.EqualTo(nameof(IList.Clear)));
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
+            InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -66,7 +66,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
+            InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Tests
                 return ((IDescendant) target).Prop;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
+            InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
             PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
@@ -97,7 +97,7 @@ namespace Solti.Utils.Proxy.Tests
                 return null;
             }
 
-            InvocationContext cntx = new InvocationContext(Array.Empty<object>(), InvokeTarget);
+            InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
             EventInfo evt = (EventInfo) cntx.InterfaceMember.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));

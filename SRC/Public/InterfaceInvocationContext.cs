@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* InvocationContext.cs                                                          *
+* InterfaceInvocationContext.cs                                                 *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -11,16 +11,16 @@ namespace Solti.Utils.Proxy
     /// <summary>
     /// Describes a method invocation context.
     /// </summary>
-    public class InvocationContext : MethodContext
+    public class InterfaceInvocationContext : InterfaceInterceptionContext
     {
 #if DEBUG
-        internal InvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, 0, null)
+        internal InterfaceInvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, 0, null)
             => Args = args ?? throw new ArgumentNullException(nameof(args));
 #endif
         /// <summary>
-        /// Creates a new <see cref="InvocationContext"/> instance.
+        /// Creates a new <see cref="InterfaceInvocationContext"/> instance.
         /// </summary>
-        public InvocationContext(object?[] args, MethodContext methodContext): base(methodContext)
+        public InterfaceInvocationContext(object?[] args, InterfaceInterceptionContext methodContext): base(methodContext)
             => Args = args ?? throw new ArgumentNullException(nameof(args));
 
         /// <summary>

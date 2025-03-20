@@ -141,7 +141,7 @@ namespace Solti.Utils.Proxy.Internals
                             Invoke,
                             arguments: Argument
                             (
-                                ResolveObject<InvocationContext>
+                                ResolveObject<InterfaceInvocationContext>
                                 (
                                     ResolveArgument(argsArray),
                                     Argument
@@ -206,7 +206,7 @@ namespace Solti.Utils.Proxy.Internals
                             Invoke,
                             arguments: Argument
                             (
-                                ResolveObject<InvocationContext>
+                                ResolveObject<InterfaceInvocationContext>
                                 (
                                     ResolveArgument(argsArray),
                                     Argument

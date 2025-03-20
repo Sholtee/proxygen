@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class MyInterceptor : InterfaceInterceptor<IMyInterface>
         {
-            public override object Invoke(InvocationContext context)
+            public override object Invoke(InterfaceInvocationContext context)
             {
                 if (context.InterfaceMember.Method.Name == nameof(Target.Hooked)) return 1986;
                 return base.Invoke(context);
@@ -160,7 +160,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public class FooProxy : InterfaceInterceptor<IFoo>
         {
-            public override object Invoke(InvocationContext context)
+            public override object Invoke(InterfaceInvocationContext context)
             {
                 return 1;
             }
@@ -189,7 +189,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InternalInterfaceProxy() : base(null) { }
 
-            public override object Invoke(InvocationContext context) => 1;
+            public override object Invoke(InterfaceInvocationContext context) => 1;
         }
 
         [Test]
@@ -217,13 +217,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public InterceptorPersistingContext(TTarget target) : base(target) { }
 
-            public override object Invoke(InvocationContext context)
+            public override object Invoke(InterfaceInvocationContext context)
             {
                 Contexts.Add(context);
                 return base.Invoke(context);
             }
 
-            public List<InvocationContext> Contexts { get; } = new List<InvocationContext>();
+            public List<InterfaceInvocationContext> Contexts { get; } = new List<InterfaceInvocationContext>();
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.Add(100);
 
             InterceptorPersistingContext<IList<int>, IList<int>> interceptor = (InterceptorPersistingContext<IList<int>, IList<int>>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -250,7 +250,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.Add(100);
 
             InterceptorPersistingContext<IList<int>, List<int>> interceptor = (InterceptorPersistingContext<IList<int>, List<int>>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -280,7 +280,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.GenericMethod(100);
 
             InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -300,7 +300,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.GenericMethod(100);
 
             InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
@@ -322,7 +322,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             _ = proxy.Count;
 
             InterceptorPersistingContext<IList<int>, IList<int>> interceptor = (InterceptorPersistingContext<IList<int>, IList<int>>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
@@ -346,7 +346,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             _ = proxy.Count;
 
             InterceptorPersistingContext<IList<int>, List<int>> interceptor = (InterceptorPersistingContext<IList<int>, List<int>>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
@@ -373,7 +373,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.Event += null;
 
             InterceptorPersistingContext<IEventSource, IEventSource> interceptor = (InterceptorPersistingContext<IEventSource, IEventSource>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
 
@@ -397,7 +397,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             proxy.Event += null;
 
             InterceptorPersistingContext<IEventSource, EventSource> interceptor = (InterceptorPersistingContext<IEventSource, EventSource>)proxy;
-            InvocationContext context = interceptor.Contexts[0];
+            InterfaceInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
 
@@ -509,7 +509,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             {
             }
 
-            public override object Invoke(InvocationContext context)
+            public override object Invoke(InterfaceInvocationContext context)
             {
                 context.Args[0] = 2;
                 return base.Invoke(context);
@@ -722,7 +722,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             internal int Hooked(in int val) => val;  // this won't be treated as implementation since it's not public
 
-            public override object Invoke(InvocationContext context)
+            public override object Invoke(InterfaceInvocationContext context)
             {
                 return 1986;
             }

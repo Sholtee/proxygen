@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* MethodContext.cs                                                              *
+* InterfaceInterceptionContext.cs                                               *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -13,23 +13,16 @@ namespace Solti.Utils.Proxy
     using Internals;
 
     /// <summary>
-    /// Member info containing the backing method
-    /// </summary>
-    /// <param name="Method">The method represented by the <see cref="Member"/></param>
-    /// <param name="Member">The original member</param>
-    public sealed record ExtendedMemberInfo(MethodInfo Method, MemberInfo Member);
-
-    /// <summary>
     /// Describes a method context.
     /// </summary>
-    public class MethodContext 
+    public class InterfaceInterceptionContext 
     {
         /// <summary>
-        /// Creates a new <see cref="MethodContext"/> instance.
+        /// Creates a new <see cref="InterfaceInterceptionContext"/> instance.
         /// </summary>
         /// <remarks>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</remarks>
         #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        public MethodContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
+        public InterfaceInterceptionContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
         #pragma warning restore CS8618
         {
             InterfaceMember = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
@@ -58,7 +51,7 @@ namespace Solti.Utils.Proxy
         /// <summary>
         /// Creates a copy from the given source.
         /// </summary>
-        protected MethodContext(MethodContext src)
+        protected InterfaceInterceptionContext(InterfaceInterceptionContext src)
         {
             if (src is null)
                 throw new ArgumentNullException(nameof(src));

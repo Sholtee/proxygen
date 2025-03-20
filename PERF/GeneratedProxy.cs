@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Perf
             public InterfaceProxyWithoutTarget() : base(null)
             {
             }
-            public override object Invoke(InvocationContext context) => 0;
+            public override object Invoke(InterfaceInvocationContext context) => 0;
         }
 
         public class DispatchProxyWithTarget : DispatchProxy // DispatchProxy cannot support target

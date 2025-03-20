@@ -9,7 +9,7 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
 
     private static class WrapperDEE7EA963FA18B0FFA714300E3E35F25<TT>
     {
-        public static readonly global::Solti.Utils.Proxy.MethodContext Value = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+        public static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext Value = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
         {
             global::System.Int32 _a = (global::System.Int32)args[0];
             global::System.String _b;
@@ -24,13 +24,13 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
     global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c)
     {
         global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};
-        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.WrapperDEE7EA963FA18B0FFA714300E3E35F25<TT>.Value));
+        global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.WrapperDEE7EA963FA18B0FFA714300E3E35F25<TT>.Value));
         b = (global::System.String)args[1];
         c = (TT)args[2];
         return (global::System.Int32)result;
     }
 
-    private static readonly global::Solti.Utils.Proxy.MethodContext F5E3B2780A596B1EF75378976B5406D84 = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+    private static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext F5E3B2780A596B1EF75378976B5406D84 = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
     {
         ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Bar();
         return null;
@@ -38,14 +38,14 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
     void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar()
     {
         global::System.Object[] args = new global::System.Object[0];
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F5E3B2780A596B1EF75378976B5406D84));
+        this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F5E3B2780A596B1EF75378976B5406D84));
     }
 
-    private static readonly global::Solti.Utils.Proxy.MethodContext F36800AD4553C8E13BEEE3C1DEE3EF22B = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+    private static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext F36800AD4553C8E13BEEE3C1DEE3EF22B = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
     {
         return (global::System.Object)((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Prop;
     }, 0, null);
-    private static readonly global::Solti.Utils.Proxy.MethodContext F8236DF1B3F472BCDAE2FEF2D45620331 = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+    private static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext F8236DF1B3F472BCDAE2FEF2D45620331 = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
     {
         global::System.Int32 _value = (global::System.Int32)args[0];
         ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Prop = _value;
@@ -56,23 +56,23 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         get
         {
             global::System.Object[] args = new global::System.Object[0];
-            return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F36800AD4553C8E13BEEE3C1DEE3EF22B));
+            return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F36800AD4553C8E13BEEE3C1DEE3EF22B));
         }
 
         set
         {
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F8236DF1B3F472BCDAE2FEF2D45620331));
+            this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.F8236DF1B3F472BCDAE2FEF2D45620331));
         }
     }
 
-    private static readonly global::Solti.Utils.Proxy.MethodContext FB87DFB32A2DD0754D6374F9CF1ED5F08 = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+    private static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext FB87DFB32A2DD0754D6374F9CF1ED5F08 = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
     {
         global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
         ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Event += _value;
         return null;
     }, 0, null);
-    private static readonly global::Solti.Utils.Proxy.MethodContext FFBD84B95FB3FB5584930D41ADD52FEC9 = new global::Solti.Utils.Proxy.MethodContext(static (global::System.Object target, global::System.Object[] args) =>
+    private static readonly global::Solti.Utils.Proxy.InterfaceInterceptionContext FFBD84B95FB3FB5584930D41ADD52FEC9 = new global::Solti.Utils.Proxy.InterfaceInterceptionContext(static (global::System.Object target, global::System.Object[] args) =>
     {
         global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
         ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)target).Event -= _value;
@@ -83,13 +83,13 @@ internal sealed class Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A : global::Solti.Uti
         add
         {
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.FB87DFB32A2DD0754D6374F9CF1ED5F08));
+            this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.FB87DFB32A2DD0754D6374F9CF1ED5F08));
         }
 
         remove
         {
             global::System.Object[] args = new global::System.Object[]{value};
-            this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.FFBD84B95FB3FB5584930D41ADD52FEC9));
+            this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Proxy_10FC5DBDBA8C97EBE529724F5CB55A8A.FFBD84B95FB3FB5584930D41ADD52FEC9));
         }
     }
 

@@ -39,15 +39,8 @@ Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>
 Solti.Utils.Proxy.Internals.LoadedTypes
 Solti.Utils.Proxy.Internals.TypeEmitter
 Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter() -> void
-Solti.Utils.Proxy.InvocationContext
-Solti.Utils.Proxy.InvocationContext.Args.get -> object?[]!
-Solti.Utils.Proxy.InvocationContext.InvocationContext(object?[]! args, Solti.Utils.Proxy.MethodContext! methodContext) -> void
 Solti.Utils.Proxy.IProxyAccess<TInterface>
 Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy.set -> void
-Solti.Utils.Proxy.MethodContext
-Solti.Utils.Proxy.MethodContext.Dispatch.get -> System.Func<object!, object?[]!, object?>!
-Solti.Utils.Proxy.MethodContext.MethodContext(Solti.Utils.Proxy.MethodContext! src) -> void
-Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<object!, object?[]!, object?>! dispatch, int callIndex, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>? mappings) -> void
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate(System.Runtime.CompilerServices.ITuple? tuple) -> TInterface
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAsync(System.Runtime.CompilerServices.ITuple? tuple, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface>!
 static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType() -> System.Type!
@@ -56,4 +49,3 @@ static Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Instance.g
 static Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Value.get -> System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>!
 static Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type! instance) -> void
 static Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(string! name, out System.Type! type) -> bool
-virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InvocationContext! context) -> object?

@@ -137,7 +137,7 @@ namespace Solti.Utils.Proxy.Internals
                     Invoke,
                     arguments: Argument
                     (
-                        ResolveObject<InvocationContext>
+                        ResolveObject<InterfaceInvocationContext>
                         (
                             ResolveArgument(argsArray),
                             Argument(accessContext)

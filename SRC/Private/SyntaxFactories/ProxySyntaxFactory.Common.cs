@@ -318,10 +318,10 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<MethodContext>
+        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<InterfaceInterceptionContext>
         (
             $"F{lambda.GetMD5HashCode()}",
-            ResolveObject<MethodContext>
+            ResolveObject<InterfaceInterceptionContext>
             (
                 Argument(lambda),
                 Argument
@@ -404,10 +404,10 @@ namespace Solti.Utils.Proxy.Internals
             )
             .AddMembers
             (
-                ResolveStaticGlobal<MethodContext>
+                ResolveStaticGlobal<InterfaceInterceptionContext>
                 (
                     $"Value",
-                    ResolveObject<MethodContext>
+                    ResolveObject<InterfaceInterceptionContext>
                     (
                         Argument(lambda),
                         Argument
