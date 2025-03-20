@@ -18,13 +18,13 @@ namespace Solti.Utils.Proxy
         /// </summary>
         public ClassInvocationContext(ExtendedMemberInfo targetMember, Func<object?[], object?> dispatch, object?[] args)
         {
-            TargetMember = targetMember ?? throw new ArgumentNullException(nameof(targetMember));
+            Member = targetMember ?? throw new ArgumentNullException(nameof(targetMember));
             Dispatch = dispatch ?? throw new ArgumentNullException(nameof(dispatch));
             Args = args ?? throw new ArgumentNullException(nameof(args));
         }
 
         /// <inheritdoc/>
-        public ExtendedMemberInfo TargetMember { get; }
+        public ExtendedMemberInfo Member { get; }
 
         /// <summary>
         /// Gets the dispatcher function.

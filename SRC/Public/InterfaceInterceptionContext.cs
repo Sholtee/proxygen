@@ -25,26 +25,26 @@ namespace Solti.Utils.Proxy
         public InterfaceInterceptionContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
         #pragma warning restore CS8618
         {
-            InterfaceMember = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
-            Debug.Assert(InterfaceMember.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
+            Member = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
+            Debug.Assert(Member.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
 
             Dispatch = dispatch;
 
             if (mappings is not null)
             {
-                if (mappings.TryGetValue(InterfaceMember.Method.IsGenericMethod ? InterfaceMember.Method.GetGenericMethodDefinition() : InterfaceMember.Method, out MethodInfo targetMethod))
+                if (mappings.TryGetValue(Member.Method.IsGenericMethod ? Member.Method.GetGenericMethodDefinition() : Member.Method, out MethodInfo targetMethod))
                 {
                     if (targetMethod.IsGenericMethod)
-                        targetMethod = targetMethod.MakeGenericMethod(InterfaceMember.Method.GetGenericArguments());
+                        targetMethod = targetMethod.MakeGenericMethod(Member.Method.GetGenericArguments());
 
-                    TargetMember = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
+                    Target = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
                     return;
                 }
-                Debug.Assert(false, $"Cannot get target method for: {InterfaceMember.Method}");
+                Debug.Assert(false, $"Cannot get the target method for: {Member.Method}");
             }
             else
             {
-                TargetMember = InterfaceMember;
+                Target = Member;
             }
         }
 
@@ -56,20 +56,20 @@ namespace Solti.Utils.Proxy
             if (src is null)
                 throw new ArgumentNullException(nameof(src));
 
-            InterfaceMember = src.InterfaceMember;
-            TargetMember    = src.TargetMember;
-            Dispatch        = src.Dispatch;
+            Member  = src.Member;
+            Target = src.Target;
+            Dispatch      = src.Dispatch;
         }
 
         /// <summary>
-        /// The member (property, event or method) that is being invoked.
+        /// The member (property, event or method) that is being proxied.
         /// </summary>
-        public ExtendedMemberInfo InterfaceMember { get; }
+        public ExtendedMemberInfo Member { get; }
 
         /// <summary>
-        /// The member (property, event or method) that is being targeted.
+        /// The concrete implementation if available, the interface member otherwise.
         /// </summary>
-        public ExtendedMemberInfo TargetMember { get; }
+        public ExtendedMemberInfo Target { get; }
 
         /// <summary>
         /// Gets the dispatcher function.

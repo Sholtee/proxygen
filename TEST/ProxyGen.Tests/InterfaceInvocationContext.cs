@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Tests
 
             InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            MethodInfo met = cntx.InterfaceMember.Method;
+            MethodInfo met = cntx.Member.Method;
             Assert.That(met.Name, Is.EqualTo(nameof(IList.Clear)));
         }
 
@@ -52,9 +52,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
+            PropertyInfo prop = (PropertyInfo) cntx.Member.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
-            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.SetMethod));
+            Assert.That(cntx.Member.Method, Is.EqualTo(prop.SetMethod));
         }
 
         [Test]
@@ -68,9 +68,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
+            PropertyInfo prop = (PropertyInfo) cntx.Member.Member;
             Assert.That(prop.Name, Is.EqualTo("Item"));
-            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.SetMethod));
+            Assert.That(cntx.Member.Method, Is.EqualTo(prop.SetMethod));
         }
 
         [Test]
@@ -83,9 +83,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            PropertyInfo prop = (PropertyInfo) cntx.InterfaceMember.Member;
+            PropertyInfo prop = (PropertyInfo) cntx.Member.Member;
             Assert.That(prop.Name, Is.EqualTo("Prop"));
-            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(cntx.Member.Method, Is.EqualTo(prop.GetMethod));
         }
 
         [Test]
@@ -99,9 +99,9 @@ namespace Solti.Utils.Proxy.Tests
 
             InterfaceInvocationContext cntx = new InterfaceInvocationContext(Array.Empty<object>(), InvokeTarget);
 
-            EventInfo evt = (EventInfo) cntx.InterfaceMember.Member;
+            EventInfo evt = (EventInfo) cntx.Member.Member;
             Assert.That(evt.Name, Is.EqualTo("Evt"));
-            Assert.That(cntx.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(cntx.Member.Method, Is.EqualTo(evt.AddMethod));
         }
     }
 }

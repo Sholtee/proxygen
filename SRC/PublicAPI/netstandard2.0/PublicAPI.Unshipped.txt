@@ -2,7 +2,7 @@ Solti.Utils.Proxy.ClassInvocationContext
 Solti.Utils.Proxy.ClassInvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.ClassInvocationContext.ClassInvocationContext(Solti.Utils.Proxy.ExtendedMemberInfo! targetMember, System.Func<object?[]!, object?>! dispatch, object?[]! args) -> void
 Solti.Utils.Proxy.ClassInvocationContext.Dispatch.get -> System.Func<object?[]!, object?>!
-Solti.Utils.Proxy.ClassInvocationContext.TargetMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.ClassInvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
 Solti.Utils.Proxy.ExtendedMemberInfo
 Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo! Method, System.Reflection.MemberInfo! Member) -> void
 Solti.Utils.Proxy.ExtendedMemberInfo.Member.get -> System.Reflection.MemberInfo!
@@ -11,13 +11,13 @@ Solti.Utils.Proxy.ExtendedMemberInfo.Method.get -> System.Reflection.MethodInfo!
 Solti.Utils.Proxy.ExtendedMemberInfo.Method.init -> void
 Solti.Utils.Proxy.IInvocationContext
 Solti.Utils.Proxy.IInvocationContext.Args.get -> object?[]!
-Solti.Utils.Proxy.IInvocationContext.TargetMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.IInvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
 Solti.Utils.Proxy.InterfaceInterceptionContext
 Solti.Utils.Proxy.InterfaceInterceptionContext.Dispatch.get -> System.Func<object!, object?[]!, object?>!
 Solti.Utils.Proxy.InterfaceInterceptionContext.InterfaceInterceptionContext(Solti.Utils.Proxy.InterfaceInterceptionContext! src) -> void
 Solti.Utils.Proxy.InterfaceInterceptionContext.InterfaceInterceptionContext(System.Func<object!, object?[]!, object?>! dispatch, int callIndex, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>? mappings) -> void
-Solti.Utils.Proxy.InterfaceInterceptionContext.InterfaceMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
-Solti.Utils.Proxy.InterfaceInterceptionContext.TargetMember.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.InterfaceInterceptionContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.InterfaceInterceptionContext.Target.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
 Solti.Utils.Proxy.InterfaceInvocationContext
 Solti.Utils.Proxy.InterfaceInvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.InterfaceInvocationContext.InterfaceInvocationContext(object?[]! args, Solti.Utils.Proxy.InterfaceInterceptionContext! methodContext) -> void

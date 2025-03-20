@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public override object Invoke(InterfaceInvocationContext context)
             {
-                if (context.InterfaceMember.Method.Name == nameof(Target.Hooked)) return 1986;
+                if (context.Member.Method.Name == nameof(Target.Hooked)) return 1986;
                 return base.Invoke(context);
             }
 
@@ -237,10 +237,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
+            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Method));
         }
 
         [Test]
@@ -254,10 +254,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.TargetMember.Method));
+            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
+            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Method, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Target.Method));
         }
 
         public interface IMyInterfaceHavingGenericMethod
@@ -284,10 +284,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Method));
+            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
+            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Method));
         }
 
         [Test]
@@ -304,10 +304,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfaceHavingGenericMethod>(iface => iface.GenericMethod(100))));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfaceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.TargetMember.Method));
+            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfaceHavingGenericMethod>(iface => iface.GenericMethod(100))));
+            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Method, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfaceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Target.Method));
         }
 
         [Test]
@@ -328,10 +328,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             PropertyInfo prop = PropertyInfoExtractor.Extract(() => proxy.Count);
 
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(prop));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Member));
+            Assert.That(context.Member.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.Member.Member, Is.EqualTo(prop));
+            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Member));
         }
 
         [Test]
@@ -352,13 +352,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             PropertyInfo prop = PropertyInfoExtractor.Extract<IList<int>, int>(lst => lst.Count);
 
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(prop));
+            Assert.That(context.Member.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.Member.Member, Is.EqualTo(prop));
 
             prop = PropertyInfoExtractor.Extract<List<int>, int>(lst => lst.Count);
 
-            Assert.That(context.TargetMember.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(prop));
+            Assert.That(context.Target.Method, Is.EqualTo(prop.GetMethod));
+            Assert.That(context.Target.Member, Is.EqualTo(prop));
         }
 
         [Test]
@@ -379,10 +379,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             EventInfo evt = typeof(IEventSource).GetEvent("Event");
 
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(evt));
-            Assert.That(context.TargetMember.Method, Is.EqualTo(context.InterfaceMember.Method));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(context.InterfaceMember.Member));
+            Assert.That(context.Member.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.Member.Member, Is.EqualTo(evt));
+            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
+            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Member));
         }
 
         [Test]
@@ -402,12 +402,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(context.Args.Length, Is.EqualTo(1));
 
             EventInfo evt = typeof(IEventSource).GetEvent("Event");
-            Assert.That(context.InterfaceMember.Method, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.InterfaceMember.Member, Is.EqualTo(evt));
+            Assert.That(context.Member.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.Member.Member, Is.EqualTo(evt));
 
             evt = typeof(EventSource).GetEvent("Event");
-            Assert.That(context.TargetMember.Method, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.TargetMember.Member, Is.EqualTo(evt));
+            Assert.That(context.Target.Method, Is.EqualTo(evt.AddMethod));
+            Assert.That(context.Target.Member, Is.EqualTo(evt));
         }
 
         [Test]
