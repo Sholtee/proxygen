@@ -9,9 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 namespace Solti.Utils.Proxy
 {
     /// <summary>
-    /// Describes a method invocation context.
+    /// Describes an interface invocation context.
     /// </summary>
-    public class InterfaceInvocationContext : InterfaceInterceptionContext
+    public sealed class InterfaceInvocationContext : InterfaceInterceptionContext, IInvocationContext
     {
 #if DEBUG
         internal InterfaceInvocationContext(object?[] args, Func<object, object?[], object?> dispatch): base(dispatch, 0, null)
