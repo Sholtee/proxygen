@@ -21,11 +21,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Primitives;
 
     [TestFixture]
-    public sealed class ClassSyntaxFactoryBaseTests : SyntaxFactoryTestsBase
+    public class ClassSyntaxFactoryBaseTests : SyntaxFactoryTestsBase
     {
         private sealed class ClassSyntaxFactory : ClassSyntaxFactoryBase
         {
-            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(referenceCollector, LanguageVersion.Latest) {}
+            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(referenceCollector, LanguageVersion.Latest) { }
 
             protected internal override IEnumerable<ITypeInfo> ResolveBases(object context) => throw new NotImplementedException();
 
@@ -120,23 +120,36 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void InvokeMethod_ShouldSupportRefKeywords() =>
-            Assert.That(new ClassSyntaxFactory(default).InvokeMethod(MetadataMethodInfo.CreateFrom(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)), IdentifierName("target"),  null, "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
+            Assert.That(new ClassSyntaxFactory(default).InvokeMethod(MetadataMethodInfo.CreateFrom(typeof(IRefInterface).GetMethod(nameof(IRefInterface.RefMethod), BindingFlags.Instance | BindingFlags.Public)), IdentifierName("target"), null, "a", "b", "c").NormalizeWhitespace().ToString(), Is.EqualTo("target.RefMethod(in a, out b, ref c)"));
 
-        private static void GenericMethod<T>(T a) { }
+        internal static void StaticGenericMethod<T>(T a) { }
 
-        public static (MethodInfo Method, string Expected)[] GenericMethods = new[] 
+        internal void GenericMethod<T>(T a) { }
+
+        protected virtual void GenericVirtualMethodHavingConstraint<T>(T a) where T : IRefInterface, new() { }
+
+        protected virtual int VirtualMethod(int i) => 0;
+
+        public static (MethodInfo Method, string Expected)[] GenericMethods = new[]
         {
-           (MethodInfoExtractor.Extract(() => GenericMethod(0)).GetGenericMethodDefinition(), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.GenericMethod<T>(a)"),
-           (MethodInfoExtractor.Extract(() => GenericMethod(0)), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.GenericMethod<global::System.Int32>(a)")
+           (MethodInfoExtractor.Extract(() => StaticGenericMethod(0)), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.StaticGenericMethod<global::System.Int32>(a)"),
+           (MethodInfoExtractor.Extract(() => StaticGenericMethod(0)).GetGenericMethodDefinition(),"global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.StaticGenericMethod<T>(a)"),
+           (MethodInfoExtractor.Extract<ClassSyntaxFactoryBaseTests>(x => x.GenericMethod(0)).GetGenericMethodDefinition(), "this.GenericMethod<T>(a)"),
+           (MethodInfoExtractor.Extract<ClassSyntaxFactoryBaseTests>(x => x.GenericMethod(0)), "this.GenericMethod<global::System.Int32>(a)")
         };
 
         [TestCaseSource(nameof(GenericMethods))]
         public void InvokeMethod_ShouldSupportGenerics((MethodInfo Method, string Expected) param) =>
             Assert.That(new ClassSyntaxFactory(default).InvokeMethod(MetadataMethodInfo.CreateFrom(param.Method), null, null, "a").NormalizeWhitespace().ToFullString(), Is.EqualTo(param.Expected));
 
-        private interface IRefInterface
+        protected interface IRefInterface
         {
             ref object RefMethod(in object a, out object b, ref object c);
+        }
+
+        private class RefClass : IRefInterface
+        {
+            public ref object RefMethod(in object a, out object b, ref object c) => throw new NotImplementedException();
         }
 
         public static (MethodInfo Method, string Expected)[] MethodsHavingNullableRetVal = new[]
@@ -149,10 +162,36 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveMethod_ShouldSupportNullables((MethodInfo Method, string Expected) param) =>
             Assert.That(new ClassSyntaxFactory(default).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
 
+        public static (MethodInfo Method, string Expected)[] InterfaceMethodsToResolve = new[]
+        {
+            (MethodInfoExtractor.Extract<IGeneric>(i => i.Foo(0)).GetGenericMethodDefinition(), "T global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.IGeneric.Foo<T>(T b)"),
+            (MethodInfoExtractor.Extract<INullable>(i => i.Object()), "global::System.Object global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.INullable.Object()"),
+        };
+
+        [TestCaseSource(nameof(InterfaceMethodsToResolve))]
+        public void ResolveMethod_ShouldSupportInterfaceMethods((MethodInfo Method, string Expected) param) =>
+            Assert.That(new ClassSyntaxFactory(default).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
+
+        public static (MethodInfo Method, string Expected)[] ClassMethodsToResolve = new[]
+        {
+            (MethodInfoExtractor.Extract<ClassSyntaxFactoryBaseTests>(x => x.VirtualMethod(0)), "protected override global::System.Int32 VirtualMethod(global::System.Int32 i)"),
+            (MethodInfoExtractor.Extract<ClassSyntaxFactoryBaseTests>(x => x.GenericMethod(0)).GetGenericMethodDefinition(), "internal new void GenericMethod<T>(T a)"),
+            (MethodInfoExtractor.Extract<ClassSyntaxFactoryBaseTests>(x => x.GenericVirtualMethodHavingConstraint<RefClass>(null!)).GetGenericMethodDefinition(), "protected override void GenericVirtualMethodHavingConstraint<T>(T a)\r\n    where T : new(), global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.IRefInterface")
+        };
+
+        [TestCaseSource(nameof(ClassMethodsToResolve))]
+        public void ResolveMethod_ShouldSupportClassMethods((MethodInfo Method, string Expected) param) =>
+            Assert.That(new ClassSyntaxFactory(default).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
+
         private interface INullable 
         {
             int? Nullable();
             object Object(); // nullable
+        }
+
+        private interface IGeneric
+        {
+            T Foo<T>(T b);
         }
     }
 

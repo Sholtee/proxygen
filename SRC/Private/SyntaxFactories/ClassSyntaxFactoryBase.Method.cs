@@ -3,10 +3,12 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -14,6 +16,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
@@ -47,17 +51,21 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
         /// </code>
+        /// or
+        /// <code>
+        /// public override int Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
         protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method, bool forceInlining = false)
         {
-            TypeSyntax returnTypeSytax = ResolveType(method.ReturnValue.Type);
+            TypeSyntax returnTypeSyntax = ResolveType(method.ReturnValue.Type);
 
             if (method.ReturnValue.Kind >= ParameterKind.Ref)
             {
-                RefTypeSyntax refReturnTypeSyntax = RefType(returnTypeSytax);
+                RefTypeSyntax refReturnTypeSyntax = RefType(returnTypeSyntax);
 
                 if (method.ReturnValue.Kind is ParameterKind.RefReadonly)
                     refReturnTypeSyntax = refReturnTypeSyntax.WithReadOnlyKeyword
@@ -65,12 +73,12 @@ namespace Solti.Utils.Proxy.Internals
                         Token(SyntaxKind.ReadOnlyKeyword)
                     );
 
-                returnTypeSytax = refReturnTypeSyntax;
+                returnTypeSyntax = refReturnTypeSyntax;
             }
 
             MethodDeclarationSyntax result = MethodDeclaration
             (
-                returnType: returnTypeSytax,
+                returnType: returnTypeSyntax,
                 identifier: Identifier(method.Name)
             )
             .WithParameterList
@@ -106,11 +114,40 @@ namespace Solti.Utils.Proxy.Internals
                         return parameter;
                     })
                 )
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
             );
+
+            if (method.DeclaringType.IsInterface)
+                result = result.WithExplicitInterfaceSpecifier
+                (
+                    explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
+                );
+            else
+            {
+                List<SyntaxKind> tokens = method
+                    .AccessModifiers
+                    .SetFlags()
+                    .Select
+                    (
+                        am => am switch
+                        {
+                            AccessModifiers.Public => SyntaxKind.PublicKeyword,
+                            AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
+                            AccessModifiers.Internal => SyntaxKind.InternalKeyword,
+                            _ => throw new ArgumentException(string.Format(Resources.METHOD_NOT_VISIBLE, method.Name), nameof(method)),
+                        }
+                    )
+                    .ToList();
+
+                tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
+
+                result = result.WithModifiers
+                (
+                    TokenList
+                    (
+                        tokens.Select(Token)
+                    )
+                );
+            }
 
             if (method is IGenericMethodInfo genericMethod)
             {
@@ -138,10 +175,10 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             genericMethod
                                 .GenericConstraints
-                                .Where(static constraint => GetConstraints(constraint).Any())
+                                .Where(constraint => GetConstraints(constraint).Any())
                                 .Select
                                 (
-                                    static constraint => TypeParameterConstraintClause
+                                    constraint => TypeParameterConstraintClause
                                     (
                                         IdentifierName
                                         (
@@ -156,16 +193,30 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     );
 
-                    static IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
+                    IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
                     {
-                        //
-                        // Explicit interface implementations must not specify type constraints
-                        //
-
                         if (constraint.Struct)
                             yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
                         if (constraint.Reference)
                             yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+
+                        //
+                        // Explicit interface implementations must not specify type constraints
+                        //
+
+                        if (method.DeclaringType.IsInterface)
+                            yield break;
+
+                        if (constraint.DefaultConstructor)
+                            yield return ConstructorConstraint();
+
+                        foreach (ITypeInfo typeConstraint in constraint.ConstraintTypes)
+                        {
+                            yield return TypeConstraint
+                            (
+                                ResolveType(typeConstraint)
+                            );
+                        }
                     }
                 }
             }
