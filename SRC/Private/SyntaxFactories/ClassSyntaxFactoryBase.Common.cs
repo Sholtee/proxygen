@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";
 
-        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining)
+        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining, params IEnumerable<SyntaxKind> modifiers)
         {
             AccessorDeclarationSyntax declaration = AccessorDeclaration(kind);
 
@@ -40,6 +40,14 @@ namespace Solti.Utils.Proxy.Internals
                     Debug.Fail("Unknown node type");
                     return null!;
             }
+
+            if (modifiers.Any()) declaration = declaration.WithModifiers
+            (
+                modifiers: TokenList
+                (
+                    modifiers.Select(Token)
+                )
+            );
 
             if (forceInlining) declaration = declaration.WithAttributeLists
             (

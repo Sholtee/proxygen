@@ -96,13 +96,25 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveType_ShouldHandleNestedTypes(Type type, string expected) =>
             Assert.That(new ClassSyntaxFactory(default).ResolveType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
 
-        [Test]
-        public void ResolveProperty_ShouldDeclareANewProperty() =>
-            Assert.That(new ClassSyntaxFactory(default).ResolveProperty(Prop, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}"));
+        public static IEnumerable<object> ResolveProperty_ShouldDeclareANewProperty_Params
+        {
+            get
+            {
+                yield return (InterfaceProp, "global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}");
+                yield return (ClassProp, "public override global::System.Int32 Prop\n{\n    get\n    {\n    }\n\n    protected set\n    {\n    }\n}");
+            }
+        }
+
+        [TestCaseSource(nameof(ResolveProperty_ShouldDeclareANewProperty_Params))]
+        public void ResolveProperty_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
+        {
+            (IPropertyInfo Property, string Expected) param = ((IPropertyInfo Property, string Expected)) p;
+            Assert.That(new ClassSyntaxFactory(default).ResolveProperty(param.Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(param.Expected));
+        }
 
         [Test]
         public void ResolveEvent_ShouldDeclareANewEvent() =>
-            Assert.That(new ClassSyntaxFactory(default).ResolveEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
+            Assert.That(new ClassSyntaxFactory(default).ResolveEvent(InterfaceEvent, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
 
         [Test]
         public void ResolveMethod_ShouldHandleParamsModifier() =>

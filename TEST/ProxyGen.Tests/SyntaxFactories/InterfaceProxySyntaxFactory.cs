@@ -39,8 +39,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (object Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
-            ((object) Foo, "global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};"),
-            (Bar, "global::System.Object[] args = new global::System.Object[0];")
+            ((object) FooMethod, "global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};"),
+            (BarMethod, "global::System.Object[] args = new global::System.Object[0];")
         };
 
         private static InterfaceProxySyntaxFactory CreateGenerator(Type iface, Type interceptor, OutputType outputType) => new InterfaceProxySyntaxFactory
@@ -65,7 +65,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             IReadOnlyList<ExpressionStatementSyntax> assignments = gen.AssignByRefParameters
             (
-                Foo, gen.ResolveLocal<object[]>("args")
+                FooMethod, gen.ResolveLocal<object[]>("args")
             ).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
@@ -88,7 +88,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 (
                     gen.ResolveType<object[]>()
                 ), 
-                Foo
+                FooMethod
             ).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
@@ -113,9 +113,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             IEnumerable<StatementSyntax> assigns = gen.ReassignArgsArray
             (
-                Foo,
+                FooMethod,
                 args,
-                gen.ResolveInvokeTargetLocals(args, Foo)
+                gen.ResolveInvokeTargetLocals(args, FooMethod)
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));
@@ -128,7 +128,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             InterfaceProxySyntaxFactory gen = CreateGenerator<IFoo<int>, FooInterceptor>(OutputType.Module);
 
-            Assert.That(gen.ResolveInvokeTarget(Foo).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CallbackSrc.txt"))));
+            Assert.That(gen.ResolveInvokeTarget(FooMethod).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CallbackSrc.txt"))));
         }
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
@@ -147,8 +147,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public static (object Method, string File)[] Methods = new[]
         {
-            ((object) Foo, "FooSrc.txt"),
-            (Bar, "BarSrc.txt")
+            ((object) FooMethod, "FooSrc.txt"),
+            (BarMethod, "BarSrc.txt")
         };
 
         [TestCaseSource(nameof(Methods))]

@@ -16,8 +16,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class ClassSyntaxFactoryBase
     {
         /// <summary>
@@ -128,12 +126,17 @@ namespace Solti.Utils.Proxy.Internals
                     .SetFlags()
                     .Select
                     (
-                        am => am switch
+                        static am =>
                         {
-                            AccessModifiers.Public => SyntaxKind.PublicKeyword,
-                            AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
-                            AccessModifiers.Internal => SyntaxKind.InternalKeyword,
-                            _ => throw new ArgumentException(string.Format(Resources.METHOD_NOT_VISIBLE, method.Name), nameof(method)),
+                            switch (am)
+                            {
+                                case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
+                                case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
+                                case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
+                                default:
+                                    Debug.Fail("Method not visible");
+                                    return SyntaxKind.None;
+                            }
                         }
                     )
                     .ToList();

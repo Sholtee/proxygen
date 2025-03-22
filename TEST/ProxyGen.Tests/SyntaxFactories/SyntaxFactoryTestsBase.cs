@@ -13,12 +13,18 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     {
         public delegate void TestDelegate<in T>(object sender, T eventArg);
 
-        internal interface IFoo<T> // direkt internal
+        internal interface IFoo<T> // internal on purpose
         {
             int Foo<TT>(int a, out string b, ref TT c);
             void Bar();
             T Prop { get; set; }
             event TestDelegate<T> Event;
+        }
+
+        internal abstract class Foo<T>
+        {
+            public virtual T Prop { get; protected set; }
+            public abstract event TestDelegate<T> Event;
         }
 
         protected interface IComplex
@@ -28,12 +34,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             event Action Event;
         }
 
-        internal static IEventInfo Event { get; } = MetadataEventInfo.CreateFrom(typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event)));
+        internal static IEventInfo InterfaceEvent { get; } = MetadataEventInfo.CreateFrom(typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event)));
 
-        internal static IPropertyInfo Prop { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop)));
+        internal static IPropertyInfo InterfaceProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop)));
 
-        internal static IMethodInfo Foo { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo)));
+        internal static IPropertyInfo ClassProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(Foo<int>).GetProperty(nameof(IFoo<int>.Prop)));
 
-        internal static IMethodInfo Bar { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Bar)));
+        internal static IMethodInfo FooMethod { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo)));
+
+        internal static IMethodInfo BarMethod { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Bar)));
     }
 }
