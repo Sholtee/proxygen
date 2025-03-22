@@ -47,6 +47,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             {
             }
 
+            public T this[int i] { get => default; set { } }
             public T Prop { get; set; }
 
 #pragma warning disable 67  // impliciten hasznalva van
@@ -81,6 +82,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         public class ExplicitFoo : IFoo<int>
         {
+            public int this[int i] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             int IFoo<int>.Prop { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             event TestDelegate<int> IFoo<int>.Event
             {

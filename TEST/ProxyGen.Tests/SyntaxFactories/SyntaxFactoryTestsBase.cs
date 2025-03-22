@@ -18,12 +18,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             int Foo<TT>(int a, out string b, ref TT c);
             void Bar();
             T Prop { get; set; }
+            T this[int i] { get; set; }
             event TestDelegate<T> Event;
         }
 
         internal abstract class Foo<T>
         {
             public virtual T Prop { get; protected set; }
+            public abstract T this[int i] { get; protected set; }
             public abstract event TestDelegate<T> Event;
         }
 
@@ -38,7 +40,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         internal static IPropertyInfo InterfaceProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop)));
 
-        internal static IPropertyInfo ClassProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(Foo<int>).GetProperty(nameof(IFoo<int>.Prop)));
+        internal static IPropertyInfo ClassProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(Foo<int>).GetProperty(nameof(Foo<int>.Prop)));
+
+        internal static IPropertyInfo InterfaceIndexer { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty("Item"));
+
+        internal static IPropertyInfo ClassIndexer { get; } = MetadataPropertyInfo.CreateFrom(typeof(Foo<int>).GetProperty("Item"));
 
         internal static IMethodInfo FooMethod { get; } = MetadataMethodInfo.CreateFrom(typeof(IFoo<int>).GetMethod(nameof(IFoo<int>.Foo)));
 

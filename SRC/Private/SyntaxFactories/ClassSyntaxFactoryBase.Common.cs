@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ObjectCreationExpressionSyntax ResolveObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: ResolveType<T>()).WithArgumentList
+        protected ObjectCreationExpressionSyntax ResolveObject<T>(params IEnumerable<ArgumentSyntax> arguments) => ObjectCreationExpression(type: ResolveType<T>()).WithArgumentList
         (
             ArgumentList
             (
@@ -152,7 +152,7 @@ namespace Solti.Utils.Proxy.Internals
                 cls.Identifier,
                 TypeArgumentList
                 (
-                    cls.TypeParameterList.Parameters.ToSyntaxList(ga => (TypeSyntax) IdentifierName(ga.Identifier))
+                    cls.TypeParameterList.Parameters.ToSyntaxList(static ga => (TypeSyntax) IdentifierName(ga.Identifier))
                 )
             );
     }

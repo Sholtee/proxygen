@@ -108,8 +108,24 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(ResolveProperty_ShouldDeclareANewProperty_Params))]
         public void ResolveProperty_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
         {
-            (IPropertyInfo Property, string Expected) param = ((IPropertyInfo Property, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(default).ResolveProperty(param.Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(param.Expected));
+            (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
+            Assert.That(new ClassSyntaxFactory(default).ResolveProperty(Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
+        }
+
+        public static IEnumerable<object> ResolveIndexer_ShouldDeclareANewProperty_Params
+        {
+            get
+            {
+                yield return (InterfaceIndexer, "global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.this[global::System.Int32 i]\n{\n    get\n    {\n    }\n\n    set\n    {\n    }\n}");
+                yield return (ClassIndexer, "public override global::System.Int32 this[global::System.Int32 i]\n{\n    get\n    {\n    }\n\n    protected set\n    {\n    }\n}");
+            }
+        }
+
+        [TestCaseSource(nameof(ResolveIndexer_ShouldDeclareANewProperty_Params))]
+        public void ResolveIndexer_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
+        {
+            (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
+            Assert.That(new ClassSyntaxFactory(default).ResolveIndexer(Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
         }
 
         [Test]
