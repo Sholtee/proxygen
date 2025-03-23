@@ -49,16 +49,16 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// private static readonly MethodContext FXxX = new MethodContext((ITarget target, object[] args) =>
+        /// private static readonly InterfaceInterceptionContext FXxX = new InterfaceInterceptionContext((object target, object[] args) =>
         /// {                                                                                                
         ///     EventType _value = (EventType) args[0];                                                      
-        ///     Target.Event += _value;                                                                      
+        ///     ((ITarget)target).Event += _value;                                                                      
         ///     return null;                                                                                  
         /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                              
-        /// private static readonly MethodContext FYyY = new MethodContext((ITarget target, object[] args) => 
+        /// private static readonly InterfaceInterceptionContext FYyY = new InterfaceInterceptionContext((object target, object[] args) => 
         /// {                                                                                                 
         ///     EventType _value = (EventType) args[0];                                                      
-        ///     Target.Event -= _value;                                                                       
+        ///     ((ITarget)target).Event -= _value;                                                                       
         ///     return null;                                                                                 
         /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                             
         /// event EventType IInterface.Event                                                                  
@@ -66,12 +66,12 @@ namespace Solti.Utils.Proxy.Internals
         ///     add                                                                                          
         ///     {                                                                                           
         ///         object[] args = new object[] { value };                                                
-        ///         Invoke(new InvocationContext(args, FXxX));                                               
+        ///         Invoke(new InterfaceInvocationContext(args, FXxX));                                               
         ///     }                                                                                            
         ///     remove                                                                                       
         ///     {                                                                                          
         ///         object[] args = new object[] { value };                                             
-        ///         Invoke(new InvocationContext(args, FYyY));                                              
+        ///         Invoke(new InterfaceInvocationContext(args, FYyY));                                              
         ///     }                                                                                           
         /// }
         /// </code>

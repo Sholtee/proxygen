@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// private static readonly MethodContext FXxX = new MethodContext((object target, object[] args) =>       
+        /// private static readonly InterfaceInterceptionContext FXxX = new InterfaceInterceptionContext((object target, object[] args) =>       
         /// {                                                                                                    
         ///     System.Int32 cb_a = (System.Int32) args[0];                                                       
         ///     System.String cb_b;                                                                               

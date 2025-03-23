@@ -55,11 +55,11 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// private static readonly MethodContext FxXx = new MethodContext(static (ITarget target, object[] args) =>  
+        /// private static readonly InterfaceInterceptionContext FxXx = new InterfaceInterceptionContext(static (ITarget target, object[] args) =>  
         /// {                                                                                                 
         ///     return target.Prop;                                                                           
         /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                          
-        /// private static readonly MethodContext FyYy = new MethodContext(static (ITarget target, object[] args) =>  
+        /// private static readonly InterfaceInterceptionContext FyYy = new InterfaceInterceptionContext(static (ITarget target, object[] args) =>  
         /// {                                                                                                
         ///     TValue _value = (TValue) args[0];                                                             
         ///     target.Prop = _value;                                                                         
