@@ -5,12 +5,12 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy
 {
     using Internals;
+    using Properties;
 
     /// <summary>
     /// Describes a method context.
@@ -26,26 +26,23 @@ namespace Solti.Utils.Proxy
         #pragma warning restore CS8618
         {
             Member = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
-            Debug.Assert(Member.Method.DeclaringType.IsInterface, "Invocation should be done on interface member");
+            if (!Member.Method.DeclaringType.IsInterface)
+                throw new InvalidOperationException(Resources.INVALID_DISPATCH_FN);
 
             Dispatch = dispatch;
 
             if (mappings is not null)
             {
-                if (mappings.TryGetValue(Member.Method.IsGenericMethod ? Member.Method.GetGenericMethodDefinition() : Member.Method, out MethodInfo targetMethod))
-                {
-                    if (targetMethod.IsGenericMethod)
-                        targetMethod = targetMethod.MakeGenericMethod(Member.Method.GetGenericArguments());
+                if (!mappings.TryGetValue(Member.Method.IsGenericMethod ? Member.Method.GetGenericMethodDefinition() : Member.Method, out MethodInfo targetMethod))
+                    throw new InvalidOperationException(Resources.TARGET_NOT_FOUND);
 
-                    Target = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
-                    return;
-                }
-                Debug.Assert(false, $"Cannot get the target method for: {Member.Method}");
+                if (targetMethod.IsGenericMethod)
+                    targetMethod = targetMethod.MakeGenericMethod(Member.Method.GetGenericArguments());
+
+                Target = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
             }
             else
-            {
                 Target = Member;
-            }
         }
 
         /// <summary>
@@ -56,9 +53,9 @@ namespace Solti.Utils.Proxy
             if (src is null)
                 throw new ArgumentNullException(nameof(src));
 
-            Member  = src.Member;
+            Member = src.Member;
             Target = src.Target;
-            Dispatch      = src.Dispatch;
+            Dispatch = src.Dispatch;
         }
 
         /// <summary>

@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -16,6 +15,8 @@ using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal static class MemberInfoExtensions
     {
         private static readonly Regex
@@ -70,10 +71,12 @@ namespace Solti.Utils.Proxy.Internals
                                     bindings.Add(prop.SetMethod, member);
                                 break;
                             case EventInfo evt:
-                                if (evt.AddMethod is not null)
-                                    bindings.Add(evt.AddMethod, member);
-                                if (evt.RemoveMethod is not null)
-                                    bindings.Add(evt.RemoveMethod, member);
+                                //
+                                // Events always have add and remove assigned
+                                //
+
+                                bindings.Add(evt.AddMethod, member);
+                                bindings.Add(evt.RemoveMethod, member);
                                 break;
                         }
                     }
@@ -84,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
                 if (bindings.TryGetValue(method, out MemberInfo member))
                     return member;
 
-                Debug.Assert(false, $"Member could not be determined for method: {method}");
+                throw new InvalidOperationException(Resources.MEMBER_NOT_FOUND);
             }
 
             return method;

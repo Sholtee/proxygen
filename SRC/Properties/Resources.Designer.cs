@@ -142,11 +142,29 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invalid dispatch function..
+        /// </summary>
+        internal static string INVALID_DISPATCH_FN {
+            get {
+                return ResourceManager.GetString("INVALID_DISPATCH_FN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The member (&quot;{0}&quot;) is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute(&quot;{1}&quot;)..
         /// </summary>
         internal static string IVT_REQUIRED {
             get {
                 return ResourceManager.GetString("IVT_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Member not found.
+        /// </summary>
+        internal static string MEMBER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("MEMBER_NOT_FOUND", resourceCulture);
             }
         }
         
@@ -237,6 +255,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string SEALED_TARGET {
             get {
                 return ResourceManager.GetString("SEALED_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target not found..
+        /// </summary>
+        internal static string TARGET_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("TARGET_NOT_FOUND", resourceCulture);
             }
         }
         
