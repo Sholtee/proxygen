@@ -14,7 +14,7 @@
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <NoWarn>CA2007;</NoWarn>
+    <NoWarn>CA2007;CA2022</NoWarn>
     <DefineConstants Condition="'$(Variant)' == 'ROSLYN_LEGACY'">LEGACY_COMPILER</DefineConstants>
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditLevel>moderate</NuGetAuditLevel>
@@ -33,7 +33,7 @@
 	</PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" Condition="'$(Variant)' != 'ROSLYN_LEGACY'" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.*" Condition="'$(Variant)' == 'ROSLYN_LEGACY'" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.*">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.*">
       <!-- This package is a develpement dependency -->
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
