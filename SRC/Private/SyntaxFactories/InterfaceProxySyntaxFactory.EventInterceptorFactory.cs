@@ -87,49 +87,32 @@ namespace Solti.Utils.Proxy.Internals
 
             const int CALL_INDEX = 0;
 
-            List<MemberDeclarationSyntax> members = new();
+            FieldDeclarationSyntax
+                addContext = BuildField(evt.AddMethod, true),
+                removeContext = BuildField(evt.RemoveMethod, false);
 
-            BlockSyntax?
-                add = null,
-                remove = null;
-
-            if (evt.AddMethod is not null)
-            {
-                FieldDeclarationSyntax addCtx = BuildField(true, evt.AddMethod);
-                members.Add(addCtx);
-
-                add = Block
+            List<MemberDeclarationSyntax> members = 
+            [
+                addContext,
+                removeContext,
+                ResolveEvent
                 (
-                    BuildBody(true, evt.AddMethod, addCtx)
-                );
-            }
-
-            if (evt.RemoveMethod is not null)
-            {
-                FieldDeclarationSyntax removeCtx = BuildField(false, evt.RemoveMethod);
-                members.Add(removeCtx);
-
-                remove = Block
-                (
-                    BuildBody(false, evt.RemoveMethod, removeCtx)
-                );
-            }
-
-            members.Add
-            (
-                ResolveEvent(evt, add, remove)
-            );
+                    evt,
+                    BuildBody(evt.AddMethod, addContext),
+                    BuildBody(evt.RemoveMethod, removeContext)
+                )
+            ];
 
             return cls.WithMembers
             (
                 cls.Members.AddRange(members)
             );
 
-            FieldDeclarationSyntax BuildField(bool add, IMethodInfo method) => ResolveMethodContext
+            FieldDeclarationSyntax BuildField(IMethodInfo backingMethod, bool add) => ResolveMethodContext
             (
                 ResolveInvokeTarget
                 (
-                    method,
+                    backingMethod,
                     (target, args, locals, body) =>
                     {
                         body.Add
@@ -158,29 +141,34 @@ namespace Solti.Utils.Proxy.Internals
                 CALL_INDEX
             );
 
-            IEnumerable<StatementSyntax> BuildBody(bool add, IMethodInfo method, FieldDeclarationSyntax fld)
+            BlockSyntax BuildBody(IMethodInfo method, FieldDeclarationSyntax field)
             {
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
-                yield return argsArray;
 
-                yield return ExpressionStatement
-                (
-                    InvokeMethod
+                StatementSyntax[] statements =
+                [
+                    argsArray,
+                    ExpressionStatement
                     (
-                        Invoke,
-                        arguments: Argument
+                        InvokeMethod
                         (
-                            ResolveObject<InterfaceInvocationContext>
+                            Invoke,
+                            arguments: Argument
                             (
-                                ResolveArgument(argsArray),
-                                Argument
+                                ResolveObject<InterfaceInvocationContext>
                                 (
-                                    StaticMemberAccess(cls, fld)
+                                    ResolveArgument(argsArray),
+                                    Argument
+                                    (
+                                        StaticMemberAccess(cls, field)
+                                    )
                                 )
                             )
                         )
                     )
-                );
+                ];
+
+                return Block(statements);
             }
         }
     }

@@ -38,6 +38,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         internal static IEventInfo InterfaceEvent { get; } = MetadataEventInfo.CreateFrom(typeof(IFoo<int>).GetEvent(nameof(IFoo<int>.Event)));
 
+        internal static IEventInfo ClassEvent { get; } = MetadataEventInfo.CreateFrom(typeof(Foo<int>).GetEvent(nameof(Foo<int>.Event)));
+
         internal static IPropertyInfo InterfaceProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(IFoo<int>).GetProperty(nameof(IFoo<int>.Prop)));
 
         internal static IPropertyInfo ClassProp { get; } = MetadataPropertyInfo.CreateFrom(typeof(Foo<int>).GetProperty(nameof(Foo<int>.Prop)));

@@ -121,25 +121,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
             else
             {
-                List<SyntaxKind> tokens = method
-                    .AccessModifiers
-                    .SetFlags()
-                    .Select
-                    (
-                        static am =>
-                        {
-                            switch (am)
-                            {
-                                case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
-                                case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
-                                case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
-                                default:
-                                    Debug.Fail("Method not visible");
-                                    return SyntaxKind.None;
-                            }
-                        }
-                    )
-                    .ToList();
+                List<SyntaxKind> tokens = AccessModifiersToSyntaxList(method.AccessModifiers).ToList();
 
                 tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
 

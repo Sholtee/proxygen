@@ -128,9 +128,21 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.That(new ClassSyntaxFactory(default).ResolveIndexer(Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
         }
 
-        [Test]
-        public void ResolveEvent_ShouldDeclareANewEvent() =>
-            Assert.That(new ClassSyntaxFactory(default).ResolveEvent(InterfaceEvent, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}"));
+        public static IEnumerable<object> ResolveEvent_ShouldDeclareANewEvent_Params
+        {
+            get
+            {
+                yield return (InterfaceEvent, "event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}");
+                yield return (ClassEvent, "public override event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> Event\n{\n    add\n    {\n    }\n\n    remove\n    {\n    }\n}");
+            }
+        }
+
+        [TestCaseSource(nameof(ResolveEvent_ShouldDeclareANewEvent_Params))]
+        public void ResolveEvent_ShouldDeclareANewEvent(object p /*object to work accessibility issue around*/)
+        {
+            (IEventInfo Event, string Expected) = ((IEventInfo Event, string Expected)) p;
+            Assert.That(new ClassSyntaxFactory(default).ResolveEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo(Expected));
+        }
 
         [Test]
         public void ResolveMethod_ShouldHandleParamsModifier() =>

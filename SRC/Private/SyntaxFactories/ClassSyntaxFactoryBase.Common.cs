@@ -57,6 +57,22 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
+        private static IEnumerable<SyntaxKind> AccessModifiersToSyntaxList(AccessModifiers am) => am.SetFlags().Select
+        (
+            static am =>
+            {
+                switch (am)
+                {
+                    case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
+                    case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
+                    case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
+                    default:
+                        Debug.Fail("Member not visible");
+                        return SyntaxKind.None;
+                }
+            }
+        );
+
         /// <summary>
         /// <code>
         /// new System.Object[] {..., ..., ...}

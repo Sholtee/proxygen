@@ -87,7 +87,7 @@ namespace Solti.Utils.Proxy.Internals
                     (int) (property.SetMethod?.AccessModifiers ?? AccessModifiers.Unknown)
                 );
 
-                List<SyntaxKind> tokens = AmToSyntax(declaredVisibility).ToList();
+                List<SyntaxKind> tokens = AccessModifiersToSyntaxList(declaredVisibility).ToList();
 
                 IMemberInfo underlyingMethod = property.GetMethod ?? property.SetMethod!;
 
@@ -131,27 +131,11 @@ namespace Solti.Utils.Proxy.Internals
                 //
 
                 IEnumerable<SyntaxKind> modifiers = backingMethod!.AccessModifiers < declaredVisibility
-                    ? AmToSyntax(backingMethod.AccessModifiers)
+                    ? AccessModifiersToSyntaxList(backingMethod.AccessModifiers)
                     : [];
 
                 return this.ResolveAccessor(kind, body, forceInlining, modifiers);
             }
-
-            static IEnumerable<SyntaxKind> AmToSyntax(AccessModifiers am) => am.SetFlags().Select
-            (
-                static am =>
-                {
-                    switch (am)
-                    {
-                        case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
-                        case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
-                        case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
-                        default:
-                            Debug.Fail("Method not visible");
-                            return SyntaxKind.None;
-                    }
-                }
-            );
         }
 
         /// <summary>
