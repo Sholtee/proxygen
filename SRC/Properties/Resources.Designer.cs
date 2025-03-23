@@ -160,15 +160,6 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Member not found.
-        /// </summary>
-        internal static string MEMBER_NOT_FOUND {
-            get {
-                return ResourceManager.GetString("MEMBER_NOT_FOUND", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The method (&quot;{0}&quot;) is not visible..
         /// </summary>
         internal static string METHOD_NOT_VISIBLE {

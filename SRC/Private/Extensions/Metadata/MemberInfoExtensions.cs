@@ -15,8 +15,6 @@ using Mono.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal static class MemberInfoExtensions
     {
         private static readonly Regex
@@ -84,10 +82,7 @@ namespace Solti.Utils.Proxy.Internals
                     return bindings;
                 });
 
-                if (bindings.TryGetValue(method, out MemberInfo member))
-                    return member;
-
-                throw new InvalidOperationException(Resources.MEMBER_NOT_FOUND);
+                return bindings[method];
             }
 
             return method;

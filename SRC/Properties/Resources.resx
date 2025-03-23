@@ -189,9 +189,6 @@
   <data name="UNDETERMINED_ACCESS_MODIFIER" xml:space="preserve">
     <value>Access modifier could not be determined.</value>
   </data>
-  <data name="MEMBER_NOT_FOUND" xml:space="preserve">
-    <value>Member not found</value>
-  </data>
   <data name="TARGET_NOT_FOUND" xml:space="preserve">
     <value>Target not found.</value>
   </data>
