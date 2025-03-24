@@ -9,6 +9,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal interface ISupportsSourceGeneration
     {
-        ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector);
+        ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector);
     }
 }

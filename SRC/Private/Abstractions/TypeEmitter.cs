@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
             return type;
         }
 
-        private protected abstract ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector);
+        private protected abstract ProxyUnitSyntaxFactoryBase CreateMainUnit(string? asmName, ReferenceCollector referenceCollector);
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
 
@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             ReferenceCollector referenceCollector = new();
 
-            ProxyUnitSyntaxFactory mainUnit = CreateMainUnit(asmName, referenceCollector);
+            ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(asmName, referenceCollector);
 
             //
             // 1) Type already loaded (for e.g. in case of embedded types)

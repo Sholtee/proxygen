@@ -15,7 +15,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class InterfaceProxySyntaxFactory: ProxyUnitSyntaxFactory
+    internal partial class InterfaceProxySyntaxFactory: ProxyUnitSyntaxFactoryBase
     {
         private static string ResolveClassName(ITypeInfo interceptorType) => $"Proxy_{interceptorType.GetMD5HashCode()}";
 

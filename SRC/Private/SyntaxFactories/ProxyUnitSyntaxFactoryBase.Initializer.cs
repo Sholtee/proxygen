@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxyUnitSyntaxFactory.Initializer.cs                                         *
+* ProxyUnitSyntaxFactoryBase.Initializer.cs                                     *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -12,7 +12,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ProxyUnitSyntaxFactory
+    internal abstract partial class ProxyUnitSyntaxFactoryBase
     {
         /// <summary>
         /// <code>

@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? new ReferenceCollector()
                 : null;
 
-        protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
+        protected static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
         {
             return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
                 ? ssg.CreateMainUnit

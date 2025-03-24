@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Generators
 
     file sealed class SupportsSourceGenerationAttribute : SupportsSourceGenerationAttributeBase
     {
-        public override ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new DuckSyntaxFactory
+        public override ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new DuckSyntaxFactory
         (
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),

@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
         public static Func<object?, object> Create(Type proxyType) => (Func<object?, object>) 
         (
             proxyType
-                .GetField(ProxyUnitSyntaxFactory.ACTIVATOR_NAME, BindingFlags.Public | BindingFlags.Static)
+                .GetField(ProxyUnitSyntaxFactoryBase.ACTIVATOR_NAME, BindingFlags.Public | BindingFlags.Static)
                 ?.GetValue(null) ?? throw new NotSupportedException()
         );
     }

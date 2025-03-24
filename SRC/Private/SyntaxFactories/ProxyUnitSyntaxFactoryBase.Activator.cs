@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxyUnitSyntaxFactory.Activator.cs                                           *
+* ProxyUnitSyntaxFactoryBase.Activator.cs                                       *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal abstract partial class ProxyUnitSyntaxFactory
+    internal abstract partial class ProxyUnitSyntaxFactoryBase
     {
         public const string ACTIVATOR_NAME = "__Activator";
 
