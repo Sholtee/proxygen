@@ -21,9 +21,7 @@ namespace Solti.Utils.Proxy
         /// Creates a new <see cref="InterfaceInterceptionContext"/> instance.
         /// </summary>
         /// <remarks>Calling this constructor is time consuming operation. It is strongly advised to cache the created instances.</remarks>
-        #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         public InterfaceInterceptionContext(Func<object, object?[], object?> dispatch, int callIndex, IReadOnlyDictionary<MethodInfo, MethodInfo>? mappings)
-        #pragma warning restore CS8618
         {
             Member = MemberInfoExtensions.ExtractFrom(dispatch ?? throw new ArgumentNullException(nameof(dispatch)), callIndex);
             if (!Member.Method.DeclaringType.IsInterface)
