@@ -250,15 +250,6 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Target not found..
-        /// </summary>
-        internal static string TARGET_NOT_FOUND {
-            get {
-                return ResourceManager.GetString("TARGET_NOT_FOUND", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to The type &quot;{0}&quot; can not be found..
         /// </summary>
         internal static string TYPE_NOT_FOUND {

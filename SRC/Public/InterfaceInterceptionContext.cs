@@ -33,9 +33,7 @@ namespace Solti.Utils.Proxy
 
             if (mappings is not null)
             {
-                if (!mappings.TryGetValue(Member.Method.IsGenericMethod ? Member.Method.GetGenericMethodDefinition() : Member.Method, out MethodInfo targetMethod))
-                    throw new InvalidOperationException(Resources.TARGET_NOT_FOUND);
-
+                MethodInfo targetMethod = mappings[Member.Method.IsGenericMethod ? Member.Method.GetGenericMethodDefinition() : Member.Method];
                 if (targetMethod.IsGenericMethod)
                     targetMethod = targetMethod.MakeGenericMethod(Member.Method.GetGenericArguments());
 
