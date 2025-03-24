@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy
                 if (targetMethod.IsGenericMethod)
                     targetMethod = targetMethod.MakeGenericMethod(Member.Method.GetGenericArguments());
 
-                Target = new ExtendedMemberInfo(targetMethod, MemberInfoExtensions.ExtractFrom(targetMethod));
+                Target = new ExtendedMemberInfo(targetMethod);
             }
             else
                 Target = Member;

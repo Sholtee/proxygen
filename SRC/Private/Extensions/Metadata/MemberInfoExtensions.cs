@@ -4,8 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -37,55 +35,7 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(static instruction => (MethodInfo) instruction.Operand)
                 .ElementAt(callIndex);
 
-            return new ExtendedMemberInfo
-            (
-                method,
-                ExtractFrom(method)
-            );
-        }
-
-        private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<MethodInfo, MemberInfo>> FMethodMemberBindings = new();
-
-        public static MemberInfo ExtractFrom(MethodInfo method)
-        {
-            if (method.IsSpecialName)
-            {
-                IReadOnlyDictionary<MethodInfo, MemberInfo> bindings = FMethodMemberBindings.GetOrAdd(method.DeclaringType, static t =>
-                {
-                    BindingFlags flags = t.IsInterface
-                        ? BindingFlags.Instance | BindingFlags.Public
-                        : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
-
-                    Dictionary<MethodInfo, MemberInfo> bindings = new();
-
-                    foreach (MemberInfo member in t.GetMembers(flags))
-                    {
-                        switch (member)
-                        {
-                            case PropertyInfo prop:
-                                if (prop.GetMethod is not null)
-                                    bindings.Add(prop.GetMethod, member);
-                                if (prop.SetMethod is not null)
-                                    bindings.Add(prop.SetMethod, member);
-                                break;
-                            case EventInfo evt:
-                                //
-                                // Events always have add and remove assigned
-                                //
-
-                                bindings.Add(evt.AddMethod, member);
-                                bindings.Add(evt.RemoveMethod, member);
-                                break;
-                        }
-                    }
-
-                    return bindings;
-                });
-
-                return bindings[method];
-            }
-
-            return method;
+            return new ExtendedMemberInfo(method);
         }
 
         public static string StrippedName(this MemberInfo self) => FStripper.Match(self.Name).Value;

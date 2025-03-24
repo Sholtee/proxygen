@@ -4,11 +4,9 @@ Solti.Utils.Proxy.ClassInvocationContext.ClassInvocationContext(Solti.Utils.Prox
 Solti.Utils.Proxy.ClassInvocationContext.Dispatch.get -> System.Func<object?[]!, object?>!
 Solti.Utils.Proxy.ClassInvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
 Solti.Utils.Proxy.ExtendedMemberInfo
-Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo! Method, System.Reflection.MemberInfo! Member) -> void
+Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo! method) -> void
 Solti.Utils.Proxy.ExtendedMemberInfo.Member.get -> System.Reflection.MemberInfo!
-Solti.Utils.Proxy.ExtendedMemberInfo.Member.init -> void
 Solti.Utils.Proxy.ExtendedMemberInfo.Method.get -> System.Reflection.MethodInfo!
-Solti.Utils.Proxy.ExtendedMemberInfo.Method.init -> void
 Solti.Utils.Proxy.IInvocationContext
 Solti.Utils.Proxy.IInvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.IInvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
