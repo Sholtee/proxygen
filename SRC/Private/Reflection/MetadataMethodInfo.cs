@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             public string Name => UnderlyingMethod.StrippedName();
 
             private ITypeInfo? FDeclaringType;
-            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderlyingMethod.ReflectedType);
+            public ITypeInfo DeclaringType => FDeclaringType ??= MetadataTypeInfo.CreateFrom(UnderlyingMethod.DeclaringType);
 
             private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
             public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingMethod

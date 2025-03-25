@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ArgumentComparer.cs                                                           *
+* TypeComparer.cs                                                               *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     // Custom comparer required as (for instance) typeof(List<>).GetGenericArguments()[0] != typeof(IList<>).GetGenericArguments()[0]
     //
 
-    internal sealed class ArgumentComparer : ComparerBase<ArgumentComparer, Type>
+    internal sealed class TypeComparer : ComparerBase<TypeComparer, Type>
     {
         public override bool Equals(Type x, Type y)
         {

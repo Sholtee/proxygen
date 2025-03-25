@@ -9,22 +9,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class IMethodInfoExtensions
     {
-        public static IMethodInfo? GetBaseMethod(this IMethodInfo method)
-        {
-            if (method.IsVirtual)
-            {
-                for (ITypeInfo? baseType = method.DeclaringType.BaseType; baseType is not null;)
-                {
-                    IMethodInfo? baseMethod = baseType.Methods.SingleOrDefault(baseMethod => method.SignatureEquals(baseMethod));
-                    if (baseMethod is not null)
-                        return baseMethod;
-
-                    baseType = baseType.BaseType;
-                }
-            }
-            return null;
-        }
-
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)
         {
             if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))

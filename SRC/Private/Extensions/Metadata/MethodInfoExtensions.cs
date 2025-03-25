@@ -90,41 +90,33 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(static p => p.ParameterType)
                 .ToArray();
 
-            foreach (Type baseType in method.ReflectedType.GetBaseTypes())
+            foreach (Type baseType in method.DeclaringType.GetBaseTypes())
             {
-                MethodInfo? overriddenMethod = baseType.GetMethod
-                (
-                    method.Name,
-                    bindingAttr:
-                        BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic |
-                        (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance),
-                    binder: null,
-                    callConvention: method.CallingConvention,
-                    types: paramz,
-                    modifiers: null
-                );
-                if (overriddenMethod is not null)
-                {
-                    //
-                    // The default binder searches for COMPATIBLE not exact signature match [for instance
-                    // typeof(Object).GetMethod("Equals", new[] { typeof(/*Any type*/) }) is never null]
-                    //
-                    // I won't create a custom binder so +1 check...
-                    //
+                //
+                // baseType.GetMethod(method.Name, types: paramz) won't for for generic methods
+                //
 
-                    ParameterInfo[] overriddenParamz = overriddenMethod.GetParameters();
+                foreach(MethodInfo baseMethod in  baseType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)))
+                {
+                    if (baseMethod.Name != method.Name)
+                        continue;
 
                     bool match = true;
-                    for (int i = 0; i < overriddenParamz.Length; i++)
+                    ParameterInfo[] baseParamz = baseMethod.GetParameters();
+                    if (baseParamz.Length != paramz.Length)
+                        continue;
+
+                    for (int i = 0; i < baseParamz.Length; i++)
                     {
-                        if (overriddenParamz[i].ParameterType != paramz[i])
+                        if (!TypeComparer.Instance.Equals(baseParamz[i].ParameterType, paramz[i]))
                         {
                             match = false;
                             break;
                         }
                     }
+
                     if (match)
-                        return overriddenMethod;
+                        return baseMethod;
                 }
             }
             return null;

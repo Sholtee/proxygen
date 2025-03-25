@@ -335,7 +335,7 @@ namespace Solti.Utils.Proxy.Internals
                     // GetGenericArguments() may return empty array if "parent" is not generic
                     //
 
-                    if (parent.GetGenericArguments().Any(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))
+                    if (parent.GetGenericArguments().Any(arg => TypeComparer.Instance.Equals(arg, openArgs[i])))
                     {
                         own = false;
                         break;
