@@ -13,19 +13,13 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed class TypeComparer : ComparerBase<TypeComparer, Type>
     {
-        public override bool Equals(Type x, Type y)
+        public override bool Equals(Type x, Type y) =>
+            (x.FullName ?? x.Name) == (y.FullName ?? y.Name) && (x.Assembly?.FullName == y.Assembly?.FullName);
+
+        public override int GetHashCode(Type type) => new
         {
-            string
-                name1 = x.FullName ?? x.Name,
-                name2 = y.FullName ?? y.Name;
-
-            return name1.Equals(name2, StringComparison.OrdinalIgnoreCase);
-        }
-
-        //
-        // Generic arguments don't have FullName
-        //
-
-        public override int GetHashCode(Type obj) => (obj.FullName ?? obj.Name).GetHashCode();
+            Name = type.FullName ?? type.Name,
+            Assembly = type.Assembly?.FullName
+        }.GetHashCode();
     }
 }
