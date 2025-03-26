@@ -1,0 +1,43 @@
+﻿/********************************************************************************
+* CurrentMember.cs                                                              *
+*                                                                               *
+* Author: Denes Solti                                                           *
+********************************************************************************/
+using System;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+namespace Solti.Utils.Proxy.Internals
+{
+    using Properties;
+
+    /// <summary>
+    /// Contains helpers related to the currently executing member (method, property or event accessor). Intended for private use only.
+    /// </summary>
+    public static class CurrentMember  // this class is referenced by the generated proxies so it must be public
+    {
+        /// <summary>
+        /// Gets the currently executing member.
+        /// </summary>
+        /// <returns>Returns false if the <paramref name="memberInfo"/> is not null</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static bool Get(ref ExtendedMemberInfo memberInfo, bool returnOverridden)
+        {
+            if (memberInfo is not null)
+                return false;
+
+            //
+            // Get the calling method
+            //
+
+            MethodInfo callingMethod = (MethodInfo) new StackTrace().GetFrame(1).GetMethod();
+            if (returnOverridden)
+                callingMethod = callingMethod.GetOverriddenMethod() ?? throw new InvalidOperationException(Resources.NOT_VIRTUAL);
+
+            memberInfo = new ExtendedMemberInfo(callingMethod);
+
+            return true;
+        }
+    }
+}

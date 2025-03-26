@@ -223,6 +223,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given member is not virtual..
+        /// </summary>
+        internal static string NOT_VIRTUAL {
+            get {
+                return ResourceManager.GetString("NOT_VIRTUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The target is NULL..
         /// </summary>
         internal static string NULL_TARGET {

@@ -189,4 +189,7 @@
   <data name="UNDETERMINED_ACCESS_MODIFIER" xml:space="preserve">
     <value>Access modifier could not be determined.</value>
   </data>
+  <data name="NOT_VIRTUAL" xml:space="preserve">
+    <value>The given member is not virtual.</value>
+  </data>
 </root>
