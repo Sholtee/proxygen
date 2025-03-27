@@ -17,14 +17,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
             public virtual ExtendedMemberInfo Prop => throw new NotImplementedException();
         }
 
-        private class Derived(bool returnOverride) : Base
+        private class Derived : Base
         {
             public override ExtendedMemberInfo Prop
             {
                 get
                 {
                     ExtendedMemberInfo result = null;
-                    return CurrentMember.Get(ref result, returnOverride)
+                    return CurrentMember.GetBase(ref result)
                         ? result
                         : null;
                 }
@@ -32,28 +32,19 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         [Test]
-        public void Get_ShouldReturnTheCallingMember()
+        public void GetBase_ShouldReturnTheBaseOfCallingMember()
         {
-            ExtendedMemberInfo memberInfo = new Derived(false).Prop;
-            
-            Assert.IsNotNull(memberInfo);
-            Assert.That(memberInfo.Member, Is.EqualTo(typeof(Derived).GetProperty(nameof(Derived.Prop))));
-        }
-
-        [Test]
-        public void Get_ShouldReturnTheBaseOfCallingMember()
-        {
-            ExtendedMemberInfo memberInfo = new Derived(true).Prop;
+            ExtendedMemberInfo memberInfo = new Derived().Prop;
 
             Assert.IsNotNull(memberInfo);
             Assert.That(memberInfo.Member, Is.EqualTo(typeof(Base).GetProperty(nameof(Base.Prop))));
         }
 
         [Test]
-        public void Get_ShouldThrowOnNonVirtualMember()
+        public void GetBase_ShouldThrowOnNonVirtualMember()
         {
             ExtendedMemberInfo result = null;
-            Assert.Throws<InvalidOperationException>(() => CurrentMember.Get(ref result, true));
+            Assert.Throws<InvalidOperationException>(() => CurrentMember.GetBase(ref result));
         }
     }
 }

@@ -18,11 +18,11 @@ namespace Solti.Utils.Proxy.Internals
     public static class CurrentMember  // this class is referenced by the generated proxies so it must be public
     {
         /// <summary>
-        /// Gets the currently executing member.
+        /// Gets the base definition of the currently executing member.
         /// </summary>
         /// <returns>Returns false if the <paramref name="memberInfo"/> is not null</returns>
         [MethodImpl(MethodImplOptions.NoInlining)]
-        public static bool Get(ref ExtendedMemberInfo memberInfo, bool returnOverridden)
+        public static bool GetBase(ref ExtendedMemberInfo memberInfo)
         {
             if (memberInfo is not null)
                 return false;
@@ -32,10 +32,11 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             MethodInfo callingMethod = (MethodInfo) new StackTrace().GetFrame(1).GetMethod();
-            if (returnOverridden)
-                callingMethod = callingMethod.GetOverriddenMethod() ?? throw new InvalidOperationException(Resources.NOT_VIRTUAL);
 
-            memberInfo = new ExtendedMemberInfo(callingMethod);
+            memberInfo = new ExtendedMemberInfo
+            (
+                callingMethod.GetOverriddenMethod() ?? throw new InvalidOperationException(Resources.NOT_VIRTUAL)
+            );
 
             return true;
         }

@@ -20,5 +20,5 @@ Solti.Utils.Proxy.InterfaceInvocationContext
 Solti.Utils.Proxy.InterfaceInvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.InterfaceInvocationContext.InterfaceInvocationContext(object?[]! args, Solti.Utils.Proxy.InterfaceInterceptionContext! methodContext) -> void
 Solti.Utils.Proxy.Internals.CurrentMember
-static Solti.Utils.Proxy.Internals.CurrentMember.Get(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo, bool returnOverridden) -> bool
+static Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
 virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InterfaceInvocationContext! context) -> object?
