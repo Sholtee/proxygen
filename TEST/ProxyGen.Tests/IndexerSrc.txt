@@ -3,7 +3,7 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
     get
     {
         global::System.Object[] args = new global::System.Object[]{index};
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F9E6B0EC6A27814BA41BB12EEF71182FD));
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F83C04C7D329A543BAB2F3EA23054179B));
     }
 
     set

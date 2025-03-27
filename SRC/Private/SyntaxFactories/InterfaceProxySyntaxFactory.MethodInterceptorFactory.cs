@@ -179,8 +179,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static readonly IReadOnlyCollection<ParameterKind> ByRefs = new[] { ParameterKind.Ref, ParameterKind.Out };
-
         /// <summary>
         /// <code>
         /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
@@ -234,72 +232,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        /// <summary>
-        /// <code>
-        /// args[0] = (System.Object)cb_a // ref
-        /// args[2] = (TT)cb_c // out
-        /// </code>
-        /// </summary>
-        #if DEBUG
-        internal
-        #else
-        private
-        #endif
-        IEnumerable<StatementSyntax> ReassignArgsArray(IMethodInfo method, ParameterSyntax argsArray, IReadOnlyList<LocalDeclarationStatementSyntax> locals)
-        {
-            int i = 0;
-            foreach (IParameterInfo param in method.Parameters)
-            {
-                if (ByRefs.Any(x => x == param.Kind))
-                {
-                    yield return ExpressionStatement
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: ElementAccessExpression
-                            (
-                                IdentifierName(argsArray.Identifier)
-                            )
-                            .WithArgumentList
-                            (
-                                argumentList: BracketedArgumentList
-                                (
-                                    SingletonSeparatedList
-                                    (
-                                        Argument
-                                        (
-                                            i.AsLiteral()
-                                        )
-                                    )
-                                )
-                            ),
-                            right: CastExpression
-                            (
-                                type: ResolveType<object>(),
-                                ResolveIdentifierName(locals[i])
-                            )
-                        )
-                    );
-                }
-                i++;
-            }
-        }
-
         /// <summary>    
-        /// <code>
-        /// (ITarget target, object[] args) =>                         
-        /// {                                                           
-        ///    System.Int32 cb_a = (System.Int32) args[0];         
-        ///    System.String cb_b;                                      
-        ///    TT cb_c = (TT) args[2];                               
-        ///    System.Object result;                                  
-        ///    result = target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);      
-        ///                                                             
-        ///    args[1] = (System.Object) cb_b;                         
-        ///    args[2] = (System.Object) cb_c;                         
-        ///    return result;                                          
-        /// }   
+        /// <code>                                                                             
+        /// [result =] target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);                                              
         /// </code>
         /// </summary>   
         #if DEBUG
@@ -307,7 +242,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, locals, body) =>
+        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, result, locals) =>
         {
             InvocationExpressionSyntax invocation = InvokeMethod
             (
@@ -317,38 +252,15 @@ namespace Solti.Utils.Proxy.Internals
                 arguments: locals.Select(ResolveArgument).ToArray()
             );
 
-            IEnumerable<StatementSyntax> argsArrayReassignment = ReassignArgsArray(method, args, locals);
-
-            if (method.ReturnValue.Type.IsVoid)
-            {
-                body.Add
+            return ExpressionStatement
+            (
+                result is null ? invocation : AssignmentExpression
                 (
-                    ExpressionStatement(invocation)
-                );
-                body.AddRange(argsArrayReassignment);
-                body.Add
-                (
-                    ReturnNull()
-                );
-            }
-            else
-            {
-                LocalDeclarationStatementSyntax result = ResolveLocal<object>
-                (
-                    EnsureUnused(nameof(result), method),
-                    CastExpression
-                    (
-                        ResolveType<object>(),
-                        invocation
-                    )
-                );
-                body.Add(result);
-                body.AddRange(argsArrayReassignment);
-                body.Add
-                (
-                    ReturnResult(null, result)
-                );
-            } 
+                    SyntaxKind.SimpleAssignmentExpression,
+                    ResolveIdentifierName(result!),
+                    invocation
+                )
+            ); 
         });
     }
 }

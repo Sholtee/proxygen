@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 FooMethod,
                 args,
-                gen.ResolveInvokeTargetLocals(args, FooMethod)
+                gen.ResolveInvokeTargetLocals(args, FooMethod).ToList()
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));

@@ -113,30 +113,20 @@ namespace Solti.Utils.Proxy.Internals
                 ResolveInvokeTarget
                 (
                     backingMethod,
-                    (target, args, locals, body) =>
-                    {
-                        body.Add
+                    (target, args, result, locals) => ExpressionStatement
+                    (
+                        RegisterEvent
                         (
-                            ExpressionStatement
+                            evt,
+                            IdentifierName(target.Identifier),
+                            add,
+                            ResolveIdentifierName
                             (
-                                RegisterEvent
-                                (
-                                    evt,
-                                    IdentifierName(target.Identifier),
-                                    add,
-                                    ResolveIdentifierName
-                                    (
-                                        locals.Single()
-                                    ),
-                                    castTargetTo: evt.DeclaringType
-                                )
-                            )
-                        );
-                        body.Add
-                        (
-                            ReturnNull()
-                        );
-                    }
+                                locals.Single()
+                            ),
+                            castTargetTo: evt.DeclaringType
+                        )
+                    )
                 ),
                 CALL_INDEX
             );

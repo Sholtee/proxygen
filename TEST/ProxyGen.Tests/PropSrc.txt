@@ -3,7 +3,7 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
     get
     {
         global::System.Object[] args = new global::System.Object[0];
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F36800AD4553C8E13BEEE3C1DEE3EF22B));
+        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F973758BDAB0B0F1706AF66B13BF9441D));
     }
 
     set

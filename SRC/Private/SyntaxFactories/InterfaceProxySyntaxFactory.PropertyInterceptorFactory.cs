@@ -104,24 +104,20 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveInvokeTarget
                     (
                         property.GetMethod,
-                        (target, args, locals, body) => body.Add
+                        (target, args, result, locals) => ExpressionStatement
                         (
-                            ReturnResult
+                            AssignmentExpression
                             (
-                                null,
-                                CastExpression
+                                kind: SyntaxKind.SimpleAssignmentExpression,
+                                left: ResolveIdentifierName(result!),
+                                right: PropertyAccess
                                 (
-                                    ResolveType<object>(),
-                                    PropertyAccess
-                                    (
-                                        property,
-                                        IdentifierName(target.Identifier),
-                                        castTargetTo: property.DeclaringType,
-                                        indices: locals.Select(ResolveArgument)
-                                    )
+                                    property,
+                                    IdentifierName(target.Identifier),
+                                    castTargetTo: property.DeclaringType,
+                                    indices: locals.Select(ResolveArgument)
                                 )
                             )
-
                         )
                     ),
                     CALL_INDEX
@@ -162,33 +158,23 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveInvokeTarget
                     (
                         property.SetMethod,
-                        (target, args, locals, body) =>
-                        {
-                            body.Add
+                        (target, args, result, locals) => ExpressionStatement
+                        (
+                            expression: AssignmentExpression
                             (
-                                ExpressionStatement
+                                kind: SyntaxKind.SimpleAssignmentExpression,
+                                left: PropertyAccess
                                 (
-                                    expression: AssignmentExpression
-                                    (
-                                        kind: SyntaxKind.SimpleAssignmentExpression,
-                                        left: PropertyAccess
-                                        (
-                                            property,
-                                            IdentifierName(target.Identifier),
-                                            castTargetTo: property.DeclaringType,
-                                            indices: locals
-                                                .Take(locals.Count - 1)
-                                                .Select(ResolveArgument)
-                                        ),
-                                        right: ResolveIdentifierName(locals[locals.Count - 1])
-                                    )
-                                )
-                            );
-                            body.Add
-                            (
-                                ReturnNull()
-                            );
-                        }
+                                    property,
+                                    IdentifierName(target.Identifier),
+                                    castTargetTo: property.DeclaringType,
+                                    indices: locals
+                                        .Take(locals.Count - 1)
+                                        .Select(ResolveArgument)
+                                ),
+                                right: ResolveIdentifierName(locals.Last())
+                            )
+                        )
                     ),
                     CALL_INDEX
                 );
