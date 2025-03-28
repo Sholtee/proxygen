@@ -1,7 +1,7 @@
 global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c)
 {
     global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};
-    global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.WrapperEF183B7AE08C814FF7923B60A7D5E6A9<TT>.Value));
+    global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.Wrapper51CB5956AE416747D1853D51CFEC498E<TT>.Value));
     b = (global::System.String)args[1];
     c = (TT)args[2];
     return (global::System.Int32)result;

@@ -3,12 +3,12 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
     add
     {
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.FB87DFB32A2DD0754D6374F9CF1ED5F08));
+        this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.FC583D26D405A7148465A31F3CCC477AA));
     }
 
     remove
     {
         global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.FFBD84B95FB3FB5584930D41ADD52FEC9));
+        this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.FBFF85D21AA5F3D4E5BC58CFB02B8CAC4));
     }
 }

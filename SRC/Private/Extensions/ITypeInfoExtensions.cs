@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
 
             for (int i = 0; i < types.Length; i++)
             {
-                Hash(types[i], md5);
+                types[i].Hash(md5);
             }
 
             md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
@@ -43,33 +43,37 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(md5.Hash[i].ToString("X2", null));
             }
 
-            return sb.ToString();
+            return sb.ToString();          
+        }
 
-            static void Hash(ITypeInfo t, ICryptoTransform transform)
+        public static void Hash(this ITypeInfo src, ICryptoTransform transform)
+        {
+            string? qualifiedName = src.QualifiedName;
+
+            if (src.RefType > RefType.None)
             {
-                string? qualifiedName = t.QualifiedName;
+                //
+                // ref structs have no element type
+                //
 
-                if (t.RefType > RefType.None)
-                {
-                    Hash(t.ElementType!, transform);
+                src.ElementType?.Hash(transform);
 
-                    qualifiedName += t.RefType.ToString();
-                }
+                qualifiedName += src.RefType.ToString();
+            }
 
-                if (qualifiedName is null)
-                    return;
+            if (qualifiedName is null)
+                return;
 
-                byte[] inputBuffer = Encoding.UTF8.GetBytes(qualifiedName);
+            byte[] inputBuffer = Encoding.UTF8.GetBytes(qualifiedName);
 
-                transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
+            transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
 
-                if (t is not IGenericTypeInfo generic)
-                    return;
+            if (src is not IGenericTypeInfo generic)
+                return;
 
-                for (int i = 0; i < generic.GenericArguments.Count; i++)
-                {
-                    Hash(generic.GenericArguments[i], transform);
-                }
+            for (int i = 0; i < generic.GenericArguments.Count; i++)
+            {
+                generic.GenericArguments[i].Hash(transform);
             }
         }
 

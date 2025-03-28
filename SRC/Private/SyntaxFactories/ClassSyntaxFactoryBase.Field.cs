@@ -3,6 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Collections.Generic;
+using System.Linq;
+
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null, bool @private = true)
+        protected FieldDeclarationSyntax ResolveStaticGlobal(ITypeInfo type, string name, ExpressionSyntax? initializer = null, bool @private = true, bool @readonly = true)
         {
             VariableDeclaratorSyntax declarator = VariableDeclarator
             (
@@ -36,6 +39,10 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
+            List<SyntaxKind> modifiers = [@private ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword, SyntaxKind.StaticKeyword];
+            if (@readonly)
+                modifiers.Add(SyntaxKind.ReadOnlyKeyword);
+
             return FieldDeclaration
             (
                 declaration: VariableDeclaration
@@ -48,12 +55,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 TokenList
                 (
-                    new SyntaxToken[]
-                    {
-                        Token(@private ? SyntaxKind.PrivateKeyword : SyntaxKind.PublicKeyword),
-                        Token(SyntaxKind.StaticKeyword),
-                        Token(SyntaxKind.ReadOnlyKeyword)
-                    }
+                    modifiers.Select(Token)
                 )
             );
         }
@@ -66,12 +68,13 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null, bool @private = true) => ResolveStaticGlobal
+        protected FieldDeclarationSyntax ResolveStaticGlobal<T>(string name, ExpressionSyntax? initializer = null, bool @private = true, bool @readonly = true) => ResolveStaticGlobal
         (
             MetadataTypeInfo.CreateFrom(typeof(T)),
             name,
             initializer,
-            @private
+            @private,
+            @readonly
         );
     }
 }

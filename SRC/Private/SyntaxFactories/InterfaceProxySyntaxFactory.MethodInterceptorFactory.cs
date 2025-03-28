@@ -89,6 +89,7 @@ namespace Solti.Utils.Proxy.Internals
             MemberDeclarationSyntax methodCtx = method is IGenericMethodInfo genericMethod
                 ? ResolveMethodContext
                 (
+                    method.GetMD5HashCode(),
                     ResolveInvokeTarget(method),
                     CALL_INDEX,
                     genericMethod.GenericArguments,
@@ -96,6 +97,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
                 : ResolveMethodContext
                 (
+                    method.GetMD5HashCode(),
                     ResolveInvokeTarget(method),
                     CALL_INDEX
                 );
@@ -176,59 +178,6 @@ namespace Solti.Utils.Proxy.Internals
                 }
 
                 return statements;
-            }
-        }
-
-        /// <summary>
-        /// <code>
-        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
-        /// {                                                                                  
-        ///   ...                                                                             
-        ///   para2 = (T2) args[1];                                                             
-        ///   para3 = (T3) args[2];                                                               
-        ///   ...                                                                                  
-        /// }
-        /// </code>
-        /// </summary>
-        #if DEBUG
-        internal
-        #else
-        private
-        #endif
-        IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IMethodInfo method, LocalDeclarationStatementSyntax argsArray)
-        {
-            int i = 0;
-            foreach (IParameterInfo param in method.Parameters)
-            {
-                if (ByRefs.Any(x => x == param.Kind))
-                {
-                    yield return ExpressionStatement
-                    (
-                        expression: AssignmentExpression
-                        (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: IdentifierName(param.Name),
-                            right: CastExpression
-                            (
-                                type: ResolveType(param.Type),
-                                expression: ElementAccessExpression(ResolveIdentifierName(argsArray)).WithArgumentList
-                                (
-                                    argumentList: BracketedArgumentList
-                                    (
-                                        SingletonSeparatedList
-                                        (
-                                            Argument
-                                            (
-                                                i.AsLiteral()
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    );
-                }
-                i++;
             }
         }
 

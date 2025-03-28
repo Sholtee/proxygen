@@ -110,6 +110,7 @@ namespace Solti.Utils.Proxy.Internals
 
             FieldDeclarationSyntax BuildField(IMethodInfo backingMethod, bool add) => ResolveMethodContext
             (
+                backingMethod.GetMD5HashCode(),
                 ResolveInvokeTarget
                 (
                     backingMethod,

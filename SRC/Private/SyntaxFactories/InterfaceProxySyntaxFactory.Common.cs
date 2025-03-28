@@ -100,9 +100,9 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        FieldDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<InterfaceInterceptionContext>
+        FieldDeclarationSyntax ResolveMethodContext(string id, ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<InterfaceInterceptionContext>
         (
-            $"F{lambda.GetMD5HashCode()}",
+            $"F{id}",
             ResolveObject<InterfaceInterceptionContext>
             (
                 Argument(lambda),
@@ -136,11 +136,11 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ClassDeclarationSyntax ResolveMethodContext(ParenthesizedLambdaExpressionSyntax lambda, int callIndex, IEnumerable<ITypeInfo> genericArguments, IEnumerable<IGenericConstraint> constraints)
+        ClassDeclarationSyntax ResolveMethodContext(string id, ParenthesizedLambdaExpressionSyntax lambda, int callIndex, IEnumerable<ITypeInfo> genericArguments, IEnumerable<IGenericConstraint> constraints)
         {
             return ClassDeclaration
             (
-                $"Wrapper{lambda.GetMD5HashCode()}"
+                $"Wrapper{id}"
             )
             .WithModifiers
             (

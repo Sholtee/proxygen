@@ -17,9 +17,9 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal abstract partial class ProxyUnitSyntaxFactory : ProxyUnitSyntaxFactoryBase
+    internal abstract partial class ProxyUnitSyntaxFactory
     {
-        protected static readonly IReadOnlyCollection<ParameterKind> ByRefs = new[] { ParameterKind.Ref, ParameterKind.Out };
+        protected static readonly IReadOnlyCollection<ParameterKind> ByRefs = [ParameterKind.Ref, ParameterKind.Out];
 
         protected static string EnsureUnused(string name, IEnumerable<IParameterInfo> parameters)
         {
@@ -34,53 +34,6 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4) 
-        /// {                                                                                
-        ///   ...                                                                          
-        ///   object[] args = new object[]{para1, para2, default(T3), para4};              
-        ///   ...                                                                            
-        /// }
-        /// </code>
-        /// </summary>
-        #if DEBUG
-        internal
-        #endif
-        protected
-        LocalDeclarationStatementSyntax ResolveArgumentsArray(IMethodInfo method)
-        {
-            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
-
-            return ResolveLocal<object[]>
-            (
-                EnsureUnused("args", paramz),
-                ResolveArray<object>
-                (
-                    paramz.Select
-                    (
-                        param => (ExpressionSyntax)
-                        (
-                            param.Kind switch
-                            {
-                                _ when param.Type.RefType is RefType.Ref =>
-                                    //
-                                    // We cannot cast "ref struct"s to objects
-                                    //
-
-                                    throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED),
-                                ParameterKind.Out => DefaultExpression
-                                (
-                                    ResolveType(param.Type)
-                                ),
-                                _ => IdentifierName(param.Name)
-                            }
-                        )
-                    )
-                )
-            );
-        }
-
-        /// <summary>
-        /// <code>
         /// return;
         /// // OR
         /// return (T) ...;
@@ -89,8 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected
-        ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, ExpressionSyntax result) => ReturnStatement
+        protected ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, ExpressionSyntax result) => ReturnStatement
         (
             expression: returnType?.IsVoid is true
                 ? null
@@ -113,8 +65,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected
-        ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, LocalDeclarationStatementSyntax result) =>
+        protected ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, LocalDeclarationStatementSyntax result) =>
             ReturnResult(returnType, ResolveIdentifierName(result));
 
         /// <summary>
@@ -125,8 +76,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected
-        static ReturnStatementSyntax ReturnNull() => ReturnStatement
+        protected static ReturnStatementSyntax ReturnNull() => ReturnStatement
         (
             LiteralExpression(SyntaxKind.NullLiteralExpression)
         );
@@ -262,7 +212,7 @@ namespace Solti.Utils.Proxy.Internals
 
             List<StatementSyntax> statements = new();
 
-            IReadOnlyList<LocalDeclarationStatementSyntax> locals = ResolveInvokeTargetLocals(args, method).ToList();
+            List<LocalDeclarationStatementSyntax> locals = new(ResolveInvokeTargetLocals(args, method));
             statements.AddRange(locals);
 
             LocalDeclarationStatementSyntax? result = null;
@@ -291,5 +241,104 @@ namespace Solti.Utils.Proxy.Internals
 
             return lambda;
         }
+
+        /// <summary>
+        /// <code>
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4) 
+        /// {                                                                                
+        ///   ...                                                                          
+        ///   object[] args = new object[]{para1, para2, default(T3), para4};              
+        ///   ...                                                                            
+        /// }
+        /// </code>
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected LocalDeclarationStatementSyntax ResolveArgumentsArray(IMethodInfo method)
+        {
+            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
+
+            return ResolveLocal<object[]>
+            (
+                EnsureUnused("args", paramz),
+                ResolveArray<object>
+                (
+                    paramz.Select<IParameterInfo, ExpressionSyntax>
+                    (
+                        param =>
+                        {
+                            if (param.Type.RefType is RefType.Ref)
+                                //
+                                // We cannot cast "ref struct"s to objects
+                                //
+
+                                throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
+
+                            return param.Kind switch
+                            {
+                                ParameterKind.Out => DefaultExpression
+                                (
+                                    ResolveType(param.Type)
+                                ),
+                                _ => IdentifierName(param.Name)
+                            };
+                        }
+                    )
+                )
+            );
+        }
+
+        /// <summary>
+        /// <code>
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
+        /// {                                                                                  
+        ///   ...                                                                             
+        ///   para2 = (T2) args[1];                                                             
+        ///   para3 = (T3) args[2];                                                               
+        ///   ...                                                                                  
+        /// }
+        /// </code>
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected IEnumerable<ExpressionStatementSyntax> AssignByRefParameters(IMethodInfo method, LocalDeclarationStatementSyntax argsArray)
+        {
+            int i = 0;
+            foreach (IParameterInfo param in method.Parameters)
+            {
+                if (ByRefs.Any(x => x == param.Kind))
+                {
+                    yield return ExpressionStatement
+                    (
+                        expression: AssignmentExpression
+                        (
+                            kind: SyntaxKind.SimpleAssignmentExpression,
+                            left: IdentifierName(param.Name),
+                            right: CastExpression
+                            (
+                                type: ResolveType(param.Type),
+                                expression: ElementAccessExpression(ResolveIdentifierName(argsArray)).WithArgumentList
+                                (
+                                    argumentList: BracketedArgumentList
+                                    (
+                                        SingletonSeparatedList
+                                        (
+                                            Argument
+                                            (
+                                                i.AsLiteral()
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    );
+                }
+                i++;
+            }
+        }
+
     }
 }

@@ -1,5 +1,5 @@
 void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar()
 {
     global::System.Object[] args = new global::System.Object[0];
-    this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F5E3B2780A596B1EF75378976B5406D84));
+    this.Invoke(new global::Solti.Utils.Proxy.InterfaceInvocationContext(args, global::Dummy.F9C6F4C7B502E8E62FE7865759385764A));
 }

@@ -101,6 +101,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 FieldDeclarationSyntax getCtx = ResolveMethodContext
                 (
+                    property.GetMethod.GetMD5HashCode(),
                     ResolveInvokeTarget
                     (
                         property.GetMethod,
@@ -155,6 +156,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 FieldDeclarationSyntax setCtx = ResolveMethodContext
                 (
+                    property.SetMethod.GetMD5HashCode(),
                     ResolveInvokeTarget
                     (
                         property.SetMethod,
