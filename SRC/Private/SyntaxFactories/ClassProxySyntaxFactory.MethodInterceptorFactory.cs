@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -16,16 +15,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassProxySyntaxFactory
     {
-        private static readonly IMethodInfo
-            FGetBase = MetadataMethodInfo.CreateFrom
-            (
-                MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetBase(ref output))
-            ),
-            FInvoke = MetadataMethodInfo.CreateFrom
-            (
-                MethodInfoExtensions.ExtractFrom<IInterceptor>(static i => i.Invoke(null!))
-            );
-
         #if DEBUG
         internal
         #endif
@@ -48,40 +37,6 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls;
         }
-
-        /// <summary>    
-        /// <code>
-        /// args =>
-        /// {
-        ///     TGeneric1 cb_a = (TGeneric1) args[0];
-        ///     T1 cb_b;                                                                               
-        ///     T2 cb_c = (T2) args[2];
-        ///     
-        ///     [result =] base.Bar&lt;TGeneric2&gt;(cb_a, out cb_b, ref cb_c);
-        ///     
-        ///     args[1] = (System.Object) cb_b;                                                                  
-        ///     args[2] = (System.Object) cb_c;   
-        ///                 
-        ///     return [result|null];  
-        /// </code>
-        /// </summary>   
-        #if DEBUG
-        internal
-        #else
-        private
-        #endif
-        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget
-        (
-            method,
-            hasTarget: false,
-            (paramz, locals) => InvokeMethod
-            (
-                method,
-                target: BaseExpression(),
-                castTargetTo: null,
-                arguments: locals.Select(ResolveArgument).ToArray()
-            )
-        );
 
         /// <summary>
         /// <code>
@@ -172,7 +127,18 @@ namespace Solti.Utils.Proxy.Internals
                         ),
                         Argument
                         (
-                            ResolveInvokeTarget(targetMethod)
+                            targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
+                            (
+                                targetMethod,
+                                hasTarget: false,
+                                (paramz, locals) => InvokeMethod
+                                (
+                                    targetMethod,
+                                    target: BaseExpression(),
+                                    castTargetTo: null,
+                                    arguments: locals.Select(ResolveArgument).ToArray()
+                                )
+                            )
                         ),
                         Argument
                         (

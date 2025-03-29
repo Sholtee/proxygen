@@ -10,22 +10,65 @@ using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
     internal partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactory
     {
+        private static readonly IMethodInfo
+            FGetBase = MetadataMethodInfo.CreateFrom
+            (
+                MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetBase(ref output))
+            ),
+            FInvoke = MetadataMethodInfo.CreateFrom
+            (
+                MethodInfoExtensions.ExtractFrom<IInterceptor>(static i => i.Invoke(null!))
+            );
+
         private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
 
         private readonly FieldDeclarationSyntax FInterceptor;
+
+        /// <summary>
+        /// <code>
+        /// (object[] _) => throw new NotImplementedException();
+        /// </code>
+        /// </summary>
+        private ParenthesizedLambdaExpressionSyntax ResolveNotImplemented() => ParenthesizedLambdaExpression()
+            .WithParameterList
+            (
+                ParameterList
+                (
+                    new ParameterSyntax[]
+                    {
+                        Parameter
+                        (
+                            identifier: Identifier("_")
+                        )
+                        .WithType
+                        (
+                            ResolveType<object[]>()
+                        )
+                    }.ToSyntaxList()
+                )
+            )
+            .WithExpressionBody
+            (
+                ThrowExpression
+                (
+                    ResolveObject<NotImplementedException>()
+                )
+            );
 
         public ITypeInfo TargetType { get; }
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => new[] { TargetType };
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [TargetType];
 
         #if DEBUG
         internal
