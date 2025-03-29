@@ -135,7 +135,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static IdentifierNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
+        protected static SimpleNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
         #if DEBUG
         internal
@@ -148,27 +148,22 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static IdentifierNameSyntax ResolveIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
+        protected static SimpleNameSyntax ResolveIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
 
         #if DEBUG
         internal
         #endif
-        protected static ArgumentSyntax ResolveArgument(FieldDeclarationSyntax field) => Argument
-        (
-            ResolveIdentifierName(field)
-        );
-
-        #if DEBUG
-        internal
-        #endif
-        protected static NameSyntax ResolveIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null
+        protected static SimpleNameSyntax ResolveIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null
             ? IdentifierName(cls.Identifier)
             : GenericName
             (
                 cls.Identifier,
                 TypeArgumentList
                 (
-                    cls.TypeParameterList.Parameters.ToSyntaxList(static ga => (TypeSyntax) IdentifierName(ga.Identifier))
+                    cls.TypeParameterList.Parameters.ToSyntaxList<TypeParameterSyntax, TypeSyntax>
+                    (
+                        static ga => IdentifierName(ga.Identifier)
+                    )
                 )
             );
     }

@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Solti.Utils.Proxy
@@ -11,28 +12,26 @@ namespace Solti.Utils.Proxy
     /// <summary>
     /// Describes a method invocation context.
     /// </summary>
-    public sealed class ClassInvocationContext: IInvocationContext
+    /// <remarks>
+    /// Creates a new <see cref="ClassInvocationContext"/> instance.
+    /// </remarks>
+    public sealed class ClassInvocationContext(ExtendedMemberInfo targetMember, Func<object?[], object?> dispatch, object?[] args, IReadOnlyList<Type> genericArguments) : IInvocationContext
     {
-        /// <summary>
-        /// Creates a new <see cref="ClassInvocationContext"/> instance.
-        /// </summary>
-        public ClassInvocationContext(ExtendedMemberInfo targetMember, Func<object?[], object?> dispatch, object?[] args)
-        {
-            Member = targetMember ?? throw new ArgumentNullException(nameof(targetMember));
-            Dispatch = dispatch ?? throw new ArgumentNullException(nameof(dispatch));
-            Args = args ?? throw new ArgumentNullException(nameof(args));
-        }
-
         /// <inheritdoc/>
-        public ExtendedMemberInfo Member { get; }
+        public ExtendedMemberInfo Member { get; } = targetMember ?? throw new ArgumentNullException(nameof(targetMember));
 
         /// <summary>
         /// Gets the dispatcher function.
         /// </summary>
-        public Func<object?[], object?> Dispatch { get; }
+        public Func<object?[], object?> Dispatch { get; } = dispatch ?? throw new ArgumentNullException(nameof(dispatch));
 
         /// <inheritdoc/>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "End user is allowed to modify the argument list.")]
-        public object?[] Args { get; }
+        public object?[] Args { get; } = args ?? throw new ArgumentNullException(nameof(args));
+
+        /// <inheritdoc/>
+        public IReadOnlyList<Type> GenericArguments { get; } = genericArguments ?? throw new ArgumentNullException(nameof(genericArguments));
+
+        object? IInvocationContext.Dispatch() => Dispatch(Args);
     }
 }

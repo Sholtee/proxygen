@@ -105,20 +105,13 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveInvokeTarget
                     (
                         property.GetMethod,
-                        (target, args, result, locals) => ExpressionStatement
+                        hasTarget: true,
+                        (paramz, locals) => PropertyAccess
                         (
-                            AssignmentExpression
-                            (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: ResolveIdentifierName(result!),
-                                right: PropertyAccess
-                                (
-                                    property,
-                                    IdentifierName(target.Identifier),
-                                    castTargetTo: property.DeclaringType,
-                                    indices: locals.Select(ResolveArgument)
-                                )
-                            )
+                            property,
+                            IdentifierName(paramz[0].Identifier),
+                            castTargetTo: property.DeclaringType,
+                            indices: locals.Select(ResolveArgument)
                         )
                     ),
                     CALL_INDEX
@@ -160,22 +153,20 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveInvokeTarget
                     (
                         property.SetMethod,
-                        (target, args, result, locals) => ExpressionStatement
+                        hasTarget: true,
+                        (paramz, locals) => AssignmentExpression
                         (
-                            expression: AssignmentExpression
+                            kind: SyntaxKind.SimpleAssignmentExpression,
+                            left: PropertyAccess
                             (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: PropertyAccess
-                                (
-                                    property,
-                                    IdentifierName(target.Identifier),
-                                    castTargetTo: property.DeclaringType,
-                                    indices: locals
-                                        .Take(locals.Count - 1)
-                                        .Select(ResolveArgument)
-                                ),
-                                right: ResolveIdentifierName(locals.Last())
-                            )
+                                property,
+                                IdentifierName(paramz[0].Identifier),
+                                castTargetTo: property.DeclaringType,
+                                indices: locals
+                                    .Take(locals.Count - 1)
+                                    .Select(ResolveArgument)
+                            ),
+                            right: ResolveIdentifierName(locals[locals.Count - 1])
                         )
                     ),
                     CALL_INDEX

@@ -14,9 +14,11 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactoryBase
+    internal partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactory
     {
         private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
+
+        private readonly FieldDeclarationSyntax FInterceptor;
 
         public ITypeInfo TargetType { get; }
 
@@ -48,6 +50,12 @@ namespace Solti.Utils.Proxy.Internals
             return base.ResolveUnit(context, cancellation);
         }
 
+        #if DEBUG
+        internal
+        #endif
+        protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) =>
+            base.ResolveMembers(cls.AddMembers(FInterceptor), context, cancellation);
+
         public ClassProxySyntaxFactory
         (
             ITypeInfo targetType,
@@ -68,6 +76,8 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(targetType));
 
             TargetType = targetType;
+
+            FInterceptor = ResolveField<IInterceptor>(nameof(FInterceptor), @static: false);
         }
     }
 }

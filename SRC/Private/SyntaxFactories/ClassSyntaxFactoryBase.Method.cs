@@ -224,9 +224,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
         {
-            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
-
-            Debug.Assert(arguments.Length == paramz.Count);
+            Debug.Assert(arguments.Length == method.Parameters.Count);
 
             return InvocationExpression
             (
@@ -243,7 +241,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     arguments.ToSyntaxList
                     (
-                        (arg, i) => paramz[i].Kind switch
+                        (arg, i) => method.Parameters[i].Kind switch
                         {
                             ParameterKind.In => arg.WithRefKindKeyword
                             (
@@ -274,16 +272,14 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params string[] arguments)
         {
-            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
-
-            Debug.Assert(arguments.Length == paramz.Count);
+            Debug.Assert(arguments.Length == method.Parameters.Count);
 
             return InvokeMethod
             (
                 method,
                 target,
                 castTargetTo,
-                arguments: paramz
+                arguments: method.Parameters
                     .Select
                     (
                         (param, i) => Argument

@@ -176,13 +176,15 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// static (object target, object[] args) =>   
+        /// [static] ([object target,] object[] args) =>   
         /// {                                             
         ///     System.Int32 cb_a = (System.Int32) args[0]; 
         ///     System.String cb_b;                   
         ///     TT cb_c = (TT) args[2];
-        ///     [object? result = null;]
+        ///     [object? result =]
         ///     ...
+        ///     args[1] = (System.Object) cb_b;                                                                  
+        ///     args[2] = (System.Object) cb_c;   
         ///     return null|result;
         /// };
         /// </code>
@@ -190,18 +192,10 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, Func<ParameterSyntax, ParameterSyntax, LocalDeclarationStatementSyntax?, IReadOnlyList<LocalDeclarationStatementSyntax>, StatementSyntax> invocationFactory)
+        protected ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, bool hasTarget, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
         {
-            ParameterSyntax
-                target = Parameter
-                (
-                    identifier: Identifier(nameof(target))
-                )
-                .WithType
-                (
-                    ResolveType<object>()
-                ),
-                args = Parameter
+            ParameterSyntax args =
+                Parameter
                 (
                     identifier: Identifier(nameof(args))
                 )
@@ -210,33 +204,73 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveType<object[]>()
                 );
 
-            List<StatementSyntax> statements = new();
+            List<ParameterSyntax> paramz = [];
+            if (hasTarget) paramz.Add
+            (
+                Parameter
+                (
+                    identifier: Identifier("target")
+                )
+                .WithType
+                (
+                    ResolveType<object>()
+                )
+            );
+            paramz.Add(args);
+        
+            List<StatementSyntax> body = [];
 
             List<LocalDeclarationStatementSyntax> locals = new(ResolveInvokeTargetLocals(args, method));
-            statements.AddRange(locals);
+            body.AddRange(locals);
 
-            LocalDeclarationStatementSyntax? result = null;
+            LocalDeclarationStatementSyntax? result;
             if (!method.ReturnValue.Type.IsVoid)
             {
-                result = ResolveLocal<object>(nameof(result));
-                statements.Add(result);
+                result = ResolveLocal<object>
+                (
+                    nameof(result),
+                    invocationFactory(paramz, locals)
+                );
+                body.Add(result);
+            }
+            else
+            {
+                result = null;
+                body.Add
+                (
+                    ExpressionStatement
+                    (
+                        invocationFactory(paramz, locals)
+                    )
+                );
             }
 
-            statements.Add(invocationFactory(target, args, result, locals));
-            statements.AddRange(ReassignArgsArray(method, args, locals));
-            statements.Add(result is null ? ReturnNull() : ReturnResult(null, result));
+            body.AddRange
+            (
+                ReassignArgsArray(method, args, locals)
+            );
+            body.Add(result is null ? ReturnNull() : ReturnResult(null, result));
 
             ParenthesizedLambdaExpressionSyntax lambda = ParenthesizedLambdaExpression()
                 .WithParameterList
                 (
                     ParameterList
                     (
-                        new ParameterSyntax[] { target, args }.ToSyntaxList()
+                        paramz.ToSyntaxList()
                     )
                 )
                 .WithBody
                 (
-                    Block(statements)
+                    Block(body)
+                );
+
+            if (hasTarget && LanguageVersion >= LanguageVersion.CSharp9)
+                lambda = lambda.WithModifiers
+                (
+                    modifiers: TokenList
+                    (
+                        Token(SyntaxKind.StaticKeyword)
+                    )
                 );
 
             return lambda;

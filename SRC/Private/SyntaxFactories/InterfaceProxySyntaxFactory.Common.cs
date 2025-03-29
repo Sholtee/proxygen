@@ -39,23 +39,6 @@ namespace Solti.Utils.Proxy.Internals
                 targetMembers.Any(targetMember => signatureEquals(targetMember, ifaceMember));
         }
 
-        #if DEBUG
-        internal
-        #endif
-        protected override ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, Func<ParameterSyntax, ParameterSyntax, LocalDeclarationStatementSyntax?, IReadOnlyList<LocalDeclarationStatementSyntax>, StatementSyntax> invocationFactory)
-        {
-            ParenthesizedLambdaExpressionSyntax lambda = base.ResolveInvokeTarget(method, invocationFactory);
-            if (LanguageVersion >= LanguageVersion.CSharp9)
-                lambda = lambda.WithModifiers
-                (
-                    modifiers: TokenList
-                    (
-                        Token(SyntaxKind.StaticKeyword)
-                    )
-                );
-            return lambda;
-        }
-
         /// <summary>
         /// <code>
         /// InterfaceMap&lt;TInterface, TTarget&gt;.Value | null
@@ -100,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        FieldDeclarationSyntax ResolveMethodContext(string id, ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveStaticGlobal<InterfaceInterceptionContext>
+        FieldDeclarationSyntax ResolveMethodContext(string id, ParenthesizedLambdaExpressionSyntax lambda, int callIndex) => ResolveField<InterfaceInterceptionContext>
         (
             $"F{id}",
             ResolveObject<InterfaceInterceptionContext>
@@ -186,7 +169,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .AddMembers
             (
-                ResolveStaticGlobal<InterfaceInterceptionContext>
+                ResolveField<InterfaceInterceptionContext>
                 (
                     $"Value",
                     ResolveObject<InterfaceInterceptionContext>

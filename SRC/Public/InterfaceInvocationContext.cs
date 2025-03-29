@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Solti.Utils.Proxy
@@ -29,5 +30,10 @@ namespace Solti.Utils.Proxy
         /// <remarks>Before the <see cref="InterfaceInterceptor{TInterface, TTarget}.Target"/> gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the "by ref" parameters set by the target method.</remarks>
         [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "End user is allowed to modify the argument list.")]
         public object?[] Args { get; }
+
+        /// <inheritdoc/>
+        public IReadOnlyList<Type> GenericArguments => throw new NotImplementedException();  // TODO: implement
+
+        object? IInvocationContext.Dispatch() => throw new NotImplementedException();  // TODO: implement
     }
 }

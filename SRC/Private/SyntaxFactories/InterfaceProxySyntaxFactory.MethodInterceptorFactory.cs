@@ -104,17 +104,14 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls.AddMembers
             (
-                new MemberDeclarationSyntax[]
-                {
-                    methodCtx,
-                    ResolveMethod(method).WithBody
+                methodCtx,
+                ResolveMethod(method).WithBody
+                (
+                    body: Block
                     (
-                        body: Block
-                        (
-                            BuildBody()
-                        )
+                        BuildBody()
                     )
-                }
+                )
             );
 
             IEnumerable<StatementSyntax> BuildBody()
@@ -182,8 +179,20 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>    
-        /// <code>                                                                             
-        /// [result =] target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);                                              
+        /// <code>
+        /// args =>
+        /// {
+        ///     TGeneric1 cb_a = (TGeneric1) args[0];
+        ///     T1 cb_b;                                                                               
+        ///     T2 cb_c = (T2) args[2];
+        ///     
+        ///     [result =] target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);
+        ///     
+        ///     args[1] = (System.Object) cb_b;                                                                  
+        ///     args[2] = (System.Object) cb_c;   
+        ///                 
+        ///     return [result|null];
+        /// }
         /// </code>
         /// </summary>   
         #if DEBUG
@@ -191,25 +200,17 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private
         #endif
-        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget(method, (target, args, result, locals) =>
-        {
-            InvocationExpressionSyntax invocation = InvokeMethod
+        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget
+        (
+            method,
+            hasTarget: true,
+            (paramz, locals) => InvokeMethod
             (
                 method,
-                target: IdentifierName(target.Identifier),
+                target: IdentifierName(paramz[0].Identifier),
                 castTargetTo: method.DeclaringType,
                 arguments: locals.Select(ResolveArgument).ToArray()
-            );
-
-            return ExpressionStatement
-            (
-                result is null ? invocation : AssignmentExpression
-                (
-                    SyntaxKind.SimpleAssignmentExpression,
-                    ResolveIdentifierName(result!),
-                    invocation
-                )
-            ); 
-        });
+            )
+        ); 
     }
 }
