@@ -131,7 +131,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 targetMethod,
                                 hasTarget: false,
-                                (paramz, locals) => InvokeMethod
+                                (_, locals) => InvokeMethod
                                 (
                                     targetMethod,
                                     target: BaseExpression(),

@@ -88,8 +88,8 @@ namespace Solti.Utils.Proxy.Internals
             const int CALL_INDEX = 0;
 
             FieldDeclarationSyntax
-                addContext = BuildField(evt.AddMethod, true),
-                removeContext = BuildField(evt.RemoveMethod, false);
+                addContext = BuildField(true),
+                removeContext = BuildField(false);
 
             List<MemberDeclarationSyntax> members = 
             [
@@ -108,27 +108,31 @@ namespace Solti.Utils.Proxy.Internals
                 cls.Members.AddRange(members)
             );
 
-            FieldDeclarationSyntax BuildField(IMethodInfo backingMethod, bool add) => ResolveMethodContext
-            (
-                backingMethod.GetMD5HashCode(),
-                ResolveInvokeTarget
+            FieldDeclarationSyntax BuildField(bool add)
+            {
+                IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
+                return ResolveMethodContext
                 (
-                    backingMethod,
-                    hasTarget: true,
-                    (paramz, locals) => RegisterEvent
+                    backingMethod.GetMD5HashCode(),
+                    ResolveInvokeTarget
                     (
-                        evt,
-                        IdentifierName(paramz[0].Identifier),
-                        add,
-                        ResolveIdentifierName
+                        backingMethod,
+                        hasTarget: true,
+                        (paramz, locals) => RegisterEvent
                         (
-                            locals.Single()
-                        ),
-                        castTargetTo: evt.DeclaringType
-                    )
-                ),
-                CALL_INDEX
-            );
+                            evt,
+                            IdentifierName(paramz[0].Identifier),
+                            add,
+                            ResolveIdentifierName
+                            (
+                                locals.Single()
+                            ),
+                            castTargetTo: evt.DeclaringType
+                        )
+                    ),
+                    CALL_INDEX
+                );
+            }
 
             BlockSyntax BuildBody(IMethodInfo method, FieldDeclarationSyntax field)
             {
