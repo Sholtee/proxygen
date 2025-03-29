@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     {
         public delegate void TestDelegate<in T>(object sender, T eventArg);
 
-        internal interface IFoo<T> // internal on purpose
+        internal interface IFoo<T> // deliberately internal
         {
             int Foo<TT>(int a, out string b, ref TT c);
             void Bar();
