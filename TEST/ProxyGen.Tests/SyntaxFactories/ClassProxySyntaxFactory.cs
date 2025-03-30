@@ -25,6 +25,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         );
 
         [TestCase(typeof(Foo<int>), OutputType.Module, "ClsProxySrcModule.txt")]
+        [TestCase(typeof(Foo<int>), OutputType.Unit, "ClsProxySrcUnit.txt")]
         public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type target, int outputType, string fileName)
         {
             ClassProxySyntaxFactory gen = CreateSyntaxFactory(target, (OutputType) outputType);

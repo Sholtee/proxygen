@@ -50,10 +50,13 @@
     <None Update="ClsProxySrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ClsSrcUnit.txt">
+    <None Update="ClsProxySrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="TargetClsSrcModule.txt">
+    <None Update="IfaceProxySrcUnit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="IfaceProxyHavingTargetSrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BarSrc.txt">
@@ -62,7 +65,7 @@
     <None Update="CallbackSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ClsSrcModule.txt">
+    <None Update="IfaceProxySrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="DuckClsSrc.txt">
