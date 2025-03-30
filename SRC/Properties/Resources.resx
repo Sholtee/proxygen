@@ -168,8 +168,8 @@
   <data name="NOT_A_GENERATOR" xml:space="preserve">
     <value>The parameter must be a Generator descendant.</value>
   </data>
-  <data name="NO_PUBLIC_CTOR" xml:space="preserve">
-    <value>At least one public constructor should be declared on {0}.</value>
+  <data name="NO_ACCESSIBLE_CTOR" xml:space="preserve">
+    <value>At least one accessible constructor should be declared on {0}.</value>
   </data>
   <data name="NULL_TARGET" xml:space="preserve">
     <value>The target is NULL.</value>

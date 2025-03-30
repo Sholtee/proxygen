@@ -178,11 +178,11 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one public constructor should be declared on {0}..
+        ///   Looks up a localized string similar to At least one accessible constructor should be declared on {0}..
         /// </summary>
-        internal static string NO_PUBLIC_CTOR {
+        internal static string NO_ACCESSIBLE_CTOR {
             get {
-                return ResourceManager.GetString("NO_PUBLIC_CTOR", resourceCulture);
+                return ResourceManager.GetString("NO_ACCESSIBLE_CTOR", resourceCulture);
             }
         }
         

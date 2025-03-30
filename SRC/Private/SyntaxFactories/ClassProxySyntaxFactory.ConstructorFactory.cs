@@ -17,10 +17,13 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IConstructorInfo ctor in TargetType.GetPublicConstructors())
+            foreach (IConstructorInfo ctor in TargetType.GetConstructors(AccessModifiers.Protected))
             {
+                Visibility.Check(ctor, ContainingAssembly, allowProtected: true);
+
                 cls = ResolveConstructor(cls, context, ctor);
             }
+
             return cls;
         }
 

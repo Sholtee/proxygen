@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IConstructorInfo ctor in InterceptorType.GetPublicConstructors())
+            foreach (IConstructorInfo ctor in InterceptorType.GetConstructors(AccessModifiers.Public))
             {
                 cls = ResolveConstructor(cls, context, ctor);
             }

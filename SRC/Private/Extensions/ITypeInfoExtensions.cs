@@ -140,19 +140,19 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static IEnumerable<IConstructorInfo> GetPublicConstructors(this ITypeInfo src)
+        public static IEnumerable<IConstructorInfo> GetConstructors(this ITypeInfo src, AccessModifiers minAccessibility)
         {
             int found = 0;
             foreach (IConstructorInfo ctor in src.Constructors)
             {
-                if (ctor.AccessModifiers is AccessModifiers.Public)
+                if (ctor.AccessModifiers >= minAccessibility)
                 {
                     yield return ctor;
                     found++;
                 }
             }
             if (found is 0)
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_PUBLIC_CTOR, src.QualifiedName));
+                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_ACCESSIBLE_CTOR, src.QualifiedName));
         }
 
         private static IEnumerable<ITypeInfo> IterateOn(this ITypeInfo src, Func<ITypeInfo, ITypeInfo?> selector) 
