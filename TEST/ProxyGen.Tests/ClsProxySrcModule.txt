@@ -1,0 +1,141 @@
+[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
+internal sealed class ClsProxy_6CC39D7E25B52C938000DCAD4005525B : global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Foo<global::System.Int32>
+{
+    private readonly global::Solti.Utils.Proxy.IInterceptor FInterceptor;
+    public ClsProxy_6CC39D7E25B52C938000DCAD4005525B(global::Solti.Utils.Proxy.IInterceptor interceptor) : base()
+    {
+        FInterceptor = interceptor;
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F50E1B6806B1AC29269945D6715D46AA0;
+    public override global::System.Int32 Bar<TT>(ref global::System.Int32 param1, TT param2)
+    {
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F50E1B6806B1AC29269945D6715D46AA0);
+        global::System.Object[] args = new global::System.Object[]{param1, param2};
+        global::System.Object result = this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F50E1B6806B1AC29269945D6715D46AA0, (global::System.Object[] args) =>
+        {
+            global::System.Int32 _param1 = (global::System.Int32)args[0];
+            TT _param2 = (TT)args[1];
+            global::System.Object result = base.Bar<TT>(ref _param1, _param2);
+            args[0] = (global::System.Object)_param1;
+            return result;
+        }, args, new global::System.Type[]{typeof(TT)}));
+        param1 = (global::System.Int32)args[0];
+        return (global::System.Int32)result;
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F13C6E47E6EE2750FF06198067507D12E;
+    public override global::System.Int32 GetHashCode()
+    {
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F13C6E47E6EE2750FF06198067507D12E);
+        global::System.Object[] args = new global::System.Object[0];
+        global::System.Object result = this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F13C6E47E6EE2750FF06198067507D12E, (global::System.Object[] args) =>
+        {
+            global::System.Object result = base.GetHashCode();
+            return result;
+        }, args, new global::System.Type[0]));
+        return (global::System.Int32)result;
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F22D4079C1B854C405B8D483DABDD2CCD;
+    public override global::System.Boolean Equals(global::System.Object obj)
+    {
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F22D4079C1B854C405B8D483DABDD2CCD);
+        global::System.Object[] args = new global::System.Object[]{obj};
+        global::System.Object result = this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F22D4079C1B854C405B8D483DABDD2CCD, (global::System.Object[] args) =>
+        {
+            global::System.Object _obj = (global::System.Object)args[0];
+            global::System.Object result = base.Equals(_obj);
+            return result;
+        }, args, new global::System.Type[0]));
+        return (global::System.Boolean)result;
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo FA715349A1BB173EBF0DEFCDCC788061D;
+    public override global::System.String ToString()
+    {
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.FA715349A1BB173EBF0DEFCDCC788061D);
+        global::System.Object[] args = new global::System.Object[0];
+        global::System.Object result = this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.FA715349A1BB173EBF0DEFCDCC788061D, (global::System.Object[] args) =>
+        {
+            global::System.Object result = base.ToString();
+            return result;
+        }, args, new global::System.Type[0]));
+        return (global::System.String)result;
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo FA54437C4AE318AE437C356784E0D0111;
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F80A7F73E1E41F6430452A212F1506E78;
+    public override global::System.Int32 Prop
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[0];
+            return (global::System.Int32)this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.FA54437C4AE318AE437C356784E0D0111, (global::System.Object[] args) =>
+            {
+                global::System.Object result = base.Prop;
+                return result;
+            }, args, new global::System.Type[0]));
+        }
+
+        protected set
+        {
+            global::System.Object[] args = new global::System.Object[]{value};
+            this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F80A7F73E1E41F6430452A212F1506E78, (global::System.Object[] args) =>
+            {
+                global::System.Int32 _value = (global::System.Int32)args[0];
+                base.Prop = _value;
+                return null;
+            }, args, new global::System.Type[0]));
+        }
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F4EB299983F2EE987777608E03A584C0F;
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F48004C7C883CC9FD22C37C61B29F546D;
+    public override global::System.Int32 this[global::System.Int32 i]
+    {
+        get
+        {
+            global::System.Object[] args = new global::System.Object[]{i};
+            return (global::System.Int32)this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F4EB299983F2EE987777608E03A584C0F, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+        }
+
+        protected set
+        {
+            global::System.Object[] args = new global::System.Object[]{i, value};
+            this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F48004C7C883CC9FD22C37C61B29F546D, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+        }
+    }
+
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo F9A0D41A9BA1B257F72B55458ED41F04B;
+    private static global::Solti.Utils.Proxy.ExtendedMemberInfo FCE42D7C19FADA1C26A38785DDE9FCDE6;
+    public override event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> Event
+    {
+        add
+        {
+            global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F9A0D41A9BA1B257F72B55458ED41F04B);
+            global::System.Object[] args = new global::System.Object[]{value};
+            this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.F9A0D41A9BA1B257F72B55458ED41F04B, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+        }
+
+        remove
+        {
+            global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.FCE42D7C19FADA1C26A38785DDE9FCDE6);
+            global::System.Object[] args = new global::System.Object[]{value};
+            this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B.FCE42D7C19FADA1C26A38785DDE9FCDE6, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+        }
+    }
+
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
+    {
+        switch (tuple)
+        {
+            case global::System.Tuple<global::Solti.Utils.Proxy.IInterceptor> t0:
+                return new global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B(t0.Item1);
+            default:
+                throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
+        }
+    };
+    [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::ClsProxy_6CC39D7E25B52C938000DCAD4005525B));
+}

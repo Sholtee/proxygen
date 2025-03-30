@@ -27,6 +27,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             public virtual T Prop { get; protected set; }
             public abstract T this[int i] { get; protected set; }
             public abstract event TestDelegate<T> Event;
+            public virtual T Bar<TT>(ref T param1, TT param2) => param1;
         }
 
         protected interface IComplex

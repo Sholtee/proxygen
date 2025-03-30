@@ -199,11 +199,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             InterfaceProxySyntaxFactory gen = CreateSyntaxFactory(iface, interceptor, (OutputType) outputType);
 
-            var s = gen
-                    .ResolveUnit(null, default)
-                    .NormalizeWhitespace(eol: "\n")
-                    .ToFullString();
-
             Assert.That
             (
                 gen

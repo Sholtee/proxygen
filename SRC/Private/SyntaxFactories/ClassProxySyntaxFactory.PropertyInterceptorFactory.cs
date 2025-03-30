@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
                     if (!backingMethod.IsVirtual && !backingMethod.IsAbstract)
                         return false;
 
-                    Visibility.Check(backingMethod, ContainingAssembly);
+                    Visibility.Check(backingMethod, ContainingAssembly, allowProtected: true);
                 }
                 return true;
             }
@@ -122,10 +122,10 @@ namespace Solti.Utils.Proxy.Internals
                 InvocationExpressionSyntax interceptorInvocation = InvokeMethod
                 (
                     method: FInvoke,
-                    target: MemberAccess
+                    target: SimpleMemberAccess
                     (
-                        ResolveIdentifierName(FInterceptor),
-                        FInvoke
+                        ThisExpression(),
+                        ResolveIdentifierName(FInterceptor)
                     ),
                     castTargetTo: null,
                     arguments: Argument

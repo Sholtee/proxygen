@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
                 // Check if the method is visible.
                 //
 
-                Visibility.Check(targetMethod, ContainingAssembly);
+                Visibility.Check(targetMethod, ContainingAssembly, allowProtected: true);
 
 
                 cls = ResolveEvent(cls, context, evt);
@@ -129,10 +129,10 @@ namespace Solti.Utils.Proxy.Internals
                     InvokeMethod
                     (
                         method: FInvoke,
-                        target: MemberAccess
+                        target: SimpleMemberAccess
                         (
-                            ResolveIdentifierName(FInterceptor),
-                            FInvoke
+                            ThisExpression(),
+                            ResolveIdentifierName(FInterceptor)
                         ),
                         castTargetTo: null,
                         arguments: Argument
