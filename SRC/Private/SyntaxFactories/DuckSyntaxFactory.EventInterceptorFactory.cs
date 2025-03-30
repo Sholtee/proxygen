@@ -73,7 +73,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo targetEvt)
         {
-            IEventInfo ifaceEVt = (IEventInfo) context;
+            IEventInfo ifaceEvt = (IEventInfo) context;
 
             IMethodInfo accessor = targetEvt.AddMethod ?? targetEvt.RemoveMethod!;
 
@@ -85,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 ResolveEvent
                 (
-                    ifaceEVt,
+                    ifaceEvt,
                     addBody: CreateBody(register: true),
                     removeBody: CreateBody(register: false),
                     forceInlining: true

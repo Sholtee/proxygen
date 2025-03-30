@@ -344,7 +344,7 @@ namespace Solti.Utils.Proxy.Internals
             static string GetName(ITypeSymbol type) 
             {
                 string name = !string.IsNullOrEmpty(type.Name)
-                    ? type.Name // tupple es nullable eseten is helyes nevet ad vissza
+                    ? type.Name // supports tuples and nullables as well
                     : type.ToDisplayString(new SymbolDisplayFormat(typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameOnly));
 
                 return type is INamedTypeSymbol named && named.IsGenericType()
@@ -433,6 +433,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return sb.ToString();
         }
+
         public static AccessModifiers GetAccessModifiers(this ITypeSymbol src)
         {
             src = src.GetElementType(recurse: true) ?? src;
@@ -459,24 +460,24 @@ namespace Solti.Utils.Proxy.Internals
                         if (ta.IsGenericParameter())
                             continue;
 
-                        UpdateAm(ta);
+                        UpdateAm(ref am, ta);
                     }
                     break;
 
                 case IFunctionPointerTypeSymbol fn:
                     foreach (ITypeSymbol pt in fn.Signature.Parameters.Select(static p => p.Type))
                     {
-                        UpdateAm(pt);
+                        UpdateAm(ref am, pt);
                     }
                     break;
             }
 
             if (!src.IsGenericParameter() && src.ContainingType is not null)
-                UpdateAm(src.ContainingType);
+                UpdateAm(ref am, src.ContainingType);
 
             return am;
 
-            void UpdateAm(ITypeSymbol t)
+            static void UpdateAm(ref AccessModifiers am, ITypeSymbol t)
             {
                 AccessModifiers @new = t.GetAccessModifiers();
                 if (@new < am)

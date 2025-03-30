@@ -371,21 +371,24 @@ namespace Solti.Utils.Proxy.Internals
             {
                 foreach (Type ga in src.GetGenericArguments())
                 {
-                    AccessModifiers gaAm = ga.GetAccessModifiers();
-                    if (gaAm < am)
-                        am = gaAm;
+                    UpdateAm(ref am, ga);
                 }
             }
 
             Type? enclosingType = src.GetEnclosingType();
             if (enclosingType is not null)
             {
-                AccessModifiers etAm = enclosingType.GetAccessModifiers();
-                if (etAm < am)
-                    am = etAm;
+                UpdateAm(ref am, enclosingType);
             }
 
             return am;
+
+            static void UpdateAm(ref AccessModifiers am, Type t)
+            {
+                AccessModifiers @new = t.GetAccessModifiers();
+                if (@new < am)
+                    am = @new;
+            }
         }
 
         public static RefType GetRefType(this Type src) => src switch
