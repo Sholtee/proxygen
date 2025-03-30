@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -57,19 +58,17 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static NameSyntax Qualify(this IEnumerable<NameSyntax> parts)
         {
-            List<NameSyntax> coll = parts as List<NameSyntax> ?? new List<NameSyntax>(parts);
-
-            if (coll.Count is 0)
-                throw new InvalidOperationException();
-
-            if (coll.Count is 1)
-                return coll[0];
-
-            return QualifiedName
-            (
-                left: Qualify(coll.GetRange(0, coll.Count - 1)),
-                right: (SimpleNameSyntax) coll[coll.Count - 1]
-            );
+            int count = parts.Count();
+            return count switch
+            {
+                0 => throw new InvalidOperationException(),
+                1 => parts.Single(),
+                _ => QualifiedName
+                (
+                    left: Qualify(parts.Take(count - 1)),
+                    right: (SimpleNameSyntax) parts.Last()
+                )
+            };
         }
 
         public static LiteralExpressionSyntax AsLiteral(this string param) => LiteralExpression

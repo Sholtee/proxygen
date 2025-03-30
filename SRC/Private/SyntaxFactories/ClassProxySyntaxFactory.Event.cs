@@ -5,19 +5,14 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Linq;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-    using System.Linq;
-    using System.Reflection;
-
     internal partial class ClassProxySyntaxFactory
     {
         /// <summary>

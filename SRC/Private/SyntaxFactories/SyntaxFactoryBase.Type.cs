@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -99,17 +98,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (type.IsNested)
             {
-                return GetParts().Qualify();
-
-                IEnumerable<NameSyntax> GetParts()
-                {
-                    foreach (ITypeInfo parent in type.GetParentTypes())
-                    {
-                        yield return GetQualifiedName(parent);
-                    }
-
-                    yield return GetQualifiedName(type);
-                }
+                return type.GetParentTypes().Append(type).Select(GetQualifiedName).Qualify();
             }
 
             if (type is IArrayTypeInfo array)
