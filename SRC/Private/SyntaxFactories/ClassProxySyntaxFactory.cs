@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactory
+    internal sealed partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactory
     {
         private static readonly IMethodInfo
             FGetBase = MetadataMethodInfo.CreateFrom

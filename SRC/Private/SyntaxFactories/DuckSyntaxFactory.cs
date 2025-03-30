@@ -16,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class DuckSyntaxFactory : ProxyUnitSyntaxFactoryBase
+    internal sealed partial class DuckSyntaxFactory : ProxyUnitSyntaxFactoryBase
     {
         private static string ResolveClassName(ITypeInfo interfaceType, ITypeInfo targetType) =>
             $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}";
