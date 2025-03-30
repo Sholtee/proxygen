@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -154,7 +153,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         property.SetMethod,
                         hasTarget: true,
-                        (paramz, locals) => AssignmentExpression
+                        (paramz, locals) => AssignmentExpression // target.Prop = _value
                         (
                             kind: SyntaxKind.SimpleAssignmentExpression,
                             left: PropertyAccess
