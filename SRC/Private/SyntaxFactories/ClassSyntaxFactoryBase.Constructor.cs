@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name, params IEnumerable<ParameterSyntax> extraParams)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
@@ -42,17 +43,22 @@ namespace Solti.Utils.Proxy.Internals
             (
                 parameterList: ParameterList
                 (
-                    paramz.ToSyntaxList
-                    (
-                        param => Parameter
+                    extraParams
+                        .Concat
                         (
-                            identifier: Identifier(param.Name)
+                            paramz.Select
+                            (
+                                param => Parameter
+                                (
+                                    identifier: Identifier(param.Name)
+                                )
+                                .WithType
+                                (
+                                    type: ResolveType(param.Type)
+                                )
+                            )
                         )
-                        .WithType
-                        (
-                            type: ResolveType(param.Type)
-                        )
-                    )
+                        .ToSyntaxList()
                 )
             )
             .WithInitializer

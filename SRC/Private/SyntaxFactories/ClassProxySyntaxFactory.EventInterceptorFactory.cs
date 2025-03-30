@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ClassProxySyntaxFactory.Event.cs                                              *
+* ClassProxySyntaxFactory.EventInterceptorFactory.cs                            *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/

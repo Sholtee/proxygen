@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ClassProxySyntaxFactory.Property.cs                                           *
+* ClassProxySyntaxFactory.PropertyInterceptorFactory.cs                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
