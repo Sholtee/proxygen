@@ -16,6 +16,31 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassProxySyntaxFactory
     {
+        #if DEBUG
+        internal
+        #endif
+        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
+        {
+            foreach (IPropertyInfo prop in TargetType.Properties)
+            {
+                if (ValidMethod(prop.GetMethod) && ValidMethod(prop.SetMethod))
+                    cls = ResolveProperty(cls, context, prop);
+            }
+            return cls;
+
+            bool ValidMethod(IMethodInfo? backingMethod)
+            {
+                if (backingMethod is not null)
+                {
+                    if (!backingMethod.IsVirtual && !backingMethod.IsAbstract)
+                        return false;
+
+                    Visibility.Check(backingMethod, ContainingAssembly);
+                }
+                return true;
+            }
+        }
+
         /// <summary>
         /// <code>
         /// private static ExtendedMemberInfo FXxX;
@@ -63,7 +88,7 @@ namespace Solti.Utils.Proxy.Internals
                 set = BuildBody
                 (
                     prop.SetMethod,
-                    (_, locals) => AssignmentExpression // target.Prop = _value
+                    (_, locals) => AssignmentExpression // base.Prop = _value
                     (
                         kind: SyntaxKind.SimpleAssignmentExpression,
                         left: PropertyAccess

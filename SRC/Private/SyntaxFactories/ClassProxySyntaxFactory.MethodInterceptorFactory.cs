@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
                 Visibility.Check(method, ContainingAssembly);
 
 
-                cls = ResolveMethod(cls, null!, method);
+                cls = ResolveMethod(cls, context, method);
             }
 
             return cls;

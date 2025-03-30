@@ -15,6 +15,30 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassProxySyntaxFactory
     {
+        #if DEBUG
+        internal
+        #endif
+        protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
+        {
+            foreach (IEventInfo evt in TargetType.Events)
+            {
+                IMethodInfo targetMethod = evt.AddMethod;  
+                if (!targetMethod.IsAbstract && !targetMethod.IsVirtual)
+                    continue;
+
+                //
+                // Check if the method is visible.
+                //
+
+                Visibility.Check(targetMethod, ContainingAssembly);
+
+
+                cls = ResolveEvent(cls, context, evt);
+            }
+
+            return cls;
+        }
+
         /// <summary>
         /// <code>
         /// private static ExtendedMemberInfo FXxX;
