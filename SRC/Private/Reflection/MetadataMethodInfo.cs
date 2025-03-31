@@ -93,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 foreach (Type ga in UnderlyingMethod.GetGenericArguments())
                 {
-                    IGenericConstraint? constraint = MetadataGenericConstraint.CreateFrom(ga);
+                    IGenericConstraint? constraint = MetadataGenericConstraint.CreateFrom(ga, UnderlyingMethod);
                     if (constraint is not null)
                         yield return constraint;
                 }

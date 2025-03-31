@@ -12,17 +12,12 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolTypeInfo : ITypeInfo
+    internal class SymbolTypeInfo(ITypeSymbol typeSymbol, Compilation compilation) : ITypeInfo
     {
-        protected ITypeSymbol UnderlyingSymbol { get; }
+        protected ITypeSymbol UnderlyingSymbol { get; } = typeSymbol;
 
-        protected Compilation Compilation { get; }
+        protected Compilation Compilation { get; } = compilation;
 
-        private SymbolTypeInfo(ITypeSymbol typeSymbol, Compilation compilation)
-        {
-            UnderlyingSymbol = typeSymbol;
-            Compilation = compilation;
-        }
 
         public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation)
         {
@@ -46,30 +41,24 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        private IAssemblyInfo? FDeclaringAssembly;
-        public IAssemblyInfo? DeclaringAssembly
+        private readonly Lazy<IAssemblyInfo?> FDeclaringAssembly = new(() =>
         {
-            get
-            {
-                if (FDeclaringAssembly is null)
-                {
-                    ITypeSymbol? elementType = UnderlyingSymbol.GetElementType(recurse: true);
+            ITypeSymbol? elementType = typeSymbol.GetElementType(recurse: true);
 
-                    IAssemblySymbol? asm = elementType?.ContainingAssembly ?? UnderlyingSymbol.ContainingAssembly;
+            IAssemblySymbol? asm = elementType?.ContainingAssembly ?? typeSymbol.ContainingAssembly;
 
-                    if (asm is not null)
-                        FDeclaringAssembly = SymbolAssemblyInfo.CreateFrom(asm, Compilation);
+            if (asm is not null)
+                return SymbolAssemblyInfo.CreateFrom(asm, compilation);
 
-                    else if (asm is null && elementType is IFunctionPointerTypeSymbol)
-                        FDeclaringAssembly = CreateFrom
-                        (
-                            Compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
-                            Compilation
-                        ).DeclaringAssembly;                      
-                }
-                return FDeclaringAssembly;
-            }
-        }
+            if (asm is null && elementType is IFunctionPointerTypeSymbol)
+                return CreateFrom
+                (
+                    compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
+                    compilation
+                ).DeclaringAssembly;
+            return null;
+        });
+        public IAssemblyInfo? DeclaringAssembly => FDeclaringAssembly.Value;
 
         public bool IsVoid => UnderlyingSymbol.SpecialType == SpecialType.System_Void;
 
@@ -91,21 +80,15 @@ namespace Solti.Utils.Proxy.Internals
 
         public string? QualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
 
-        private ITypeInfo? FElementType;
-        public ITypeInfo? ElementType
+        private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
-            get
-            {
-                if (FElementType is null)
-                {
-                    ITypeSymbol? realType = UnderlyingSymbol.GetElementType();
+            ITypeSymbol? realType = typeSymbol.GetElementType();
 
-                    if (realType is not null)
-                        FElementType = CreateFrom(realType, Compilation);
-                }
-                return FElementType;
-            }
-        }
+            return realType is not null
+                ? CreateFrom(realType, compilation)
+                : null;
+        });
+        public ITypeInfo? ElementType => FElementType.Value;
 
         private ITypeInfo? FEnclosingType;
         public ITypeInfo? EnclosingType => UnderlyingSymbol.GetEnclosingType() is not null
@@ -156,35 +139,28 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => UnderlyingSymbol.IsAbstract;
 
-        private IHasName? FContainingMember;
-        public IHasName? ContainingMember
+        private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            get
+            ITypeSymbol concreteType = typeSymbol.GetElementType(recurse: true) ?? typeSymbol;
+
+            return concreteType.ContainingSymbol switch
             {
-                if (FContainingMember is null)
-                {
-                    ITypeSymbol concreteType = UnderlyingSymbol.GetElementType(recurse: true) ?? UnderlyingSymbol;
+                IMethodSymbol method => SymbolMethodInfo.CreateFrom
+                (
+                    //
+                    // Mimic the way how reflection works...
+                    //
 
-                    FContainingMember = concreteType.ContainingSymbol switch
-                    {
-                        IMethodSymbol method => SymbolMethodInfo.CreateFrom
-                        (
-                            //
-                            // Mimic the way how reflection works...
-                            //
-
-                            IsGenericParameter && method.IsGenericMethod
-                                ? method.OriginalDefinition
-                                : method,
-                            Compilation
-                        ),
-                        _ when UnderlyingSymbol.GetEnclosingType() is not null => SymbolTypeInfo.CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation),
-                        _ => null
-                    };
-                }
-                return FContainingMember;
-            }
-        }
+                    typeSymbol.IsGenericParameter() && method.IsGenericMethod
+                        ? method.OriginalDefinition
+                        : method,
+                    compilation
+                ),
+                _ when typeSymbol.GetEnclosingType() is not null => CreateFrom(typeSymbol.GetEnclosingType()!, compilation),
+                _ => null
+            };
+        });
+        public IHasName? ContainingMember => FContainingMember.Value;
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 

@@ -11,36 +11,26 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class SymbolGenericConstraint : IGenericConstraint
+    internal sealed class SymbolGenericConstraint(ITypeParameterSymbol genericArgument, Compilation compilation) : IGenericConstraint
     {
-        private SymbolGenericConstraint(ITypeParameterSymbol genericArgument, Compilation compilation)
-        {
-            Target = SymbolTypeInfo.CreateFrom(genericArgument, compilation);
-            ConstraintTypes = genericArgument
-                .ConstraintTypes
-                .Select(t => SymbolTypeInfo.CreateFrom(t, compilation))
-                .ToImmutableList();
-            DefaultConstructor = genericArgument.HasConstructorConstraint;
-            Reference = genericArgument.HasReferenceTypeConstraint;
-            Struct = genericArgument.HasValueTypeConstraint;
-        }
-
-        public static IGenericConstraint? CreateFrom(ITypeParameterSymbol genericArgument, Compilation compilation)
-        {
-            SymbolGenericConstraint result = new(genericArgument, compilation);
-            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Any()
+        public static IGenericConstraint? CreateFrom(ITypeParameterSymbol genericArgument, Compilation compilation) =>
+            !genericArgument.HasConstructorConstraint && !genericArgument.HasReferenceTypeConstraint && !genericArgument.HasValueTypeConstraint && !genericArgument.ConstraintTypes.Any()
                 ? null
-                : result;
-        }
+                : new SymbolGenericConstraint(genericArgument, compilation);
 
-        public bool DefaultConstructor { get; }
+        public bool DefaultConstructor => genericArgument.HasConstructorConstraint;
 
-        public bool Reference { get; }
+        public bool Reference => genericArgument.HasReferenceTypeConstraint;
 
-        public bool Struct { get; }
+        public bool Struct => genericArgument.HasValueTypeConstraint;
 
-        public IReadOnlyList<ITypeInfo> ConstraintTypes { get; }
+        private IReadOnlyList<ITypeInfo>? FConstraintTypes;
+        public IReadOnlyList<ITypeInfo> ConstraintTypes => FConstraintTypes ??= genericArgument
+            .ConstraintTypes
+            .Select(t => SymbolTypeInfo.CreateFrom(t, compilation))
+            .ToImmutableList();
 
-        public ITypeInfo Target { get; }
+        private ITypeInfo? FTarget;
+        public ITypeInfo Target => FTarget ??= SymbolTypeInfo.CreateFrom(genericArgument, compilation);
     }
 }

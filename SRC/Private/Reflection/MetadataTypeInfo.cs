@@ -11,11 +11,9 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataTypeInfo : ITypeInfo
+    internal class MetadataTypeInfo(Type underlyingType) : ITypeInfo
     {
-        protected Type UnderlyingType { get; }
-
-        protected MetadataTypeInfo(Type underlyingType) => UnderlyingType = underlyingType;
+        protected Type UnderlyingType { get; } = underlyingType;
 
         public static ITypeInfo CreateFrom(Type underlyingType)
         {
@@ -46,21 +44,15 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsVoid => UnderlyingType == typeof(void);
 
-        private ITypeInfo? FEnclosingType;
-        public ITypeInfo? EnclosingType
+        private readonly Lazy<ITypeInfo?> FEnclosingType = new(() =>
         {
-            get
-            {
-                if (FEnclosingType is null)
-                {
-                    Type? enclosingType = UnderlyingType.GetEnclosingType();
+            Type? enclosingType = underlyingType.GetEnclosingType();
 
-                    if (enclosingType is not null)
-                        FEnclosingType = CreateFrom(enclosingType);
-                }
-                return FEnclosingType;
-            }
-        }
+            return enclosingType is not null
+                ? CreateFrom(enclosingType)
+                : null;
+        });
+        public ITypeInfo? EnclosingType => FEnclosingType.Value;
 
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
@@ -77,21 +69,15 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType.GetRefType();
 
-        private ITypeInfo? FElementType;
-        public ITypeInfo? ElementType
+        private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
-            get
-            {
-                if (FElementType is null)
-                {
-                    Type? realType = UnderlyingType.GetElementType();
+            Type? realType = underlyingType.GetElementType();
 
-                    if (realType is not null)
-                        FElementType = CreateFrom(realType);
-                }
-                return FElementType;
-            }
-        }
+            return realType is not null
+                ? CreateFrom(realType)
+                : null;
+        }) ;
+        public ITypeInfo? ElementType => FElementType.Value;
 
         //
         // In case of "Cica<T>.Mica<TT>", "TT" is embedded which is inappropriate to us
@@ -159,25 +145,18 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => UnderlyingType.IsAbstract();
 
-        private IHasName? FContainingMember;
-        public IHasName? ContainingMember
+        private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            get
-            {
-                if (FContainingMember is null)
-                {
-                    Type concreteType = UnderlyingType.GetInnermostElementType() ?? UnderlyingType;
+            Type concreteType = underlyingType.GetInnermostElementType() ?? underlyingType;
 
-                    FContainingMember = concreteType switch
-                    {
-                        _ when concreteType.IsGenericParameter && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
-                        _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
-                        _ => null
-                    };
-                }
-                return FContainingMember;
-            }
-        }
+            return concreteType switch
+            {
+                _ when concreteType.IsGenericParameter && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
+                _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
+                _ => null
+            };
+        });
+        public IHasName? ContainingMember => FContainingMember.Value;
 
         public AccessModifiers AccessModifiers => UnderlyingType.GetAccessModifiers();
 

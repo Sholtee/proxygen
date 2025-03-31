@@ -11,17 +11,9 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class SymbolAssemblyInfo : IAssemblyInfo
+    internal sealed class SymbolAssemblyInfo(IAssemblySymbol underlyingSymbol, Compilation compilation) : IAssemblyInfo
     {
-        private IAssemblySymbol UnderlyingSymbol { get; }
-
-        private Compilation Compilation { get; }
-
-        private SymbolAssemblyInfo(IAssemblySymbol underlyingSymbol, Compilation compilation) 
-        {
-            UnderlyingSymbol = underlyingSymbol;
-            Compilation = compilation;
-        }
+        private IAssemblySymbol UnderlyingSymbol { get; } = underlyingSymbol;
 
         public static IAssemblyInfo CreateFrom(IAssemblySymbol asm, Compilation compilation)
         {
@@ -30,34 +22,32 @@ namespace Solti.Utils.Proxy.Internals
             return new SymbolAssemblyInfo(asm, compilation);
         }
 
-        public string? Location
+        private readonly Lazy<string?> FLocation = new(() =>
         {
-            get
-            {
-                if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.Assembly))
-                    //
-                    // Assembly being compiled doesn't have path
-                    //
-
-                    return null;
-
-                foreach (MetadataReference reference in Compilation.References)
-                {
-                    if (SymbolEqualityComparer.Default.Equals(UnderlyingSymbol, Compilation.GetAssemblyOrModuleSymbol(reference)))
-                    {
-                        //
-                        // MetadataReference.Display is not necessarily a path
-                        //
-
-                        return !string.IsNullOrEmpty(reference.Display) && File.Exists(reference.Display)
-                            ? reference.Display
-                            : null;
-                    }
-                }
+            if (SymbolEqualityComparer.Default.Equals(underlyingSymbol, compilation.Assembly))
+                //
+                // Assembly being compiled doesn't have path
+                //
 
                 return null;
+
+            foreach (MetadataReference reference in compilation.References)
+            {
+                if (SymbolEqualityComparer.Default.Equals(underlyingSymbol, compilation.GetAssemblyOrModuleSymbol(reference)))
+                {
+                    //
+                    // MetadataReference.Display is not necessarily a path
+                    //
+
+                    return !string.IsNullOrEmpty(reference.Display) && File.Exists(reference.Display)
+                        ? reference.Display
+                        : null;
+                }
             }
-        }
+
+            return null;
+        });
+        public string? Location => FLocation.Value;
 
         public bool IsDynamic => false; // We cannot reference dynamic ASMs during build
 
@@ -73,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
             INamedTypeSymbol? type = UnderlyingSymbol.GetTypeByMetadataName(fullName);
 
             return type is not null
-                ? SymbolTypeInfo.CreateFrom(type, Compilation)
+                ? SymbolTypeInfo.CreateFrom(type, compilation)
                 : null;
         }
 

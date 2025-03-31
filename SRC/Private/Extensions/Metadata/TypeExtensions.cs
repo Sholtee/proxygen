@@ -421,5 +421,42 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly Func<Type, bool> FIsFunctionPointerCore = GetIsFunctionPointerCore();
 
         public static bool IsFunctionPointer(this Type src) => FIsFunctionPointerCore(src);
+
+        public static IEnumerable<Type> GetGenericConstraints(this Type src, MemberInfo declaringMember)
+        {
+            foreach(Type gpc in src.GetGenericParameterConstraints())
+            {      
+                //
+                // We don't want a
+                //     "where TT : struct, global::System.ValueType"
+                //
+
+                if (gpc == typeof(ValueType) && src.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+                    continue;
+
+                Type? declaringType = declaringMember switch
+                {
+                    MethodInfo method => method.DeclaringType,
+                    Type type => type.DeclaringType,
+                    _ => null
+                };
+                if (declaringType?.IsConstructedGenericType is true)
+                {
+                    //
+                    // Get the specialized constraint from the declaring member
+                    // (note that gpc.DeclaringXxX always returns the generic definition)
+                    //
+
+                    int position = declaringType.GetGenericTypeDefinition().GetGenericArguments().IndexOf(gpc);
+                    if (position >= 0)
+                    {
+                        yield return declaringType.GetGenericArguments()[position];
+                        continue;
+                    }
+                }
+
+                yield return gpc;
+            }
+        }
     }
 }

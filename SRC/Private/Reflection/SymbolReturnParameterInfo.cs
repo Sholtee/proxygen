@@ -7,25 +7,19 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class SymbolReturnParameterInfo : IParameterInfo 
+    internal sealed class SymbolReturnParameterInfo(IMethodSymbol method, Compilation compilation) : IParameterInfo 
     {
-        public ParameterKind Kind { get; }
+        public ParameterKind Kind => method switch
+        {
+            _ when method.ReturnsByRefReadonly => ParameterKind.RefReadonly,
+            _ when method.ReturnsByRef => ParameterKind.Ref,
+            _ => ParameterKind.Out
+        };
 
         public string Name { get; } = string.Empty;
 
-        public ITypeInfo Type { get; }
-
-        private SymbolReturnParameterInfo(IMethodSymbol method, Compilation compilation)
-        {
-            Kind = method switch 
-            {
-                _ when method.ReturnsByRefReadonly => ParameterKind.RefReadonly,
-                _ when method.ReturnsByRef => ParameterKind.Ref,
-                _ => ParameterKind.Out
-            };
-
-            Type = SymbolTypeInfo.CreateFrom(method.ReturnType, compilation);
-        }
+        private ITypeInfo? FType;
+        public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(method.ReturnType, compilation);
 
         public static IParameterInfo CreateFrom(IMethodSymbol method, Compilation compilation)
         {

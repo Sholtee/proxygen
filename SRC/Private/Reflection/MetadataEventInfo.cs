@@ -14,7 +14,7 @@ namespace Solti.Utils.Proxy.Internals
         public string Name => UnderlyingEvent.StrippedName();
 
         private ITypeInfo? FDeclaringType;
-        public ITypeInfo DeclaringType => FDeclaringType ??= (AddMethod ?? RemoveMethod!).DeclaringType;
+        public ITypeInfo DeclaringType => FDeclaringType ??= (AddMethod ?? RemoveMethod).DeclaringType;
 
         private IMethodInfo? FAddMethod;
         public IMethodInfo AddMethod => FAddMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingEvent.AddMethod);
@@ -25,11 +25,11 @@ namespace Solti.Utils.Proxy.Internals
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingEvent.EventHandlerType);
 
-        public bool IsStatic => (AddMethod ?? RemoveMethod!).IsStatic;
+        public bool IsStatic => (AddMethod ?? RemoveMethod).IsStatic;
 
-        public bool IsAbstract => (AddMethod ?? RemoveMethod!).IsAbstract;
+        public bool IsAbstract => (AddMethod ?? RemoveMethod).IsAbstract;
 
-        public bool IsVirtual => (AddMethod ?? RemoveMethod!).IsVirtual;
+        public bool IsVirtual => (AddMethod ?? RemoveMethod).IsVirtual;
 
         private MetadataEventInfo(EventInfo evt) => UnderlyingEvent = evt;
 

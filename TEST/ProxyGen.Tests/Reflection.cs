@@ -244,7 +244,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(gm1 != null, gm2 != null);
                 if (gm1 != null)
+                {
                     AssertSequenceEqualsT(gm1.GenericArguments, gm2.GenericArguments);
+                    AssertSequenceEqualsG(gm1.GenericConstraints, gm2.GenericConstraints);
+                }
             }
 
             void AssertEqualsPr(IPropertyInfo p1, IPropertyInfo p2) 
@@ -333,6 +336,21 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 for (int i = 0; i < l1.Count; i++)
                 {
                     AssertEqualsE(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsG(IReadOnlyList<IGenericConstraint> l1, IReadOnlyList<IGenericConstraint> l2)
+            {
+                Assert.AreEqual(l1.Count, l2.Count);
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    Assert.AreEqual(l1[i].Struct, l2[i].Struct);
+                    Assert.AreEqual(l1[i].Reference, l2[i].Reference);
+                    Assert.AreEqual(l1[i].DefaultConstructor, l2[i].DefaultConstructor);
+
+                    AssertSequenceEqualsT(l1[i].ConstraintTypes, l2[i].ConstraintTypes);
+                    AssertEqualsT(l1[i].Target, l2[i].Target);
                 }
             }
         }

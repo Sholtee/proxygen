@@ -6,6 +6,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -17,13 +18,13 @@ namespace Solti.Utils.Proxy.Internals
         private Compilation Compilation { get; }
 
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingSymbol.GetMethod is not null
-            ? SymbolMethodInfo.CreateFrom(UnderlyingSymbol.GetMethod, Compilation) 
+        public IMethodInfo? GetMethod => UnderlyingSymbol.GetMethod is not null
+            ? FGetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.GetMethod, Compilation) 
             : null;
 
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingSymbol.SetMethod is not null
-            ? SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
+        public IMethodInfo? SetMethod => UnderlyingSymbol.SetMethod is not null
+            ? FSetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
             : null;
 
         public string Name => UnderlyingSymbol.StrippedName();

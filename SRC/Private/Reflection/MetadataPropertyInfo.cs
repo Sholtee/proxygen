@@ -15,13 +15,13 @@ namespace Solti.Utils.Proxy.Internals
         private PropertyInfo UnderlyingProperty { get; }
 
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingProperty.GetMethod is not null
-            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
+        public IMethodInfo? GetMethod => UnderlyingProperty.GetMethod is not null
+            ? FGetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
             : null;
 
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingProperty.SetMethod is not null
-            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
+        public IMethodInfo? SetMethod => UnderlyingProperty.SetMethod is not null 
+            ? FSetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
             : null;
 
         public string Name => UnderlyingProperty.StrippedName();

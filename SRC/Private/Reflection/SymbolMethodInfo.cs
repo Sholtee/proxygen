@@ -103,9 +103,7 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= !IsGenericDefinition
-                ? ImmutableList.Create<IGenericConstraint>()
-                : GetConstraints().ToImmutableList();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= GetConstraints().ToImmutableList();
 
             public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // we don't need this
         }
