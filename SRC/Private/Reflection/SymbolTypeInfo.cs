@@ -110,12 +110,14 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
+            .Sort()
             .ToImmutableList();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
+            .Sort()
             .ToImmutableList();
 
         private IReadOnlyList<IMethodInfo>? FMethods;
@@ -123,12 +125,14 @@ namespace Solti.Utils.Proxy.Internals
             .ListMethods(includeStatic: true)
             .Where(IMethodSymbolExtensions.IsClassMethod)
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
+            .Sort()
             .ToImmutableList();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             .GetConstructors()
             .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
+            .Sort()
             .ToImmutableList();
 
         public string Name => UnderlyingSymbol.GetFriendlyName();

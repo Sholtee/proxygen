@@ -22,28 +22,17 @@ namespace Solti.Utils.Proxy.Internals
         // Generic arguments have no impact on "GUID" property
         //
 
-        public static string GetMD5HashCode(this ITypeInfo src) => GetMD5HashCode(types: src);
+        public static string GetMD5HashCode(this ITypeInfo src) => new ITypeInfo[] { src }.GetMD5HashCode();
 
         [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms")]
-        public static string GetMD5HashCode(params ITypeInfo[] types)
+        public static string GetMD5HashCode(this IEnumerable<ITypeInfo> types)
         {
             using MD5 md5 = MD5.Create();
 
-            for (int i = 0; i < types.Length; i++)
-            {
-                types[i].Hash(md5);
-            }
+            foreach (ITypeInfo type in types)
+                type.Hash(md5);
 
-            md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-
-            StringBuilder sb = new();
-
-            for (int i = 0; i < md5.Hash.Length; i++)
-            {
-                sb.Append(md5.Hash[i].ToString("X2", null));
-            }
-
-            return sb.ToString();          
+            return md5.ToString("X2");         
         }
 
         public static void Hash(this ITypeInfo src, ICryptoTransform transform)

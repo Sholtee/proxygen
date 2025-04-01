@@ -136,10 +136,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertEqualsT(t1.BaseType, t2.BaseType);
                 AssertEqualsN(t1.ContainingMember, t2.ContainingMember);
                 AssertSequenceEqualsT(t1.Interfaces.OrderBy(i => i.Name).ToArray(), t2.Interfaces.OrderBy(i => i.Name).ToArray());
-                AssertSequenceEqualsM(OrderCtors(t1).ToArray(), OrderCtors(t2).ToArray());
-                AssertSequenceEqualsM(OrderMethods(t1).ToArray(), OrderMethods(t2).ToArray());
-                AssertSequenceEqualsPr(OrderProperties(t1).ToArray(), OrderProperties(t2).ToArray());
-                AssertSequenceEqualsE(t1.Events.OrderBy(e => e.Name).ToArray(), t2.Events.OrderBy(e => e.Name).ToArray());
+                AssertSequenceEqualsM(t1.Constructors, t2.Constructors);
+                AssertSequenceEqualsM(t1.Methods, t2.Methods);
+                AssertSequenceEqualsPr(t1.Properties, t2.Properties);
+                AssertSequenceEqualsE(t1.Events, t2.Events);
 
                 IGenericTypeInfo
                     gt1 = t1 as IGenericTypeInfo,
@@ -153,25 +153,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                     AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
                 }
-
-                static IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
-                    .Constructors
-                    .OrderBy(m => m.AccessModifiers)
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
-
-                static IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
-                    .Methods
-                    .OrderBy(m => m.Name)
-                    .ThenBy(m => m.AccessModifiers)
-                    .ThenBy(m => m.IsStatic)     
-                    .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
-                    .ThenBy(m => string.Join("_", m.Parameters.Select(p => $"{p.Type.Name}_{p.Type.RefType}")))
-                    .ThenBy(m => m.ReturnValue.Type.Name);
-
-                static IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
-                    .Properties
-                    .OrderBy(p => p.Name)
-                    .ThenBy(p => p.DeclaringType.Name);
             }
 
             void AssertEqualsA(IAssemblyInfo a1, IAssemblyInfo a2) 

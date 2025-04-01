@@ -3,7 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -12,37 +12,36 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class IMethodInfoExtensions
     {
-        public static string GetMD5HashCode(this IMethodInfo src)
+        public static string GetMD5HashCode(this IMethodInfo src) => new IMethodInfo[] { src }.GetMD5HashCode();
+
+        public static string GetMD5HashCode(this IEnumerable<IMethodInfo> methods)
         {
             using MD5 md5 = MD5.Create();
 
+            foreach (IMethodInfo method in methods)
+                method.Hash(md5);
+
+            return md5.ToString("X2");
+        }
+
+        public static void Hash(this IMethodInfo src, ICryptoTransform transform)
+        {
             byte[] name = Encoding.UTF8.GetBytes(src.Name);
 
-            md5.TransformBlock(name, 0, name.Length, name, 0);
+            transform.TransformBlock(name, 0, name.Length, name, 0);
 
             //
             // IEnumerable<T>.GetEnumerator() - IEnumerable.GetEnumerator()
             //
 
-            src.DeclaringType.Hash(md5); 
+            src.DeclaringType.Hash(transform);
 
             foreach (IParameterInfo param in src.Parameters)
-                param.Type.Hash(md5);
+                param.Type.Hash(transform);
 
             if (src is IGenericMethodInfo generic)
                 foreach (ITypeInfo ga in generic.GenericArguments)
-                    ga.Hash(md5);
-
-            md5.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-
-            StringBuilder sb = new();
-
-            for (int i = 0; i < md5.Hash.Length; i++)
-            {
-                sb.Append(md5.Hash[i].ToString("X2", null));
-            }
-
-            return sb.ToString();
+                    ga.Hash(transform);
         }
 
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)
@@ -94,5 +93,8 @@ namespace Solti.Utils.Proxy.Internals
                     : (AccessModifiers?) null
             };
         }
+
+        public static IEnumerable<TMethodInfo> Sort<TMethodInfo>(this IEnumerable<TMethodInfo> self) where TMethodInfo: IMethodInfo => self
+            .OrderBy(static m => $"{m.Name}_{m.GetMD5HashCode()}");
     }
 }

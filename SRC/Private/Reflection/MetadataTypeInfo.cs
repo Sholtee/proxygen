@@ -91,12 +91,14 @@ namespace Solti.Utils.Proxy.Internals
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
             .Select(MetadataPropertyInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
             .Select(MetadataEventInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
         //
@@ -108,27 +110,21 @@ namespace Solti.Utils.Proxy.Internals
             (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
             (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
             (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
-            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke") // delegate.Invoke(...)
-#if DEBUG
-            //
-            // https://github.com/OpenCover/opencover/blob/master/main/OpenCover.Profiler/CodeCoverage_Cuckoo.cpp
-            //
-
-            || new string[] { "SafeVisited", "VisitedCritical" }.IndexOf(m.Name) >= 0
-#endif
-        ;
+            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke"); // delegate.Invoke(...)
 
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
             .Where(meth => !ShouldSkip(meth))
             .Select(MetadataMethodInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
                 .GetDeclaredConstructors()
                 .Select(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor))
+                .Sort()
                 .ToImmutableList();
 
         public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
