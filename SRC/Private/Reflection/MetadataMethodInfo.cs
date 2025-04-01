@@ -89,22 +89,21 @@ namespace Solti.Utils.Proxy.Internals
                 UnderlyingMethod.GetGenericMethodDefinition()
             );
 
-            private IEnumerable<IGenericConstraint> GetConstraints()
-            {
-                foreach (Type ga in UnderlyingMethod.GetGenericArguments())
-                {
-                    IGenericConstraint? constraint = MetadataGenericConstraint.CreateFrom(ga, UnderlyingMethod);
-                    if (constraint is not null)
-                        yield return constraint;
-                }
-            }
-
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
             public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= !IsGenericDefinition
                 ? ImmutableList.Create<IGenericConstraint>()
-                : GetConstraints().ToImmutableList();
+                : UnderlyingMethod
+                    .GetGenericArguments()
+                    .Select(ga => MetadataGenericConstraint.CreateFrom(ga, UnderlyingMethod)!)
+                    .Where(static c => c is not null)
+                    .ToImmutableList();
 
-            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // out of use
+            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) =>
+                //
+                // We never specialize open generic methods
+                //
+
+                throw new NotImplementedException();
         }
 
         private sealed class MetadataConstructorInfo : MetadataMethodBase<ConstructorInfo>, IConstructorInfo 

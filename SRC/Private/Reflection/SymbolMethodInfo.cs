@@ -92,20 +92,19 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
                 .ToImmutableList();
 
-            private IEnumerable<IGenericConstraint> GetConstraints()
-            {
-                foreach (ITypeParameterSymbol ga in UnderlyingSymbol.TypeParameters)
-                {
-                    IGenericConstraint? constraint = SymbolGenericConstraint.CreateFrom(ga, Compilation);
-                    if (constraint is not null)
-                        yield return constraint;
-                }
-            }
-
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= GetConstraints().ToImmutableList();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= UnderlyingSymbol
+                .TypeParameters
+                .Select(gc => SymbolGenericConstraint.CreateFrom(gc, Compilation)!)
+                .Where(static gc => gc is not null)
+                .ToImmutableList();
 
-            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) => throw new NotImplementedException(); // we don't need this
+            public IGenericMethodInfo Close(params ITypeInfo[] genericArgs) =>
+                //
+                // We never specialize open generic methods
+                //
+
+                throw new NotImplementedException();
         }
     }
 }

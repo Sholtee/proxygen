@@ -193,7 +193,12 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(ti => CreateFrom(ti, Compilation))
                 .ToImmutableList();
 
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints =>
+                //
+                // We never generate open generic proxies so implementing this property not required
+                //
+
+                throw new NotImplementedException();
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {

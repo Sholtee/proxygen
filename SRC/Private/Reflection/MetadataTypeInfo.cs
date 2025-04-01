@@ -180,7 +180,12 @@ namespace Solti.Utils.Proxy.Internals
 
             public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints =>
+                //
+                // We never generate open generic proxies so implementing this property not required
+                //
+
+                throw new NotImplementedException();
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {

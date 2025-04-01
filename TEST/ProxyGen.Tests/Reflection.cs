@@ -154,12 +154,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
                 }
 
-                IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
+                static IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
                     .Constructors
                     .OrderBy(m => m.AccessModifiers)
                     .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
 
-                IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
+                static IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
                     .Methods
                     .OrderBy(m => m.Name)
                     .ThenBy(m => m.AccessModifiers)
@@ -168,7 +168,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     .ThenBy(m => string.Join("_", m.Parameters.Select(p => $"{p.Type.Name}_{p.Type.RefType}")))
                     .ThenBy(m => m.ReturnValue.Type.Name);
 
-                IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
+                static IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
                     .Properties
                     .OrderBy(p => p.Name)
                     .ThenBy(p => p.DeclaringType.Name);
@@ -289,6 +289,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertEqualsM(e1.RemoveMethod, e2.RemoveMethod);
             }
 
+            void AssertEqualsG(IGenericConstraint c1, IGenericConstraint c2)
+            {
+                Assert.AreEqual(c1.Struct, c2.Struct);
+                Assert.AreEqual(c1.Reference, c2.Reference);
+                Assert.AreEqual(c1.DefaultConstructor, c2.DefaultConstructor);
+
+                AssertSequenceEqualsT(c1.ConstraintTypes, c2.ConstraintTypes);
+                AssertEqualsT(c1.Target, c2.Target);
+            }
+
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
             {
                 Assert.AreEqual(l1.Count, l2.Count);
@@ -345,12 +355,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 for (int i = 0; i < l1.Count; i++)
                 {
-                    Assert.AreEqual(l1[i].Struct, l2[i].Struct);
-                    Assert.AreEqual(l1[i].Reference, l2[i].Reference);
-                    Assert.AreEqual(l1[i].DefaultConstructor, l2[i].DefaultConstructor);
-
-                    AssertSequenceEqualsT(l1[i].ConstraintTypes, l2[i].ConstraintTypes);
-                    AssertEqualsT(l1[i].Target, l2[i].Target);
+                    AssertEqualsG(l1[i], l2[i]);
                 }
             }
         }
