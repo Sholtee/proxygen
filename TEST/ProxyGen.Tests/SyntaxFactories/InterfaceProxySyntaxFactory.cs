@@ -192,9 +192,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Module, "IfaceProxySrcModule.txt")]
         [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Unit, "IfaceProxySrcUnit.txt")]
-#if !NETFRAMEWORK // The InterfaceInterceptionContext field gets different name when targeting .NET FW (TODO: Investigate why)
         [TestCase(typeof(IList), typeof(InterfaceInterceptor<IList, List<object>>), OutputType.Module, "IfaceProxyHavingTargetSrcModule.txt")]
-#endif
         public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, Type interceptor, int outputType, string fileName)
         {
             InterfaceProxySyntaxFactory gen = CreateSyntaxFactory(iface, interceptor, (OutputType) outputType);

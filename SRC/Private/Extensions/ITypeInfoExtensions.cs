@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
 using Microsoft.CodeAnalysis;
 
@@ -53,16 +52,19 @@ namespace Solti.Utils.Proxy.Internals
             if (qualifiedName is null)
                 return;
 
-            byte[] inputBuffer = Encoding.UTF8.GetBytes(qualifiedName);
+            transform.Update(qualifiedName);
 
-            transform.TransformBlock(inputBuffer, 0, inputBuffer.Length, inputBuffer, 0);
-
-            if (src is not IGenericTypeInfo generic)
-                return;
-
-            for (int i = 0; i < generic.GenericArguments.Count; i++)
+            if (src is IGenericTypeInfo generic)
             {
-                generic.GenericArguments[i].Hash(transform);
+                if (generic.IsGenericDefinition)
+                    //
+                    // For generic definition we cannot use the arguments (they have no qualified name)
+                    //
+
+                    transform.Update($"arity:{generic.GenericArguments.Count}");
+                else
+                    foreach (ITypeInfo ga in generic.GenericArguments)
+                        ga.Hash(transform);
             }
         }
 

@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.Internals
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
-            .Where(meth => !ShouldSkip(meth))
+            .Where(static meth => !ShouldSkip(meth))
             .Select(MetadataMethodInfo.CreateFrom)
             .Sort()
             .ToImmutableList();

@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* HashAlgorithmExtensions.cs                                                    *
+* HashExtensions.cs                                                             *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal static class HashAlgorithmExtensions
+    internal static class HashExtensions
     {
         public static string ToString(this HashAlgorithm self, string format)
         {
@@ -21,6 +21,12 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(self.Hash[i].ToString(format, null));
 
             return sb.ToString();
+        }
+
+        public static void Update(this ICryptoTransform transform, string value)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(value);
+            transform.TransformBlock(bytes, 0, bytes.Length, bytes, 0);
         }
     }
 }

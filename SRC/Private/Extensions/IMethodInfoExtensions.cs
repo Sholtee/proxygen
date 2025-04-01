@@ -6,7 +6,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -26,9 +25,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Hash(this IMethodInfo src, ICryptoTransform transform)
         {
-            byte[] name = Encoding.UTF8.GetBytes(src.Name);
-
-            transform.TransformBlock(name, 0, name.Length, name, 0);
+            transform.Update(src.Name);
 
             //
             // IEnumerable<T>.GetEnumerator() - IEnumerable.GetEnumerator()
@@ -40,8 +37,17 @@ namespace Solti.Utils.Proxy.Internals
                 param.Type.Hash(transform);
 
             if (src is IGenericMethodInfo generic)
-                foreach (ITypeInfo ga in generic.GenericArguments)
-                    ga.Hash(transform);
+            {
+                if (generic.IsGenericDefinition)
+                    //
+                    // For generic definition we cannot use the arguments (they have no qualified name)
+                    //
+
+                    transform.Update($"arity:{generic.GenericArguments.Count}");
+                else
+                    foreach (ITypeInfo ga in generic.GenericArguments)
+                        ga.Hash(transform);
+            }
         }
 
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)
