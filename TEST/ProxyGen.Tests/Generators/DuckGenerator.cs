@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 
 [assembly: InternalsVisibleTo("Duck_6191D0BB1603D9ADCE5DC9C7263A20D7")]
-[assembly: InternalsVisibleTo("Duck_D794BCF6F9BF1A73E2F1353F68AD23BB")]
+[assembly: InternalsVisibleTo("Duck_B18DECEF59D57C6AB68D9A8E24528852")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {

@@ -18,12 +18,12 @@ namespace Solti.Utils.Proxy.Internals.Tests
     public class ITypeInfoExtensionsTests: CodeAnalysisTestsBase
     {
         [TestCase(typeof(byte), "CF53DF959DD5A05087959B351908EE59")]
-        [TestCase(typeof(byte*), "2E953ADA48A331186C0A781183A65428")]
-        [TestCase(typeof(byte[]), "01B08AFFE9E7221128903AE09E85F3AD")]
-        [TestCase(typeof(List<byte>), "CEFC1D408B19E22E23055E20F796814F")]
-        [TestCase(typeof(List<byte>[]), "8EF27603D0E7E60AD7CFA397EA530F5F")]
-        [TestCase(typeof(List<byte[]>), "3E1A46380A2660ACDFF97D0B706F0041")]
-        [TestCase(typeof(List<>), "631A398DBC9CF667EE61F97423AE5CDF")]
+        [TestCase(typeof(byte*), "19F35337AE3BF432B0EC2DC12F27ED0F")]
+        [TestCase(typeof(byte[]), "74D7FF138EB16B14B959AC16874C4C64")]
+        [TestCase(typeof(List<byte>), "E47C10415CD484DC9D8AC1F5705BE431")]
+        [TestCase(typeof(List<byte>[]), "FC025B03ACEA197B07AB94FEFA629795")]
+        [TestCase(typeof(List<byte[]>), "6135BB1118B7D3F9E84FB096B33F4723")]
+        [TestCase(typeof(List<>), "793EB15224B0ECBB3E765880825D540A")]
         public void GetMD5HashCode_ShouldGenerateUniqueHashCode(Type t, string hash) => 
             Assert.That(MetadataTypeInfo.CreateFrom(t).GetMD5HashCode(), Is.EqualTo(hash)); 
 

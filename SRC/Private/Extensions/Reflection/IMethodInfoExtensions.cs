@@ -37,17 +37,8 @@ namespace Solti.Utils.Proxy.Internals
                 param.Type.Hash(transform);
 
             if (src is IGenericMethodInfo generic)
-            {
-                if (generic.IsGenericDefinition)
-                    //
-                    // For generic definition we cannot use the arguments (they have no qualified name)
-                    //
-
-                    transform.Update($"arity:{generic.GenericArguments.Count}");
-                else
-                    foreach (ITypeInfo ga in generic.GenericArguments)
-                        ga.Hash(transform);
-            }
+                foreach (ITypeInfo ga in generic.GenericArguments)
+                    ga.Hash(transform);
         }
 
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)

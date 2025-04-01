@@ -25,13 +25,6 @@ namespace Solti.Utils.Proxy.Internals
                 if (method.IsSpecial || (!method.IsAbstract && !method.IsVirtual))
                     continue;
 
-                //
-                // Check if the method is visible.
-                //
-
-                Visibility.Check(method, ContainingAssembly, allowProtected: true);
-
-
                 cls = ResolveMethod(cls, context, method);
             }
 
@@ -82,6 +75,12 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo targetMethod)
         {
+            //
+            // Check if the method is visible.
+            //
+
+            Visibility.Check(targetMethod, ContainingAssembly, allowProtected: true);
+
             FieldDeclarationSyntax memberInfo = ResolveField<ExtendedMemberInfo>
             (
                 $"F{targetMethod.GetMD5HashCode()}",

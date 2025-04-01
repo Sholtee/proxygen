@@ -111,6 +111,13 @@ namespace Solti.Utils.Proxy.Internals
             FieldDeclarationSyntax BuildField(bool add)
             {
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
+
+                //
+                // Starting from .NET 5.0 interfaces may have visibility.
+                //
+
+                Visibility.Check(backingMethod, ContainingAssembly);
+
                 return ResolveMethodContext
                 (
                     backingMethod.GetMD5HashCode(),

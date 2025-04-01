@@ -1,7 +1,7 @@
 ﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Utils.Proxy.Internals.DuckBase<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
+internal sealed class Duck_BBDAC00766728D37DE5666C5248517A4 : global::Solti.Utils.Proxy.Internals.DuckBase<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
-    public Duck_2648115D0AA68B747DBE21865A3A6FC2(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target) : base(target)
+    public Duck_BBDAC00766728D37DE5666C5248517A4(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target) : base(target)
     {
     }
 
@@ -26,11 +26,11 @@ internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Util
         switch (tuple)
         {
             case global::System.Tuple<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>> t0:
-                return new global::Duck_2648115D0AA68B747DBE21865A3A6FC2(t0.Item1);
+                return new global::Duck_BBDAC00766728D37DE5666C5248517A4(t0.Item1);
             default:
                 throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_2648115D0AA68B747DBE21865A3A6FC2));
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_BBDAC00766728D37DE5666C5248517A4));
 }

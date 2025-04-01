@@ -36,36 +36,30 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Hash(this ITypeInfo src, ICryptoTransform transform)
         {
-            string? qualifiedName = src.QualifiedName;
+            if (src.IsGenericParameter)
+                //
+                // class Foo<T> { void Method(T x); } | class Foo {void Method<T>(T x); }
+                //
 
-            if (src.RefType > RefType.None)
+                transform.Update($"generic:{src.GetGenericParameterIndex()}");
+
+            else if (src.RefType > RefType.None)
             {
+                transform.Update(src.RefType.ToString());
+
                 //
                 // ref structs have no element type
                 //
 
-                src.ElementType?.Hash(transform);
-
-                qualifiedName += src.RefType.ToString();
+                src.ElementType?.Hash(transform);    
             }
-
-            if (qualifiedName is null)
-                return;
-
-            transform.Update(qualifiedName);
 
             if (src is IGenericTypeInfo generic)
-            {
-                if (generic.IsGenericDefinition)
-                    //
-                    // For generic definition we cannot use the arguments (they have no qualified name)
-                    //
+                foreach (ITypeInfo ga in generic.GenericArguments)
+                    ga.Hash(transform);
 
-                    transform.Update($"arity:{generic.GenericArguments.Count}");
-                else
-                    foreach (ITypeInfo ga in generic.GenericArguments)
-                        ga.Hash(transform);
-            }
+            if (src.QualifiedName is not null)
+                transform.Update(src.QualifiedName);
         }
 
         public static bool EqualsTo(this ITypeInfo src, ITypeInfo that)

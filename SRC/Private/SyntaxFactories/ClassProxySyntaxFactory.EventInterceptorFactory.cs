@@ -22,18 +22,9 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IEventInfo evt in TargetType.Events)
             {
-                IMethodInfo targetMethod = evt.AddMethod;  
-                if (!targetMethod.IsAbstract && !targetMethod.IsVirtual)
-                    continue;
-
-                //
-                // Check if the method is visible.
-                //
-
-                Visibility.Check(targetMethod, ContainingAssembly, allowProtected: true);
-
-
-                cls = ResolveEvent(cls, context, evt);
+                IMethodInfo targetMethod = evt.AddMethod ?? evt.RemoveMethod;  
+                if (targetMethod.IsAbstract || targetMethod.IsVirtual)
+                    cls = ResolveEvent(cls, context, evt);
             }
 
             return cls;
@@ -108,6 +99,8 @@ namespace Solti.Utils.Proxy.Internals
             {
                 FieldDeclarationSyntax field = add ? addField : removeField;
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
+
+                Visibility.Check(backingMethod, ContainingAssembly, allowProtected: true);
 
                 yield return ExpressionStatement
                 (

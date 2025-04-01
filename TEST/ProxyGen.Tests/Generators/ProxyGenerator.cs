@@ -17,7 +17,7 @@ using NUnit.Framework;
 [assembly: 
     InternalsVisibleTo("Proxy_5C3FC6431B4D81D670187842F42EDDDE")
 #if NET5_0_OR_GREATER
-    , InternalsVisibleTo("Proxy_70691AD41E6056EFB4D10D70BD1E48C2")
+    , InternalsVisibleTo("Proxy_2FFBF997E2A9202D71C7318B42DB665F")
 #endif
 ]
 
@@ -644,7 +644,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        private const string WIRED_NAME = "Proxy_C0A8B48E74900773E53774AC260C0EF7"; // amig a tipus nem valtozik addig ez sem valtozhat
+        private const string WIRED_NAME = "Proxy_D1B9AA85D98FC339836984A532386366"; // amig a tipus nem valtozik addig ez sem valtozhat
 
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()

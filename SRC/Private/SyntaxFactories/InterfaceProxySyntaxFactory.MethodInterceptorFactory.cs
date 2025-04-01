@@ -81,6 +81,12 @@ namespace Solti.Utils.Proxy.Internals
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method)
         {
             //
+            // Starting from .NET 5.0 interfaces may have visibility.
+            //
+
+            Visibility.Check(method, ContainingAssembly);
+
+            //
             // For now, we only have call-index of 0
             //
 

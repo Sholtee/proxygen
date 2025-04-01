@@ -23,22 +23,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IPropertyInfo prop in TargetType.Properties)
             {
-                if (ValidMethod(prop.GetMethod) && ValidMethod(prop.SetMethod))
+                IMethodInfo targetMethod = prop.GetMethod ?? prop.SetMethod!;
+                if (targetMethod.IsAbstract || targetMethod.IsVirtual)
                     cls = ResolveProperty(cls, context, prop);
             }
+
             return cls;
-
-            bool ValidMethod(IMethodInfo? backingMethod)
-            {
-                if (backingMethod is not null)
-                {
-                    if (!backingMethod.IsVirtual && !backingMethod.IsAbstract)
-                        return false;
-
-                    Visibility.Check(backingMethod, ContainingAssembly, allowProtected: true);
-                }
-                return true;
-            }
         }
 
         /// <summary>
@@ -108,6 +98,12 @@ namespace Solti.Utils.Proxy.Internals
             {
                 if (backingMethod is null)
                     return null;
+
+                //
+                // Check if the method is visible.
+                //
+
+                Visibility.Check(backingMethod, ContainingAssembly, allowProtected: true);
 
                 FieldDeclarationSyntax field = ResolveField<ExtendedMemberInfo>
                 (

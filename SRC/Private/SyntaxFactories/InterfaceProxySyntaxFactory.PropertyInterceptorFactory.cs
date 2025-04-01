@@ -98,6 +98,12 @@ namespace Solti.Utils.Proxy.Internals
 
             if (property.GetMethod is not null)
             {
+                //
+                // Starting from .NET 5.0 interfaces may have visibility.
+                //
+
+                Visibility.Check(property.GetMethod, ContainingAssembly);
+
                 FieldDeclarationSyntax getCtx = ResolveMethodContext
                 (
                     property.GetMethod.GetMD5HashCode(),
@@ -146,6 +152,8 @@ namespace Solti.Utils.Proxy.Internals
 
             if (property.SetMethod is not null)
             {
+                Visibility.Check(property.SetMethod, ContainingAssembly);
+
                 FieldDeclarationSyntax setCtx = ResolveMethodContext
                 (
                     property.SetMethod.GetMD5HashCode(),
