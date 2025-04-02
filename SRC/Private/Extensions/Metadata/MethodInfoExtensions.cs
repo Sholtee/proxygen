@@ -81,8 +81,12 @@ namespace Solti.Utils.Proxy.Internals
             }
             */
 
+            if (method.IsGenericMethod)
+                method = method.GetGenericMethodDefinition();
+
             //
-            // GetBaseDefinition() won't work for "new" override.
+            // GetBaseDefinition() won't work for "new" override as well as it always return the declaring
+            // method instead of the overridden one.
             //
 
             Type[] paramz = method
@@ -101,22 +105,32 @@ namespace Solti.Utils.Proxy.Internals
                     if (baseMethod.Name != method.Name)
                         continue;
 
-                    bool match = true;
+                    if (baseMethod.IsGenericMethod)
+                    {
+                        if (!method.IsGenericMethod || baseMethod.GetGenericArguments().Length != method.GetGenericArguments().Length)
+                            continue;
+
+                        //
+                        // We don't need to compare the generic parameters
+                        //
+                    }
+
                     ParameterInfo[] baseParamz = baseMethod.GetParameters();
                     if (baseParamz.Length != paramz.Length)
                         continue;
 
                     for (int i = 0; i < baseParamz.Length; i++)
                     {
-                        if (!TypeComparer.Instance.Equals(baseParamz[i].ParameterType, paramz[i]))
-                        {
-                            match = false;
-                            break;
-                        }
+                        Type
+                            baseParam = baseParamz[i].ParameterType,
+                            param = paramz[i];
+
+                        if (param.IsGenericParameter ? param.GetGenericParameterIndex() != baseParam.GetGenericParameterIndex() : param != baseParam)
+                            goto next;
                     }
 
-                    if (match)
-                        return baseMethod;
+                    return baseMethod;
+                    next:;
                 }
             }
             return null;

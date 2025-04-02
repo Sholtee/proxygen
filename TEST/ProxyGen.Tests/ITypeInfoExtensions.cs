@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase(typeof(List<byte>), "E47C10415CD484DC9D8AC1F5705BE431")]
         [TestCase(typeof(List<byte>[]), "FC025B03ACEA197B07AB94FEFA629795")]
         [TestCase(typeof(List<byte[]>), "6135BB1118B7D3F9E84FB096B33F4723")]
-        [TestCase(typeof(List<>), "793EB15224B0ECBB3E765880825D540A")]
+        [TestCase(typeof(List<>), "5C0FE618BE55751E8E6ADA33578EC0D9")]
         public void GetMD5HashCode_ShouldGenerateUniqueHashCode(Type t, string hash) => 
             Assert.That(MetadataTypeInfo.CreateFrom(t).GetMD5HashCode(), Is.EqualTo(hash)); 
 
@@ -55,7 +55,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     public void Foo(TT para) {}
                 }
             ",
-            true
+            false
         )]
         [TestCase
         (

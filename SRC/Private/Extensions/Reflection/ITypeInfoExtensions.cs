@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
@@ -114,15 +115,25 @@ namespace Solti.Utils.Proxy.Internals
 
             static int GetIndex<T>(ITypeInfo src, IGeneric<T> generic) where T: IGeneric<T>
             {
-                int index = 0;
-                foreach (ITypeInfo ga in generic.GenericArguments)
-                {
-                    index++;
-                    if (ga.Name == src.Name)
-                        return index;
-                }
-                return 0;
+                src = src.GetInnermostElementType() ?? src;
+
+                int result = generic.GenericArguments.Select(static ga => ga.Name).IndexOf(src.Name);
+                Debug.Assert(result >= 0);
+
+                return result + 1;
             }
+        }
+
+        public static ITypeInfo? GetInnermostElementType(this ITypeInfo src)
+        {
+            ITypeInfo? prev = null;
+
+            for (ITypeInfo? current = src; (current = current!.ElementType) is not null;)
+            {
+                prev = current;
+            }
+
+            return prev;
         }
 
         public static IEnumerable<IConstructorInfo> GetConstructors(this ITypeInfo src, AccessModifiers minAccessibility)

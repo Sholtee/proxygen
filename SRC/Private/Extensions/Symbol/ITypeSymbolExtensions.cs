@@ -35,14 +35,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.IndexOf(src.TypeKind) >= 0;
 
-        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src)
-        {
-            src = src.GetElementType(recurse: true) ?? src;
-
-            return !src.IsGenericParameter()
-                ? src.ContainingType
-                : null;
-        }
+        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => (src.GetElementType(recurse: true) ?? src).ContainingType;
 
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
@@ -452,6 +445,9 @@ namespace Solti.Utils.Proxy.Internals
                 #pragma warning restore CA2201
             };
 
+            if (src.IsGenericParameter())
+                return am;
+
             switch (src)
             {
                 case INamedTypeSymbol namedType:
@@ -472,7 +468,7 @@ namespace Solti.Utils.Proxy.Internals
                     break;
             }
 
-            if (!src.IsGenericParameter() && src.ContainingType is not null)
+            if (src.ContainingType is not null)
                 UpdateAm(ref am, src.ContainingType);
 
             return am;

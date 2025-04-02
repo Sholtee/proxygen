@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -92,12 +93,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             src = src.GetInnermostElementType() ?? src;
 
-            if (src.IsGenericParameter)
-                return null;
-
             Type? enclosingType = src.DeclaringType;
             if (enclosingType is null)
                 return null;
+
+            if (src.IsGenericParameter)
+                return enclosingType;
 
             //
             // "Cica<T>.Mica<TT>.Kutya" counts as generic, too: In open form it is returned as Cica<T>.Mica<TT>.Kutya<T, TT>
@@ -322,20 +323,22 @@ namespace Solti.Utils.Proxy.Internals
             // while in closed as "Cica<T>.Mica<TT>.Kutya<TConcrete1, TConcrete2>".
             //
 
-            IReadOnlyList<Type> 
+            Type[] 
                 closedArgs = src.GetGenericArguments(),
                 openArgs = (src = src.GetGenericTypeDefinition()).GetGenericArguments();
 
-            for(int i = 0; i < openArgs.Count; i++)
+            for(int i = 0; i < openArgs.Length; i++)
             {
+                Type openArg = openArgs[i];
+
                 bool own = true;
                 for (Type? parent = src; (parent = parent!.DeclaringType) is not null;)
                 {
                     //
-                    // GetGenericArguments() may return empty array if "parent" is not generic
+                    // GetGenericArguments() will return empty array if "parent" is not generic
                     //
 
-                    if (parent.GetGenericArguments().Any(arg => TypeComparer.Instance.Equals(arg, openArgs[i])))
+                    if (parent.GetGenericArguments().Any(arg => openArg.IsGenericParameter ? arg.IsGenericParameter && arg.Name == openArg.Name : arg == openArg))
                     {
                         own = false;
                         break;
@@ -360,6 +363,9 @@ namespace Solti.Utils.Proxy.Internals
                 _ when src.IsNestedPrivate => AccessModifiers.Private,
                 _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
             };
+
+            if (src.IsGenericParameter)
+                return am;
 
             //
             // Generic arguments may impact the visibility.
@@ -454,6 +460,26 @@ namespace Solti.Utils.Proxy.Internals
                 }
 
                 yield return gpc;
+            }
+        }
+
+        public static int GetGenericParameterIndex(this Type src)
+        {
+            if (!src.IsGenericParameter)
+                return 0;
+
+            src = src.GetInnermostElementType() ?? src;
+
+            return src.DeclaringMethod is not null
+                ? GetIndex(src.DeclaringMethod.GetGenericArguments(), src)
+                : GetIndex(src.DeclaringType.GetGenericArguments(), src) * -1;
+
+            static int GetIndex(IEnumerable<Type> gas, Type src)
+            {
+                int result = gas.Select(static t => t.Name).IndexOf(src.Name);
+                Debug.Assert(result >= 0);
+
+                return result + 1;
             }
         }
     }
