@@ -358,9 +358,7 @@ namespace Solti.Utils.Proxy.Internals
                 _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
                 _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
                 _ when src.IsNestedPrivate => AccessModifiers.Private,
-                #pragma warning disable CA2201 // In theory we should never reach here.
-                _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-                #pragma warning restore CA2201
+                _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
             };
 
             //
