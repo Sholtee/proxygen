@@ -53,6 +53,9 @@
     <None Update="ClsProxySrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Duck_E40AA6C9C0242588555A55F2A4533DAB.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="IfaceProxySrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -69,9 +72,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="DuckClsSrc.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Duck_BDC3F352D7006029026A47DF190814B3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="EventSrc.txt">
@@ -92,7 +92,7 @@
     <None Update="PropSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Proxy_EC92C59252CD801169A8506A0EF1E4F4.dll">
+    <None Update="Proxy_BBEDBF7293E5942CFACD0CD4BBF687D0.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
