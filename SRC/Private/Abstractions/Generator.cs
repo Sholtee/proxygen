@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +45,12 @@ namespace Solti.Utils.Proxy.Internals
         /// Creates a new <see cref="Generator"/> instance.
         /// </summary>
         protected Generator(object id) => Id = id;
+
+        /// <summary>
+        /// Creates unique generator ids. 
+        /// </summary>
+        protected static string GenerateId(string prefix, params IEnumerable<Type> types) =>
+            $"{prefix}:{types.Select(MetadataTypeInfo.CreateFrom).GetMD5HashCode()}";
 
         #region Public
         /// <summary>

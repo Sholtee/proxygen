@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="DuckGenerator"/> instance.
         /// </summary>
-        public DuckGenerator(Type iface, Type target): base(id: new { iface, target })
+        public DuckGenerator(Type iface, Type target): base(id: GenerateId(nameof(DuckGenerator), iface, target))
         {
             //
             // The rest of validation is done in the compile phase.

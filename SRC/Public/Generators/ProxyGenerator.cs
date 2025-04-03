@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates a new <see cref="ProxyGenerator"/> instance.
         /// </summary>
-        public ProxyGenerator(Type iface, Type interceptor): base(id: new { iface, interceptor})
+        public ProxyGenerator(Type iface, Type interceptor): base(id: GenerateId(nameof(ProxyGenerator), iface, interceptor))
         {
             //
             // The rest of validation is done in the compile phase.
