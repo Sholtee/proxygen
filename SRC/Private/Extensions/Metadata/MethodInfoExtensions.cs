@@ -24,9 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             _ when src.IsPublic => AccessModifiers.Public,
             _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
             _ when src.IsPrivate => AccessModifiers.Private,
-            #pragma warning disable CA2201 // In theory we should never reach here.
-            _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-            #pragma warning restore CA2201
+            _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface

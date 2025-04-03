@@ -440,9 +440,7 @@ namespace Solti.Utils.Proxy.Internals
                 Accessibility.Public => AccessModifiers.Public,
                 Accessibility.Private => AccessModifiers.Private,
                 Accessibility.NotApplicable => AccessModifiers.Public, // TODO: FIXME
-                #pragma warning disable CA2201 // In theory we should never reach here.
-                _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-                #pragma warning restore CA2201
+                _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
             };
 
             if (src.IsGenericParameter())
