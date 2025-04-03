@@ -33,6 +33,9 @@ namespace Solti.Utils.Proxy.Internals
 
             src.DeclaringType.Hash(transform);
 
+            foreach(ITypeInfo iface in src.DeclaringInterfaces)
+                iface.Hash(transform);
+
             foreach (IParameterInfo param in src.Parameters)
                 param.Type.Hash(transform);
 
@@ -43,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)
         {
-            if (!GetMethodBasicAttributes(src).Equals(GetMethodBasicAttributes(that)))
+            if (!GetMethodBasicAttributes(src, ignoreVisibility).Equals(GetMethodBasicAttributes(that, ignoreVisibility)))
                 return false;
 
             if (!src.ReturnValue.EqualsTo(that.ReturnValue))
@@ -69,7 +72,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return true;
 
-            object GetMethodBasicAttributes(IMethodInfo m) => new
+            static object GetMethodBasicAttributes(IMethodInfo m, bool ignoreVisibility) => new
             {
                 //
                 // T ClassA<T>.Foo() != T ClassB<TT, T>.Foo()
