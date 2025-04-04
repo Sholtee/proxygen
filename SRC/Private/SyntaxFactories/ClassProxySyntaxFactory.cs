@@ -28,9 +28,13 @@ namespace Solti.Utils.Proxy.Internals
                 MethodInfoExtensions.ExtractFrom<IInterceptor>(static i => i.Invoke(null!))
             );
 
-        private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
+        private static readonly IPropertyInfo
+            FInterceptor = MetadataPropertyInfo.CreateFrom
+            (
+                PropertyInfoExtensions.ExtractFrom<IInterceptorAccess>(static ia => ia.Interceptor)
+            );
 
-        private readonly FieldDeclarationSyntax FInterceptor;
+        private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
 
         /// <summary>
         /// <code>
@@ -63,6 +67,25 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
+        private InvocationExpressionSyntax InvokeInterceptor(params IEnumerable<ArgumentSyntax> arguments) => InvokeMethod
+        (
+            method: FInvoke,
+            target: MemberAccess
+            (
+                ThisExpression(),
+                FInterceptor,
+                castTargetTo: FInterceptor.DeclaringType
+            ),
+            castTargetTo: null,
+            arguments: Argument
+            (
+                ResolveObject<ClassInvocationContext>
+                (
+                    arguments
+                )
+            )
+        );
+
         public ITypeInfo TargetType { get; }
 
         #if DEBUG
@@ -93,12 +116,6 @@ namespace Solti.Utils.Proxy.Internals
             return base.ResolveUnit(context, cancellation);
         }
 
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) =>
-            base.ResolveMembers(cls.AddMembers(FInterceptor), context, cancellation);
-
         public ClassProxySyntaxFactory
         (
             ITypeInfo targetType,
@@ -119,8 +136,6 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(targetType));
 
             TargetType = targetType;
-
-            FInterceptor = ResolveField<IInterceptor>(nameof(FInterceptor), @static: false);
         }
     }
 }

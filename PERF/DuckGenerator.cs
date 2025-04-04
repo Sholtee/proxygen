@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                DuckGenerator<IInterface, Implementation>.Activate(Tuple.Create(FImplementation));
+                DuckGenerator<IInterface, Implementation>.Activate(FImplementation);
             }
         }
     }

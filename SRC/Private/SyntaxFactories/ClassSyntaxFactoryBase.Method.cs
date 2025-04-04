@@ -222,9 +222,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
+        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params IEnumerable<ArgumentSyntax> arguments)
         {
-            Debug.Assert(arguments.Length == method.Parameters.Count);
+            Debug.Assert(arguments.Count() == method.Parameters.Count);
 
             return InvocationExpression
             (

@@ -107,55 +107,42 @@ namespace Solti.Utils.Proxy.Internals
             LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(targetMethod);
             body.Add(argsArray);
 
-            InvocationExpressionSyntax invokeInterceptor = InvokeMethod
+            InvocationExpressionSyntax invokeInterceptor = InvokeInterceptor
             (
-                method: FInvoke,
-                target: SimpleMemberAccess
+                Argument
                 (
-                    ThisExpression(),
-                    ResolveIdentifierName(FInterceptor)
+                    StaticMemberAccess(cls, memberInfo)
                 ),
-                castTargetTo: null,
-                arguments: Argument
+                Argument
                 (
-                    ResolveObject<ClassInvocationContext>
+                    targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
                     (
-                        Argument
+                        targetMethod,
+                        hasTarget: false,
+                        (_, locals) => InvokeMethod
                         (
-                            StaticMemberAccess(cls, memberInfo)
-                        ),
-                        Argument
-                        (
-                            targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
-                            (
-                                targetMethod,
-                                hasTarget: false,
-                                (_, locals) => InvokeMethod
-                                (
-                                    targetMethod,
-                                    target: BaseExpression(),
-                                    castTargetTo: null,
-                                    arguments: locals.Select(ResolveArgument).ToArray()
-                                )
-                            )
-                        ),
-                        Argument
-                        (
-                            ResolveIdentifierName(argsArray)
-                        ),
-                        Argument
-                        (
-                            ResolveArray<Type>
-                            (
-                                (targetMethod as IGenericMethodInfo)?.GenericArguments.Select
-                                (
-                                    static ga => TypeOfExpression
-                                    (
-                                        IdentifierName(ga.Name)
-                                    )
-                                ) ?? []
-                            )
+                            targetMethod,
+                            target: BaseExpression(),
+                            castTargetTo: null,
+                            arguments: locals.Select(ResolveArgument).ToArray()
                         )
+                    )
+                ),
+                Argument
+                (
+                    ResolveIdentifierName(argsArray)
+                ),
+                Argument
+                (
+                    ResolveArray<Type>
+                    (
+                        (targetMethod as IGenericMethodInfo)?.GenericArguments.Select
+                        (
+                            static ga => TypeOfExpression
+                            (
+                                IdentifierName(ga.Name)
+                            )
+                        ) ?? []
                     )
                 )
             );

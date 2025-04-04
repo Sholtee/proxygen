@@ -106,12 +106,12 @@ namespace Solti.Utils.Proxy.Internals
 
             if (property.GetMethod is not null) accessors.Add
             (
-                ResolveAccessor(property.GetMethod, getBody!, SyntaxKind.GetAccessorDeclaration)
+                ResolveAccessor(property.GetMethod, getBody, SyntaxKind.GetAccessorDeclaration)
             );
 
             if (property.SetMethod is not null) accessors.Add
             (
-                ResolveAccessor(property.SetMethod, setBody!, SyntaxKind.SetAccessorDeclaration)
+                ResolveAccessor(property.SetMethod, setBody, SyntaxKind.SetAccessorDeclaration)
             );
 
             return (TDeclaration) result.WithAccessorList
@@ -122,7 +122,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-            AccessorDeclarationSyntax ResolveAccessor(IMethodInfo backingMethod, CSharpSyntaxNode body, SyntaxKind kind)
+            AccessorDeclarationSyntax ResolveAccessor(IMethodInfo backingMethod, CSharpSyntaxNode? body, SyntaxKind kind)
             {
                 Debug.Assert(backingMethod is not null, "Backing method cannot be null");
 

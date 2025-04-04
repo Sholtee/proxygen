@@ -30,12 +30,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods, SignatureEquals);
 
-                //
-                // Check if the method is visible.
-                //
-
-                Visibility.Check(targetMethod, ContainingAssembly);
-
                 cls = ResolveMethod(cls, ifaceMethod, targetMethod);
             }
 
@@ -57,6 +51,9 @@ namespace Solti.Utils.Proxy.Internals
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo targetMethod)
         {
             IMethodInfo ifaceMethod = (IMethodInfo) context;
+
+            Visibility.Check(targetMethod, ContainingAssembly);
+            Visibility.Check(ifaceMethod, ContainingAssembly);
 
             ExpressionSyntax invocation = InvokeMethod
             (

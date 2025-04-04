@@ -119,50 +119,38 @@ namespace Solti.Utils.Proxy.Internals
 
                 yield return ExpressionStatement
                 (
-                    InvokeMethod
+                    InvokeInterceptor
                     (
-                        method: FInvoke,
-                        target: SimpleMemberAccess
+
+                        Argument
                         (
-                            ThisExpression(),
-                            ResolveIdentifierName(FInterceptor)
+                            StaticMemberAccess(cls, field)
                         ),
-                        castTargetTo: null,
-                        arguments: Argument
+                        Argument
                         (
-                            ResolveObject<ClassInvocationContext>
+                            backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
                             (
-                                Argument
+                                backingMethod,
+                                hasTarget: false,
+                                (_, locals) => RegisterEvent
                                 (
-                                    StaticMemberAccess(cls, field)
-                                ),
-                                Argument
-                                (
-                                    backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
+                                    evt,
+                                    target: BaseExpression(),
+                                    add,
+                                    ResolveIdentifierName
                                     (
-                                        backingMethod,
-                                        hasTarget: false,
-                                        (_, locals) => RegisterEvent
-                                        (
-                                            evt,
-                                            target: BaseExpression(),
-                                            add,
-                                            ResolveIdentifierName
-                                            (
-                                                locals.Single()
-                                            )
-                                        )
+                                        locals.Single()
                                     )
-                                ),
-                                Argument
-                                (
-                                    ResolveIdentifierName(argsArray)
-                                ),
-                                Argument
-                                (
-                                    ResolveArray<Type>([])
                                 )
                             )
+                        ),
+                        Argument
+                        (
+                            ResolveIdentifierName(argsArray)
+                        ),
+                        Argument
+                        (
+                            ResolveArray<Type>([])
                         )
                     )
                 );

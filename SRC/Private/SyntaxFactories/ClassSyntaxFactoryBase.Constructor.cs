@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name, params IEnumerable<ParameterSyntax> extraParams)
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
         {
             IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
 
@@ -43,22 +43,17 @@ namespace Solti.Utils.Proxy.Internals
             (
                 parameterList: ParameterList
                 (
-                    extraParams
-                        .Concat
+                    paramz.Select
+                    (
+                        param => Parameter
                         (
-                            paramz.Select
-                            (
-                                param => Parameter
-                                (
-                                    identifier: Identifier(param.Name)
-                                )
-                                .WithType
-                                (
-                                    type: ResolveType(param.Type)
-                                )
-                            )
+                            identifier: Identifier(param.Name)
                         )
-                        .ToSyntaxList()
+                        .WithType
+                        (
+                            type: ResolveType(param.Type)
+                        )
+                    ).ToSyntaxList()
                 )
             )
             .WithInitializer

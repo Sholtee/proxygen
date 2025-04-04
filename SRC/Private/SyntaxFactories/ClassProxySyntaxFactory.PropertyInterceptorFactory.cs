@@ -28,7 +28,10 @@ namespace Solti.Utils.Proxy.Internals
                     cls = ResolveProperty(cls, context, prop);
             }
 
-            return cls;
+            return cls.AddMembers
+            (
+                ResolveProperty(FInterceptor, null, null)
+            );
         }
 
         /// <summary>
@@ -115,41 +118,28 @@ namespace Solti.Utils.Proxy.Internals
 
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(backingMethod);
 
-                InvocationExpressionSyntax interceptorInvocation = InvokeMethod
+                InvocationExpressionSyntax interceptorInvocation = InvokeInterceptor
                 (
-                    method: FInvoke,
-                    target: SimpleMemberAccess
+                    Argument
                     (
-                        ThisExpression(),
-                        ResolveIdentifierName(FInterceptor)
+                        StaticMemberAccess(cls, field)
                     ),
-                    castTargetTo: null,
-                    arguments: Argument
+                    Argument
                     (
-                        ResolveObject<ClassInvocationContext>
+                        backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
                         (
-                            Argument
-                            (
-                                StaticMemberAccess(cls, field)
-                            ),
-                            Argument
-                            (
-                                backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
-                                (
-                                    backingMethod,
-                                    hasTarget: false,
-                                    invocationFactory
-                                )
-                            ),
-                            Argument
-                            (
-                                ResolveIdentifierName(argsArray)
-                            ),
-                            Argument
-                            (
-                                ResolveArray<Type>([])
-                            )
+                            backingMethod,
+                            hasTarget: false,
+                            invocationFactory
                         )
+                    ),
+                    Argument
+                    (
+                        ResolveIdentifierName(argsArray)
+                    ),
+                    Argument
+                    (
+                        ResolveArray<Type>([])
                     )
                 );
 

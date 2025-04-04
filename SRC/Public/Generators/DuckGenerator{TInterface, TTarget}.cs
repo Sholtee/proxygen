@@ -1,8 +1,12 @@
 /********************************************************************************
-* DuckGenerator.cs                                                              *
+* DuckGenerator{TInterface, TTarget}.cs                                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Generators
@@ -32,5 +36,16 @@ namespace Solti.Utils.Proxy.Generators
     {
         /// <inheritdoc/>
         protected override Generator GetConcreteGenerator() => new DuckGenerator(typeof(TInterface), typeof(TTarget));
+
+        /// <summary>
+        /// Creates an instance of the generated type.
+        /// </summary>
+        public static Task<TInterface> ActivateAsync(TTarget target, CancellationToken cancellation = default)
+            => ActivateAsync(Tuple.Create(target), cancellation);
+
+        /// <summary>
+        /// Creates an instance of the generated type.
+        /// </summary>
+        public static TInterface Activate(TTarget target) => Activate(Tuple.Create(target));
     }
 }

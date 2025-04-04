@@ -1,9 +1,19 @@
 /********************************************************************************
-* ProxyGenerator.cs                                                             *
+* ProxyGenerator{TInterface, TInterceptor}.cs                                   *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Threading;
+using System.Threading.Tasks;
+
 using Microsoft.CodeAnalysis;
+
+using Tuple =
+    #if NETSTANDARD2_1_OR_GREATER
+    System.Runtime.CompilerServices.ITuple;
+    #else
+    object;
+    #endif
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -33,5 +43,17 @@ namespace Solti.Utils.Proxy.Generators
     {
         /// <inheritdoc/>
         protected override Generator GetConcreteGenerator() => new ProxyGenerator(typeof(TInterface), typeof(TInterceptor));
+
+        /// <summary>
+        /// Creates an instance of the generated type.
+        /// </summary>
+        public static new Task<TInterface> ActivateAsync(Tuple ctorParamz, CancellationToken cancellation = default) =>
+            Generator<TInterface, ProxyGenerator<TInterface, TInterceptor>>.ActivateAsync(ctorParamz, cancellation);
+
+        /// <summary>
+        /// Creates an instance of the generated type.
+        /// </summary>
+        public static new TInterface Activate(Tuple ctorParamz) =>
+            Generator<TInterface, ProxyGenerator<TInterface, TInterceptor>>.Activate(ctorParamz);
     }
 }

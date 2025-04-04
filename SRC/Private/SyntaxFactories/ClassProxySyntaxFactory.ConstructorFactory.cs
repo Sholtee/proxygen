@@ -3,10 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -29,54 +26,15 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// public MyClass(IInterceptor interceptor, T param1, TT param2): base(param1, param2)
-        /// {
-        ///     FInterceptor = interceptor;
-        /// }
+        /// public MyClass(T param1, TT param2): base(param1, param2) {}
         /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor)
-        {
-            string interceptor = EnsureUnused(nameof(interceptor), ctor);
-
-            return cls.AddMembers
-            (
-                ResolveConstructor
-                (
-                    ctor,
-                    cls.Identifier,
-                    Parameter
-                    (
-                        identifier: Identifier(interceptor)
-                    )
-                    .WithType
-                    (
-                        type: ResolveType<IInterceptor>()
-                    )
-                )
-                .WithBody
-                (
-                    Block
-                    (
-                        ExpressionStatement
-                        (
-                            AssignmentExpression
-                            (
-                                kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: SimpleMemberAccess
-                                (
-                                    ThisExpression(),
-                                    ResolveIdentifierName(FInterceptor)
-                                ),
-                                right: IdentifierName(interceptor)
-                            )
-                        )
-                    )
-                )
-            );
-        }
+        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls.AddMembers
+        (
+            ResolveConstructor(ctor, cls.Identifier)
+        );
     }
 }

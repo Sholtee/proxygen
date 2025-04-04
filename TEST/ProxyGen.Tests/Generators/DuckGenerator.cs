@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            DuckGenerator<TInterface, TTarget>.ActivateAsync(Tuple.Create(target));
+            DuckGenerator<TInterface, TTarget>.ActivateAsync(target);
 
         [Test]
         public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -304,6 +304,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldHandleOverrides() =>
-            Assert.DoesNotThrow(() => DuckGenerator<IDescendant, MockDescendant>.Activate(Tuple.Create(new MockDescendant())));
+            Assert.DoesNotThrow(() => DuckGenerator<IDescendant, MockDescendant>.Activate(new MockDescendant()));
     }
 }

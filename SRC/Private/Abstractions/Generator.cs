@@ -11,6 +11,13 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Tuple =
+    #if NETSTANDARD2_1_OR_GREATER
+    System.Runtime.CompilerServices.ITuple;
+    #else
+    object;
+    #endif
+
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
@@ -98,11 +105,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
         /// <param name="cancellation">Token to cancel the operation.</param>
         /// <returns>The just activated instance.</returns>
-        #if NETSTANDARD2_1_OR_GREATER
-        public async Task<object> ActivateAsync(ITuple? tuple, CancellationToken cancellation = default)
-        #else
-        public async Task<object> ActivateAsync(object? tuple, CancellationToken cancellation = default)
-        #endif
+        public async Task<object> ActivateAsync(Tuple? tuple, CancellationToken cancellation = default)
         {
             cancellation.ThrowIfCancellationRequested();
 
@@ -119,12 +122,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
         /// <returns>The just activated instance.</returns>
-        #if NETSTANDARD2_1_OR_GREATER
-        public object Activate(ITuple? tuple) =>
-        #else
-        public object Activate(object? tuple) =>
-        #endif
-            ActivateAsync(tuple)
+        public object Activate(Tuple? tuple) => ActivateAsync(tuple)
             .GetAwaiter()
             .GetResult();
         #endregion

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";
 
-        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining, params IEnumerable<SyntaxKind> modifiers)
+        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode? body, bool forceInlining, params IEnumerable<SyntaxKind> modifiers)
         {
             AccessorDeclarationSyntax declaration = AccessorDeclaration(kind);
 
@@ -35,6 +35,12 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             Token(SyntaxKind.SemicolonToken)
                         );
+                    break;
+                case null:
+                    declaration = declaration.WithSemicolonToken
+                    (
+                        Token(SyntaxKind.SemicolonToken)
+                    );
                     break;
                 default:
                     Debug.Fail("Unknown node type");
