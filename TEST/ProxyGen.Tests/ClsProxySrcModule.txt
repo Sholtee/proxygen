@@ -4,7 +4,7 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
     private readonly global::Solti.Utils.Proxy.IInterceptor FInterceptor;
     public ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C(global::Solti.Utils.Proxy.IInterceptor interceptor) : base()
     {
-        FInterceptor = interceptor;
+        this.FInterceptor = interceptor;
     }
 
     private static global::Solti.Utils.Proxy.ExtendedMemberInfo F31E5FFE3FB9CF599346D7BE73D6FEA91;

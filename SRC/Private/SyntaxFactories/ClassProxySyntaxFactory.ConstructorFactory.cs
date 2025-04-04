@@ -66,7 +66,11 @@ namespace Solti.Utils.Proxy.Internals
                             AssignmentExpression
                             (
                                 kind: SyntaxKind.SimpleAssignmentExpression,
-                                left: ResolveIdentifierName(FInterceptor),
+                                left: SimpleMemberAccess
+                                (
+                                    ThisExpression(),
+                                    ResolveIdentifierName(FInterceptor)
+                                ),
                                 right: IdentifierName(interceptor)
                             )
                         )
