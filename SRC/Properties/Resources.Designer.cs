@@ -259,6 +259,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Too many constructor parameters.
+        /// </summary>
+        internal static string TOO_MANY_CTOR_PARAMS {
+            get {
+                return ResourceManager.GetString("TOO_MANY_CTOR_PARAMS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The type &quot;{0}&quot; can not be found..
         /// </summary>
         internal static string TYPE_NOT_FOUND {

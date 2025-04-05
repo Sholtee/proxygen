@@ -192,4 +192,7 @@
   <data name="NOT_VIRTUAL" xml:space="preserve">
     <value>The given member is not virtual.</value>
   </data>
+  <data name="TOO_MANY_CTOR_PARAMS" xml:space="preserve">
+    <value>Too many constructor parameters</value>
+  </data>
 </root>

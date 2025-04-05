@@ -95,8 +95,10 @@ namespace Solti.Utils.Proxy.Internals
                     // Tuple may hold at most 7 items
                     //
 
-                    if (ctor.ParameterList.Parameters.Count <= 7)
-                        yield return GetCase(ctor, ref i);
+                    if (ctor.ParameterList.Parameters.Count > 7)
+                        throw new InvalidOperationException(Resources.TOO_MANY_CTOR_PARAMS);
+
+                    yield return GetCase(ctor, ref i);
                 }
 
                 yield return SwitchSection().WithLabels
