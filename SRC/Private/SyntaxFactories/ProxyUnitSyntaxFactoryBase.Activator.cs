@@ -178,20 +178,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                     .WithStatements
                     (
-                        SingletonList<StatementSyntax>
-                        (
-                            ReturnStatement
-                            (
-                                ObjectCreationExpression
-                                (
-                                    IdentifierName(cls.Identifier)
-                                )
-                                .WithArgumentList
-                                (
-                                    ArgumentList()
-                                )
-                            )
-                        )
+                        InvokeCtor()
                     );
                 }
 
@@ -217,44 +204,44 @@ namespace Solti.Utils.Proxy.Internals
                 )
                 .WithStatements
                 (
-                    SingletonList<StatementSyntax>
+                    InvokeCtor
                     (
-                        ReturnStatement
+                        ctor.ParameterList.Parameters.Count.Times
                         (
-                            ObjectCreationExpression
+                            i => Argument
                             (
-                                AliasQualifiedName
+                                SimpleMemberAccess
                                 (
-                                    IdentifierName
-                                    (
-                                        Token(SyntaxKind.GlobalKeyword)
-                                    ),
-                                    IdentifierName(cls.Identifier)
-                                )
-                            )
-                            .WithArgumentList
-                            (
-                                ArgumentList
-                                (
-                                    ctor.ParameterList.Parameters.Count.Times
-                                    (
-                                        i => Argument
-                                        (
-                                            MemberAccessExpression
-                                            (
-                                                SyntaxKind.SimpleMemberAccessExpression,
-                                                IdentifierName(tupleId),
-                                                IdentifierName($"Item{i + 1}")
-                                            )
-                                        )
-                                    )
-                                    .ToSyntaxList()
+                                    IdentifierName(tupleId),
+                                    IdentifierName($"Item{i + 1}")
                                 )
                             )
                         )
                     )
                 );
             }
+
+            SyntaxList<StatementSyntax> InvokeCtor(params IEnumerable<ArgumentSyntax> arguments) => SingletonList<StatementSyntax>
+            (
+                ReturnStatement
+                (
+                    ObjectCreationExpression
+                    (
+                        AliasQualifiedName
+                        (
+                            IdentifierName
+                            (
+                                Token(SyntaxKind.GlobalKeyword)
+                            ),
+                            IdentifierName(cls.Identifier)
+                        )
+                    )
+                    .WithArgumentList
+                    (
+                        ArgumentList(arguments.ToSyntaxList())
+                    )
+                )
+            );
 
             TypeSyntax GetTupleForCtor(ConstructorDeclarationSyntax ctor)
             {

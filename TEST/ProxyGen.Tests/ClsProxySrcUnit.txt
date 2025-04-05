@@ -132,7 +132,7 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         switch (tuple)
         {
             case null:
-                return new ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C();
+                return new global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C();
             default:
                 throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }
