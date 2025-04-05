@@ -43,75 +43,47 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls.AddMembers
             (
-                FieldDeclaration
+                ResolveField
                 (
-                    VariableDeclaration
-                    (
-                        ResolveType<Func<object, object>>()
-                    )
-                    .WithVariables
-                    (
-                        SingletonSeparatedList
+                    MetadataTypeInfo.CreateFrom(typeof(Func<object, object>)),
+                    ACTIVATOR_NAME,
+                    initializer: 
+                        SimpleLambdaExpression
                         (
-                            VariableDeclarator
+                            Parameter
                             (
-                                Identifier(ACTIVATOR_NAME)
+                                Identifier(tuple)
                             )
-                            .WithInitializer
+                        )
+                        .WithModifiers
+                        (
+                            TokenList
                             (
-                                EqualsValueClause
+                                Token(SyntaxKind.StaticKeyword)
+                            )
+                        )
+                        .WithBlock
+                        (
+                            Block
+                            (
+                                SingletonList<StatementSyntax>
                                 (
-                                    SimpleLambdaExpression
+                                    SwitchStatement
                                     (
-                                        Parameter
-                                        (
-                                            Identifier(tuple)
-                                        )
+                                        IdentifierName(tuple)
                                     )
-                                    .WithModifiers
+                                    .WithSections
                                     (
-                                        TokenList
+                                        List
                                         (
-                                            Token(SyntaxKind.StaticKeyword)
-                                        )
-                                    )
-                                    .WithBlock
-                                    (
-                                        Block
-                                        (
-                                            SingletonList<StatementSyntax>
-                                            (
-                                                SwitchStatement
-                                                (
-                                                    IdentifierName(tuple)
-                                                )
-                                                .WithSections
-                                                (
-                                                    List
-                                                    (
-                                                        GetCases()
-                                                    )
-                                                )
-                                            )
+                                            GetCases()
                                         )
                                     )
                                 )
                             )
-                        )
-                    )
+                        ),
+                    @private: false
                 )
-                .WithModifiers
-                (
-                    TokenList
-                    (
-                        new[]
-                        {
-                            Token(SyntaxKind.PublicKeyword),
-                            Token(SyntaxKind.StaticKeyword),
-                            Token(SyntaxKind.ReadOnlyKeyword)
-                        }
-                    )
-                )        
             );
 
             IEnumerable<SwitchSectionSyntax> GetCases()
