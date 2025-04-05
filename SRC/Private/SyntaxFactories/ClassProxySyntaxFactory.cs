@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [TargetType];
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [TargetType, MetadataTypeInfo.CreateFrom(typeof(IInterceptorAccess))];
 
         #if DEBUG
         internal
