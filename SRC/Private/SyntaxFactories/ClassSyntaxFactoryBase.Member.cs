@@ -51,11 +51,19 @@ namespace Solti.Utils.Proxy.Internals
             member
         );
 
+        #if DEBUG
+        internal
+        #endif
+        protected static MemberAccessExpressionSyntax StaticMemberAccess(ClassDeclarationSyntax target, string member) => StaticMemberAccess
+        (
+            target,
+            IdentifierName(member)
+        );
 
         #if DEBUG
         internal
         #endif
-        protected static MemberAccessExpressionSyntax StaticMemberAccess(ClassDeclarationSyntax target, MemberDeclarationSyntax member) => SimpleMemberAccess
+        protected static MemberAccessExpressionSyntax StaticMemberAccess(ClassDeclarationSyntax target, SimpleNameSyntax member) => SimpleMemberAccess
         (
             AliasQualifiedName
             (
@@ -65,6 +73,15 @@ namespace Solti.Utils.Proxy.Internals
                 ),
                 IdentifierName(target.Identifier)
             ),
+            member
+        );
+
+        #if DEBUG
+        internal
+        #endif
+        protected static MemberAccessExpressionSyntax StaticMemberAccess(ClassDeclarationSyntax target, MemberDeclarationSyntax member) => StaticMemberAccess
+        (
+            target,
             member switch 
             {
                 FieldDeclarationSyntax fld => ResolveIdentifierName(fld),

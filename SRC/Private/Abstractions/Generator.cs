@@ -23,18 +23,17 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of untyped generators.
     /// </summary>
-    public abstract class Generator : TypeEmitter
+    public abstract class Generator(object id) : TypeEmitter
     {
         #region Private
-        private sealed class GeneratorContext
+        private sealed class ContextWrapper
         {
-            public Type? GeneratedType { get; set; }
+            public TypeContext? Context { get; set; }
 
             public SemaphoreSlim Lock { get; } = new(1, 1);
         }
 
-        private static readonly ConcurrentDictionary<object, GeneratorContext> FContextCache = new();
-        private static readonly ConcurrentDictionary<object, Func<object?, object>> FActivatorCache = new();
+        private static readonly ConcurrentDictionary<object, ContextWrapper> FContextCache = new();
 
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
         {
@@ -46,14 +45,31 @@ namespace Solti.Utils.Proxy.Internals
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
                 yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
         }
+
+        private async Task<TypeContext> GetContextAsync(CancellationToken cancellation)
+        {
+            cancellation.ThrowIfCancellationRequested();
+
+            ContextWrapper context = FContextCache.GetOrAdd(Id, static _ => new ContextWrapper());
+            if (context.Context is not null)
+                return context.Context;
+
+            await context.Lock.WaitAsync(cancellation);
+
+            try
+            {
+                context.Context ??= await EmitAsync(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
+            }
+            finally
+            {
+                context.Lock.Release();
+            }
+
+            return context.Context;
+        }
         #endregion
 
         #region Protected
-        /// <summary>
-        /// Creates a new <see cref="Generator"/> instance.
-        /// </summary>
-        protected Generator(object id) => Id = id;
-
         /// <summary>
         /// Creates unique generator ids. 
         /// </summary>
@@ -68,14 +84,8 @@ namespace Solti.Utils.Proxy.Internals
         /// <returns>The just activated instance.</returns>
         protected async Task<object> ActivateAsync(Tuple? tuple, CancellationToken cancellation)
         {
-            cancellation.ThrowIfCancellationRequested();
-
-            if (!FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
-            {
-                activator = FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsync(cancellation)));
-            }
-
-            return activator(tuple);
+            TypeContext context = await GetContextAsync(cancellation);
+            return context.Activator(tuple!);
         }
         #endregion
 
@@ -83,7 +93,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Unique generator id. Generators emitting the same output should have the same id.
         /// </summary>
-        public object Id { get; }
+        public object Id { get; } = id ?? throw new ArgumentNullException(nameof(id));
 
         /// <summary>
         /// Gets the generated <see cref="Type"/> asynchronously .
@@ -91,24 +101,8 @@ namespace Solti.Utils.Proxy.Internals
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
         public async Task<Type> GetGeneratedTypeAsync(CancellationToken cancellation = default)
         {
-            cancellation.ThrowIfCancellationRequested();
-
-            GeneratorContext context = FContextCache.GetOrAdd(Id, static _ => new GeneratorContext());
-            if (context.GeneratedType is not null)
-                return context.GeneratedType;
-
-            await context.Lock.WaitAsync(cancellation);
-
-            try
-            {
-                context.GeneratedType ??= await EmitAsync(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
-            }
-            finally
-            {
-                context.Lock.Release();
-            }
-
-            return context.GeneratedType;
+            TypeContext context = await GetContextAsync(cancellation);
+            return context.Type;
         }
 
         /// <summary>

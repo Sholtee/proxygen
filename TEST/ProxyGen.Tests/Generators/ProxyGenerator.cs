@@ -639,7 +639,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
-            Type gt = await generator.EmitAsync(default, cacheDir, default);
+            Type gt = (await generator.EmitAsync(default, cacheDir, default)).Type;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

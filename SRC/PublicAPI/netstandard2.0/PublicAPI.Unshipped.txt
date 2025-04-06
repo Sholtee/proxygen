@@ -75,6 +75,12 @@ Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>
 Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase() -> void
 Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>
 Solti.Utils.Proxy.Internals.LoadedTypes
+Solti.Utils.Proxy.Internals.TypeContext
+Solti.Utils.Proxy.Internals.TypeContext.Activator.get -> System.Func<object?, object!>!
+Solti.Utils.Proxy.Internals.TypeContext.Activator.init -> void
+Solti.Utils.Proxy.Internals.TypeContext.Type.get -> System.Type!
+Solti.Utils.Proxy.Internals.TypeContext.Type.init -> void
+Solti.Utils.Proxy.Internals.TypeContext.TypeContext(System.Type! Type, System.Func<object?, object!>! Activator) -> void
 Solti.Utils.Proxy.Internals.TypeEmitter
 Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter() -> void
 Solti.Utils.Proxy.IProxyAccess<TInterface>
@@ -94,6 +100,5 @@ static Solti.Utils.Proxy.Internals.Generator<TTarget, TGenerator, TDescendant>.G
 static Solti.Utils.Proxy.Internals.Generator<TTarget, TGenerator, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Type!>!
 static Solti.Utils.Proxy.Internals.Generator<TTarget, TGenerator, TDescendant>.Instance.get -> TGenerator!
 static Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Value.get -> System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo!, System.Reflection.MethodInfo!>!
-static Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type! instance) -> void
-static Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(string! name, out System.Type! type) -> bool
+static Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type! type, System.Func<object?, object!>! activator) -> void
 virtual Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InterfaceInvocationContext! context) -> object?

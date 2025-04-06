@@ -137,5 +137,5 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C));
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C), global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.__Activator);
 }

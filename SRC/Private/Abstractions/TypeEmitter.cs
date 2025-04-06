@@ -5,7 +5,6 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -36,9 +35,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static Type? GetInstanceFromCache(string className, bool throwOnMissing)
+        private static TypeContext? GetInstanceFromCache(string className, bool throwOnMissing)
         {
-            if (!LoadedTypes.TryGet(className, out Type type) && throwOnMissing)
+            if (!LoadedTypes.TryGet(className, out TypeContext type) && throwOnMissing)
                 throw new TypeLoadException(className);  // FIXME: somehow try to set the TypeName property
             return type;
         }
@@ -47,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
 
-        internal Task<Type> EmitAsync(string? asmName, string? asmCacheDir, CancellationToken cancellation)
+        internal Task<TypeContext> EmitAsync(string? asmName, string? asmCacheDir, CancellationToken cancellation)
         {
             ReferenceCollector referenceCollector = new();
 
@@ -57,11 +56,11 @@ namespace Solti.Utils.Proxy.Internals
             // 1) Type already loaded (for e.g. in case of embedded types)
             //
 
-            Type? type = GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: false);
+            TypeContext? type = GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: false);
             if (type is not null)
                 return Task.FromResult(type);
 
-            return Task<Type>.Factory.StartNew(() =>
+            return Task<TypeContext>.Factory.StartNew(() =>
             {
                 //
                 // 2) If the assembly physically stored, try to load it from the cache directory.
@@ -105,15 +104,10 @@ namespace Solti.Utils.Proxy.Internals
 
                 using Stream asm = Compile.ToAssembly
                 (
-                    units
-                        .Select(unit => unit.ResolveUnitAndDump(cancellation))
-                        .ToImmutableList(),
+                    [..units.Select(unit => unit.ResolveUnitAndDump(cancellation))],
                     mainUnit.ContainingAssembly,
                     cacheFile,
-                    referenceCollector
-                        .References
-                        .Select(static asm => MetadataReference.CreateFromFile(asm.Location!))
-                        .ToImmutableList(),
+                    [..referenceCollector.References.Select(static asm => MetadataReference.CreateFromFile(asm.Location!))],
                     customConfig: null,
                     cancellation
                 );

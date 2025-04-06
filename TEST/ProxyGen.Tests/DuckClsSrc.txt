@@ -26,5 +26,5 @@ internal sealed class Duck_BBDAC00766728D37DE5666C5248517A4 : global::Solti.Util
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_BBDAC00766728D37DE5666C5248517A4));
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_BBDAC00766728D37DE5666C5248517A4), global::Duck_BBDAC00766728D37DE5666C5248517A4.__Activator);
 }

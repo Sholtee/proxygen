@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// <code>
         /// [ModuleInitializerAttribute]
-        /// public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass)); // C# 7.0 compatible
+        /// public static void Initialize() => LoadedTypes.Register(typeof(CurrentClass), CurrentClass.__Activator); // C# 7.0 compatible
         /// </code>
         /// </summary>
         #if DEBUG
@@ -62,9 +62,11 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         MetadataMethodInfo.CreateFrom
                         (
-                            MethodInfoExtensions.ExtractFrom<object>(static _ => LoadedTypes.Register(null!))
+                            MethodInfoExtensions.ExtractFrom<object>(static _ => LoadedTypes.Register(null!, null!))
                         ),
-                        arguments: Argument
+                        null,
+                        null,
+                        Argument
                         (
                             TypeOfExpression
                             (
@@ -77,6 +79,10 @@ namespace Solti.Utils.Proxy.Internals
                                     IdentifierName(cls.Identifier)
                                 )
                             )
+                        ),
+                        Argument
+                        (
+                            StaticMemberAccess(cls, ACTIVATOR_NAME)
                         )
                     )
                 )
