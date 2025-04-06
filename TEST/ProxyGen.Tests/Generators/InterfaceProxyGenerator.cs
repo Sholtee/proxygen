@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* ProxyGenerator.cs                                                             *
+* InterfaceProxyGenerator.cs                                                    *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -15,9 +15,9 @@ using Moq;
 using NUnit.Framework;
 
 [assembly: 
-    InternalsVisibleTo("Proxy_5C3FC6431B4D81D670187842F42EDDDE")
+    InternalsVisibleTo("Proxy_33CB287866A082C02051FC68A9510E79")
 #if NET5_0_OR_GREATER
-    , InternalsVisibleTo("Proxy_2FFBF997E2A9202D71C7318B42DB665F")
+    , InternalsVisibleTo("Proxy_46DFD72DDDF255F1784EF659ADFCD692")
 #endif
 ]
 
@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     using Proxy.Tests.External;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
-    public class ProxyGeneratorTests
+    public sealed class InterfaceProxyGeneratorTests
     {
         public interface IMyInterface
         {
