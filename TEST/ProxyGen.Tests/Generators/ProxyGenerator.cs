@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             public override object Invoke(InterfaceInvocationContext context)
             {
-                if (context.Member.Method.Name == nameof(Target.Hooked)) return 1986;
+                if (context.Member.Method.Name == nameof(IMyInterface.Hooked)) return 1986;
                 return base.Invoke(context);
             }
 
@@ -520,7 +520,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public void ProxyGenerator_ShouldValidate()
         {
             Assert.Throws<ArgumentException>(() => ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType());
-            Assert.Throws<ArgumentException>(() => new ProxyGenerator(typeof(IList<string>), typeof(InterfaceInterceptor<IList<int>>)).GetGeneratedType());
+            Assert.Throws<ArgumentException>(() => new InterfaceProxyGenerator(typeof(IList<string>), typeof(InterfaceInterceptor<IList<int>>)).GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, AbstractInterceptor>.GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, SealedInterceptor>.GetGeneratedType());
             Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, InterceptorWithPrivateCtor>.GetGeneratedType());
@@ -605,7 +605,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void ProxyGenerator_ShouldWorkWith(Type iface) =>
-            Assert.DoesNotThrow(() => new ProxyGenerator(iface, typeof(InterfaceInterceptor<>).MakeGenericType(iface)).GetGeneratedType());
+            Assert.DoesNotThrow(() => new InterfaceProxyGenerator(iface, typeof(InterfaceInterceptor<>).MakeGenericType(iface)).GetGeneratedType());
 
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
@@ -659,7 +659,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void ProxyGenerator_ShouldAssembleTheProxyOnce2() =>
-            Assert.AreSame(ProxyGenerator<IQueryable, InterfaceInterceptor<IQueryable>>.GetGeneratedType(), new ProxyGenerator(typeof(IQueryable), typeof(InterfaceInterceptor<IQueryable>)).GetGeneratedType());
+            Assert.AreSame(ProxyGenerator<IQueryable, InterfaceInterceptor<IQueryable>>.GetGeneratedType(), new InterfaceProxyGenerator(typeof(IQueryable), typeof(InterfaceInterceptor<IQueryable>)).GetGeneratedType());
 
         [Test]
         public async Task Target_MayAccessTheMostOuterEnclosingProxyInstance()

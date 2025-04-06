@@ -23,22 +23,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType.Properties, SignatureEquals);
 
-                //
-                // Check if the property is visible
-                //
-
-                Visibility.Check
-                (
-                    targetProperty,
-                    ContainingAssembly,
-                    checkGet: ifaceProperty.GetMethod is not null,
-                    checkSet: ifaceProperty.SetMethod is not null
-                );
-
                 cls = ResolveProperty(cls, ifaceProperty, targetProperty);
             }
 
-            return cls;
+            return cls.AddMembers
+            (
+                ResolveProperty(FTarget, null, null)
+            );
 
             static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
             {
@@ -66,9 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// System.Int32 IFoo&lt;System.Int32&gt;.Prop 
         /// {                                         
-        ///   [MethodImplAttribute(AggressiveInlining)] 
-        ///   get => Target.Prop;                     
-        ///   [MethodImplAttribute(AggressiveInlining)] 
+        ///   get => Target.Prop;                      
         ///   set => Target.Prop = value;              
         /// }
         /// </code>
@@ -80,19 +69,24 @@ namespace Solti.Utils.Proxy.Internals
         {
             IPropertyInfo ifaceProperty = (IPropertyInfo) context;
 
+            Visibility.Check(targetProperty, ContainingAssembly);
+            Visibility.Check(ifaceProperty, ContainingAssembly);
+
             IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;
 
             //
-            // Invoke the interface property to make sure that all indexer parameter names will match.
+            // Explicit members cannot be accessed directly
             //
+
+            ITypeInfo castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
+                    ? accessor.DeclaringInterfaces.Single()
+                    : TargetType;
 
             ExpressionSyntax propertyAccess = PropertyAccess
             (
                 ifaceProperty,
-                MemberAccess(null, Target),
-                castTargetTo: accessor.AccessModifiers is AccessModifiers.Explicit
-                    ? accessor.DeclaringInterfaces.Single() // Explicit properties belong to exactly one interface definition
-                    : null
+                GetTarget(),
+                castTargetTo
             );
 
             //
@@ -121,15 +115,13 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         property: ifaceProperty,
                         getBody: getBody,
-                        setBody: setBody,
-                        forceInlining: true
+                        setBody: setBody
                     )
                     : ResolveProperty
                     (
                         property: ifaceProperty,
                         getBody: getBody,
-                        setBody: setBody,
-                        forceInlining: true
+                        setBody: setBody
                     )
             );
         }

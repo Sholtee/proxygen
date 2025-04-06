@@ -32,20 +32,21 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TInterface">The interface for which the proxy will be created.</typeparam>
     /// <typeparam name="TTarget">The target implementing all the <typeparamref name="TInterface"/> members.</typeparam>
     [SupportsSourceGeneration]
-    public sealed class DuckGenerator<TInterface, TTarget>: Generator<TInterface, DuckGenerator<TInterface, TTarget>> where TInterface: class
+    public sealed class DuckGenerator<TInterface, TTarget>: Generator<TInterface, DuckGenerator, DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
         /// <inheritdoc/>
-        protected override Generator GetConcreteGenerator() => new DuckGenerator(typeof(TInterface), typeof(TTarget));
+        protected override DuckGenerator GetConcreteGenerator() => new(typeof(TInterface), typeof(TTarget));
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static Task<TInterface> ActivateAsync(TTarget target, CancellationToken cancellation = default)
-            => ActivateAsync(Tuple.Create(target), cancellation);
+        public static async Task<TInterface> ActivateAsync(TTarget target, CancellationToken cancellation = default) =>
+            (TInterface) await Instance.ActivateAsync(target ?? throw new ArgumentNullException(nameof(target)), cancellation);
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static TInterface Activate(TTarget target) => Activate(Tuple.Create(target));
+        public static TInterface Activate(TTarget target) =>
+            (TInterface) Instance.Activate(target ?? throw new ArgumentNullException(nameof(target)));
     }
 }

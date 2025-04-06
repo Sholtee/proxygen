@@ -35,21 +35,21 @@ namespace Solti.Utils.Proxy.Generators
     /// </summary>
     /// <typeparam name="TClass">The class to be proxied</typeparam>
     [SupportsSourceGeneration]
-    public sealed class ProxyGenerator<TClass> : Generator<TClass, ProxyGenerator<TClass>> where TClass : class
+    public sealed class ProxyGenerator<TClass> : Generator<TClass, ClassProxyGenerator, ProxyGenerator<TClass>> where TClass : class
     {
         /// <inheritdoc/>
-        protected override Generator GetConcreteGenerator() => new ProxyGenerator(typeof(TClass));
+        protected override ClassProxyGenerator GetConcreteGenerator() => new(typeof(TClass));
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static Task<TClass> ActivateAsync(IInterceptor interceptor, Tuple ctorParamz, CancellationToken cancellation = default) =>
-            ActivateAsync(ctorParamz, cancellation);
+        public static async Task<TClass> ActivateAsync(IInterceptor interceptor, Tuple ctorParamz, CancellationToken cancellation = default) =>
+            (TClass) await Instance.ActivateAsync(interceptor, ctorParamz, cancellation);
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
         public static TClass Activate(IInterceptor interceptor, Tuple ctorParamz) =>
-            Activate(ctorParamz);
+            (TClass) Instance.Activate(interceptor, ctorParamz);
     }
 }

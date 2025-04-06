@@ -209,8 +209,8 @@ namespace Solti.Utils.Proxy.Internals
             members.Add
             (
                 property.Indices.Any() 
-                    ? ResolveIndexer(property, get, set, false)
-                    : ResolveProperty(property, get, set, false)
+                    ? ResolveIndexer(property, get, set)
+                    : ResolveProperty(property, get, set)
             );
 
             return cls.WithMembers

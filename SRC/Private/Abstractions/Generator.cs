@@ -48,6 +48,7 @@ namespace Solti.Utils.Proxy.Internals
         }
         #endregion
 
+        #region Protected
         /// <summary>
         /// Creates a new <see cref="Generator"/> instance.
         /// </summary>
@@ -58,6 +59,25 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         protected static string GenerateId(string prefix, params IEnumerable<Type> types) =>
             $"{prefix}:{types.Select(MetadataTypeInfo.CreateFrom).GetMD5HashCode()}";
+
+        /// <summary>
+        /// Creates an instance of the generated type.
+        /// </summary>
+        /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
+        /// <param name="cancellation">Token to cancel the operation.</param>
+        /// <returns>The just activated instance.</returns>
+        protected async Task<object> ActivateAsync(Tuple? tuple, CancellationToken cancellation)
+        {
+            cancellation.ThrowIfCancellationRequested();
+
+            if (!FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
+            {
+                activator = FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsync(cancellation)));
+            }
+
+            return activator(tuple);
+        }
+        #endregion
 
         #region Public
         /// <summary>
@@ -96,33 +116,6 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         /// <remarks>The returned <see cref="Type"/> is generated only once.</remarks>
         public Type GetGeneratedType() => GetGeneratedTypeAsync()
-            .GetAwaiter()
-            .GetResult();
-
-        /// <summary>
-        /// Creates an instance of the generated type.
-        /// </summary>
-        /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
-        /// <param name="cancellation">Token to cancel the operation.</param>
-        /// <returns>The just activated instance.</returns>
-        public async Task<object> ActivateAsync(Tuple? tuple, CancellationToken cancellation = default)
-        {
-            cancellation.ThrowIfCancellationRequested();
-
-            if (!FActivatorCache.TryGetValue(Id, out Func<object?, object> activator))
-            {
-                activator = FActivatorCache.GetOrAdd(Id, ProxyActivator.Create(await GetGeneratedTypeAsync(cancellation)));
-            }
-
-            return activator(tuple);
-        }
-            
-        /// <summary>
-        /// Creates an instance of the generated type.
-        /// </summary>
-        /// <param name="tuple">A <see cref="Tuple"/> containing the constructor parameters or null if you want to invoke the parameterless constructor.</param>
-        /// <returns>The just activated instance.</returns>
-        public object Activate(Tuple? tuple) => ActivateAsync(tuple)
             .GetAwaiter()
             .GetResult();
         #endregion

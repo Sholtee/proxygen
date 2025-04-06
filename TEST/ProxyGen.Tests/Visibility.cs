@@ -73,13 +73,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get
             {
                 yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.IVT_REQUIRED);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
                 yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
                 yield return (static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod("ProtectedMethod", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: true, checkSet: false), Resources.METHOD_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly, checkGet: false, checkSet: true), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), NonAnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty("PrivateProperty", BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly), Resources.METHOD_NOT_VISIBLE);
             }
         }
 
@@ -92,9 +90,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             get
             {
                 yield return static () => Visibility.Check(MetadataMethodInfo.CreateFrom(typeof(TestClass).GetMethod(nameof(TestClass.InternalMethod), BindingFlags.Instance | BindingFlags.NonPublic)), AnnotatedAssembly);
-                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, checkGet: true, checkSet: false);
-                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), AnnotatedAssembly, checkGet: false, checkSet: true);
-                yield return static () => Visibility.Check(MetadataEventInfo.CreateFrom(typeof(TestClass).GetEvent(nameof(TestClass.PublicEvent))), NonAnnotatedAssembly, checkAdd: true, checkRemove: true);
+                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), NonAnnotatedAssembly, allowProtected: true);
+                yield return static () => Visibility.Check(MetadataPropertyInfo.CreateFrom(typeof(TestClass).GetProperty(nameof(TestClass.InternalProtectedProperty))), AnnotatedAssembly, allowProtected: true);
+                yield return static () => Visibility.Check(MetadataEventInfo.CreateFrom(typeof(TestClass).GetEvent(nameof(TestClass.PublicEvent))), NonAnnotatedAssembly);
             }
         }
 

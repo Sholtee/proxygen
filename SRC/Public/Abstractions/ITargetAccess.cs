@@ -1,18 +1,18 @@
 ﻿/********************************************************************************
-* IInterceptorAccess.cs                                                         *
+* ITargetAccess.cs                                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 namespace Solti.Utils.Proxy
 {
     /// <summary>
-    /// Type independent way to access the underlying interceptor.
+    /// Type independent way to access the underlying target.
     /// </summary>
-    public interface IInterceptorAccess
+    public interface ITargetAccess
     {
         /// <summary>
-        /// The interceptor instance
+        /// The target instance.
         /// </summary>
-        IInterceptor Interceptor { get; set; }
+        object? Target { get; set; }
     }
 }

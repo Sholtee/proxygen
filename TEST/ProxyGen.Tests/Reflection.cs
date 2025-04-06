@@ -87,7 +87,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             typeof(InterfaceInterceptor<>),
             typeof(Generators.ProxyGenerator<,>), 
             typeof(System.ComponentModel.Component), // van esemenye
-            typeof(DuckBase<>), 
             typeof(HasInternal))] Type type) 
         {
             Assembly[] refs = type

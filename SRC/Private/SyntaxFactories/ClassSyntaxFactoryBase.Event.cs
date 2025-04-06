@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode addBody, CSharpSyntaxNode removeBody, bool forceInlining = false)
+        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode addBody, CSharpSyntaxNode removeBody)
         {
             EventDeclarationSyntax result = EventDeclaration
             (
@@ -83,8 +83,8 @@ namespace Solti.Utils.Proxy.Internals
                             // Modifiers cannot be placed on event declarations
                             //
 
-                            ResolveAccessor(SyntaxKind.AddAccessorDeclaration, addBody, forceInlining),
-                            ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining)
+                            ResolveAccessor(SyntaxKind.AddAccessorDeclaration, addBody),
+                            ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody)
                         ]
                     )
                 )

@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static ReferenceCollector? CreateReferenceCollector() =>
             //
-            // Collectiong references required only when dumping the source
+            // Collecting references required only when dumping the source
             //
 
             WorkingDirectories.Instance.SourceDump is not null

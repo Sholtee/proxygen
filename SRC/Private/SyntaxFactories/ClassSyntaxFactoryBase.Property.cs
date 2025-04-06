@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-        private TDeclaration ResolveProperty<TDeclaration>(IPropertyInfo property, Func<IPropertyInfo, TDeclaration> fact, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining) where TDeclaration : BasePropertyDeclarationSyntax
+        private TDeclaration ResolveProperty<TDeclaration>(IPropertyInfo property, Func<IPropertyInfo, TDeclaration> fact, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) where TDeclaration : BasePropertyDeclarationSyntax
         {
             TDeclaration result = fact(property);
 
@@ -134,7 +134,7 @@ namespace Solti.Utils.Proxy.Internals
                     ? AccessModifiersToSyntaxList(backingMethod.AccessModifiers)
                     : [];
 
-                return this.ResolveAccessor(kind, body, forceInlining, modifiers);
+                return this.ResolveAccessor(kind, body, modifiers);
             }
         }
 
@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false) => ResolveProperty
+        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
         (
             property,
             property => PropertyDeclaration
@@ -167,8 +167,7 @@ namespace Solti.Utils.Proxy.Internals
                 identifier: Identifier(property.Name)
             ),
             getBody,
-            setBody,
-            forceInlining
+            setBody
         );
 
         /// <summary>
@@ -191,7 +190,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false) => ResolveProperty
+        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
         (
             property,
             property => 
@@ -217,8 +216,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 ),
             getBody,
-            setBody,
-            forceInlining
+            setBody
         );
 
         #if DEBUG

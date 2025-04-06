@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method, bool forceInlining = false)
+        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method)
         {
             TypeSyntax returnTypeSyntax = ResolveType(method.ReturnValue.Type);
 
@@ -206,11 +206,6 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
 
-            if (forceInlining) result = result.WithAttributeLists
-            (
-                attributeLists: ResolveMethodImplAttributeToForceInlining()
-            );
-
             return result;
         }
 
@@ -270,9 +265,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params string[] arguments)
+        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params IReadOnlyList<string> arguments)
         {
-            Debug.Assert(arguments.Length == method.Parameters.Count);
+            Debug.Assert(arguments.Count == method.Parameters.Count);
 
             return InvokeMethod
             (

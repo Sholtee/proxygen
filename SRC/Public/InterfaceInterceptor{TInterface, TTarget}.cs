@@ -15,14 +15,14 @@ namespace Solti.Utils.Proxy
     /// </summary>
     /// <typeparam name="TInterface">The interface to be intercepted.</typeparam>
     /// <typeparam name="TTarget">The target interface implementation.</typeparam>
-    public class InterfaceInterceptor<TInterface, TTarget> : InterfaceInterceptorBase<TInterface>, IHasTarget<TTarget?>, IProxyAccess<TInterface>
+    public class InterfaceInterceptor<TInterface, TTarget> : InterfaceInterceptorBase<TInterface>, ITargetAccess, IProxyAccess<TInterface>
         where TInterface : class
         where TTarget : TInterface
     {
         /// <summary>
         /// The target of this interceptor.
         /// </summary>
-        public TTarget? Target { get; }
+        public object? Target { get; set; }
 
         /// <summary>
         /// The most outer enclosing proxy.

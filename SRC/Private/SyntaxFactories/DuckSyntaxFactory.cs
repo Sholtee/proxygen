@@ -12,6 +12,8 @@ using System.Threading;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
@@ -25,9 +27,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo TargetType { get; }
 
-        public ITypeInfo BaseType { get; }
-
-        public IPropertyInfo Target { get; }
+        private static readonly IPropertyInfo
+            FTarget = MetadataPropertyInfo.CreateFrom
+            (
+                PropertyInfoExtensions.ExtractFrom<ITargetAccess>(static ta => ta.Target!)
+            );
 
         public DuckSyntaxFactory
         (
@@ -52,15 +56,6 @@ namespace Solti.Utils.Proxy.Internals
 
             InterfaceType = interfaceType;
             TargetType = targetType;
-
-            //
-            // We don't know if BaseType should be backed by Symbol or Metadata, so grab it from proxyGenAsm.
-            //
-
-            BaseType = ((IGenericTypeInfo) proxyGenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
-            Target = BaseType
-                .Properties
-                .Single(static prop => prop.Name == nameof(DuckBase<object>.Target));
         }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
@@ -74,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => new[] { BaseType, InterfaceType };
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [InterfaceType, MetadataTypeInfo.CreateFrom(typeof(ITargetAccess))];
 
         #if DEBUG
         internal
@@ -88,6 +83,14 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected override string ResolveClassName(object context) => ResolveClassName(InterfaceType, TargetType);
+
+
+        private MemberAccessExpressionSyntax GetTarget() => MemberAccess
+        (
+            ThisExpression(),
+            FTarget,
+            castTargetTo: FTarget.DeclaringType
+        );
 
         private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {

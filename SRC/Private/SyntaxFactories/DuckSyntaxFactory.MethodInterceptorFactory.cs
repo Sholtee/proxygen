@@ -28,20 +28,21 @@ namespace Solti.Utils.Proxy.Internals
                 if (ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
 
-                IMethodInfo targetMethod = GetTargetMember(ifaceMethod, TargetType.Methods, SignatureEquals);
+                IMethodInfo targetMethod = GetTargetMember
+                (
+                    ifaceMethod,
+                    TargetType.Methods,
+                    static (targetMethod, ifaceMethod) => targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true)
+                );
 
                 cls = ResolveMethod(cls, ifaceMethod, targetMethod);
             }
 
             return cls;
-
-            static bool SignatureEquals(IMethodInfo targetMethod, IMethodInfo ifaceMethod) =>
-                targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true);
         }
 
         /// <summary>
         /// <code>
-        /// [MethodImplAttribute(AggressiveInlining)]
         /// ref TResult IFoo&lt;TGeneric1&gt;.Bar&lt;TGeneric2&gt;(TGeneric1 para1, ref T1 para2, out T2 para3, TGeneric2 para4) => ref Target.Foo&lt;TGeneric2&gt;(para1, ref para2, out para3, para4);
         /// </code>
         /// </summary>
@@ -55,17 +56,20 @@ namespace Solti.Utils.Proxy.Internals
             Visibility.Check(targetMethod, ContainingAssembly);
             Visibility.Check(ifaceMethod, ContainingAssembly);
 
+            //
+            // Explicit members cannot be accessed directly
+            //
+
+            ITypeInfo castTargetTo = targetMethod.AccessModifiers is AccessModifiers.Explicit
+                    ? targetMethod.DeclaringInterfaces.Single()
+                    : TargetType;
+
             ExpressionSyntax invocation = InvokeMethod
             (
                 ifaceMethod,
-                MemberAccess(null, Target),
-                castTargetTo: targetMethod.AccessModifiers is AccessModifiers.Explicit
-                    ? targetMethod.DeclaringInterfaces.Single() // explicit methods cannot implement more than one interface
-                    : null,
-                arguments: ifaceMethod
-                    .Parameters
-                    .Select(static para => para.Name)
-                    .ToArray()
+                GetTarget(),
+                castTargetTo,
+                arguments: [..ifaceMethod.Parameters.Select(static para => para.Name)]
             );
 
             if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
@@ -73,19 +77,15 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls.AddMembers
             (
-                ResolveMethod
-                (
-                    ifaceMethod,
-                    forceInlining: true
-                )
-                .WithExpressionBody
-                (
-                    expressionBody: ArrowExpressionClause(invocation)
-                )
-                .WithSemicolonToken
-                (
-                    Token(SyntaxKind.SemicolonToken)
-                )
+                ResolveMethod(ifaceMethod)
+                    .WithExpressionBody
+                    (
+                        expressionBody: ArrowExpressionClause(invocation)
+                    )
+                    .WithSemicolonToken
+                    (
+                        Token(SyntaxKind.SemicolonToken)
+                    )
             );
         }
     }

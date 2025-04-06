@@ -239,7 +239,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Concat(new[] { type.Assembly, typeof(InterfaceInterceptor<>).Assembly })
+                .Concat([type.Assembly, typeof(InterfaceInterceptor<>).Assembly])
                 .Distinct()
                 .ToArray();
 
@@ -275,16 +275,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
                 src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
 
-            //
-            // Deklaraciok sorrendje nem biztos h azonos ezert ez a csoda
-            //
-           
-            string[]
-                lines1 = src1.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray(),
-                lines2 = src2.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray();
-
-            Assert.That(lines1.Length, Is.EqualTo(lines2.Length));
-            Assert.That(lines1.SequenceEqual(lines2));
+            Assert.That(src1.SequenceEqual(src2));
         }
 
         [Test]
