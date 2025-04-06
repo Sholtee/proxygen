@@ -87,15 +87,17 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
-        private void CheckVisibility(IMethodInfo method)
+        private bool IsVisible(IMethodInfo method)
         {
             try
             {
                 Visibility.Check(method, ContainingAssembly, allowProtected: true);
+                return true;
             }
             catch(MemberAccessException) when (!ThrowOnInaccessibleInternalMembers)
             {
                 Trace.TraceWarning($"Method not visible: {method}");
+                return false;
             }
         }
 

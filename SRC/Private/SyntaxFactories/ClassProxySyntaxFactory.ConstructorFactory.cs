@@ -16,8 +16,6 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IConstructorInfo ctor in TargetType.GetConstructors(AccessModifiers.Protected))
             {
-                Visibility.Check(ctor, ContainingAssembly, allowProtected: true);
-
                 cls = ResolveConstructor(cls, context, ctor);
             }
 
@@ -32,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls.AddMembers
+        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => !IsVisible(ctor) ? cls : cls.AddMembers
         (
             ResolveConstructor(ctor, cls.Identifier)
         );

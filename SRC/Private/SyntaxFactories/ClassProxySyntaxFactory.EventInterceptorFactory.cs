@@ -65,6 +65,9 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt)
         {
+            if (!IsVisible(evt.AddMethod) || !IsVisible(evt.RemoveMethod))
+                return cls;
+
             FieldDeclarationSyntax
                 addField = ResolveField<ExtendedMemberInfo>
                 (
@@ -99,8 +102,6 @@ namespace Solti.Utils.Proxy.Internals
             {
                 FieldDeclarationSyntax field = add ? addField : removeField;
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
-
-                CheckVisibility(backingMethod);
 
                 yield return ExpressionStatement
                 (

@@ -79,7 +79,8 @@ namespace Solti.Utils.Proxy.Internals
             // Check if the method is visible.
             //
 
-            CheckVisibility(targetMethod);
+            if (!IsVisible(targetMethod))
+                return cls;
 
             FieldDeclarationSyntax memberInfo = ResolveField<ExtendedMemberInfo>
             (

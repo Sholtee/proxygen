@@ -64,9 +64,14 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo prop)
         {
-            List<MemberDeclarationSyntax> members = new();
+            List<MemberDeclarationSyntax> members = [];
 
-            BlockSyntax?
+            BlockSyntax? get;
+            if (prop.GetMethod is null) get = null; else
+            {
+                if (!IsVisible(prop.GetMethod))
+                    return cls;
+
                 get = BuildBody
                 (
                     prop.GetMethod,
@@ -74,10 +79,17 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         prop,
                         BaseExpression(),
-                        castTargetTo: null,
                         indices: locals.Select(ResolveArgument)
                     )
-                ),
+                );
+            }
+
+            BlockSyntax? set;
+            if (prop.SetMethod is null) set = null; else
+            {
+                if (!IsVisible(prop.SetMethod))
+                    return cls;
+
                 set = BuildBody
                 (
                     prop.SetMethod,
@@ -88,7 +100,6 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             prop,
                             BaseExpression(),
-                            castTargetTo: null,
                             indices: locals
                                 .Take(locals.Count - 1)
                                 .Select(ResolveArgument)
@@ -96,17 +107,24 @@ namespace Solti.Utils.Proxy.Internals
                         right: ResolveIdentifierName(locals.Last())
                     )
                 );
+            }
 
-            BlockSyntax? BuildBody(IMethodInfo? backingMethod, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
+            members.Add
+            (
+                prop.Indices.Any()
+                    ? ResolveIndexer(prop, get, set)
+                    : ResolveProperty(prop, get, set)
+            );
+
+            return cls.AddMembers([.. members]);
+
+            BlockSyntax? BuildBody(IMethodInfo backingMethod, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
             {
-                if (backingMethod is null)
-                    return null;
-
                 //
                 // Check if the method is visible.
                 //
 
-                CheckVisibility(backingMethod);
+                IsVisible(backingMethod);
 
                 FieldDeclarationSyntax field = ResolveField<ExtendedMemberInfo>
                 (
@@ -151,15 +169,6 @@ namespace Solti.Utils.Proxy.Internals
                         : ReturnResult(backingMethod.ReturnValue.Type, interceptorInvocation)
                 );
             }
-
-            members.Add
-            (
-                prop.Indices.Any()
-                    ? ResolveIndexer(prop, get, set)
-                    : ResolveProperty(prop, get, set)
-            );
-
-            return cls.AddMembers(members.ToArray());
         }
     }
 }
