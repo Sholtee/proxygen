@@ -118,14 +118,8 @@ namespace Solti.Utils.Proxy.Internals
                         continue;
 
                     for (int i = 0; i < baseParamz.Length; i++)
-                    {
-                        Type
-                            baseParam = baseParamz[i].ParameterType,
-                            param = paramz[i];
-
-                        if (param.IsGenericParameter ? param.GetGenericParameterIndex() != baseParam.GetGenericParameterIndex() : param != baseParam)
+                        if (!paramz[i].EqualsTo(baseParamz[i].ParameterType))
                             goto next;
-                    }
 
                     return baseMethod;
                     next:;

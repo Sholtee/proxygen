@@ -468,8 +468,6 @@ namespace Solti.Utils.Proxy.Internals
             if (!src.IsGenericParameter)
                 return 0;
 
-            src = src.GetInnermostElementType() ?? src;
-
             return src.DeclaringMethod is not null
                 ? GetIndex(src.DeclaringMethod.GetGenericArguments(), src)
                 : GetIndex(src.DeclaringType.GetGenericArguments(), src) * -1;
@@ -481,6 +479,34 @@ namespace Solti.Utils.Proxy.Internals
 
                 return result + 1;
             }
+        }
+
+        public static bool EqualsTo(this Type src, Type that)
+        {
+            if (!GetBasicProps(src).Equals(GetBasicProps(that)))
+                return false;
+
+            Type? srcElement = src.GetElementType();
+            if (srcElement is not null)
+            {
+                Type? thatElement = that.GetElementType();
+                return thatElement is not null && srcElement.EqualsTo(thatElement);
+            }
+
+            if (src.IsGenericParameter)
+                return that.IsGenericParameter && src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
+                
+            return src == that;
+
+            static object GetBasicProps(Type t) => new
+            {
+                t.IsPrimitive,
+                t.IsPointer,
+                t.IsEnum,
+                t.IsValueType,
+                t.IsArray,
+                t.IsByRef
+            };
         }
     }
 }
