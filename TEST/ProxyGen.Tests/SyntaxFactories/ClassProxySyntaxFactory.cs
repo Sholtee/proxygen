@@ -20,8 +20,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(target),
             typeof(ClassProxySyntaxFactoryTests).Assembly.GetName().Name,
-            outputType,
-            null
+            outputType
         );
 
         [TestCase(typeof(Foo<int>), OutputType.Module, "ClsProxySrcModule.txt")]

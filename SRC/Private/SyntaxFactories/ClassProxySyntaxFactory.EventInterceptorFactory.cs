@@ -100,7 +100,7 @@ namespace Solti.Utils.Proxy.Internals
                 FieldDeclarationSyntax field = add ? addField : removeField;
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
 
-                Visibility.Check(backingMethod, ContainingAssembly, allowProtected: true);
+                CheckVisibility(backingMethod);
 
                 yield return ExpressionStatement
                 (

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -86,7 +87,21 @@ namespace Solti.Utils.Proxy.Internals
             )
         );
 
+        private void CheckVisibility(IMethodInfo method)
+        {
+            try
+            {
+                Visibility.Check(method, ContainingAssembly, allowProtected: true);
+            }
+            catch(MemberAccessException) when (!ThrowOnInaccessibleInternalMembers)
+            {
+                Trace.TraceWarning($"Method not visible: {method}");
+            }
+        }
+
         public ITypeInfo TargetType { get; }
+
+        public bool ThrowOnInaccessibleInternalMembers { get; }
 
         #if DEBUG
         internal
@@ -121,6 +136,7 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo targetType,
             string? containingAssembly,
             OutputType outputType,
+            bool throwOnInaccessibleInternalMembers = false,
             ReferenceCollector? referenceCollector = null,
             LanguageVersion languageVersion = LanguageVersion.Latest
         )
@@ -136,6 +152,7 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(targetType));
 
             TargetType = targetType;
+            ThrowOnInaccessibleInternalMembers = throwOnInaccessibleInternalMembers;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Generators
             MetadataTypeInfo.CreateFrom(Class),
             asmName,
             OutputType.Module,
-            referenceCollector
+            referenceCollector: referenceCollector
         );
     }
 }

@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Generators
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
             compilation.Assembly.Name,
             OutputType.Unit,
-            referenceCollector
+            referenceCollector: referenceCollector
         );
     }
 

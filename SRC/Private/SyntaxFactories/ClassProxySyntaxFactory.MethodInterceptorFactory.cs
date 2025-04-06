@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.Internals
             // Check if the method is visible.
             //
 
-            Visibility.Check(targetMethod, ContainingAssembly, allowProtected: true);
+            CheckVisibility(targetMethod);
 
             FieldDeclarationSyntax memberInfo = ResolveField<ExtendedMemberInfo>
             (
