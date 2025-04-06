@@ -120,12 +120,6 @@ namespace Solti.Utils.Proxy.Internals
 
             BlockSyntax? BuildBody(IMethodInfo backingMethod, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
             {
-                //
-                // Check if the method is visible.
-                //
-
-                IsVisible(backingMethod);
-
                 FieldDeclarationSyntax field = ResolveField<ExtendedMemberInfo>
                 (
                     $"F{backingMethod.GetMD5HashCode()}",
@@ -163,6 +157,17 @@ namespace Solti.Utils.Proxy.Internals
 
                 return Block
                 (
+                    ExpressionStatement
+                    (
+                        InvokeMethod
+                        (
+                            FGetBase,
+                            arguments: Argument
+                            (
+                                StaticMemberAccess(cls, field)
+                            )
+                        )
+                    ),
                     argsArray,
                     backingMethod.ReturnValue.Type.IsVoid
                         ? ExpressionStatement(interceptorInvocation)
