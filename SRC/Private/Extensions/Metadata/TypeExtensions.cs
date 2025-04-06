@@ -493,6 +493,12 @@ namespace Solti.Utils.Proxy.Internals
                 return thatElement is not null && srcElement.EqualsTo(thatElement);
             }
 
+            if (src.IsGenericType)
+                return 
+                    that.IsGenericType && 
+                    src.GetGenericTypeDefinition().Equals(that.GetGenericTypeDefinition()) && 
+                    src.GetGenericArguments().SequenceEqual(that.GetGenericArguments(), TypeComparer.Instance);
+
             if (src.IsGenericParameter)
                 return that.IsGenericParameter && src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
                 
@@ -507,6 +513,13 @@ namespace Solti.Utils.Proxy.Internals
                 t.IsArray,
                 t.IsByRef
             };
+        }
+
+        private sealed class TypeComparer : ComparerBase<TypeComparer, Type>
+        {
+            public override bool Equals(Type x, Type y) => x.EqualsTo(y);
+
+            public override int GetHashCode(Type obj) => throw new NotImplementedException();
         }
     }
 }

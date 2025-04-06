@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     {
         public abstract class Foo(int myParam)
         {
-            public abstract int Bar<T>(ref T x, out string y, in object z);
+            public abstract int Bar<T>(ref T x, out string y, in List<T> z);
 
             public virtual int Prop { get; protected set; }
 
