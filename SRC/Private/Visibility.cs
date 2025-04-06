@@ -104,7 +104,7 @@ namespace Solti.Utils.Proxy.Internals
 
             switch (type.AccessModifiers) 
             {
-                case AccessModifiers.Private:
+                case AccessModifiers.Private: case AccessModifiers.Protected when type.IsNested:
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
                 case AccessModifiers.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));

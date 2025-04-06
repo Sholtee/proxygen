@@ -34,6 +34,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
                 yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
                 yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(ProtectedClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(ProtectedClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
             }
         }
 
@@ -49,7 +51,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<IInternalInterface>)), AnnotatedAssembly);
                 yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), AnnotatedAssembly);
                 yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<object>)), NonAnnotatedAssembly);
-                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(ProtectedClass)), NonAnnotatedAssembly);
             }
         }
 
