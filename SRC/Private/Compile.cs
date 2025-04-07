@@ -119,15 +119,19 @@ namespace Solti.Utils.Proxy.Internals
                     );
 
                     string[]
-                        failures = result
-                            .Diagnostics
-                            .Where(static d => d.Severity is DiagnosticSeverity.Error)
-                            .Select(static d => d.ToString())
-                            .ToArray(),
-                        refs = compilation
-                            .References
-                            .Select(static r => r.Display!)
-                            .ToArray();
+                        failures = 
+                        [
+                            ..result
+                                .Diagnostics
+                                .Where(static d => d.Severity is DiagnosticSeverity.Error)
+                                .Select(static d => d.ToString())
+                        ],
+                        refs =
+                        [
+                            ..compilation
+                                .References
+                                .Select(static r => r.Display!)
+                        ];
 
                     InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
 
