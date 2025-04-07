@@ -13,11 +13,11 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.Generators.Tests
 {
     [TestFixture, Parallelizable(ParallelScope.All)]
-    public sealed class ClassProxyGenerator
+    public sealed class ClassProxyGeneratorTests
     {
         public abstract class Foo(int myParam)
         {
-            public abstract int Bar<T>(ref T x, out string y, in List<T> z);
+            public abstract int Bar<T>(ref T x, out string y, in List<T> z) where T: struct;
 
             public virtual int Prop { get; protected set; }
 
@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             int i = 0;
 
-            Assert.That(proxy.Bar(ref i, out _, null), Is.EqualTo(1));
+            Assert.That(proxy.Bar(ref i, out _, default), Is.EqualTo(1));
             Assert.That(proxy.Prop, Is.EqualTo(1));
         }
 
@@ -53,7 +53,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
-            proxy.Bar(ref i, out _, null);
+            proxy.Bar(ref i, out _, default);
 
             Assert.That(interceptor.GenericArguments.SequenceEqual([typeof(int)]));
 

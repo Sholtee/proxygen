@@ -68,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             }
         }
 
-        private class DerivedClass2 : BaseClass1
+        private class DerivedClass2 : BaseClass2
         {
         }
 
@@ -118,5 +118,27 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCaseSource(nameof(GetOverriddenMethod_ShouldReturnTheImmediateBaseDeclaration_Params))]
         public void GetOverriddenMethod_ShouldReturnTheImmediateBaseDeclaration(MethodInfo original, MethodInfo expected) => 
             Assert.That(original.GetOverriddenMethod(), Is.EqualTo(expected));
+
+        public static IEnumerable<MethodInfo> GetOverriddenMethod_AgainstSystemTypes_Params
+        {
+            get
+            {
+                HashSet<MethodInfo> returned = [];
+
+                foreach (Type t in typeof(object).Assembly.GetTypes().Where(t => t.IsClass))
+                {
+                    foreach (MethodInfo method in t.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+                    {
+                        MethodInfo @base = method.GetBaseDefinition();
+                        if (@base is not null && @base != method && returned.Add(@base))
+                            yield return method;
+                    }
+                }
+            }
+        }
+
+        [TestCaseSource(nameof(GetOverriddenMethod_AgainstSystemTypes_Params))]
+        public void GetOverriddenMethod_AgainstSystemTypes(MethodInfo @override) =>
+            Assert.That(@override.GetOverriddenMethod(), Is.Not.Null);
     }
 }

@@ -87,12 +87,9 @@ namespace Solti.Utils.Proxy.Internals
             // method instead of the overridden one.
             //
 
-            Type[] paramz = method
-                .GetParameters()
-                .Select(static p => p.ParameterType)
-                .ToArray();
+            Type[] paramz = [..method.GetParameters().Select(static p => p.ParameterType)];
 
-            foreach (Type baseType in method.DeclaringType.GetBaseTypes())
+            foreach (Type baseType in method.ReflectedType.GetBaseTypes())
             {
                 //
                 // baseType.GetMethod(method.Name, types: paramz) won't for for generic methods
