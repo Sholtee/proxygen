@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         public interface IMyGenericInterfaceHavingConstraint
         {
-            void Foo<T>() where T : class, IDisposable;
+            void Foo<T>(List<T> values) where T : class, IDisposable;
             void Bar<T, TT>() where T : new() where TT : struct;
         }
 

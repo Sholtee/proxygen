@@ -4,10 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -39,24 +35,5 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);
         }
-
-        public static IEnumerable<string> PlatformAsmsDirs
-        {
-            get 
-            {
-                yield return null;
-                yield return Environment.ExpandEnvironmentVariables("%USERPROFILE%\\.nuget\\packages\\netstandard.library\\2.0.0\\build\\netstandard2.0\\ref");
-            }
-        }
-
-        [Test]
-        public void GetPlatformAssemblies_ShouldReturnTheDesiredAsms([ValueSource(nameof(PlatformAsmsDirs))] string platformAsmDir) =>
-            Assert.That
-            (
-                File.Exists
-                (
-                    Compile.GetPlatformAssemblies(platformAsmDir, new string[] { "netstandard.dll" }).Single().Display
-                )
-            );
     }
 }

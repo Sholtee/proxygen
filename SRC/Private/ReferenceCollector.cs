@@ -22,9 +22,7 @@ namespace Solti.Utils.Proxy.Internals
 
         protected internal void AddType(ITypeInfo type) 
         {
-            IGenericTypeInfo? genericType = type as IGenericTypeInfo;
-
-            if (genericType?.IsGenericDefinition is true)
+            if (type.IsGenericParameter)
                 return;
 
             if (!FTypes.Add(type)) // circular reference fix
@@ -58,7 +56,7 @@ namespace Solti.Utils.Proxy.Internals
             // Generic parameters may come from different assemblies.
             //
 
-            if (genericType is not null)
+            if (type is IGenericTypeInfo genericType)
                 AddTypesFrom(genericType.GenericArguments);
 
             //

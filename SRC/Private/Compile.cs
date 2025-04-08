@@ -22,47 +22,6 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        internal static IEnumerable<MetadataReference> GetPlatformAssemblies(string? platformAsmsDir, IEnumerable<string> platformAsms)
-        {
-            if (Directory.Exists(platformAsmsDir))  // Directory.Exists() returns False on NULL 
-                return GetFilteredPlatformAssemblies
-                (
-                    EnumerateDlls(platformAsmsDir!)
-                );
-
-            if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string tpa)
-                return GetFilteredPlatformAssemblies
-                (
-                    tpa.Split(Path.PathSeparator)
-                );
-
-            //
-            // .NET Framework 4.X support
-            //
-
-            return GetFilteredPlatformAssemblies 
-            (
-                EnumerateDlls
-                (
-                    Path.GetDirectoryName(typeof(object).Assembly.Location)
-                )
-            );
-
-            static IEnumerable<string> EnumerateDlls(string path) => Directory.EnumerateFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
-
-            IEnumerable<MetadataReference> GetFilteredPlatformAssemblies(IEnumerable<string> allAssemblies)
-            {
-                foreach (string asm in allAssemblies)
-                {
-                    foreach (string platformAsm in platformAsms)
-                    {
-                        if (Path.GetFileName(asm).Equals(platformAsm, StringComparison.OrdinalIgnoreCase))
-                            yield return MetadataReference.CreateFromFile(asm);
-                    }
-                }
-            }
-        }
-
         public static Stream ToAssembly(
             IReadOnlyCollection<CompilationUnitSyntax> units,
             string asmName,
@@ -77,11 +36,7 @@ namespace Solti.Utils.Proxy.Internals
                 syntaxTrees: units.Select(static unit => CSharpSyntaxTree.Create(unit)),
                 references: references.Union
                 (              
-                    GetPlatformAssemblies
-                    (
-                        TargetFramework.Instance.PlatformAssembliesDir,
-                        TargetFramework.Instance.PlatformAssemblies
-                    ),
+                    PlatformAssemblies.References,
                     MetadataReferenceComparer.Instance
                 ),
                 options: new CSharpCompilationOptions

@@ -22,6 +22,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
             public virtual int Prop { get; protected set; }
 
             public virtual event Action Event;
+
+            public int Param { get; } = myParam;
         }
 
         private sealed class FooInterceptor : IInterceptor
