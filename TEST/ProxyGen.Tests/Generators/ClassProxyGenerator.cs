@@ -6,12 +6,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
+    using Internals;
+
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class ClassProxyGeneratorTests
     {
@@ -28,11 +31,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         private sealed class FooInterceptor : IInterceptor
         {
-            public IReadOnlyList<Type> GenericArguments { get; private set; }
+            public IInvocationContext Context { get; private set; }
 
             public object Invoke(IInvocationContext context)
             {
-                GenericArguments = context.GenericArguments;
+                Context = context;
                 return 1;
             }
         }
@@ -43,9 +46,17 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
 
             int i = 0;
-
             Assert.That(proxy.Bar(ref i, out _, default), Is.EqualTo(1));
+
             Assert.That(proxy.Prop, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GeneratedProxy_ShouldHandleCtorParams()
+        {
+            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
+
+            Assert.That(proxy.Param, Is.EqualTo(1986));
         }
 
         [Test]
@@ -57,10 +68,64 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int i = 0;
             proxy.Bar(ref i, out _, default);
 
-            Assert.That(interceptor.GenericArguments.SequenceEqual([typeof(int)]));
+            Assert.That(interceptor.Context.GenericArguments.SequenceEqual([typeof(int)]));
 
             _ = proxy.Prop;
-            Assert.That(interceptor.GenericArguments, Is.Empty);
+            Assert.That(interceptor.Context.GenericArguments, Is.Empty);
         }
+
+        [Test]
+        public async Task GeneratedProxy_ShouldExposeTheTargetMember()
+        {
+            FooInterceptor interceptor = new();
+            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
+
+            int i = 0;
+            proxy.Bar(ref i, out _, default);
+
+            string s;
+            Assert.That(interceptor.Context.Member.Member, Is.EqualTo(MethodInfoExtensions.ExtractFrom<Foo>(f => f.Bar(ref i, out s ,default)).GetGenericMethodDefinition()));
+
+            _ = proxy.Prop;
+            Assert.That(interceptor.Context.Member.Member, Is.EqualTo(PropertyInfoExtensions.ExtractFrom((Foo f) => f.Prop)));
+        }
+
+        private static readonly HashSet<Type> SpecialTypes = [typeof(Array), typeof(Delegate), typeof(Enum), typeof(MulticastDelegate)];
+
+        public static IEnumerable<Type> GeneratedProxy_AgainstSystemType_Params => typeof(object)
+            .Assembly
+            .GetExportedTypes()
+            .Where
+            (
+                t =>
+                {
+                    IEnumerable<MethodInfo> virtualMethods = t.GetMethods().Where
+                    (
+                        m => m.GetAccessModifiers() is not AccessModifiers.Private or AccessModifiers.Internal && (m.IsAbstract || m.IsVirtual)
+                    );
+
+                    IEnumerable<ConstructorInfo> ctors = t.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where
+                    (
+                        c => c.GetAccessModifiers() is AccessModifiers.Public or AccessModifiers.Protected
+                    );
+
+                    return t.IsClass &&
+                        !t.IsSealed &&
+                        !t.IsSpecialName &&
+                        !t.GetGenericArguments().Any() &&
+                        !SpecialTypes.Contains(t) &&
+                        !virtualMethods.Any(RequiresUnsafeContext) &&
+                        virtualMethods.Count() > 3 &&
+                        !ctors.Any(RequiresUnsafeContext) &&
+                        !ctors.Any(c => c.GetParameters().Any(p => p.IsIn || p.IsOut || p.ParameterType.IsByRef)) &&
+                        ctors.Any();
+
+                    static bool RequiresUnsafeContext(MethodBase m) => m.GetParameters().Any(p => p.ParameterType.IsPointer);
+                }
+            );
+
+        [TestCaseSource(nameof(GeneratedProxy_AgainstSystemType_Params))]
+        public void GeneratedProxy_AgainstSystemType(Type type) =>
+            Assert.DoesNotThrow(() => new ClassProxyGenerator(type).GetGeneratedType());
     }
 }

@@ -126,7 +126,7 @@
   <data name="AMBIGUOUS_MATCH" xml:space="preserve">
     <value>Ambiguous match for member: {0}</value>
   </data>
-  <data name="BYREF_NOT_SUPPORTED" xml:space="preserve">
+  <data name="REF_VALUE" xml:space="preserve">
     <value>"reference return value"s and "ref struct"s are not supported.</value>
   </data>
   <data name="COMPILATION_FAILED" xml:space="preserve">
@@ -139,10 +139,10 @@
     <value>Dynamic assemblies are not supported.</value>
   </data>
   <data name="GENERIC_IFACE" xml:space="preserve">
-    <value>Target interface can not be generic</value>
+    <value>Target interface can not be open generic</value>
   </data>
   <data name="GENERIC_INTERCEPTOR" xml:space="preserve">
-    <value>The interceptor can not be generic.</value>
+    <value>The interceptor can not be open generic.</value>
   </data>
   <data name="IVT_REQUIRED" xml:space="preserve">
     <value>The member ("{0}") is internal. The declaring assembly should be annotated with the InternalsVisibleToAttribute("{1}").</value>
@@ -194,5 +194,14 @@
   </data>
   <data name="TOO_MANY_CTOR_PARAMS" xml:space="preserve">
     <value>Too many constructor parameters</value>
+  </data>
+  <data name="GENERIC_TARGET" xml:space="preserve">
+    <value>The target class cannot be open generic.</value>
+  </data>
+  <data name="UNSAFE_CONTEXT" xml:space="preserve">
+    <value>Unsafe context not supported.</value>
+  </data>
+  <data name="BYREF_CTOR_PARAMETER" xml:space="preserve">
+    <value>By ref constructor parameters are not supported.</value>
   </data>
 </root>

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,6 +32,15 @@ namespace Solti.Utils.Proxy.Internals
 
             return target;
         }
+
+        protected static string EnsureUnused(ClassDeclarationSyntax cls, string member) => cls.Members.Any(m => m switch
+        {
+            MethodDeclarationSyntax method => method.Identifier.ValueText == member,
+            PropertyDeclarationSyntax prop => prop.Identifier.ValueText == member,
+            EventDeclarationSyntax evt => evt.Identifier.ValueText == member,
+            FieldDeclarationSyntax fld => ResolveIdentifierName(fld).Identifier.ValueText == member,
+            _ => false
+        }) ? EnsureUnused(cls, $"_{member}") : member;
 
         #if DEBUG
         internal

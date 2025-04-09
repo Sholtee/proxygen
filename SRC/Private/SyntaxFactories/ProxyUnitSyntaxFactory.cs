@@ -7,8 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ProxyUnitSyntaxFactory : ProxyUnitSyntaxFactoryBase
+    internal abstract partial class ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : ProxyUnitSyntaxFactoryBase(outputType, containingAssembly, referenceCollector, languageVersion)
     {
-        protected ProxyUnitSyntaxFactory(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : base(outputType, containingAssembly, referenceCollector, languageVersion) { }
     }
 }

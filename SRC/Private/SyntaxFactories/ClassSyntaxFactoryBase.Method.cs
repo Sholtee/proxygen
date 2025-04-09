@@ -18,6 +18,61 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassSyntaxFactoryBase
     {
+        private static ArgumentListSyntax ResolveArgumentList(IMethodInfo method, IEnumerable<ArgumentSyntax> arguments) => ArgumentList
+        (
+            arguments.ToSyntaxList
+            (
+                (arg, i) => method.Parameters[i].Kind switch
+                {
+                    ParameterKind.In => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.InKeyword)
+                    ),
+                    ParameterKind.Out => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.OutKeyword)
+                    ),
+                    ParameterKind.Ref => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.RefKeyword)
+                    ),
+                    _ => arg
+                }
+            )
+        );
+
+        private ParameterListSyntax ResolveParameterList(IMethodInfo method) => ParameterList
+        (
+            method.Parameters.ToSyntaxList(param =>
+            {
+                ParameterSyntax parameter = Parameter
+                (
+                    Identifier(param.Name)
+                )
+                .WithType
+                (
+                    type: ResolveType(param.Type)
+                );
+
+                SyntaxKind? modifier = param.Kind switch
+                {
+                    ParameterKind.In => SyntaxKind.InKeyword,
+                    ParameterKind.Out => SyntaxKind.OutKeyword,
+                    ParameterKind.Ref => SyntaxKind.RefKeyword,
+                    ParameterKind.Params => SyntaxKind.ParamsKeyword,
+                    _ => null
+                };
+
+                return modifier is null ? parameter : parameter.WithModifiers
+                (
+                    TokenList
+                    (
+                        Token(modifier.Value)
+                    )
+                );
+            })
+        );
+
         /// <summary>
         /// <code>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method&lt;...&gt;(...)
@@ -81,37 +136,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithParameterList
             (
-                ParameterList
-                (
-                    parameters: method.Parameters.ToSyntaxList(param =>
-                    {
-                        ParameterSyntax parameter = Parameter
-                        (
-                            Identifier(param.Name)
-                        )
-                        .WithType
-                        (
-                            type: ResolveType(param.Type)
-                        );
-
-                        SyntaxKind? modifier = param.Kind switch
-                        {
-                            ParameterKind.In => SyntaxKind.InKeyword,
-                            ParameterKind.Out => SyntaxKind.OutKeyword,
-                            ParameterKind.Ref => SyntaxKind.RefKeyword,
-                            ParameterKind.Params => SyntaxKind.ParamsKeyword,
-                            _ => null
-                        };
-
-                        if (modifier is not null)
-                            parameter = parameter.WithModifiers
-                            (
-                                TokenList(Token(modifier.Value))
-                            );
-
-                        return parameter;
-                    })
-                )
+                ResolveParameterList(method)
             );
 
             if (method.DeclaringType.IsInterface)
@@ -121,7 +146,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
             else
             {
-                List<SyntaxKind> tokens = AccessModifiersToSyntaxList(method.AccessModifiers).ToList();
+                List<SyntaxKind> tokens = [..ResolveAccessModifiers(method)];
 
                 tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
 
@@ -232,28 +257,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithArgumentList
             (
-                argumentList: ArgumentList
-                (
-                    arguments.ToSyntaxList
-                    (
-                        (arg, i) => method.Parameters[i].Kind switch
-                        {
-                            ParameterKind.In => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.InKeyword)
-                            ),
-                            ParameterKind.Out => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.OutKeyword)
-                            ),
-                            ParameterKind.Ref => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.RefKeyword)
-                            ),
-                            _ => arg
-                        }
-                    )
-                )
+                ResolveArgumentList(method, arguments)
             );
         }
 
@@ -274,7 +278,8 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target,
                 castTargetTo,
-                arguments: method.Parameters
+                arguments: method
+                    .Parameters
                     .Select
                     (
                         (param, i) => Argument

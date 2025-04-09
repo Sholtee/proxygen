@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
                 //
 
                 if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
-                    throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
+                    throw new NotSupportedException(Resources.REF_VALUE);
 
                 cls = ResolveMethod(cls, context, ifaceMethod);
             }
@@ -154,7 +154,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     LocalDeclarationStatementSyntax result = ResolveLocal<object>
                     (
-                        EnsureUnused(nameof(result), method),
+                        EnsureUnused(method, nameof(result)),
                         invocation
                     );
 

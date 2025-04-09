@@ -31,7 +31,10 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     MetadataTypeInfo.CreateFrom(typeof(void))
                 ),
-                Identifier("Initialize")
+                Identifier
+                (
+                    EnsureUnused(cls, "Initialize")
+                )
             )
             .WithModifiers
             (

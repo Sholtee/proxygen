@@ -15,9 +15,9 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ClassSyntaxFactoryBase: SyntaxFactoryBase
+    internal abstract partial class ClassSyntaxFactoryBase(string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : SyntaxFactoryBase(referenceCollector, languageVersion)
     {
-        public ClassSyntaxFactoryBase(ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : base(referenceCollector, languageVersion) { }
+        public string ContainingAssembly { get; } = containingAssembly;
 
         #if DEBUG
         internal

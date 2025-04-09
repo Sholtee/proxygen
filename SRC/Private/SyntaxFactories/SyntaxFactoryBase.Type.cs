@@ -13,6 +13,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class SyntaxFactoryBase
     {
         /// <summary>
@@ -40,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
                     names[i] = IdentifierName(parts[i]);
                 }
 
-                names[names.Length - 1] = CreateTypeName(parts[parts.Length - 1]);
+                names[^1] = CreateTypeName(parts[^1]);
 
                 //
                 // This handles types having no namespace properly
@@ -83,7 +85,7 @@ namespace Solti.Utils.Proxy.Internals
                 TypeSyntax result = ResolveType(type.ElementType);
 
                 if (type.RefType is RefType.Pointer) 
-                    result = PointerType(result);
+                    result = AllowPointers ? PointerType(result) : throw new InvalidOperationException(Resources.UNSAFE_CONTEXT);
 
                 return result;
             }
@@ -124,6 +126,8 @@ namespace Solti.Utils.Proxy.Internals
 
             return GetQualifiedName(type);
         }
+
+        public bool AllowPointers { get; set; }
 
         #if DEBUG
         internal

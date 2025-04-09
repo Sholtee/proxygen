@@ -18,22 +18,19 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase
+    internal abstract class UnitSyntaxFactoryBase(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : ClassSyntaxFactoryBase(containingAssembly, referenceCollector, languageVersion)
     {
         private static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
         (
             attributes.ToSyntaxList()
         );
 
-        protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector, LanguageVersion languageVersion): base(referenceCollector, languageVersion) =>
-            OutputType = outputType;
-
         #if DEBUG
         internal
         #endif
         protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
-        public OutputType OutputType { get; }
+        public OutputType OutputType { get; } = outputType;
 
         public abstract string ExposedClass { get; }
 

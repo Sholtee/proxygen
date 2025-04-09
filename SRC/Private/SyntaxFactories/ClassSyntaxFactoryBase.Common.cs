@@ -58,21 +58,31 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        private static IEnumerable<SyntaxKind> AccessModifiersToSyntaxList(AccessModifiers am) => am.SetFlags().Select
-        (
-            static am =>
-            {
-                switch (am)
+        private IEnumerable<SyntaxKind> ResolveAccessModifiers(IMethodInfo method) => method
+            .AccessModifiers
+            .SetFlags()
+            
+            //
+            // When overriding an "internal protected" member we cannot reuse the "internal" keyword
+            // if the base is declared in a different assembly
+            //
+
+            .Where(am => am >= AccessModifiers.Protected && (am is not AccessModifiers.Internal || method.DeclaringType.DeclaringAssembly?.IsFriend(ContainingAssembly) is true))
+            .Select
+            (
+                static am =>
                 {
-                    case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
-                    case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
-                    case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
-                    default:
-                        Debug.Fail("Member not visible");
-                        return SyntaxKind.None;
+                    switch (am)
+                    {
+                        case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
+                        case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
+                        case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
+                        default:
+                            Debug.Fail("Member not visible");
+                            return SyntaxKind.None;
+                    }
                 }
-            }
-        );
+            );
 
         /// <summary>
         /// <code>

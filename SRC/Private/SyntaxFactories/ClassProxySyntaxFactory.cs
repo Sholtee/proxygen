@@ -32,7 +32,7 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly IPropertyInfo
             FInterceptor = MetadataPropertyInfo.CreateFrom
             (
-                PropertyInfoExtensions.ExtractFrom<IInterceptorAccess>(static ia => ia.Interceptor)
+                PropertyInfoExtensions.ExtractFrom(static (IInterceptorAccess ia) => ia.Interceptor)
             );
 
         private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
@@ -152,6 +152,9 @@ namespace Solti.Utils.Proxy.Internals
         {
             if (!targetType.IsClass)
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(targetType));
+
+            if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
 
             TargetType = targetType;
             ThrowOnInaccessibleInternalMembers = throwOnInaccessibleInternalMembers;

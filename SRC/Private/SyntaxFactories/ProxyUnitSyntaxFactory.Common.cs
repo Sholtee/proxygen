@@ -21,16 +21,16 @@ namespace Solti.Utils.Proxy.Internals
     {
         protected static readonly IReadOnlyCollection<ParameterKind> ByRefs = [ParameterKind.Ref, ParameterKind.Out];
 
-        protected static string EnsureUnused(string name, IEnumerable<IParameterInfo> parameters)
+        protected static string EnsureUnused(IEnumerable<IParameterInfo> parameters, string variable)
         {
-            while (parameters.Any(param => param.Name == name))
+            while (parameters.Any(param => param.Name == variable))
             {
-                name = $"_{name}";
+                variable = $"_{variable}";
             }
-            return name;
+            return variable;
         }
 
-        protected static string EnsureUnused(string name, IMethodInfo method) => EnsureUnused(name, method.Parameters);
+        protected static string EnsureUnused(IMethodInfo method, string variable) => EnsureUnused(method.Parameters, variable);
 
         /// <summary>
         /// <code>
@@ -295,7 +295,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return ResolveLocal<object[]>
             (
-                EnsureUnused("args", paramz),
+                EnsureUnused(paramz, "args"),
                 ResolveArray<object>
                 (
                     paramz.Select<IParameterInfo, ExpressionSyntax>
@@ -307,7 +307,7 @@ namespace Solti.Utils.Proxy.Internals
                                 // We cannot cast "ref struct"s to objects
                                 //
 
-                                throw new NotSupportedException(Resources.BYREF_NOT_SUPPORTED);
+                                throw new NotSupportedException(Resources.REF_VALUE);
 
                             return param.Kind switch
                             {

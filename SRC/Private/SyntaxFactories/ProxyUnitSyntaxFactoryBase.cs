@@ -11,13 +11,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ProxyUnitSyntaxFactoryBase : UnitSyntaxFactoryBase
+    internal abstract partial class ProxyUnitSyntaxFactoryBase(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : UnitSyntaxFactoryBase(outputType, containingAssembly, referenceCollector, languageVersion)
     {
-        protected ProxyUnitSyntaxFactoryBase(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion): base(outputType, referenceCollector, languageVersion) =>
-            ContainingAssembly = containingAssembly;
-
-        public string ContainingAssembly { get; }
-
         public override string ExposedClass => ResolveClassName(null!);
 
         #if DEBUG

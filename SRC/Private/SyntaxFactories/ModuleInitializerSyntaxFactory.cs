@@ -16,12 +16,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class ModuleInitializerSyntaxFactory : UnitSyntaxFactoryBase
+    internal class ModuleInitializerSyntaxFactory(OutputType outputType, ReferenceCollector? referenceCollector = null, LanguageVersion languageVersion = LanguageVersion.Latest) : UnitSyntaxFactoryBase(outputType, null!, referenceCollector, languageVersion)
     {
-        public ModuleInitializerSyntaxFactory(OutputType outputType, ReferenceCollector? referenceCollector = null, LanguageVersion languageVersion = LanguageVersion.Latest) : base(outputType, referenceCollector, languageVersion)
-        {
-        }
-
         public override string ExposedClass { get; } = nameof(ModuleInitializerAttribute);
 
         #if DEBUG

@@ -65,12 +65,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             TDeclaration result = fact(property);
 
-            AccessModifiers declaredVisibility;
+            IMethodInfo backingMethodHavingHigherVisibility = (property.GetMethod?.AccessModifiers ?? AccessModifiers.Unknown) > (property.SetMethod?.AccessModifiers ?? AccessModifiers.Unknown)
+                ? property.GetMethod!
+                : property.SetMethod!;
 
             if (property.DeclaringType.IsInterface)
             {
-                declaredVisibility = AccessModifiers.Explicit;
-
                 result = (TDeclaration) result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
@@ -81,13 +81,7 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                declaredVisibility = (AccessModifiers) Math.Max
-                (
-                    (int) (property.GetMethod?.AccessModifiers ?? AccessModifiers.Unknown),
-                    (int) (property.SetMethod?.AccessModifiers ?? AccessModifiers.Unknown)
-                );
-
-                List<SyntaxKind> tokens = AccessModifiersToSyntaxList(declaredVisibility).ToList();
+                List<SyntaxKind> tokens = [..ResolveAccessModifiers(backingMethodHavingHigherVisibility)];
 
                 IMemberInfo underlyingMethod = property.GetMethod ?? property.SetMethod!;
 
@@ -130,8 +124,8 @@ namespace Solti.Utils.Proxy.Internals
                 // Accessor cannot have higher visibility than the property's
                 //
 
-                IEnumerable<SyntaxKind> modifiers = backingMethod!.AccessModifiers < declaredVisibility
-                    ? AccessModifiersToSyntaxList(backingMethod.AccessModifiers)
+                IEnumerable<SyntaxKind> modifiers = backingMethod!.AccessModifiers < backingMethodHavingHigherVisibility.AccessModifiers
+                    ? ResolveAccessModifiers(backingMethod)
                     : [];
 
                 return this.ResolveAccessor(kind, body, modifiers);

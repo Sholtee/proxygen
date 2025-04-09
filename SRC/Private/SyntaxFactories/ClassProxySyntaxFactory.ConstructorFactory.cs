@@ -3,10 +3,14 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
+
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassProxySyntaxFactory
     {
         #if DEBUG
@@ -14,10 +18,18 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
+            bool hasConstructor = false;
             foreach (IConstructorInfo ctor in TargetType.GetConstructors(AccessModifiers.Protected))
             {
-                cls = ResolveConstructor(cls, context, ctor);
+                if (IsVisible(ctor))
+                {
+                    cls = ResolveConstructor(cls, context, ctor);
+                    hasConstructor = true;
+                }
             }
+
+            if (!hasConstructor)
+                throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, TargetType.Name));
 
             return cls;
         }
@@ -30,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => !IsVisible(ctor) ? cls : cls.AddMembers
+        protected override ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls.AddMembers
         (
             ResolveConstructor(ctor, cls.Identifier)
         );

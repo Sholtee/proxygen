@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 result = ResolveLocal<object>
                 (
-                    EnsureUnused(nameof(result), targetMethod),
+                    EnsureUnused(targetMethod, nameof(result)),
                     invokeInterceptor
                 );
                 body.Add(result);

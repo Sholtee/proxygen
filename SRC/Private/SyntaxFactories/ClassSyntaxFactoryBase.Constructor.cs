@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -24,14 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
-        {
-            IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
-
-            return ConstructorDeclaration
-            (
-                name
-            )
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => ConstructorDeclaration(name)
             .WithModifiers
             (
                 modifiers: TokenList
@@ -41,29 +33,17 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithParameterList
             (
-                parameterList: ParameterList
-                (
-                    paramz.Select
-                    (
-                        param => Parameter
-                        (
-                            identifier: Identifier(param.Name)
-                        )
-                        .WithType
-                        (
-                            type: ResolveType(param.Type)
-                        )
-                    ).ToSyntaxList()
-                )
+                parameterList: ResolveParameterList(ctor)
             )
             .WithInitializer
             (
                 initializer: ConstructorInitializer
                 (
                     SyntaxKind.BaseConstructorInitializer,
-                    ArgumentList
+                    ResolveArgumentList
                     (
-                        paramz.ToSyntaxList
+                        ctor,
+                        ctor.Parameters.Select
                         (
                             static param => Argument
                             (
@@ -74,7 +54,6 @@ namespace Solti.Utils.Proxy.Internals
                 )
             )
             .WithBody(Block());
-        }
 
         #if DEBUG
         internal

@@ -59,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 IMethodInfo backingMethod = @event.AddMethod!;
 
-                List<SyntaxKind> tokens = AccessModifiersToSyntaxList(backingMethod.AccessModifiers).ToList();
+                List<SyntaxKind> tokens = [.. ResolveAccessModifiers(backingMethod)];
 
                 tokens.Add(backingMethod.IsVirtual || backingMethod.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
 

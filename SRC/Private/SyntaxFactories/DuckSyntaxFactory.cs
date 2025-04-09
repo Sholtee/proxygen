@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly IPropertyInfo
             FTarget = MetadataPropertyInfo.CreateFrom
             (
-                PropertyInfoExtensions.ExtractFrom<ITargetAccess>(static ta => ta.Target!)
+                PropertyInfoExtensions.ExtractFrom(static (ITargetAccess ta) => ta.Target!)
             );
 
         public DuckSyntaxFactory

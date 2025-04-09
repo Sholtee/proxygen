@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static IReadOnlyDictionary<string, ISupportsSourceGeneration> GetSourceFactories()
         {
-            Dictionary<string, ISupportsSourceGeneration> result = new();
+            Dictionary<string, ISupportsSourceGeneration> result = [];
 
             foreach (Type type in typeof(Generator).Assembly.GetExportedTypes())
             {

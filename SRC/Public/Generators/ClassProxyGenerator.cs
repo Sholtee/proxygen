@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Generators
         }
 
         /// <summary>
-        /// Activates the underlying duck type.
+        /// Activates the underlying proxy type.
         /// </summary>
         public object Activate(IInterceptor interceptor, Tuple ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None).GetAwaiter().GetResult();
 

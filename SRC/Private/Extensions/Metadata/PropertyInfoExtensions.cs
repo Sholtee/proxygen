@@ -11,6 +11,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class PropertyInfoExtensions
     {
-        public static PropertyInfo ExtractFrom<T>(Expression<Func<T, object>> expression) => (PropertyInfo) ((MemberExpression) expression.Body).Member;
+        public static PropertyInfo ExtractFrom<T, TResult>(Expression<Func<T, TResult>> expression) => (PropertyInfo) ((MemberExpression) expression.Body).Member;
     }
 }

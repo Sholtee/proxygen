@@ -101,100 +101,110 @@ namespace Solti.Utils.Proxy.Internals
                     yield return GetCase(ctor, ref i);
                 }
 
-                yield return SwitchSection().WithLabels
-                (
-                    SingletonList<SwitchLabelSyntax>
+                yield return SwitchSection()
+                    .WithLabels
                     (
-                        DefaultSwitchLabel()
-                    )
-                )
-                .WithStatements
-                (
-                    SingletonList<StatementSyntax>
-                    (
-                        ThrowStatement
+                        SingletonList<SwitchLabelSyntax>
                         (
-                            ObjectCreationExpression
+                            DefaultSwitchLabel()
+                        )
+                    )
+                    .WithStatements
+                    (
+                        SingletonList<StatementSyntax>
+                        (
+                            ThrowStatement
                             (
-                                ResolveType<MissingMethodException>()
-                            )
-                            .WithArgumentList
-                            (
-                                ArgumentList
+                                ObjectCreationExpression
                                 (
-                                    SingletonSeparatedList
+                                    ResolveType<MissingMethodException>()
+                                )
+                                .WithArgumentList
+                                (
+                                    ArgumentList
                                     (
-                                        Argument
+                                        SingletonSeparatedList
                                         (
-                                            Resources.CTOR_NOT_FOUND.AsLiteral()
+                                            Argument
+                                            (
+                                                Resources.CTOR_NOT_FOUND.AsLiteral()
+                                            )
                                         )
                                     )
                                 )
                             )
                         )
-                    )
-                );
+                    );
             }
 
             SwitchSectionSyntax GetCase(ConstructorDeclarationSyntax ctor, ref int i)
             {
                 if (ctor.ParameterList.Parameters.Count is 0)
                 {
-                    return SwitchSection().WithLabels
+                    return SwitchSection()
+                        .WithLabels
+                        (
+                            SingletonList<SwitchLabelSyntax>
+                            (
+                                CaseSwitchLabel
+                                (
+                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                )
+                            )
+                        )
+                        .WithStatements
+                        (
+                            InvokeCtor()
+                        );
+                }
+
+                string tupleId = $"t{i++}";
+
+                return SwitchSection()
+                    .WithLabels
                     (
                         SingletonList<SwitchLabelSyntax>
                         (
-                            CaseSwitchLabel
+                            CasePatternSwitchLabel
                             (
-                                LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                DeclarationPattern
+                                (
+                                    GetTupleForCtor(ctor),
+                                    SingleVariableDesignation
+                                    (
+                                        Identifier(tupleId)
+                                    )
+                                ),
+                                Token(SyntaxKind.ColonToken)
                             )
                         )
                     )
                     .WithStatements
                     (
-                        InvokeCtor()
-                    );
-                }
-
-                string tupleId = $"t{i++}";
-
-                return SwitchSection().WithLabels
-                (
-                    SingletonList<SwitchLabelSyntax>
-                    (
-                        CasePatternSwitchLabel
+                        InvokeCtor
                         (
-                            DeclarationPattern
+                            ctor.ParameterList.Parameters.Select
                             (
-                                GetTupleForCtor(ctor),
-                                SingleVariableDesignation
-                                (
-                                    Identifier(tupleId)
-                                )
-                            ),
-                            Token(SyntaxKind.ColonToken)
-                        )
-                    )
-                )
-                .WithStatements
-                (
-                    InvokeCtor
-                    (
-                        ctor.ParameterList.Parameters.Count.Times
-                        (
-                            i => Argument
-                            (
-                                SimpleMemberAccess
-                                (
-                                    IdentifierName(tupleId),
-                                    IdentifierName($"Item{i + 1}")
-                                )
+                                (parameter, i) =>
+                                {
+                                    if (parameter.Modifiers.Any(static token => token.IsKind(SyntaxKind.OutKeyword) || token.IsKind(SyntaxKind.RefKeyword)))
+                                        throw new InvalidOperationException(Resources.BYREF_CTOR_PARAMETER);
+
+                                    return Argument
+                                    (
+                                        SimpleMemberAccess
+                                        (
+                                            IdentifierName(tupleId),
+                                            IdentifierName($"Item{i + 1}")
+                                        )
+                                    );
+                                }
                             )
                         )
-                    )
-                );
+                    );
             }
 
+            
             SyntaxList<StatementSyntax> InvokeCtor(params IEnumerable<ArgumentSyntax> arguments) => SingletonList<StatementSyntax>
             (
                 ReturnStatement
