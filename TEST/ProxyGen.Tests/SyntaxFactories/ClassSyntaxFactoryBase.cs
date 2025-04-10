@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     {
         private sealed class ClassSyntaxFactory : ClassSyntaxFactoryBase
         {
-            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(null!, referenceCollector, LanguageVersion.Latest) { }
+            public ClassSyntaxFactory(ReferenceCollector referenceCollector) : base(typeof(ClassSyntaxFactory).Assembly.GetName().Name, referenceCollector, LanguageVersion.Latest) { }
 
             protected internal override IEnumerable<ITypeInfo> ResolveBases(object context) => throw new NotImplementedException();
 
@@ -63,8 +63,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(IEnumerable<int>[]), "global::System.Collections.Generic.IEnumerable<global::System.Int32>[]")]
         [TestCase(typeof(IEnumerable<IEnumerable<string>>), "global::System.Collections.Generic.IEnumerable<global::System.Collections.Generic.IEnumerable<global::System.String>>")]
         [TestCase(typeof((string Foo, object Bar)), "global::System.ValueTuple<global::System.String, global::System.Object>")]
-        public void ResolveType_ShouldHandleNonNestedTypes(Type type, string expected) =>
-            Assert.That(new ClassSyntaxFactory(default).ResolveType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+        public void ResolveType_ShouldHandleNonNestedTypes(Type type, string expected)
+        {
+            ClassSyntaxFactory fact = new(default)
+            {
+                AllowPointers = true
+            };
+
+            Assert.That(fact.ResolveType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+        }
 
         private class CicaNested<T>
         {

@@ -23,5 +23,5 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         public static int IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
-    }
+    } 
 }

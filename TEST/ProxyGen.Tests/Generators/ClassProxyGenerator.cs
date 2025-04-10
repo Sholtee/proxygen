@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Security;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
 
@@ -94,8 +95,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         private static readonly HashSet<Type> TypesToSkip = 
         [
-            typeof(Array), typeof(Delegate), typeof(Enum), typeof(MulticastDelegate), // special types, can't derive from them
+            typeof(Array), typeof(Delegate), typeof(Enum), typeof(MulticastDelegate), typeof(ValueType), // special types, can't derive from them
             typeof(SecurityException),  // too many ctors
+#if NETFRAMEWORK
+            typeof(ObjectAccessRule), typeof(ObjectAuditRule),  // too many ctors
+            typeof(RuntimeEnvironment),  // obsolete class
+#endif
+#if NET5_0_OR_GREATER
+            typeof(ComWrappers),
+#endif
 #if !NET5_0 && !NETCOREAPP3_1
             typeof(GenericSecurityDescriptor),  // abstract internal property
 #endif
@@ -109,7 +117,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             (
                 t =>
                 {
-                    IEnumerable<MethodInfo> virtualMethods = t.GetMethods().Where
+                    IEnumerable<MethodInfo> virtualMethods = t.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where
                     (
                         m => m.GetAccessModifiers() is not AccessModifiers.Private or AccessModifiers.Internal && (m.IsAbstract || m.IsVirtual)
                     );
@@ -124,13 +132,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
                         !t.IsSpecialName &&
                         !t.GetGenericArguments().Any() &&
                         !TypesToSkip.Contains(t) &&
-                        !virtualMethods.Any(RequiresUnsafeContext) &&
+                        !virtualMethods.Any(m => m.GetParameters().Any(p => p.ParameterType.GetRefType() is RefType.Ref or RefType.Pointer)) &&
                         virtualMethods.Count() > 3 &&
-                        !ctors.Any(RequiresUnsafeContext) &&
-                        !ctors.Any(c => c.GetParameters().Any(p => p.IsIn || p.IsOut || p.ParameterType.IsByRef)) &&
+                        !ctors.Any(c => c.GetParameters().Any(p => p.IsOut || p.IsIn || p.ParameterType.GetRefType() is RefType.Ref or RefType.Pointer)) &&
                         ctors.Any();
 
-                    static bool RequiresUnsafeContext(MethodBase m) => m.GetParameters().Any(p => p.ParameterType.IsPointer);
                 }
             );
 

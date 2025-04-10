@@ -2,7 +2,7 @@
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
 internal sealed class Proxy_1DAF70F1918BF7C2B6600BA934BD9030 : global::Solti.Utils.Proxy.SyntaxFactories.Tests.InterfaceProxySyntaxFactoryTests.FooInterceptor, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
-    public Proxy_1DAF70F1918BF7C2B6600BA934BD9030(global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32> target) : base(target)
+    internal Proxy_1DAF70F1918BF7C2B6600BA934BD9030(global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32> target) : base(target)
     {
         this.Proxy = this;
     }

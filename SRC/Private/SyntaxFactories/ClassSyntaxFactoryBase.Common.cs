@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,38 +15,36 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassSyntaxFactoryBase
     {
         // https://github.com/dotnet/roslyn/issues/4861
         protected const string Value = "value";
 
-        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode? body, params IEnumerable<SyntaxKind> modifiers)
+        private static T Fail<T>(string message)
+        {
+            Debug.Fail(message);
+            return default!;
+        }
+
+        private static AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode? body, params IEnumerable<SyntaxKind> modifiers)
         {
             AccessorDeclarationSyntax declaration = AccessorDeclaration(kind);
 
-            switch (body)
+            declaration = body switch
             {
-                case BlockSyntax block:
-                    declaration = declaration.WithBody(block);
-                    break;
-                case ArrowExpressionClauseSyntax arrow:
-                    declaration = declaration
-                        .WithExpressionBody(arrow)
-                        .WithSemicolonToken
-                        (
-                            Token(SyntaxKind.SemicolonToken)
-                        );
-                    break;
-                case null:
-                    declaration = declaration.WithSemicolonToken
-                    (
-                        Token(SyntaxKind.SemicolonToken)
-                    );
-                    break;
-                default:
-                    Debug.Fail("Unknown node type");
-                    return null!;
-            }
+                BlockSyntax block => declaration.WithBody(block),
+                ArrowExpressionClauseSyntax arrow => declaration.WithExpressionBody(arrow).WithSemicolonToken
+                (
+                    Token(SyntaxKind.SemicolonToken)
+                ),
+                null => declaration.WithSemicolonToken
+                (
+                    Token(SyntaxKind.SemicolonToken)
+                ),
+                _ => Fail<AccessorDeclarationSyntax>("Unknown node type")
+            };
 
             if (modifiers.Any()) declaration = declaration.WithModifiers
             (
@@ -58,31 +57,35 @@ namespace Solti.Utils.Proxy.Internals
             return declaration;
         }
 
-        private IEnumerable<SyntaxKind> ResolveAccessModifiers(IMethodInfo method) => method
-            .AccessModifiers
-            .SetFlags()
-            
-            //
-            // When overriding an "internal protected" member we cannot reuse the "internal" keyword
-            // if the base is declared in a different assembly
-            //
+        private IEnumerable<SyntaxKind> ResolveAccessModifiers(IMethodInfo method)
+        {
+            bool internalAllowed = method.DeclaringType.DeclaringAssembly?.IsFriend(ContainingAssembly) is true;
 
-            .Where(am => am >= AccessModifiers.Protected && (am is not AccessModifiers.Internal || method.DeclaringType.DeclaringAssembly?.IsFriend(ContainingAssembly) is true))
-            .Select
-            (
-                static am =>
-                {
-                    switch (am)
+            IEnumerable<SyntaxKind> ams = method
+                .AccessModifiers
+                .SetFlags()
+
+                //
+                // When overriding an "internal protected" member we cannot reuse the "internal" keyword
+                // if the base is declared in a different assembly
+                //
+
+                .Where(am => am >= AccessModifiers.Protected && (am is not AccessModifiers.Internal || internalAllowed))
+                .Select
+                (
+                    static am => am switch
                     {
-                        case AccessModifiers.Public: return SyntaxKind.PublicKeyword;
-                        case AccessModifiers.Protected: return SyntaxKind.ProtectedKeyword;
-                        case AccessModifiers.Internal: return SyntaxKind.InternalKeyword;
-                        default:
-                            Debug.Fail("Member not visible");
-                            return SyntaxKind.None;
+                        AccessModifiers.Public => SyntaxKind.PublicKeyword,
+                        AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
+                        AccessModifiers.Internal => SyntaxKind.InternalKeyword,
+                        _ => Fail<SyntaxKind>("Member not visible")
                     }
-                }
-            );
+                );
+            if (!ams.Any())
+                throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER);
+
+            return ams;
+        }
 
         /// <summary>
         /// <code>

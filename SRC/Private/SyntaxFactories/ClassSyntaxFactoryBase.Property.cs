@@ -128,7 +128,7 @@ namespace Solti.Utils.Proxy.Internals
                     ? ResolveAccessModifiers(backingMethod)
                     : [];
 
-                return this.ResolveAccessor(kind, body, modifiers);
+                return ClassSyntaxFactoryBase.ResolveAccessor(kind, body, modifiers);
             }
         }
 
