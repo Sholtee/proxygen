@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -94,7 +95,12 @@ namespace Solti.Utils.Proxy.Internals
                 Visibility.Check(method, ContainingAssembly, allowProtected: true);
                 return true;
             }
-            catch(MemberAccessException) when (!ThrowOnInaccessibleInternalMembers)
+            
+            //
+            // Abstract internal members cannot be skipped
+            //
+            
+            catch(MemberAccessException) when (!method.IsAbstract)
             {
                 Trace.TraceWarning($"Method not visible: {method}");
                 return false;
@@ -102,8 +108,6 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         public ITypeInfo TargetType { get; }
-
-        public bool ThrowOnInaccessibleInternalMembers { get; }
 
         #if DEBUG
         internal
@@ -133,12 +137,16 @@ namespace Solti.Utils.Proxy.Internals
             return base.ResolveUnit(context, cancellation);
         }
 
+        private static IReadOnlyCollection<ITypeInfo> ReservedTypes { get; } =
+        [
+            ..new Type[] {typeof(Array), typeof(Delegate), typeof(ValueType)}.Select(MetadataTypeInfo.CreateFrom)
+        ]; 
+
         public ClassProxySyntaxFactory
         (
             ITypeInfo targetType,
             string? containingAssembly,
             OutputType outputType,
-            bool throwOnInaccessibleInternalMembers = false,
             ReferenceCollector? referenceCollector = null,
             LanguageVersion languageVersion = LanguageVersion.Latest
         )
@@ -156,8 +164,10 @@ namespace Solti.Utils.Proxy.Internals
             if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
 
+            if (ReservedTypes.Any(rt => rt.IsAccessibleFrom(targetType)))
+                throw new ArgumentException(Resources.RESERVED_TYPE, nameof(targetType));
+
             TargetType = targetType;
-            ThrowOnInaccessibleInternalMembers = throwOnInaccessibleInternalMembers;
         }
     }
 }

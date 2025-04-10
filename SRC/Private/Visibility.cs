@@ -19,25 +19,23 @@ namespace Solti.Utils.Proxy.Internals
 
             if (am.HasFlag(AccessModifiers.Internal))
             {
-                bool grantedByAttr = method
-                    .DeclaringType
-                    .DeclaringAssembly
-                    ?.IsFriend(assemblyName) is true;
-
-                if (grantedByAttr)
+                if (IsFriend())
                     return;
 
                 if (!am.HasFlag(AccessModifiers.Protected) /*protected-internal*/)
-                {
-                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
-                }
+                    ThrowIVTRequired();
             }
 
             if (am.HasFlag(AccessModifiers.Protected)) 
             {
                 if (allowProtected)
+                {
+                    if (am.HasFlag(AccessModifiers.Private) /*private-protected*/ && !IsFriend())
+                        ThrowIVTRequired();
+
                     return;
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+                }
+                ThrowNotVisible();
             }
 
             //
@@ -48,9 +46,15 @@ namespace Solti.Utils.Proxy.Internals
                 return; // The method is visible after a type-cast
 
             if (am is AccessModifiers.Private)
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+                ThrowNotVisible();
 
             Assert(am is AccessModifiers.Public, $"Unknown AccessModifier: {am}");
+
+            bool IsFriend() => method.DeclaringType.DeclaringAssembly?.IsFriend(assemblyName) is true;
+
+            void ThrowNotVisible() => throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+
+            void ThrowIVTRequired() => throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
         }
 
         public static void Check(IPropertyInfo property, string assemblyName, bool allowProtected = false) 

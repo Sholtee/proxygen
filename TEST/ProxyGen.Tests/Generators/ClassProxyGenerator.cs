@@ -5,8 +5,10 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Security;
 using System.Linq;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
@@ -90,7 +92,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(interceptor.Context.Member.Member, Is.EqualTo(PropertyInfoExtensions.ExtractFrom((Foo f) => f.Prop)));
         }
 
-        private static readonly HashSet<Type> SpecialTypes = [typeof(Array), typeof(Delegate), typeof(Enum), typeof(MulticastDelegate)];
+        private static readonly HashSet<Type> TypesToSkip = 
+        [
+            typeof(Array), typeof(Delegate), typeof(Enum), typeof(MulticastDelegate), // special types, can't derive from them
+            typeof(SecurityException),  // too many ctors
+#if !NET5_0 && !NETCOREAPP3_1
+            typeof(GenericSecurityDescriptor),  // abstract internal property
+#endif
+            typeof(FieldInfo)  // [not annotated] ref struct parameter 
+        ];
 
         public static IEnumerable<Type> GeneratedProxy_AgainstSystemType_Params => typeof(object)
             .Assembly
@@ -113,7 +123,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                         !t.IsSealed &&
                         !t.IsSpecialName &&
                         !t.GetGenericArguments().Any() &&
-                        !SpecialTypes.Contains(t) &&
+                        !TypesToSkip.Contains(t) &&
                         !virtualMethods.Any(RequiresUnsafeContext) &&
                         virtualMethods.Count() > 3 &&
                         !ctors.Any(RequiresUnsafeContext) &&

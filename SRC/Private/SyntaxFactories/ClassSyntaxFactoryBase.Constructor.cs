@@ -28,7 +28,19 @@ namespace Solti.Utils.Proxy.Internals
             (
                 modifiers: TokenList
                 (
-                    Token(SyntaxKind.PublicKeyword)
+                    //
+                    // Constructor argument may use nested protected/internal types
+                    //
+
+                    Token
+                    (
+                        ctor.Parameters.SelectMany(static param => param.Type.AccessModifiers.SetFlags()).DefaultIfEmpty().Min() switch
+                        {
+                            AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
+                            AccessModifiers.Internal => SyntaxKind.InternalKeyword,
+                            _ => SyntaxKind.PublicKeyword
+                        }
+                    )
                 )
             )
             .WithParameterList

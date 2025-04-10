@@ -259,6 +259,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot derive from reserved type..
+        /// </summary>
+        internal static string RESERVED_TYPE {
+            get {
+                return ResourceManager.GetString("RESERVED_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The interceptor cannot be sealed..
         /// </summary>
         internal static string SEALED_INTERCEPTOR {

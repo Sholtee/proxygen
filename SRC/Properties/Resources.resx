@@ -204,4 +204,7 @@
   <data name="BYREF_CTOR_PARAMETER" xml:space="preserve">
     <value>By ref constructor parameters are not supported.</value>
   </data>
+  <data name="RESERVED_TYPE" xml:space="preserve">
+    <value>Cannot derive from reserved type.</value>
+  </data>
 </root>
