@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -39,11 +40,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingType.ToString();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IAssemblyInfo? FDeclaringAssembly;
         public IAssemblyInfo DeclaringAssembly => FDeclaringAssembly ??= MetadataAssemblyInfo.CreateFrom(UnderlyingType.Assembly);
 
         public bool IsVoid => UnderlyingType == typeof(void);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FEnclosingType = new(() =>
         {
             Type? enclosingType = underlyingType.GetEnclosingType();
@@ -54,12 +57,14 @@ namespace Solti.Utils.Proxy.Internals
         });
         public ITypeInfo? EnclosingType => FEnclosingType.Value;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
             .GetAllInterfaces()
             .Select(CreateFrom)
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingType.GetBaseType() is not null
             ? FBaseType ??= CreateFrom(UnderlyingType.GetBaseType()!)
@@ -69,6 +74,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public RefType RefType => UnderlyingType.GetRefType();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
             Type? realType = underlyingType.GetElementType();
@@ -87,6 +93,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsInterface => UnderlyingType.IsInterface;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
@@ -94,6 +101,7 @@ namespace Solti.Utils.Proxy.Internals
             .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
@@ -112,6 +120,7 @@ namespace Solti.Utils.Proxy.Internals
             (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
             (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke"); // delegate.Invoke(...)
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
@@ -120,6 +129,7 @@ namespace Solti.Utils.Proxy.Internals
             .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
                 .GetDeclaredConstructors()
@@ -141,6 +151,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => UnderlyingType.IsAbstract();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
             Type concreteType = underlyingType.GetInnermostElementType() ?? underlyingType;
@@ -156,14 +167,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public AccessModifiers AccessModifiers => UnderlyingType.GetAccessModifiers();
 
-        private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
+        private sealed class MetadataGenericTypeInfo(Type underlyingType) : MetadataTypeInfo(underlyingType), IGenericTypeInfo
         {
-            public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
-
             public bool IsGenericDefinition => UnderlyingType
                 .GetGenericArguments()
                 .Any(static ga => ga.IsGenericParameter);
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()
@@ -199,10 +209,8 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 
+        private sealed class MetadataArrayTypeInfo(Type underlyingType) : MetadataTypeInfo(underlyingType), IArrayTypeInfo 
         {
-            public MetadataArrayTypeInfo(Type underlyingType) : base(underlyingType) { }
-
             public int Rank => UnderlyingType.GetArrayRank();
         }
     }

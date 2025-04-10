@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Diagnostics;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -18,6 +20,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name { get; } = string.Empty;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(method.ReturnType, compilation);
 

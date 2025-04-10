@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -13,15 +14,19 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingEvent.StrippedName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (AddMethod ?? RemoveMethod).DeclaringType;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FAddMethod;
         public IMethodInfo AddMethod => FAddMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingEvent.AddMethod);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FRemoveMethod;
         public IMethodInfo RemoveMethod => FRemoveMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingEvent.RemoveMethod);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingEvent.EventHandlerType);
 

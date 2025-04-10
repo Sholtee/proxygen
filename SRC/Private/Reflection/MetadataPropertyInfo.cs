@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -14,11 +15,13 @@ namespace Solti.Utils.Proxy.Internals
     {
         private PropertyInfo UnderlyingProperty { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FGetMethod;
         public IMethodInfo? GetMethod => UnderlyingProperty.GetMethod is not null
             ? FGetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FSetMethod;
         public IMethodInfo? SetMethod => UnderlyingProperty.SetMethod is not null 
             ? FSetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
@@ -26,12 +29,15 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingProperty.StrippedName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingProperty.PropertyType);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IParameterInfo>? FIndices;
         public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty
             .GetIndexParameters()

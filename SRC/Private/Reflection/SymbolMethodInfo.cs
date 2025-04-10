@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -35,17 +36,20 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IParameterInfo>? FParameters;
         public IReadOnlyList<IParameterInfo> Parameters => FParameters ??= UnderlyingSymbol
             .Parameters
             .Select(p => SymbolParameterInfo.CreateFrom(p, Compilation))
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IParameterInfo? FReturnValue;
         public IParameterInfo ReturnValue => FReturnValue ??= UnderlyingSymbol.MethodKind != MethodKind.Constructor
             ? SymbolReturnParameterInfo.CreateFrom(UnderlyingSymbol, Compilation)
             : null!;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private bool? FIsSpecial;
         public bool IsSpecial => FIsSpecial ??= UnderlyingSymbol.IsSpecial();
 
@@ -55,9 +59,11 @@ namespace Solti.Utils.Proxy.Internals
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.ContainingType, Compilation);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FDeclaringInterfaces;
         public IReadOnlyList<ITypeInfo> DeclaringInterfaces => FDeclaringInterfaces ??= UnderlyingSymbol
             .GetDeclaringInterfaces()
@@ -74,24 +80,26 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingSymbol.ToString();
 
-        private sealed class SymbolGenericMethodInfo : SymbolMethodInfo, IGenericMethodInfo 
+        private sealed class SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : SymbolMethodInfo(method, compilation), IGenericMethodInfo 
         {
-            public SymbolGenericMethodInfo(IMethodSymbol method, Compilation compilation) : base(method, compilation) { }
-
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private bool? FIsGenericDefinition;
             public bool IsGenericDefinition => FIsGenericDefinition ??= !UnderlyingSymbol
                 .TypeParameters
                 .Any(static tp => !SymbolEqualityComparer.Default.Equals(tp.OriginalDefinition, tp));
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IGenericMethodInfo? FGenericDefinition;
             public IGenericMethodInfo GenericDefinition => FGenericDefinition ??= new SymbolGenericMethodInfo(UnderlyingSymbol.OriginalDefinition, Compilation);
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
                 .Select(ta => SymbolTypeInfo.CreateFrom(ta, Compilation))
                 .ToImmutableList();
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<IGenericConstraint>? FGenericConstraints;
             public IReadOnlyList<IGenericConstraint> GenericConstraints => FGenericConstraints ??= UnderlyingSymbol
                 .TypeParameters

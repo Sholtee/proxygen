@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 using System.IO;
 
 using Microsoft.CodeAnalysis;
@@ -22,6 +23,7 @@ namespace Solti.Utils.Proxy.Internals
             return new SymbolAssemblyInfo(asm, compilation);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<string?> FLocation = new(() =>
         {
             if (SymbolEqualityComparer.Default.Equals(underlyingSymbol, compilation.Assembly))

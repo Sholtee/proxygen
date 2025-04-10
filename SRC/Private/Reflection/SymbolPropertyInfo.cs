@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -17,11 +18,13 @@ namespace Solti.Utils.Proxy.Internals
 
         private Compilation Compilation { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FGetMethod;
         public IMethodInfo? GetMethod => UnderlyingSymbol.GetMethod is not null
             ? FGetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.GetMethod, Compilation) 
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FSetMethod;
         public IMethodInfo? SetMethod => UnderlyingSymbol.SetMethod is not null
             ? FSetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
@@ -29,12 +32,15 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.StrippedName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.Type, Compilation);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IParameterInfo>? FIndices;
         public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingSymbol
             .Parameters

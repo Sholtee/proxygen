@@ -3,6 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Diagnostics;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -26,6 +28,7 @@ namespace Solti.Utils.Proxy.Internals
             return new SymbolParameterInfo(para, compilation);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.Type, Compilation);
 

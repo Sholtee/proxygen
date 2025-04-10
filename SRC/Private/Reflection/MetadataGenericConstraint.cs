@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -40,6 +41,7 @@ namespace Solti.Utils.Proxy.Internals
             .GenericParameterAttributes
             .HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FConstraintTypes;
         public IReadOnlyList<ITypeInfo> ConstraintTypes => FConstraintTypes ??= UnderlyingType
             .GetGenericConstraints(DeclaringMember)

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -17,7 +18,6 @@ namespace Solti.Utils.Proxy.Internals
         protected ITypeSymbol UnderlyingSymbol { get; } = typeSymbol;
 
         protected Compilation Compilation { get; } = compilation;
-
 
         public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation)
         {
@@ -41,6 +41,7 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IAssemblyInfo?> FDeclaringAssembly = new(() =>
         {
             ITypeSymbol? elementType = typeSymbol.GetElementType(recurse: true);
@@ -80,6 +81,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public string? QualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
             ITypeSymbol? realType = typeSymbol.GetElementType();
@@ -90,22 +92,26 @@ namespace Solti.Utils.Proxy.Internals
         });
         public ITypeInfo? ElementType => FElementType.Value;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FEnclosingType;
         public ITypeInfo? EnclosingType => UnderlyingSymbol.GetEnclosingType() is not null
             ? FEnclosingType ??= CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation)
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .GetAllInterfaces()
             .Select(ti => CreateFrom(ti, Compilation))
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
             ? FBaseType ??= CreateFrom(UnderlyingSymbol.BaseType, Compilation)
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
@@ -113,6 +119,7 @@ namespace Solti.Utils.Proxy.Internals
             .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
@@ -120,6 +127,7 @@ namespace Solti.Utils.Proxy.Internals
             .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
@@ -128,6 +136,7 @@ namespace Solti.Utils.Proxy.Internals
             .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             .GetConstructors()
@@ -143,6 +152,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool IsAbstract => UnderlyingSymbol.IsAbstract;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
             ITypeSymbol concreteType = typeSymbol.GetElementType(recurse: true) ?? typeSymbol;
@@ -174,11 +184,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingSymbol.ToString();
 
-        private sealed class SymbolGenericTypeInfo : SymbolTypeInfo, IGenericTypeInfo
+        private sealed class SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : SymbolTypeInfo(underlyingSymbol, compilation), IGenericTypeInfo
         {
             private new INamedTypeSymbol UnderlyingSymbol => (INamedTypeSymbol) base.UnderlyingSymbol;
-
-            public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
             //
             // "UnderlyingSymbol.IsUnboundGenericType" doesn't work
@@ -188,9 +196,11 @@ namespace Solti.Utils.Proxy.Internals
                 .TypeArguments
                 .Any(static ta => ta.IsGenericParameter());
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IGenericTypeInfo? FGenericDefinition;
             public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= (IGenericTypeInfo) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
@@ -224,10 +234,8 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private sealed class SymbolArrayTypeInfo : SymbolTypeInfo, IArrayTypeInfo
+        private sealed class SymbolArrayTypeInfo(IArrayTypeSymbol underlyingSymbol, Compilation compilation) : SymbolTypeInfo(underlyingSymbol, compilation), IArrayTypeInfo
         {
-            public SymbolArrayTypeInfo(IArrayTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
-
             public int Rank => ((IArrayTypeSymbol) UnderlyingSymbol).Rank;
         }
     }

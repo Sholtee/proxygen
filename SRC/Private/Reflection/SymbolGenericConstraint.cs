@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -24,12 +25,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public bool Struct => genericArgument.HasValueTypeConstraint;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FConstraintTypes;
         public IReadOnlyList<ITypeInfo> ConstraintTypes => FConstraintTypes ??= genericArgument
             .ConstraintTypes
             .Select(t => SymbolTypeInfo.CreateFrom(t, compilation))
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FTarget;
         public ITypeInfo Target => FTarget ??= SymbolTypeInfo.CreateFrom(genericArgument, compilation);
     }
