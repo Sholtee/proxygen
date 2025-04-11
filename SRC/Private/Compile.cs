@@ -22,13 +22,15 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        public static Stream ToAssembly(
+        public static Stream ToAssembly
+        (
             IReadOnlyCollection<CompilationUnitSyntax> units,
             string asmName,
             string? outputFile,
             IReadOnlyCollection<MetadataReference> references,
             Func<Compilation, Compilation>? customConfig = default,
-            in CancellationToken cancellation = default) 
+            in CancellationToken cancellation = default
+        ) 
         {
             Compilation compilation = CSharpCompilation.Create
             (

@@ -60,9 +60,9 @@ namespace Solti.Utils.Proxy.Internals
             // Explicit members cannot be accessed directly
             //
 
-            ITypeInfo castTargetTo = targetMethod.AccessModifiers is AccessModifiers.Explicit
+            ITypeInfo? castTargetTo = targetMethod.AccessModifiers is AccessModifiers.Explicit
                     ? targetMethod.DeclaringInterfaces.Single()
-                    : TargetType;
+                    : null;
 
             ExpressionSyntax invocation = InvokeMethod
             (

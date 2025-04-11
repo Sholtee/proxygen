@@ -62,7 +62,7 @@ namespace Solti.Utils.Proxy.Internals
 
             ITypeInfo? castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
                 ? accessor.DeclaringInterfaces.Single() // Explicit event can have exactly one declaring interface
-                : TargetType;
+                : null;
 
             return cls.AddMembers
             (
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
                     targetEvt,
                     GetTarget(),
                     register,
-                    IdentifierName(Value),
+                    FValue,
                     castTargetTo
                 )
             );

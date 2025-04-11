@@ -36,6 +36,11 @@ namespace Solti.Utils.Proxy.Internals
                 PropertyInfoExtensions.ExtractFrom(static (IInterceptorAccess ia) => ia.Interceptor)
             );
 
+        private static readonly IReadOnlyCollection<ITypeInfo> FReservedTypes =
+        [
+            ..new Type[] {typeof(Array), typeof(Delegate), typeof(ValueType)}.Select(MetadataTypeInfo.CreateFrom)
+        ];
+
         private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
 
         /// <summary>
@@ -137,11 +142,6 @@ namespace Solti.Utils.Proxy.Internals
             return base.ResolveUnit(context, cancellation);
         }
 
-        private static IReadOnlyCollection<ITypeInfo> ReservedTypes { get; } =
-        [
-            ..new Type[] {typeof(Array), typeof(Delegate), typeof(ValueType)}.Select(MetadataTypeInfo.CreateFrom)
-        ]; 
-
         public ClassProxySyntaxFactory
         (
             ITypeInfo targetType,
@@ -164,7 +164,7 @@ namespace Solti.Utils.Proxy.Internals
             if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
 
-            if (ReservedTypes.Any(rt => rt.IsAccessibleFrom(targetType)))
+            if (FReservedTypes.Any(rt => rt.IsAccessibleFrom(targetType)))
                 throw new ArgumentException(Resources.RESERVED_TYPE, nameof(targetType));
 
             TargetType = targetType;

@@ -75,10 +75,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
         [Test]
-        public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported()
-        {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Foo<TT>(a, out b, ref c);")));
-        }
+        public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported() =>
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.FTarget.Foo<TT>(a, out b, ref c);")));
 
         public class ExplicitFoo : IFoo<int>
         {
@@ -96,7 +94,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveMethod_ShouldHandleExplicitImplementations()
         {
-            Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Foo<TT>(a, out b, ref c);")));
+            MemberDeclarationSyntax m = CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(GetDummyClass(), null).Members.Single(m => m is MethodDeclarationSyntax method && method.Identifier.Text.Contains("Foo"));
+
+            Assert.That(m.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.FTarget).Foo<TT>(a, out b, ref c);"));
         }
 
         [Test]
@@ -110,7 +110,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheDesiredPropertyIfSupported()
         {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(GetDummyClass(), default).Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Prop; set => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Prop = value; }")));
+            MemberDeclarationSyntax p = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(GetDummyClass(), default).Members.Single(m => m is PropertyDeclarationSyntax p && p.Identifier.Text.Contains("Prop"));
+
+            Assert.That(p.NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => this.FTarget.Prop; set => this.FTarget.Prop = value; }"));
         }
 
         [Test]
@@ -124,12 +126,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveEvent_ShouldGenerateTheDesiredEventIfSupported()
         {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Event += value; remove => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)((global::Solti.Utils.Proxy.ITargetAccess)this).Target).Event -= value; }")));
+            MemberDeclarationSyntax e = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(GetDummyClass(), null).Members.Single(m => m is EventDeclarationSyntax);
+
+            Assert.That(e.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => this.FTarget.Event += value; remove => this.FTarget.Event -= value; }"));
         }
 
         [Test]
-        public void ResolveUnit_ShouldGenerateTheDesiredClass()
-        {
+        public void ResolveUnit_ShouldGenerateTheDesiredClass() =>
             Assert.That
             (
                 CreateGenerator<IFoo<int>, GoodFoo<int>>()
@@ -151,7 +154,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                             .ToString())
                 )
             );
-        }
 
         [Test]
         public void ResolveProperty_ShouldThrowOnAmbiguousImplementation() =>

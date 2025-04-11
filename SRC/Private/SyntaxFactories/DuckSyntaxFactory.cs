@@ -23,15 +23,23 @@ namespace Solti.Utils.Proxy.Internals
         private static string ResolveClassName(ITypeInfo interfaceType, ITypeInfo targetType) =>
             $"Duck_{new ITypeInfo[] { interfaceType, targetType }.GetMD5HashCode()}";
 
-        public ITypeInfo InterfaceType { get; }
-
-        public ITypeInfo TargetType { get; }
-
         private static readonly IPropertyInfo
             FTarget = MetadataPropertyInfo.CreateFrom
             (
                 PropertyInfoExtensions.ExtractFrom(static (ITargetAccess ta) => ta.Target!)
             );
+
+        private const string TARGET_FIELD = nameof(FTarget);
+
+        private static MemberAccessExpressionSyntax GetTarget() => SimpleMemberAccess
+        (
+            ThisExpression(),
+            TARGET_FIELD
+        );
+
+        public ITypeInfo InterfaceType { get; }
+
+        public ITypeInfo TargetType { get; }
 
         public DuckSyntaxFactory
         (
@@ -82,15 +90,20 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(InterfaceType, TargetType);
-
-
-        private MemberAccessExpressionSyntax GetTarget() => MemberAccess
+        protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => base.ResolveMembers
         (
-            ThisExpression(),
-            FTarget,
-            castTargetTo: FTarget.DeclaringType
+            cls.AddMembers
+            (
+                ResolveField(TargetType, TARGET_FIELD, @static: false, @readonly: false)
+            ),
+            context,
+            cancellation
         );
+
+        #if DEBUG
+        internal
+        #endif
+        protected override string ResolveClassName(object context) => ResolveClassName(InterfaceType, TargetType);
 
         private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {

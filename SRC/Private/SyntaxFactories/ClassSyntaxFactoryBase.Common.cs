@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
     internal partial class ClassSyntaxFactoryBase
     {
         // https://github.com/dotnet/roslyn/issues/4861
-        protected const string Value = "value";
+        protected static readonly IdentifierNameSyntax FValue = IdentifierName("value");
 
         private static T Fail<T>(string message)
         {

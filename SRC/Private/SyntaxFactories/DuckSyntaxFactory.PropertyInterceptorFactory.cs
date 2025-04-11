@@ -28,7 +28,23 @@ namespace Solti.Utils.Proxy.Internals
 
             return cls.AddMembers
             (
-                ResolveProperty(FTarget, null, null)
+                ResolveProperty
+                (
+                    FTarget,
+                    ArrowExpressionClause
+                    (
+                        SimpleMemberAccess(ThisExpression(), TARGET_FIELD)
+                    ),
+                    ArrowExpressionClause
+                    (
+                        AssignmentExpression
+                        (
+                            SyntaxKind.SimpleAssignmentExpression,
+                            left: SimpleMemberAccess(ThisExpression(), TARGET_FIELD),
+                            right: CastExpression(ResolveType(TargetType), FValue)
+                        )
+                    )
+                )
             );
 
             static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
@@ -78,9 +94,9 @@ namespace Solti.Utils.Proxy.Internals
             // Explicit members cannot be accessed directly
             //
 
-            ITypeInfo castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
+            ITypeInfo? castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
                     ? accessor.DeclaringInterfaces.Single()
-                    : TargetType;
+                    : null;
 
             ExpressionSyntax propertyAccess = PropertyAccess
             (
@@ -104,7 +120,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         kind: SyntaxKind.SimpleAssignmentExpression,
                         left: propertyAccess,
-                        right: IdentifierName(Value)
+                        right: FValue
                     )
                 );
 
