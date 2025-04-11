@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal class ReferenceCollector
+    internal sealed class ReferenceCollector
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<IAssemblyInfo> FReferences = new(IAssemblyInfoComparer.Instance);
@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
         private readonly HashSet<ITypeInfo> FTypes = new(ITypeInfoComparer.Instance);
         public IReadOnlyCollection<ITypeInfo> Types => FTypes;
 
-        protected internal void AddType(ITypeInfo type) 
+        public void AddType(ITypeInfo type) 
         {
             if (type.IsGenericParameter)
                 return;
