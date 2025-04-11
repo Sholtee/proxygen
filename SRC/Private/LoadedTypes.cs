@@ -19,6 +19,7 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     public static class LoadedTypes  // this class is referenced by the generated proxies so it must be public
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly ConcurrentDictionary<string, TypeContext> FStore = new();
 
         /// <summary>

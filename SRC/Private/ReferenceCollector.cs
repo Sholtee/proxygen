@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -12,12 +13,12 @@ namespace Solti.Utils.Proxy.Internals
 
     internal class ReferenceCollector
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<IAssemblyInfo> FReferences = new(IAssemblyInfoComparer.Instance);
-
         public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<ITypeInfo> FTypes = new(ITypeInfoComparer.Instance);
-
         public IReadOnlyCollection<ITypeInfo> Types => FTypes;
 
         protected internal void AddType(ITypeInfo type) 

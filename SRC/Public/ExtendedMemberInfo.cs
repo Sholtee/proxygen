@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy
@@ -15,6 +16,7 @@ namespace Solti.Utils.Proxy
     /// </summary>
     public sealed class ExtendedMemberInfo
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly ConcurrentDictionary<Type, IReadOnlyDictionary<MethodInfo, MemberInfo>> FMethodMemberBindings = new();
 
         /// <summary>

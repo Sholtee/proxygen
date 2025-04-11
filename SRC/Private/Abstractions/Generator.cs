@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -33,6 +34,7 @@ namespace Solti.Utils.Proxy.Internals
             public SemaphoreSlim Lock { get; } = new(1, 1);
         }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly ConcurrentDictionary<object, ContextWrapper> FContextCache = new();
 
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
