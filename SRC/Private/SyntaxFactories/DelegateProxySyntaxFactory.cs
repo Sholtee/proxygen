@@ -24,16 +24,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => base.ResolveBases(context).Concat
-        (
-            [
-                MetadataTypeInfo.CreateFrom(typeof(ITargetAccess))
-            ]
-        );
-
-        #if DEBUG
-        internal
-        #endif
         protected override string ResolveClassName(object context) => ResolveClassName(TargetType!);
 
         #if DEBUG

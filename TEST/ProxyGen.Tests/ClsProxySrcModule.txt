@@ -1,5 +1,5 @@
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.Utils.Proxy.IInterceptorAccess
+internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Foo<global::System.Int32>, global::Solti.Utils.Proxy.IInterceptorAccess
 {
     public ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C() : base()
     {
