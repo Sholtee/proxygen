@@ -125,50 +125,50 @@ namespace Solti.Utils.Proxy.Internals
 
                 members.Add(field);
 
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(backingMethod);
-
-                InvocationExpressionSyntax interceptorInvocation = InvokeInterceptor<ClassInvocationContext>
-                (
-                    Argument
-                    (
-                        StaticMemberAccess(cls, field)
-                    ),
-                    Argument
-                    (
-                        backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
-                        (
-                            backingMethod,
-                            hasTarget: false,
-                            invocationFactory
-                        )
-                    ),
-                    Argument
-                    (
-                        ResolveIdentifierName(argsArray)
-                    ),
-                    Argument
-                    (
-                        ResolveArray<Type>([])
-                    )
-                );
-
                 return Block
                 (
-                    ExpressionStatement
-                    (
-                        InvokeMethod
+                    (StatementSyntax[])
+                    [
+                        ExpressionStatement
                         (
-                            FGetBase,
-                            arguments: Argument
+                            InvokeMethod
                             (
-                                StaticMemberAccess(cls, field)
+                                FGetBase,
+                                arguments: Argument
+                                (
+                                    StaticMemberAccess(cls, field)
+                                )
                             )
+                        ),
+                        ..ResolveInvokeInterceptor<ClassInvocationContext>
+                        (
+                            backingMethod,
+                            argsArray =>
+                            [
+                                Argument
+                                (
+                                    StaticMemberAccess(cls, field)
+                                ),
+                                Argument
+                                (
+                                    backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
+                                    (
+                                        backingMethod,
+                                        hasTarget: false,
+                                        invocationFactory
+                                    )
+                                ),
+                                Argument
+                                (
+                                    ResolveIdentifierName(argsArray)
+                                ),
+                                Argument
+                                (
+                                    ResolveArray<Type>([])
+                                )
+                            ]
                         )
-                    ),
-                    argsArray,
-                    backingMethod.ReturnValue.Type.IsVoid
-                        ? ExpressionStatement(interceptorInvocation)
-                        : ReturnResult(backingMethod.ReturnValue.Type, interceptorInvocation)
+                    ]
                 );
             }
         }

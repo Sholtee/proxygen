@@ -70,7 +70,8 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F20A9297E8C10BA9B04329D9E20030285);
             global::System.Object[] args = new global::System.Object[]{i};
-            return (global::System.Int32)((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F20A9297E8C10BA9B04329D9E20030285, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+            global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F20A9297E8C10BA9B04329D9E20030285, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
+            return (global::System.Int32)result;
         }
 
         protected set
@@ -89,11 +90,12 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.FBA47204BC6B0AD3EBC12E1083F3E2454);
             global::System.Object[] args = new global::System.Object[0];
-            return (global::System.Int32)((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.FBA47204BC6B0AD3EBC12E1083F3E2454, (global::System.Object[] args) =>
+            global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.FBA47204BC6B0AD3EBC12E1083F3E2454, (global::System.Object[] args) =>
             {
                 global::System.Object result = base.Prop;
                 return result;
             }, args, new global::System.Type[0]));
+            return (global::System.Int32)result;
         }
 
         protected set

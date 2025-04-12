@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -17,6 +18,9 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed partial class DelegateProxySyntaxFactory : ProxyUnitSyntaxFactory
     {
+        private const string INVOKE_METHOD_NAME = nameof(Action.Invoke);
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly IMethodInfo FInvokeDelegate;
 
         private static string ResolveClassName(ITypeInfo targetType) => $"DelegateProxy_{targetType.GetMD5HashCode()}";
@@ -33,6 +37,15 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return ResolveClass(context, cancellation);
         }
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) =>
+        [
+            MetadataTypeInfo.CreateFrom(typeof(IDelegateWrapper)),
+            ..base.ResolveBases(context)
+        ];
 
         public DelegateProxySyntaxFactory
         (
@@ -51,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
             languageVersion
         )
         {
-            if (!MetadataTypeInfo.CreateFrom(typeof(Delegate)).IsAccessibleFrom(targetType) || (FInvokeDelegate = targetType.Methods.SingleOrDefault(static m => m.Name == nameof(Action.Invoke))) is null)
+            if (!MetadataTypeInfo.CreateFrom(typeof(Delegate)).IsAccessibleFrom(targetType) || (FInvokeDelegate = targetType.Methods.SingleOrDefault(static m => m.Name == INVOKE_METHOD_NAME)) is null)
                 throw new ArgumentException(Resources.NOT_A_DELEGATE, nameof(targetType));
 
             if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)

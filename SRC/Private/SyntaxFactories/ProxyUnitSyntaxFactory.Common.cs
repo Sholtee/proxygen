@@ -192,7 +192,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, bool hasTarget, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
+        protected ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, bool hasTarget /*TODO: REMOVE*/, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
         {
             ParameterSyntax args =
                 Parameter

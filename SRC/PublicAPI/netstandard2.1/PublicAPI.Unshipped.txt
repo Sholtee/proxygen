@@ -35,6 +35,8 @@ Solti.Utils.Proxy.Generators.ProxyGenerator<TClass>
 Solti.Utils.Proxy.Generators.ProxyGenerator<TClass>.ProxyGenerator() -> void
 Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>
 Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator() -> void
+Solti.Utils.Proxy.IDelegateWrapper
+Solti.Utils.Proxy.IDelegateWrapper.Wrapped.get -> System.Delegate!
 Solti.Utils.Proxy.IInterceptor
 Solti.Utils.Proxy.IInterceptor.Invoke(Solti.Utils.Proxy.IInvocationContext! context) -> object?
 Solti.Utils.Proxy.IInterceptorAccess

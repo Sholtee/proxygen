@@ -100,19 +100,16 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+
         /// <summary>
         /// <code>
-        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
-        /// </code>
-        /// or
-        /// <code>
-        /// public override int Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// int Foo(T a, ref TT b)
         /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method)
+        protected MethodDeclarationSyntax ResolveMethodCore(IMethodInfo method)
         {
             TypeSyntax returnTypeSyntax = ResolveType(method.ReturnValue.Type);
 
@@ -129,7 +126,7 @@ namespace Solti.Utils.Proxy.Internals
                 returnTypeSyntax = refReturnTypeSyntax;
             }
 
-            MethodDeclarationSyntax result = MethodDeclaration
+            return MethodDeclaration
             (
                 returnType: returnTypeSyntax,
                 identifier: Identifier(method.Name)
@@ -138,6 +135,23 @@ namespace Solti.Utils.Proxy.Internals
             (
                 ResolveParameterList(method)
             );
+        }
+
+        /// <summary>
+        /// <code>
+        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// </code>
+        /// or
+        /// <code>
+        /// public override int Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// </code>
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method)
+        {
+            MethodDeclarationSyntax result = ResolveMethodCore(method);
 
             if (method.DeclaringType.IsInterface)
                 result = result.WithExplicitInterfaceSpecifier
@@ -299,6 +313,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => cls;
+        protected virtual ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => throw new NotImplementedException();
     }
 }

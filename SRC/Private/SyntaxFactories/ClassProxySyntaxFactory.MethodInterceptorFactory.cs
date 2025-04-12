@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -88,98 +87,71 @@ namespace Solti.Utils.Proxy.Internals
                 @readonly: false
             );
 
-            List<StatementSyntax> body = [];
-
-            body.Add
-            (
-                ExpressionStatement
-                (
-                    InvokeMethod
-                    (
-                        FGetBase,
-                        arguments: Argument
-                        (
-                            StaticMemberAccess(cls, memberInfo)
-                        )
-                    )
-                )
-            );
-
-            LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(targetMethod);
-            body.Add(argsArray);
-
-            InvocationExpressionSyntax invokeInterceptor = InvokeInterceptor<ClassInvocationContext>
-            (
-                Argument
-                (
-                    StaticMemberAccess(cls, memberInfo)
-                ),
-                Argument
-                (
-                    targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
-                    (
-                        targetMethod,
-                        hasTarget: false,
-                        (_, locals) => InvokeMethod
-                        (
-                            targetMethod,
-                            target: BaseExpression(),
-                            castTargetTo: null,
-                            arguments: locals.Select(ResolveArgument).ToArray()
-                        )
-                    )
-                ),
-                Argument
-                (
-                    ResolveIdentifierName(argsArray)
-                ),
-                Argument
-                (
-                    ResolveArray<Type>
-                    (
-                        (targetMethod as IGenericMethodInfo)?.GenericArguments.Select
-                        (
-                            static ga => TypeOfExpression
-                            (
-                                IdentifierName(ga.Name)
-                            )
-                        ) ?? []
-                    )
-                )
-            );
-
-            LocalDeclarationStatementSyntax? result;
-            if (targetMethod.ReturnValue.Type.IsVoid)
-            {
-                result = null;
-                body.Add(ExpressionStatement(invokeInterceptor));
-            }
-            else
-            {
-                result = ResolveLocal<object>
-                (
-                    EnsureUnused(targetMethod, nameof(result)),
-                    invokeInterceptor
-                );
-                body.Add(result);
-            }
-
-            body.AddRange
-            (
-                AssignByRefParameters(targetMethod, argsArray)
-            );
-
-            if (result is not null) body.Add
-            (
-                ReturnResult(targetMethod.ReturnValue.Type, result)
-            );
-
             return cls.AddMembers
             (
                 memberInfo,
                 ResolveMethod(targetMethod).WithBody
                 (
-                    Block(body)
+                    Block
+                    (
+                        (StatementSyntax[])
+                        [
+                            ExpressionStatement
+                            (
+                                InvokeMethod
+                                (
+                                    FGetBase,
+                                    arguments: Argument
+                                    (
+                                        StaticMemberAccess(cls, memberInfo)
+                                    )
+                                )
+                            ),
+                            ..ResolveInvokeInterceptor<ClassInvocationContext>
+                            (
+                                targetMethod,
+                                argsArray =>
+                                [
+                                    Argument
+                                    (
+                                        StaticMemberAccess(cls, memberInfo)
+                                    ),
+                                    Argument
+                                    (
+                                        targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
+                                        (
+                                            targetMethod,
+                                            hasTarget: false,
+                                            (_, locals) => InvokeMethod
+                                            (
+                                                targetMethod,
+                                                target: BaseExpression(),
+                                                castTargetTo: null,
+                                                arguments: locals.Select(ResolveArgument).ToArray()
+                                            )
+                                        )
+                                    ),
+                                    Argument
+                                    (
+                                        ResolveIdentifierName(argsArray)
+                                    ),
+                                    Argument
+                                    (
+                                        ResolveArray<Type>
+                                        (
+                                            (targetMethod as IGenericMethodInfo)?.GenericArguments.Select
+                                            (
+                                                static ga => TypeOfExpression
+                                                (
+                                                    IdentifierName(ga.Name)
+                                                )
+                                            ) ?? []
+                                        )
+                                    )
+                                ]
+                            )
+                        ]
+                    )
                 )
             );
         }

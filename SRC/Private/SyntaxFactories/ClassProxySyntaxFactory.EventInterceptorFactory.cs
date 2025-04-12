@@ -115,14 +115,11 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(backingMethod);
-                yield return argsArray;
-
-                yield return ExpressionStatement
+                IEnumerable<StatementSyntax> interceptorInvocation = ResolveInvokeInterceptor<ClassInvocationContext>
                 (
-                    InvokeInterceptor<ClassInvocationContext>
-                    (
-
+                    backingMethod,
+                    argsArray =>
+                    [
                         Argument
                         (
                             StaticMemberAccess(cls, field)
@@ -153,8 +150,11 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             ResolveArray<Type>([])
                         )
-                    )
+                    ]
                 );
+
+                foreach (StatementSyntax statement in interceptorInvocation)
+                    yield return statement;
             }
         }
     }

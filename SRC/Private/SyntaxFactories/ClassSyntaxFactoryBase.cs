@@ -22,9 +22,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation)
-        {
-            ClassDeclarationSyntax cls = ClassDeclaration
+        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation) => ResolveMembers
+        (
+            ClassDeclaration
             (
                 identifier: ResolveClassName(context)
             )
@@ -52,10 +52,10 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 )
-            );
-
-            return ResolveMembers(cls, context, cancellation);
-        }
+            ),
+            context,
+            cancellation
+        );
 
         #if DEBUG
         internal

@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -47,23 +48,55 @@ namespace Solti.Utils.Proxy.Internals
             context
         );
 
-        protected InvocationExpressionSyntax InvokeInterceptor<TContext>(params IEnumerable<ArgumentSyntax> arguments) where TContext: IInvocationContext => InvokeMethod
-        (
-            method: FInvokeInterceptor,
-            target: MemberAccess
+        #if DEBUG
+        internal
+        #endif
+        protected IEnumerable<StatementSyntax> ResolveInvokeInterceptor<TContext>(IMethodInfo targetMethod, Func<LocalDeclarationStatementSyntax, IEnumerable<ArgumentSyntax>> contextArgs) where TContext : IInvocationContext
+        {
+            LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(targetMethod);
+            yield return argsArray;
+
+            InvocationExpressionSyntax invokeInterceptor = InvokeMethod
             (
-                ThisExpression(),
-                FInterceptor,
-                castTargetTo: FInterceptor.DeclaringType
-            ),
-            castTargetTo: null,
-            arguments: Argument
-            (
-                ResolveObject<TContext>
+                method: FInvokeInterceptor,
+                target: MemberAccess
                 (
-                    arguments
+                    ThisExpression(),
+                    FInterceptor,
+                    castTargetTo: FInterceptor.DeclaringType
+                ),
+                castTargetTo: null,
+                arguments: Argument
+                (
+                    ResolveObject<TContext>
+                    (
+                        contextArgs(argsArray)
+                    )
                 )
-            )
-        );
+            );
+
+            LocalDeclarationStatementSyntax? result;
+
+            if (targetMethod.ReturnValue.Type.IsVoid)
+            {
+                result = null;
+                yield return ExpressionStatement(invokeInterceptor);
+            }
+            else
+            {
+                result = ResolveLocal<object>
+                (
+                    EnsureUnused(targetMethod, nameof(result)),
+                    invokeInterceptor
+                );
+                yield return result;
+            }
+
+            foreach(ExpressionStatementSyntax expr in AssignByRefParameters(targetMethod, argsArray))
+                yield return expr;
+
+            if (result is not null)
+               yield return ReturnResult(targetMethod.ReturnValue.Type, result);
+        }
     }
 }
