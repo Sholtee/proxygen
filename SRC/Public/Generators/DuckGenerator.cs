@@ -50,7 +50,6 @@ namespace Solti.Utils.Proxy.Generators
             MetadataTypeInfo.CreateFrom(Target),
             asmName,
             OutputType.Module,
-            MetadataAssemblyInfo.CreateFrom(GetType().Assembly),
             referenceCollector
         );
     }

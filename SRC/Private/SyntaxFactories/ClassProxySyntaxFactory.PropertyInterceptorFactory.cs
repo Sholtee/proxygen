@@ -21,17 +21,14 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IPropertyInfo prop in TargetType.Properties)
+            foreach (IPropertyInfo prop in BaseType.Properties)
             {
                 IMethodInfo targetMethod = prop.GetMethod ?? prop.SetMethod!;
                 if (targetMethod.IsAbstract || targetMethod.IsVirtual)
                     cls = ResolveProperty(cls, context, prop);
             }
 
-            return cls.AddMembers
-            (
-                ResolveProperty(FInterceptor, null, null)
-            );
+            return base.ResolveProperties(cls, context);
         }
 
         /// <summary>
@@ -130,7 +127,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(backingMethod);
 
-                InvocationExpressionSyntax interceptorInvocation = InvokeInterceptor
+                InvocationExpressionSyntax interceptorInvocation = InvokeInterceptor<ClassInvocationContext>
                 (
                     Argument
                     (

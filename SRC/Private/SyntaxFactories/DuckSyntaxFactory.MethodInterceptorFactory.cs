@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
                 IMethodInfo targetMethod = GetTargetMember
                 (
                     ifaceMethod,
-                    TargetType.Methods,
+                    TargetType!.Methods,
                     static (targetMethod, ifaceMethod) => targetMethod.SignatureEquals(ifaceMethod, ignoreVisibility: true)
                 );
 
@@ -61,8 +61,8 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             ITypeInfo? castTargetTo = targetMethod.AccessModifiers is AccessModifiers.Explicit
-                    ? targetMethod.DeclaringInterfaces.Single()
-                    : null;
+                ? targetMethod.DeclaringInterfaces.Single()
+                : null;
 
             ExpressionSyntax invocation = InvokeMethod
             (

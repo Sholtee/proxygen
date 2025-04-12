@@ -20,22 +20,13 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed partial class ClassProxySyntaxFactory : ProxyUnitSyntaxFactory
     {
-        private static readonly IMethodInfo
-            FGetBase = MetadataMethodInfo.CreateFrom
-            (
-                MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetBase(ref output))
-            ),
-            FInvoke = MetadataMethodInfo.CreateFrom
-            (
-                MethodInfoExtensions.ExtractFrom<IInterceptor>(static i => i.Invoke(null!))
-            );
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly IMethodInfo FGetBase = MetadataMethodInfo.CreateFrom
+        (
+            MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetBase(ref output))
+        );
 
-        private static readonly IPropertyInfo
-            FInterceptor = MetadataPropertyInfo.CreateFrom
-            (
-                PropertyInfoExtensions.ExtractFrom(static (IInterceptorAccess ia) => ia.Interceptor)
-            );
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly IReadOnlyCollection<ITypeInfo> FReservedTypes =
         [
             ..new Type[] {typeof(Array), typeof(Delegate), typeof(ValueType)}.Select(MetadataTypeInfo.CreateFrom)
@@ -74,25 +65,6 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-        private InvocationExpressionSyntax InvokeInterceptor(params IEnumerable<ArgumentSyntax> arguments) => InvokeMethod
-        (
-            method: FInvoke,
-            target: MemberAccess
-            (
-                ThisExpression(),
-                FInterceptor,
-                castTargetTo: FInterceptor.DeclaringType
-            ),
-            castTargetTo: null,
-            arguments: Argument
-            (
-                ResolveObject<ClassInvocationContext>
-                (
-                    arguments
-                )
-            )
-        );
-
         private bool IsVisible(IMethodInfo method)
         {
             try
@@ -112,13 +84,6 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public ITypeInfo TargetType { get; }
-
-        #if DEBUG
-        internal
-        #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [TargetType, MetadataTypeInfo.CreateFrom(typeof(IInterceptorAccess))];
-
         #if DEBUG
         internal
         #endif
@@ -130,21 +95,28 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(TargetType);
+        protected override string ResolveClassName(object context) => ResolveClassName(BaseType);
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [BaseType, ..base.ResolveBases(context)];
+
+        public ITypeInfo BaseType { get; }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (TargetType.IsFinal)
+            if (BaseType.IsFinal)
                 throw new InvalidOperationException(Resources.SEALED_TARGET);
 
-            Visibility.Check(TargetType, ContainingAssembly);
+            Visibility.Check(BaseType, ContainingAssembly);
 
             return base.ResolveUnit(context, cancellation);
         }
 
         public ClassProxySyntaxFactory
         (
-            ITypeInfo targetType,
+            ITypeInfo baseType,
             string? containingAssembly,
             OutputType outputType,
             ReferenceCollector? referenceCollector = null,
@@ -152,22 +124,23 @@ namespace Solti.Utils.Proxy.Internals
         )
         : base
         (
+            null,
             outputType,
-            containingAssembly ?? ResolveClassName(targetType),
+            containingAssembly ?? ResolveClassName(baseType),
             referenceCollector,
             languageVersion
         )
         {
-            if (!targetType.IsClass)
-                throw new ArgumentException(Resources.NOT_A_CLASS, nameof(targetType));
+            if (!baseType.IsClass)
+                throw new ArgumentException(Resources.NOT_A_CLASS, nameof(baseType));
 
-            if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)
-                throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
+            if (baseType is IGenericTypeInfo generic && generic.IsGenericDefinition)
+                throw new ArgumentException(Resources.GENERIC_TARGET, nameof(baseType));
 
-            if (FReservedTypes.Any(rt => rt.IsAccessibleFrom(targetType)))
-                throw new ArgumentException(Resources.RESERVED_TYPE, nameof(targetType));
+            if (FReservedTypes.Any(rt => rt.IsAccessibleFrom(baseType)))
+                throw new ArgumentException(Resources.RESERVED_TYPE, nameof(baseType));
 
-            TargetType = targetType;
+            BaseType = baseType;
         }
     }
 }

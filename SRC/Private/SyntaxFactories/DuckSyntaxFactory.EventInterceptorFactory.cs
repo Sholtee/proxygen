@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
                 IEventInfo targetEvt = GetTargetMember
                 (
                     ifaceEvt,
-                    TargetType.Events,
+                    TargetType!.Events,
                     static (targetEvent, ifaceEvent) =>
                         targetEvent.AddMethod.SignatureEquals(ifaceEvent.AddMethod, ignoreVisibility: true) &&
                         targetEvent.RemoveMethod.SignatureEquals(ifaceEvent.RemoveMethod, ignoreVisibility: true)

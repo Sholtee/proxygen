@@ -207,4 +207,7 @@
   <data name="RESERVED_TYPE" xml:space="preserve">
     <value>Cannot derive from reserved type.</value>
   </data>
+  <data name="NOT_A_DELEGATE" xml:space="preserve">
+    <value>The given type is not a concrete delegate.</value>
+  </data>
 </root>

@@ -205,6 +205,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given type is not a concrete delegate..
+        /// </summary>
+        internal static string NOT_A_DELEGATE {
+            get {
+                return ResourceManager.GetString("NOT_A_DELEGATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The parameter must be a Generator descendant..
         /// </summary>
         internal static string NOT_A_GENERATOR {

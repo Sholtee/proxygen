@@ -61,8 +61,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             MetadataTypeInfo.CreateFrom(typeof(TInterface)), 
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
             asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name,
-            OutputType.Module, 
-            MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>).Assembly),
+            OutputType.Module,
             null
         );
 
@@ -190,7 +189,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     type1, 
                     "cica", 
                     (OutputType) outputType, 
-                    MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<,>).Assembly),
                     new ReferenceCollector()
                 ),
                 fact2 = new DuckSyntaxFactory
@@ -198,12 +196,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     type2, 
                     type2, 
                     "cica", 
-                    (OutputType) outputType, 
-                    SymbolAssemblyInfo.CreateFrom
-                    (
-                        (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == typeof(DuckGenerator<,>).Assembly.Location)), 
-                        compilation
-                    ),
+                    (OutputType) outputType,
                     new ReferenceCollector()
                 );
 

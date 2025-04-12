@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public ITypeInfo InterceptorType { get; }
 
-        public ITypeInfo TargetType { get; }
+        public new ITypeInfo TargetType { get; }
 
         public IMethodInfo Invoke { get; }
 
@@ -56,6 +56,7 @@ namespace Solti.Utils.Proxy.Internals
         )
         : base
         (
+            null!,
             outputType,
             containingAssembly ?? ResolveClassName(interceptorType),
             referenceCollector,

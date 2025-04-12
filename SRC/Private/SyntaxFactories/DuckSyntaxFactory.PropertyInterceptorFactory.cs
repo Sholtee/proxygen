@@ -21,31 +21,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             foreach (IPropertyInfo ifaceProperty in InterfaceType.Properties)
             {
-                IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType.Properties, SignatureEquals);
+                IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType!.Properties, SignatureEquals);
 
                 cls = ResolveProperty(cls, ifaceProperty, targetProperty);
             }
 
-            return cls.AddMembers
-            (
-                ResolveProperty
-                (
-                    FTarget,
-                    ArrowExpressionClause
-                    (
-                        SimpleMemberAccess(ThisExpression(), TARGET_FIELD)
-                    ),
-                    ArrowExpressionClause
-                    (
-                        AssignmentExpression
-                        (
-                            SyntaxKind.SimpleAssignmentExpression,
-                            left: SimpleMemberAccess(ThisExpression(), TARGET_FIELD),
-                            right: CastExpression(ResolveType(TargetType), FValue)
-                        )
-                    )
-                )
-            );
+            return base.ResolveProperties(cls, context);
 
             static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
             {
@@ -95,8 +76,8 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             ITypeInfo? castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
-                    ? accessor.DeclaringInterfaces.Single()
-                    : null;
+                ? accessor.DeclaringInterfaces.Single()
+                : null;
 
             ExpressionSyntax propertyAccess = PropertyAccess
             (

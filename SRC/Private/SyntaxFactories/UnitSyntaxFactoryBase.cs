@@ -36,10 +36,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            List<MemberDeclarationSyntax> members = new
-            (
-                ResolveUnitMembers(context, cancellation)
-            );
+            List<MemberDeclarationSyntax> members = [..ResolveUnitMembers(context, cancellation)];
 
             if (members.Any() && OutputType is OutputType.Unit)
             {

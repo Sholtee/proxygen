@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo method in TargetType.Methods)
+            foreach (IMethodInfo method in BaseType.Methods)
             {
                 if (method.IsSpecial || (!method.IsAbstract && !method.IsVirtual))
                     continue;
@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
             LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(targetMethod);
             body.Add(argsArray);
 
-            InvocationExpressionSyntax invokeInterceptor = InvokeInterceptor
+            InvocationExpressionSyntax invokeInterceptor = InvokeInterceptor<ClassInvocationContext>
             (
                 Argument
                 (

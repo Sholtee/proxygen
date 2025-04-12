@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
             bool hasConstructor = false;
-            foreach (IConstructorInfo ctor in TargetType.GetConstructors(AccessModifiers.Protected))
+            foreach (IConstructorInfo ctor in BaseType.GetConstructors(AccessModifiers.Protected))
             {
                 if (IsVisible(ctor))
                 {
@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             if (!hasConstructor)
-                throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, TargetType.Name));
+                throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, BaseType.Name));
 
             return cls;
         }

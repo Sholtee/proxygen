@@ -5,15 +5,26 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ProxyUnitSyntaxFactoryBase(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : UnitSyntaxFactoryBase(outputType, containingAssembly, referenceCollector, languageVersion)
+    internal abstract partial class ProxyUnitSyntaxFactoryBase(ITypeInfo? targetType, OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : UnitSyntaxFactoryBase(outputType, containingAssembly, referenceCollector, languageVersion)
     {
+        public ITypeInfo? TargetType { get; } = targetType;
+
         public override string ExposedClass => ResolveClassName(null!);
+
+        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        {
+            if (TargetType is not null)
+                Visibility.Check(TargetType, ContainingAssembly);
+
+            return base.ResolveUnit(context, cancellation);
+        }
 
         #if DEBUG
         internal
