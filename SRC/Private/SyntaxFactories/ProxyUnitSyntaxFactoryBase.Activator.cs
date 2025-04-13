@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
                 ResolveField
                 (
                     MetadataTypeInfo.CreateFrom(typeof(Func<object, object>)),
-                    ACTIVATOR_NAME,
+                    EnsureUnused(cls, ACTIVATOR_NAME),
                     initializer: 
                         SimpleLambdaExpression
                         (
