@@ -13,9 +13,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolTypeInfo(ITypeSymbol typeSymbol, Compilation compilation) : ITypeInfo
+    internal class SymbolTypeInfo(ITypeSymbol underlyingSymbol, Compilation compilation) : ITypeInfo
     {
-        protected ITypeSymbol UnderlyingSymbol { get; } = typeSymbol;
+        protected ITypeSymbol UnderlyingSymbol { get; } = underlyingSymbol;
 
         protected Compilation Compilation { get; } = compilation;
 
@@ -44,9 +44,9 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IAssemblyInfo?> FDeclaringAssembly = new(() =>
         {
-            ITypeSymbol? elementType = typeSymbol.GetElementType(recurse: true);
+            ITypeSymbol? elementType = underlyingSymbol.GetElementType(recurse: true);
 
-            IAssemblySymbol? asm = elementType?.ContainingAssembly ?? typeSymbol.ContainingAssembly;
+            IAssemblySymbol? asm = elementType?.ContainingAssembly ?? underlyingSymbol.ContainingAssembly;
 
             if (asm is not null)
                 return SymbolAssemblyInfo.CreateFrom(asm, compilation);
@@ -61,7 +61,38 @@ namespace Solti.Utils.Proxy.Internals
         });
         public IAssemblyInfo? DeclaringAssembly => FDeclaringAssembly.Value;
 
-        public bool IsVoid => UnderlyingSymbol.SpecialType == SpecialType.System_Void;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<TypeInfoFlags> FFlags = new(() =>
+        {
+            TypeInfoFlags flags = TypeInfoFlags.None;
+
+            if (underlyingSymbol.SpecialType == SpecialType.System_Void)
+                flags |= TypeInfoFlags.IsVoid;
+
+            if (underlyingSymbol.IsDelegate())
+                flags |= TypeInfoFlags.IsDelegate;
+
+            if (underlyingSymbol.IsGenericParameter())
+                flags |= TypeInfoFlags.IsGenericParameter;
+
+            if (underlyingSymbol.IsNested())
+                flags |= TypeInfoFlags.IsNested;
+
+            if (underlyingSymbol.IsInterface())
+                flags |= TypeInfoFlags.IsInterface;
+
+            if (underlyingSymbol.IsClass())
+                flags |= TypeInfoFlags.IsClass;
+
+            if (underlyingSymbol.IsFinal())
+                flags |= TypeInfoFlags.IsFinal;
+
+            if (underlyingSymbol.IsAbstract)
+                flags |= TypeInfoFlags.IsAbstract;
+
+            return flags;
+        });
+        public TypeInfoFlags Flags => FFlags.Value;
 
         public RefType RefType => UnderlyingSymbol switch
         {
@@ -71,20 +102,28 @@ namespace Solti.Utils.Proxy.Internals
             _ => RefType.None
         };
 
-        public bool IsNested => UnderlyingSymbol.IsNested();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FAssemblyQualifiedName = new
+        (
+            () => !underlyingSymbol.IsGenericParameter()
+                ? underlyingSymbol.GetAssemblyQualifiedName()
+                : null
+        );
+        public string? AssemblyQualifiedName => FAssemblyQualifiedName.Value;
 
-        public bool IsGenericParameter => UnderlyingSymbol.IsGenericParameter();
-
-        public bool IsInterface => UnderlyingSymbol.IsInterface();
-
-        public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetAssemblyQualifiedName() : null;
-
-        public string? QualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FQualifiedName = new
+        (
+            () => !underlyingSymbol.IsGenericParameter()
+                ? underlyingSymbol.GetQualifiedMetadataName()
+                : null
+        );
+        public string? QualifiedName => FQualifiedName.Value;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
-            ITypeSymbol? realType = typeSymbol.GetElementType();
+            ITypeSymbol? realType = underlyingSymbol.GetElementType();
 
             return realType is not null
                 ? CreateFrom(realType, compilation)
@@ -146,16 +185,10 @@ namespace Solti.Utils.Proxy.Internals
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
-        public bool IsClass => UnderlyingSymbol.IsClass();
-
-        public bool IsFinal => UnderlyingSymbol.IsFinal();
-
-        public bool IsAbstract => UnderlyingSymbol.IsAbstract;
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            ITypeSymbol concreteType = typeSymbol.GetElementType(recurse: true) ?? typeSymbol;
+            ITypeSymbol concreteType = underlyingSymbol.GetElementType(recurse: true) ?? underlyingSymbol;
 
             return concreteType.ContainingSymbol switch
             {
@@ -165,12 +198,12 @@ namespace Solti.Utils.Proxy.Internals
                     // Mimic the way how reflection works...
                     //
 
-                    typeSymbol.IsGenericParameter() && method.IsGenericMethod
+                    underlyingSymbol.IsGenericParameter() && method.IsGenericMethod
                         ? method.OriginalDefinition
                         : method,
                     compilation
                 ),
-                _ when typeSymbol.GetEnclosingType() is not null => CreateFrom(typeSymbol.GetEnclosingType()!, compilation),
+                _ when underlyingSymbol.GetEnclosingType() is not null => CreateFrom(underlyingSymbol.GetEnclosingType()!, compilation),
                 _ => null
             };
         });

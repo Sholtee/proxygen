@@ -291,7 +291,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
-            for (Type? baseType = type.GetBaseType(); baseType is not null; baseType = baseType.GetBaseType())
+            for (Type? baseType = type; (baseType = baseType!.GetBaseType()) is not null; )
                 yield return baseType;
         }
 
@@ -312,6 +312,9 @@ namespace Solti.Utils.Proxy.Internals
                 yield return t;
             }
         }
+
+        public static bool IsDelegate(this Type src) =>
+            (src.GetInnermostElementType() ?? src).GetBaseTypes().Any(static bt => bt == typeof(Delegate)) && src != typeof(MulticastDelegate);
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {

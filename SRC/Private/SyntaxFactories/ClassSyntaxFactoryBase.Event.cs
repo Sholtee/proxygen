@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
                 identifier: Identifier(@event.Name)
             );
 
-            if (@event.DeclaringType.IsInterface)
+            if (@event.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 result = result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier

@@ -64,11 +64,13 @@ namespace Solti.Utils.Proxy.Internals
             languageVersion
         )
         {
-            if (!MetadataTypeInfo.CreateFrom(typeof(Delegate)).IsAccessibleFrom(targetType) || (FInvokeDelegate = targetType.Methods.SingleOrDefault(static m => m.Name == INVOKE_METHOD_NAME)) is null)
+            if (!targetType.Flags.HasFlag(TypeInfoFlags.IsDelegate))
                 throw new ArgumentException(Resources.NOT_A_DELEGATE, nameof(targetType));
 
             if (targetType is IGenericTypeInfo generic && generic.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
+
+            FInvokeDelegate = targetType.Methods.Single(static m => m.Name == INVOKE_METHOD_NAME);
         }
     }
 }

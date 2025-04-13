@@ -75,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Check(ITypeInfo type, string assemblyName)
         {
-            if (type.IsGenericParameter)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return;
 
             //
@@ -108,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
 
             switch (type.AccessModifiers) 
             {
-                case AccessModifiers.Private: case AccessModifiers.Protected when type.IsNested:
+                case AccessModifiers.Private: case AccessModifiers.Protected when type.Flags.HasFlag(TypeInfoFlags.IsNested):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
                 case AccessModifiers.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));

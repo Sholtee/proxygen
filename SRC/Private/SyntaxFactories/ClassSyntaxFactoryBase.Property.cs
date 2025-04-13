@@ -69,7 +69,7 @@ namespace Solti.Utils.Proxy.Internals
                 ? property.GetMethod!
                 : property.SetMethod!;
 
-            if (property.DeclaringType.IsInterface)
+            if (property.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
             {
                 result = (TDeclaration) result.WithExplicitInterfaceSpecifier
                 (

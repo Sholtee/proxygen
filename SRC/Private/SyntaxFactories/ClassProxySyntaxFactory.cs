@@ -106,7 +106,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (BaseType.IsFinal)
+            if (BaseType.Flags.HasFlag(TypeInfoFlags.IsFinal))
                 throw new InvalidOperationException(Resources.SEALED_TARGET);
 
             Visibility.Check(BaseType, ContainingAssembly);
@@ -131,7 +131,7 @@ namespace Solti.Utils.Proxy.Internals
             languageVersion
         )
         {
-            if (!baseType.IsClass)
+            if (!baseType.Flags.HasFlag(TypeInfoFlags.IsClass))
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(baseType));
 
             if (baseType is IGenericTypeInfo generic && generic.IsGenericDefinition)

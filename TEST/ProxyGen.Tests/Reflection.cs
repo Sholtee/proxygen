@@ -66,28 +66,37 @@ namespace Solti.Utils.Proxy.Internals.Tests
             );
         }
 
+        private delegate void MyDelegate(int i);
+
         [Test]
-        public void TypeInfo_AbstractionTest([Values(
-            typeof(void), 
-            typeof(object), 
-            typeof(int),
-            typeof(int[]), 
-            typeof(int[,]),
-            typeof((int Int, string String)), 
-            typeof(int*),
-            typeof(nint),
-            typeof(nint[]),
-            typeof(DateTime),
-            typeof(List<>),
-            typeof(Span<int>),
-            typeof(ReadOnlySpan<int>),
-            typeof(List<object>), 
-            typeof(NestedGeneric<>), 
-            typeof(NestedGeneric<List<string>>), 
-            typeof(InterfaceInterceptor<>),
-            typeof(Generators.ProxyGenerator<,>), 
-            typeof(System.ComponentModel.Component), // van esemenye
-            typeof(HasInternal))] Type type) 
+        public void TypeInfo_AbstractionTest(
+        [
+            Values
+            (
+                typeof(void), 
+                typeof(object), 
+                typeof(int),
+                typeof(int[]), 
+                typeof(int[,]),
+                typeof((int Int, string String)), 
+                typeof(int*),
+                typeof(nint),
+                typeof(nint[]),
+                typeof(DateTime),
+                typeof(List<>),
+                typeof(Span<int>),
+                typeof(ReadOnlySpan<int>),
+                typeof(List<object>), 
+                typeof(NestedGeneric<>), 
+                typeof(NestedGeneric<List<string>>), 
+                typeof(InterfaceInterceptor<>),
+                typeof(Generators.ProxyGenerator<,>), 
+                typeof(System.ComponentModel.Component), // van esemenye
+                typeof(HasInternal),
+                typeof(MyDelegate),
+                typeof(Action)
+            )
+        ] Type type) 
         {
             Assembly[] refs = type
                 .Assembly
@@ -116,15 +125,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.Name, t2.Name);
                 Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
-                Assert.AreEqual(t1.IsNested, t2.IsNested);
+                Assert.AreEqual(t1.Flags, t2.Flags);
                 Assert.AreEqual(t1.AccessModifiers, t2.AccessModifiers);
-                Assert.AreEqual(t1.IsClass, t2.IsClass);
-                Assert.AreEqual(t1.IsAbstract, t2.IsAbstract);
-                Assert.AreEqual(t1.IsFinal, t2.IsFinal);
-                Assert.AreEqual(t1.IsInterface, t2.IsInterface);
                 Assert.AreEqual(t1.RefType, t2.RefType);
-                Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
-                Assert.AreEqual(t1.IsVoid, t2.IsVoid);
 
                 if (!FProcessedTypes.TryAdd(t1.Name, null) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
                     return;
@@ -148,7 +151,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 if (gt1 != null)
                 {
                     Assert.AreEqual(gt1.IsGenericDefinition, gt2.IsGenericDefinition);
-                    Assert.AreEqual(gt1.IsGenericParameter, gt2.IsGenericParameter);
+                    Assert.AreEqual(gt1.Flags.HasFlag(TypeInfoFlags.IsGenericParameter), gt2.Flags.HasFlag(TypeInfoFlags.IsGenericParameter));
 
                     AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
                 }

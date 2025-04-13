@@ -153,7 +153,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             MethodDeclarationSyntax result = ResolveMethodCore(method);
 
-            if (method.DeclaringType.IsInterface)
+            if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 result = result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
@@ -228,7 +228,7 @@ namespace Solti.Utils.Proxy.Internals
                         // Explicit interface implementations must not specify type constraints
                         //
 
-                        if (method.DeclaringType.IsInterface)
+                        if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                             yield break;
 
                         if (constraint.DefaultConstructor)

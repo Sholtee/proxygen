@@ -11,10 +11,10 @@ namespace Solti.Utils.Proxy.Internals
     internal enum AccessModifiers
     {
         Unknown   = 0,
-        Private   = 1,
-        Explicit  = 2,
-        Protected = 4,
-        Internal  = 8,
-        Public    = 16
+        Private   = 1 << 0,
+        Explicit  = 1 << 1,
+        Protected = 1 << 2,
+        Internal  = 1 << 3,
+        Public    = 1 << 4
     }
 }

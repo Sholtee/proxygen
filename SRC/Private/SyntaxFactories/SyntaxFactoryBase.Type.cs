@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
 
             NameSyntax[] names = new NameSyntax[parts.Length];
 
-            if (type.IsNested)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsNested))
             {
                 names[0] = CreateTypeName(parts.Single());
             }
@@ -48,7 +48,7 @@ namespace Solti.Utils.Proxy.Internals
                 // This handles types having no namespace properly
                 //
 
-                if (!type.IsVoid && !type.IsGenericParameter) names[0] = AliasQualifiedName
+                if (!type.Flags.HasFlag(TypeInfoFlags.IsVoid) && !type.Flags.HasFlag(TypeInfoFlags.IsGenericParameter)) names[0] = AliasQualifiedName
                 (
                     IdentifierName
                     (
@@ -90,7 +90,7 @@ namespace Solti.Utils.Proxy.Internals
                 return result;
             }
 
-            if (type.IsVoid)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsVoid))
             {
                 return PredefinedType
                 (
@@ -98,7 +98,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
             }
 
-            if (type.IsNested)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsNested))
             {
                 return type.GetParentTypes().Append(type).Select(GetQualifiedName).Qualify();
             }

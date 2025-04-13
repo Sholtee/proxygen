@@ -77,7 +77,7 @@ namespace Solti.Utils.Proxy.Internals
 
             LocalDeclarationStatementSyntax? result;
 
-            if (targetMethod.ReturnValue.Type.IsVoid)
+            if (targetMethod.ReturnValue.Type.Flags.HasFlag(TypeInfoFlags.IsVoid))
             {
                 result = null;
                 yield return ExpressionStatement(invokeInterceptor);

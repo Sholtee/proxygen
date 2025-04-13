@@ -11,20 +11,8 @@ namespace Solti.Utils.Proxy.Internals
     {
         IAssemblyInfo? DeclaringAssembly { get; }
         AccessModifiers AccessModifiers { get; }
-        bool IsVoid { get; }
+        TypeInfoFlags Flags { get; }
         RefType RefType { get; }
-        /// <summary>
-        /// Returns true if the type is nested and not a generic parameter.
-        /// </summary>
-        bool IsNested { get; }
-        /// <summary>
-        /// The type represents a generic parameter (for e.g.: "T" in <see cref="List{T}"/>).
-        /// </summary>
-        bool IsGenericParameter { get; }
-        bool IsInterface { get; }
-        bool IsClass { get; }
-        bool IsFinal { get; }
-        bool IsAbstract { get; }
         /// <summary>
         /// The <see cref="QualifiedName"/> of the type followed by the identity of the containing assembly. The result should not reflect the type arguments.
         /// </summary>

@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Internals
                                         (
                                             Argument
                                             (
-                                                SimpleMemberAccess(GetTarget(), INVOKE_METHOD_NAME)
+                                                SimpleMemberAccess(GetTarget(), nameof(Action.Method))
                                             )
                                         )
                                     ),

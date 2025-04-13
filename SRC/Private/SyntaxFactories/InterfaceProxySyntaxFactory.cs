@@ -63,7 +63,7 @@ namespace Solti.Utils.Proxy.Internals
             languageVersion
         ) 
         {
-            if (!interfaceType.IsInterface)
+            if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
@@ -106,10 +106,10 @@ namespace Solti.Utils.Proxy.Internals
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (InterceptorType.IsFinal)
+            if (InterceptorType.Flags.HasFlag(TypeInfoFlags.IsFinal))
                 throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
 
-            if (InterceptorType.IsAbstract)
+            if (InterceptorType.Flags.HasFlag(TypeInfoFlags.IsAbstract))
                 throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
 
             Visibility.Check(InterfaceType, ContainingAssembly);

@@ -150,7 +150,7 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                if (!method.ReturnValue.Type.IsVoid)
+                if (!method.ReturnValue.Type.Flags.HasFlag(TypeInfoFlags.IsVoid))
                 {
                     LocalDeclarationStatementSyntax result = ResolveLocal<object>
                     (

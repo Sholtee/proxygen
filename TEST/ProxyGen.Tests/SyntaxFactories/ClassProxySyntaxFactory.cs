@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
     using Internals;
-    
+
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class ClassProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {

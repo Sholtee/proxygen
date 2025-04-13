@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected ReturnStatementSyntax ReturnResult(ITypeInfo? returnType, ExpressionSyntax result) => ReturnStatement
         (
-            expression: returnType?.IsVoid is true
+            expression: returnType?.Flags.HasFlag(TypeInfoFlags.IsVoid) is true
                 ? null
                 : returnType is not null
                     ? CastExpression
@@ -224,7 +224,7 @@ namespace Solti.Utils.Proxy.Internals
             body.AddRange(locals);
 
             LocalDeclarationStatementSyntax? result;
-            if (!method.ReturnValue.Type.IsVoid)
+            if (!method.ReturnValue.Type.Flags.HasFlag(TypeInfoFlags.IsVoid))
             {
                 result = ResolveLocal<object>
                 (

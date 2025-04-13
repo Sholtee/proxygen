@@ -44,8 +44,6 @@ namespace Solti.Utils.Proxy.Internals
         private IAssemblyInfo? FDeclaringAssembly;
         public IAssemblyInfo DeclaringAssembly => FDeclaringAssembly ??= MetadataAssemblyInfo.CreateFrom(UnderlyingType.Assembly);
 
-        public bool IsVoid => UnderlyingType == typeof(void);
-
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FEnclosingType = new(() =>
         {
@@ -72,6 +70,39 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<TypeInfoFlags> FFlags = new(() =>
+        {
+            TypeInfoFlags flags = TypeInfoFlags.None;
+
+            if (underlyingType == typeof(void))
+                flags |= TypeInfoFlags.IsVoid;
+
+            if (underlyingType.IsDelegate())
+                flags |= TypeInfoFlags.IsDelegate;
+
+            if ((underlyingType.GetInnermostElementType() ?? underlyingType).IsGenericParameter)
+                flags |= TypeInfoFlags.IsGenericParameter;
+
+            if (underlyingType.IsNested() && !flags.HasFlag(TypeInfoFlags.IsGenericParameter))
+                flags |= TypeInfoFlags.IsNested;
+
+            if (underlyingType.IsInterface)
+                flags |= TypeInfoFlags.IsInterface;
+
+            if (underlyingType.IsClass())
+                flags |= TypeInfoFlags.IsClass;
+
+            if (underlyingType.IsSealed)
+                flags |= TypeInfoFlags.IsFinal;
+                
+            if (underlyingType.IsAbstract())
+                flags |= TypeInfoFlags.IsAbstract;
+
+            return flags;
+        });
+        public TypeInfoFlags Flags => FFlags.Value;
+
         public RefType RefType => UnderlyingType.GetRefType();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -84,14 +115,6 @@ namespace Solti.Utils.Proxy.Internals
                 : null;
         }) ;
         public ITypeInfo? ElementType => FElementType.Value;
-
-        //
-        // In case of "Cica<T>.Mica<TT>", "TT" is embedded which is inappropriate to us
-        //
-
-        public bool IsNested => UnderlyingType.IsNested() && !IsGenericParameter;
-
-        public bool IsInterface => UnderlyingType.IsInterface;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IPropertyInfo>? FProperties;
@@ -137,19 +160,22 @@ namespace Solti.Utils.Proxy.Internals
                 .Sort()
                 .ToImmutableList();
 
-        public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
-            ? $"{QualifiedName}, {UnderlyingType.Assembly}"
-            : null;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FAssemblyQualifiedName = new
+        (
+            () =>
+            {
+                string? qualifiedName = underlyingType.GetQualifiedName();
+                return qualifiedName is not null
+                    ? $"{qualifiedName}, {underlyingType.Assembly}"
+                    : null;
+            }
+        );
+        public string? AssemblyQualifiedName => FAssemblyQualifiedName.Value;
 
-        public bool IsGenericParameter => (UnderlyingType.GetInnermostElementType() ?? UnderlyingType).IsGenericParameter;
-
-        public string? QualifiedName => UnderlyingType.GetQualifiedName();
-
-        public bool IsClass => UnderlyingType.IsClass();
-
-        public bool IsFinal => UnderlyingType.IsSealed;
-
-        public bool IsAbstract => UnderlyingType.IsAbstract();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FQualifiedName = new(() => underlyingType.GetQualifiedName());
+        public string? QualifiedName => FQualifiedName.Value;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IHasName?> FContainingMember = new(() =>

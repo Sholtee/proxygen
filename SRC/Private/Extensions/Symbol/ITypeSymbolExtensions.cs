@@ -18,20 +18,20 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static bool IsInterface(this ITypeSymbol src) => src.TypeKind is TypeKind.Interface;
 
-        private static readonly IReadOnlyList<TypeKind> ClassTypes = new[] 
-        {
+        private static readonly IReadOnlyList<TypeKind> ClassTypes =
+        [
             TypeKind.Class,
             TypeKind.Array,
             TypeKind.Delegate,
             TypeKind.Pointer
-        };
+        ];
 
         public static bool IsClass(this ITypeSymbol src) => ClassTypes.IndexOf(src.TypeKind) >= 0;
 
-        private static readonly IReadOnlyList<TypeKind> SealedTypes = new[]
-        {
+        private static readonly IReadOnlyList<TypeKind> SealedTypes =
+        [
             TypeKind.Array
-        };
+        ];
 
         public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.IndexOf(src.TypeKind) >= 0;
 
@@ -287,6 +287,9 @@ namespace Solti.Utils.Proxy.Internals
             return $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
+        public static bool IsDelegate(this ITypeSymbol src) =>
+            (src.GetElementType(recurse: true) ?? src).TypeKind is TypeKind.Delegate;
+
         //
         // Types (for instance arrays) derived from embedded types are no longer embedded. That's why this
         // GetElementType() magic.
@@ -295,19 +298,8 @@ namespace Solti.Utils.Proxy.Internals
         public static bool IsNested(this ITypeSymbol src) => 
             (src.GetElementType(recurse: true)?.ContainingType ?? src.ContainingType) is not null && !src.IsGenericParameter();
 
-        public static bool IsGenericParameter(this ITypeSymbol src)
-        {
-            src = src.GetElementType(recurse: true) ?? src;     
-            /*
-            return src.ContainingSymbol switch
-            {
-                IMethodSymbol method => method.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
-                INamedTypeSymbol type => type.TypeParameters.Some(tp => SymbolEqualityComparer.Default.Equals(tp, src)),
-                _ => false
-            };
-            */
-            return src.TypeKind is TypeKind.TypeParameter;
-        }
+        public static bool IsGenericParameter(this ITypeSymbol src) =>
+            (src.GetElementType(recurse: true) ?? src).TypeKind is TypeKind.TypeParameter;
 
         public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {

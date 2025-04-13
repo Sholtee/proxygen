@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static void Hash(this ITypeInfo src, ICryptoTransform transform)
         {
-            if (src.IsGenericParameter)
+            if (src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 //
                 // class Foo<T> { void Method(T x); } | class Foo {void Method<T>(T x); }
                 //
@@ -65,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static bool EqualsTo(this ITypeInfo src, ITypeInfo that)
         {
-            if (src.IsGenericParameter)
+            if (src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
 
             if (src.ElementType is null != that.ElementType is null)
@@ -103,7 +103,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public static int GetGenericParameterIndex(this ITypeInfo src) 
         {
-            if (!src.IsGenericParameter)
+            if (!src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return 0;
 
             return src.ContainingMember switch

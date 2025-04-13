@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals
             languageVersion
         ) 
         {
-            if (!interfaceType.IsInterface)
+            if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             InterfaceType = interfaceType;

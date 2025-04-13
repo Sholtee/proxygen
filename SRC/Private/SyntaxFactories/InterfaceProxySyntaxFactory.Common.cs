@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         ExpressionSyntax ResolveInterfaceMap()
         {
-            if (TargetType.IsInterface)
+            if (TargetType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 return LiteralExpression(SyntaxKind.NullLiteralExpression);
 
             IGenericTypeInfo map = 
@@ -142,7 +142,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     genericArguments.ToSyntaxList(ga =>
                     {
-                        Debug.Assert(ga.IsGenericParameter, "Argument must be a generic parameter");
+                        Debug.Assert(ga.Flags.HasFlag(TypeInfoFlags.IsGenericParameter), "Argument must be a generic parameter");
                         return TypeParameter(ga.Name);
                     })
                 )

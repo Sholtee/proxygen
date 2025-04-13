@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
 
         public void AddType(ITypeInfo type) 
         {
-            if (type.IsGenericParameter)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return;
 
             if (!FTypes.Add(type)) // circular reference fix
