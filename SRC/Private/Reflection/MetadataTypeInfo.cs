@@ -137,11 +137,10 @@ namespace Solti.Utils.Proxy.Internals
         //
 
         private static bool ShouldSkip(MethodInfo m) =>
-            (m.DeclaringType.IsClass && m.Name == "Finalize") || // destructor
-            (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
+            (m.DeclaringType.IsClass && m.Name == "Finalize") ||  // destructor
+            (m.DeclaringType.IsArray && m.Name == "Get") ||  // = array[i]
             (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
-            (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
-            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke"); // delegate.Invoke(...)
+            (m.DeclaringType.IsArray && m.Name == "Address");  // = ref array[i]
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IMethodInfo>? FMethods;

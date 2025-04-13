@@ -94,15 +94,16 @@ namespace Solti.Utils.Proxy.Internals
             return SpecialMethods.Any(mk => mk == src.MethodKind);
         }
 
-        private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
-        {
+        private static readonly IReadOnlyList<MethodKind> ClassMethods =
+        [
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.UserDefinedOperator,
-            MethodKind.Conversion // explicit, implicit
-        };
+            MethodKind.Conversion, // explicit, implicit
+            MethodKind.DelegateInvoke
+        ];
 
         public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Any(mk => mk == src.MethodKind);
 
