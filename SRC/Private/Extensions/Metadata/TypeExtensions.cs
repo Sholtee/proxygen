@@ -198,12 +198,14 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static IEnumerable<TMember> ListMembersInternal<TMember>(
+        private static IEnumerable<TMember> ListMembersInternal<TMember>
+        (
             this Type src, 
             Func<Type, BindingFlags, TMember[]> getter, 
             Func<TMember, MethodInfo> getUnderlyingMethod, 
             Func<TMember, MethodInfo?> getOverriddenMethod, 
-            bool includeStatic) where TMember: MemberInfo
+            bool includeStatic
+        ) where TMember: MemberInfo
         {
             if (src.IsGenericParameter)
                 yield break;
