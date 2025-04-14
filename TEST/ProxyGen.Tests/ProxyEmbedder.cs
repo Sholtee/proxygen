@@ -23,6 +23,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
     using Attributes;
     using Properties;
     using Primitives;
+    using Proxy.Generators.Tests;
     using Proxy.Tests.EmbeddedTypes;
     using Proxy.Tests;
 
@@ -528,7 +529,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(generatedType.Assembly, Is.EqualTo(typeof(EmbeddedTypeExposer).Assembly));
         }
 
-        public static IEnumerable<string> RandomInterfaces => RandomInterfaces<object>
+        public static IEnumerable<string> ProxyGeneration_AgainstRandomInterfaces_Params => RandomInterfaces<object>
             .Values
 #if NET6_0_OR_GREATER
             // ref return values not supported
@@ -540,7 +541,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 #endif
             .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
 
-        [TestCaseSource(nameof(RandomInterfaces))]
+        [TestCaseSource(nameof(ProxyGeneration_AgainstRandomInterfaces_Params))]
         public void ProxyGeneration_AgainstRandomInterfaces(string iface)
         {
             Compilation compilation = CreateCompilation
@@ -561,16 +562,44 @@ namespace Solti.Utils.Proxy.Internals.Tests
             GeneratorDriver driver = CreateDriver(null);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
-            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
+            Assert.That(diags.Count(diag => diag.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error), Is.EqualTo(0));
         }
 
-        public static IEnumerable<string> RandomInterfaces2 => RandomInterfaces<object>
+        public static IEnumerable<string> ProxyGeneration_AgainstRandomClasses_Params => ClassProxyGeneratorTests
+            .GeneratedProxy_AgainstSystemType_Params
+            .Select(static cls => cls.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
+
+        [TestCaseSource(nameof(ProxyGeneration_AgainstRandomClasses_Params))]
+        public void ProxyGeneration_AgainstRandomClasses(string cls)
+        {
+            Compilation compilation = CreateCompilation
+            (
+                @$"
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<{cls}>))]
+
+                ",
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CreateDriver(null);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error), Is.EqualTo(0));
+        }
+
+        public static IEnumerable<string> DuckGeneration_AgainstRandomInterfaces_Params => RandomInterfaces<object>
             .Values
             // ambiguous match
             .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2), typeof(IEnumerator<object>) })
             .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
 
-        [TestCaseSource(nameof(RandomInterfaces2))]
+        [TestCaseSource(nameof(DuckGeneration_AgainstRandomInterfaces_Params))]
         public void DuckGeneration_AgainstRandomInterfaces(string iface)
         {
             Compilation compilation = CreateCompilation
@@ -591,7 +620,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             GeneratorDriver driver = CreateDriver(null);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
-            Assert.That(diags.Count(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning), Is.EqualTo(0));
+            Assert.That(diags.Count(diag => diag.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error), Is.EqualTo(0));
         }
     }
 }
