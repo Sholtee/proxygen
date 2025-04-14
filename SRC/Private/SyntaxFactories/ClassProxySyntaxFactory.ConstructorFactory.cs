@@ -18,17 +18,16 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
-            bool hasConstructor = false;
+            int found = 0;
+
             foreach (IConstructorInfo ctor in BaseType.GetConstructors(AccessModifiers.Protected))
-            {
                 if (IsVisible(ctor))
                 {
                     cls = ResolveConstructor(cls, context, ctor);
-                    hasConstructor = true;
+                    found++;
                 }
-            }
 
-            if (!hasConstructor)
+            if (found is 0)
                 throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, BaseType.Name));
 
             return cls;

@@ -230,46 +230,38 @@ namespace Solti.Utils.Proxy.Internals
                 flags |= BindingFlags.Static;
 
             if (src.IsInterface)
-            {
-                foreach (Type t in src.GetHierarchy())
-                {
-                    foreach (TMember member in getter(t, flags))
-                    {
-                        yield return member;
-                    }
-                }
-            }
+                foreach (TMember member in GetMembers())
+                    yield return member;
             else
             {
-                HashSet<MethodInfo> overriddenMethods = new();
+                HashSet<MethodInfo> overriddenMethods = [];
 
                 //
                 // Order matters: we're processing the hierarchy towards the ancestor
                 //
 
-                foreach (Type t in src.GetHierarchy())
+                foreach (TMember member in GetMembers())
                 {
-                    foreach (TMember member in getter(t, flags))
-                    {
-                        MethodInfo? 
-                            overriddenMethod = getOverriddenMethod(member),
-                            underlyingMethod = getUnderlyingMethod(member);
+                    MethodInfo? 
+                        overriddenMethod = getOverriddenMethod(member),
+                        underlyingMethod = getUnderlyingMethod(member);
 
-                        if (overriddenMethod is not null)
-                            overriddenMethods.Add(overriddenMethod);
+                    if (overriddenMethod is not null)
+                        overriddenMethods.Add(overriddenMethod);
 
-                        if (overriddenMethods.Contains(underlyingMethod))
-                            continue;
+                    if (overriddenMethods.Contains(underlyingMethod))
+                        continue;
 
-                        //
-                        // If it was not yielded before (due to "new" or "override") and not private then we are fine.
-                        //
+                    //
+                    // If it was not yielded before (due to "new" or "override") and not private then we are fine.
+                    //
 
-                        if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
-                            yield return member;
-                    }
+                    if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
+                        yield return member;
                 }
             }
+
+            IEnumerable<TMember> GetMembers() => src.GetHierarchy().SelectMany(t => getter(t, flags));
         }
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type)
@@ -283,10 +275,7 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             foreach (ConstructorInfo ctor in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (ctor.GetAccessModifiers() > AccessModifiers.Private)
-                    yield return ctor;
-            }
+                yield return ctor;
         }
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
@@ -308,9 +297,7 @@ namespace Solti.Utils.Proxy.Internals
             yield return src;
 
             foreach (Type t in src.IsInterface ? src.GetAllInterfaces() : src.GetBaseTypes())
-            {
                 yield return t;
-            }
         }
 
         public static bool IsDelegate(this Type src) =>
@@ -336,7 +323,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 bool own = true;
                 for (Type? parent = src; (parent = parent!.DeclaringType) is not null;)
-                {
                     //
                     // GetGenericArguments() will return empty array if "parent" is not generic
                     //
@@ -346,7 +332,7 @@ namespace Solti.Utils.Proxy.Internals
                         own = false;
                         break;
                     }
-                }
+
                 if (own) 
                     yield return closedArgs[i];
             } 
@@ -375,18 +361,12 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             if (src.IsConstructedGenericType)
-            {
                 foreach (Type ga in src.GetGenericArguments())
-                {
                     UpdateAm(ref am, ga);
-                }
-            }
 
             Type? enclosingType = src.GetEnclosingType();
             if (enclosingType is not null)
-            {
                 UpdateAm(ref am, enclosingType);
-            }
 
             return am;
 

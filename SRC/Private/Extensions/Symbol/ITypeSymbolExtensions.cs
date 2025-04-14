@@ -182,69 +182,54 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static IEnumerable<TMember> ListMembersInternal<TMember>(
+        private static IEnumerable<TMember> ListMembersInternal<TMember>
+        (
             this ITypeSymbol src, 
             Func<TMember, IMethodSymbol> getUnderlyingMethod,
             Func<TMember, IMethodSymbol?> getOverriddenMethod,
-            bool includeStatic) where TMember : ISymbol
+            bool includeStatic
+        ) where TMember : ISymbol
         {
             if (src.IsInterface())
-            {
-                foreach (ITypeSymbol t in src.GetHierarchy())
-                {
-                    foreach (ISymbol symbol in t.GetMembers())
-                    {
-                        if (symbol is TMember member)
-                            yield return member;
-                    }
-                }
-            }
+                foreach (TMember member in GetMembers(src))
+                    yield return member;
             else
             {
-                //
-                // TODO: implement IMethodSymbolComparer
-                //
-
-                #pragma warning disable RS1024 // Compare symbols correctly
-                HashSet<IMethodSymbol> overriddenMethods = new();
-                #pragma warning restore RS1024
+                HashSet<IMethodSymbol> overriddenMethods = new(SymbolEqualityComparer.Default);
 
                 //
                 // Order matters: we're processing the hierarchy towards the ancestor
                 //
 
-                foreach (ITypeSymbol t in src.GetHierarchy())
+                foreach (TMember member in GetMembers(src))
                 {
-                    foreach (ISymbol symbol in t.GetMembers())
-                    {
-                        if (symbol is TMember member && (includeStatic || !member.IsStatic))
-                        {
-                            IMethodSymbol?
-                                overriddenMethod = getOverriddenMethod(member),
-                                underlyingMethod = getUnderlyingMethod(member);
+                    if (member.IsStatic && !includeStatic)
+                        continue;
 
-                            if (overriddenMethod is not null)
-                                overriddenMethods.Add(overriddenMethod);
+                    IMethodSymbol?
+                        overriddenMethod = getOverriddenMethod(member),
+                        underlyingMethod = getUnderlyingMethod(member);
 
-                            if (overriddenMethods.Contains(underlyingMethod))
-                                continue;
+                    if (overriddenMethod is not null)
+                        overriddenMethods.Add(overriddenMethod);
 
-                            //
-                            // If it was not yielded before (due to "new" or "override") and not private then we are fine.
-                            //
+                    if (overriddenMethods.Contains(underlyingMethod))
+                        continue;
 
-                            if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
-                                yield return member;
-                        }
-                    }
+                    //
+                    // If it was not yielded before (due to "new" or "override") and not private then we are fine.
+                    //
+
+                    if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
+                        yield return member;
                 }
             }
-        }
 
-        private static readonly IReadOnlyList<MethodKind> Ctors = new[]
-        {
-            MethodKind.Constructor, MethodKind.StaticConstructor
-        };
+            static IEnumerable<TMember> GetMembers(ITypeSymbol src) => src
+                .GetHierarchy()
+                .SelectMany(static ts => ts.GetMembers())
+                .OfType<TMember>();
+        }
 
         public static IEnumerable<IMethodSymbol> GetConstructors(this ITypeSymbol src)
         {
@@ -254,7 +239,7 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (ISymbol m in src.GetMembers())
             {
-                if (m is not IMethodSymbol ctor || Ctors.IndexOf(ctor.MethodKind) < 0 || ctor.GetAccessModifiers() is AccessModifiers.Private || ctor.IsImplicitlyDeclared)
+                if (m is not IMethodSymbol ctor || ctor.MethodKind is not MethodKind.Constructor || ctor.IsImplicitlyDeclared)
                     continue;
 
                 yield return ctor;

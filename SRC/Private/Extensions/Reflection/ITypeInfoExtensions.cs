@@ -92,10 +92,8 @@ namespace Solti.Utils.Proxy.Internals
                 IGenericTypeInfo genericThat = (IGenericTypeInfo) that;
 
                 for (int i = 0; i < genericSrc.GenericArguments.Count; i++)
-                {
                     if (!genericSrc.GenericArguments[i].EqualsTo(genericThat.GenericArguments[i]))
                         return false;
-                }
             }
 
             return true;
@@ -118,7 +116,7 @@ namespace Solti.Utils.Proxy.Internals
                 src = src.GetInnermostElementType() ?? src;
 
                 int result = generic.GenericArguments.Select(static ga => ga.Name).IndexOf(src.Name);
-                Debug.Assert(result >= 0);
+                Debug.Assert(result >= 0, $"Generic parameter with name '{src.Name}' must be included in GenericArguments list");
 
                 return result + 1;
             }
@@ -129,26 +127,39 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo? prev = null;
 
             for (ITypeInfo? current = src; (current = current!.ElementType) is not null;)
-            {
                 prev = current;
-            }
 
             return prev;
         }
 
         public static IEnumerable<IConstructorInfo> GetConstructors(this ITypeInfo src, AccessModifiers minAccessibility)
         {
-            int found = 0;
-            foreach (IConstructorInfo ctor in src.Constructors)
+            //
+            // Return the default constructor from the base if available
+            //
+
+            if (src.Constructors.Count is 0)
             {
-                if (ctor.AccessModifiers >= minAccessibility)
-                {
-                    yield return ctor;
-                    found++;
-                }
+                IEnumerable<IConstructorInfo> defaultCtor = src.BaseType!.GetConstructors(AccessModifiers.Protected);
+                Debug.Assert(defaultCtor.Count() is 1, "A type cannot have more than one default constructor");
+                Debug.Assert(defaultCtor.Single().Parameters.Count is 0, "Default constructor cannot have arguments");
+
+                yield return defaultCtor.Single();
             }
-            if (found is 0)
-                throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_ACCESSIBLE_CTOR, src.QualifiedName));
+            else
+            {
+                int found = 0;
+
+                foreach (IConstructorInfo ctor in src.Constructors)
+                    if (ctor.AccessModifiers >= minAccessibility)
+                    {
+                        yield return ctor;
+                        found++;
+                    }
+
+                if (found is 0)
+                    throw new InvalidOperationException(string.Format(Resources.Culture, Resources.NO_ACCESSIBLE_CTOR, src.QualifiedName));
+            }
         }
 
         private static IEnumerable<ITypeInfo> IterateOn(this ITypeInfo src, Func<ITypeInfo, ITypeInfo?> selector) 
@@ -157,11 +168,11 @@ namespace Solti.Utils.Proxy.Internals
                 yield return type;
         }
 
-        public static IEnumerable<ITypeInfo> GetBaseTypes(this ITypeInfo src) => src.IterateOn(x => x.BaseType);
+        public static IEnumerable<ITypeInfo> GetBaseTypes(this ITypeInfo src) => src.IterateOn(static x => x.BaseType);
 
-        public static IEnumerable<ITypeInfo> GetEnclosingTypes(this ITypeInfo src) => src.IterateOn(x => x.EnclosingType);
+        public static IEnumerable<ITypeInfo> GetEnclosingTypes(this ITypeInfo src) => src.IterateOn(static x => x.EnclosingType);
 
-        public static IEnumerable<ITypeInfo> GetParentTypes(this ITypeInfo src) => new Stack<ITypeInfo>(src.GetEnclosingTypes());
+        public static IEnumerable<ITypeInfo> GetParentTypes(this ITypeInfo src) => src.GetEnclosingTypes().Reverse();
 
         public static bool IsAccessibleFrom(this ITypeInfo src, ITypeInfo type) =>
             type.EqualsTo(src) ||
@@ -220,11 +231,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src is IGenericTypeInfo generic && !generic.IsGenericDefinition)
             {
-                ITypeSymbol[] gaSymbols = generic
-                    .GenericArguments
-                    .Select(ga => ToSymbol(ga, compilation))
-                    .ToArray();
-
+                ITypeSymbol[] gaSymbols = [.. generic.GenericArguments.Select(ga => ToSymbol(ga, compilation))];
                 return symbol.Construct(gaSymbols);
             }
 
@@ -244,33 +251,29 @@ namespace Solti.Utils.Proxy.Internals
 
             if (queried.IsGenericType)
             {
-                List<Type> gas = new(); 
+                List<Type> gas = []; 
 
                 foreach (ITypeInfo parent in src.GetParentTypes())
-                {
                     ReadGenericArguments(parent, gas);
-                }
 
                 ReadGenericArguments(src, gas);
 
                 return queried.MakeGenericType(gas.ToArray());
-
-                static void ReadGenericArguments(ITypeInfo src, IList<Type> gas)
-                {
-                    if (src is not IGenericTypeInfo generic)
-                        return;
-
-                    foreach (ITypeInfo ga in generic.GenericArguments)
-                    {
-                         gas.Add
-                         (
-                             ga.ToMetadata()
-                         );
-                    }
-                }
             }
 
             return queried;
+
+            static void ReadGenericArguments(ITypeInfo src, IList<Type> gas)
+            {
+                if (src is not IGenericTypeInfo generic)
+                    return;
+
+                foreach (ITypeInfo ga in generic.GenericArguments)
+                    gas.Add
+                    (
+                        ga.ToMetadata()
+                    );
+            }
         }
     }
 }

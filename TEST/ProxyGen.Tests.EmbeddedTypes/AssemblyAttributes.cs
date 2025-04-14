@@ -12,12 +12,16 @@ using Solti.Utils.Proxy.Generators;
 using Solti.Utils.Proxy.Tests.External;
 using Solti.Utils.Proxy.Tests.EmbeddedTypes;
 
-[assembly: 
+[
+    assembly: 
     EmbedGeneratedType(typeof(ProxyGenerator<IList, ExternalInterceptor<IList>>)),
     EmbedGeneratedType(typeof(ProxyGenerator<IList, InterfaceInterceptor<IList, List<object>>>)),
     EmbedGeneratedType(typeof(ProxyGenerator<IList<string>, ExternalInterceptor<IList<string>>>)),
     EmbedGeneratedType(typeof(ProxyGenerator<IInternalInterface, InterfaceInterceptor<IInternalInterface>>)),
     EmbedGeneratedType(typeof(ProxyGenerator<IGenericInterfaceHavingConstraint, InterfaceInterceptor<IGenericInterfaceHavingConstraint>>)),
     EmbedGeneratedType(typeof(DuckGenerator<IInternalInterface, IInternalInterface>)),
-    EmbedGeneratedType(typeof(DuckGenerator<IReadOnlyCollection<string>, List<string>>))]
+    EmbedGeneratedType(typeof(DuckGenerator<IReadOnlyCollection<string>, List<string>>)),
+    EmbedGeneratedType(typeof(ProxyGenerator<InternalFoo<string>>)),
+    EmbedGeneratedType(typeof(ProxyGenerator<List<object>>))
+]
 

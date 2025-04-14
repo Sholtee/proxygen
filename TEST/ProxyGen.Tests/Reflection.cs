@@ -68,6 +68,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         private delegate void MyDelegate(int i);
 
+        private sealed class MyClassNoCtor { }
+
         [Test]
         public void TypeInfo_AbstractionTest(
         [
@@ -94,7 +96,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 typeof(System.ComponentModel.Component), // van esemenye
                 typeof(HasInternal),
                 typeof(MyDelegate),
-                typeof(Action)
+                typeof(Action),
+                typeof(MyClassNoCtor)
             )
         ] Type type) 
         {

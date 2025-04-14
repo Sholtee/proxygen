@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Tests.EmbeddedTypes
     public static class EmbeddedTypeExposer
     {
         //
-        // A beagyzott tipushoz csak a befoglalo szerelvenybol ferhetunk hozza.
+        // Nested types are accessible within the declaring assembly only
         //
 
         public static Type GetGeneratedTypeByGenerator<TGenerator>() where TGenerator: new() => (Type) typeof(TGenerator).InvokeMember
