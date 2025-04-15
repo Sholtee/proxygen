@@ -1,5 +1,5 @@
 ﻿/********************************************************************************
-* DuckSyntaxFactory.ConstructorFactory.cs                                       *
+* ProxyUnitSyntaxFactory.Constructor.cs                                         *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal partial class DuckSyntaxFactory
+    internal partial class ProxyUnitSyntaxFactory
     {
         #if DEBUG
         internal
