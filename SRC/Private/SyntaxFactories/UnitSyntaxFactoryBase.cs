@@ -18,7 +18,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class UnitSyntaxFactoryBase(OutputType outputType, string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : ClassSyntaxFactoryBase(containingAssembly, referenceCollector, languageVersion)
+    internal abstract class UnitSyntaxFactoryBase(SyntaxFactoryContext context) : ClassSyntaxFactoryBase(context)
     {
         private static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
         (
@@ -30,15 +30,11 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
-        public OutputType OutputType { get; } = outputType;
-
-        public abstract string ExposedClass { get; }
-
         public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
             List<MemberDeclarationSyntax> members = [..ResolveUnitMembers(context, cancellation)];
 
-            if (members.Any() && OutputType is OutputType.Unit)
+            if (members.Any() && Context.OutputType is OutputType.Unit)
             {
                 members[0] = members[0] switch
                 {

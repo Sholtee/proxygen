@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 Log(Path.Combine(sourceDump, hint), unit.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(), cancellation);
 
-                if (src.ReferenceCollector is not null)
+                if (src.Context.ReferenceCollector is not null)
                 {
                     Log
                     (
@@ -47,6 +47,7 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             Environment.NewLine,
                             src
+                                .Context
                                 .ReferenceCollector
                                 .References
                                 .Select(static @ref => $"{@ref.Name}: {@ref.Location ?? "NULL"}")

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
+            foreach (IMethodInfo ifaceMethod in FInterfaceType.Methods)
             {
                 //
                 // Starting from .NET Core 5.0 interface methods may have visibility

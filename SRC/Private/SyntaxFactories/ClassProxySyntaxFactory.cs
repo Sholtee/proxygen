@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -32,7 +31,8 @@ namespace Solti.Utils.Proxy.Internals
             ..new Type[] {typeof(Array), typeof(Delegate), typeof(ValueType)}.Select(MetadataTypeInfo.CreateFrom)
         ];
 
-        private static string ResolveClassName(ITypeInfo targetType) => $"ClsProxy_{targetType.GetMD5HashCode()}";
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly ITypeInfo FBaseType;
 
         /// <summary>
         /// <code>
@@ -95,41 +95,21 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(BaseType);
+        protected override IReadOnlyList<ITypeInfo> Bases => [FBaseType, ..base.Bases];
 
-        #if DEBUG
-        internal
-        #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [BaseType, ..base.ResolveBases(context)];
-
-        public ITypeInfo BaseType { get; }
+        public override string ExposedClass => $"ClsProxy_{FBaseType.GetMD5HashCode()}";
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (BaseType.Flags.HasFlag(TypeInfoFlags.IsFinal))
+            if (FBaseType.Flags.HasFlag(TypeInfoFlags.IsFinal))
                 throw new InvalidOperationException(Resources.SEALED_TARGET);
 
-            Visibility.Check(BaseType, ContainingAssembly);
+            Visibility.Check(FBaseType, ContainingAssembly);
 
             return base.ResolveUnit(context, cancellation);
         }
 
-        public ClassProxySyntaxFactory
-        (
-            ITypeInfo baseType,
-            string? containingAssembly,
-            OutputType outputType,
-            ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest
-        )
-        : base
-        (
-            null,
-            outputType,
-            containingAssembly ?? ResolveClassName(baseType),
-            referenceCollector,
-            languageVersion
-        )
+        public ClassProxySyntaxFactory(ITypeInfo baseType, SyntaxFactoryContext context) : base(null, context)
         {
             if (!baseType.Flags.HasFlag(TypeInfoFlags.IsClass))
                 throw new ArgumentException(Resources.NOT_A_CLASS, nameof(baseType));
@@ -140,7 +120,7 @@ namespace Solti.Utils.Proxy.Internals
             if (FReservedTypes.Any(rt => rt.IsAccessibleFrom(baseType)))
                 throw new ArgumentException(Resources.RESERVED_TYPE, nameof(baseType));
 
-            BaseType = baseType;
+            FBaseType = baseType;
         }
     }
 }

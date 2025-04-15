@@ -43,12 +43,10 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public object Activate(IInterceptor interceptor, Tuple ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None).GetAwaiter().GetResult();
 
-        private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(string? asmName, ReferenceCollector referenceCollector) => new ClassProxySyntaxFactory
+        private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context) => new ClassProxySyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(Class),
-            asmName,
-            OutputType.Module,
-            referenceCollector: referenceCollector
+            context
         );
     }
 }

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo method in BaseType.Methods)
+            foreach (IMethodInfo method in FBaseType.Methods)
             {
                 if (method.IsSpecial || (!method.IsAbstract && !method.IsVirtual))
                     continue;

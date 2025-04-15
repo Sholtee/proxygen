@@ -9,7 +9,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
@@ -23,13 +22,6 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly IMethodInfo FInvokeDelegate;
 
-        private static string ResolveClassName(ITypeInfo targetType) => $"DelegateProxy_{targetType.GetMD5HashCode()}";
-
-        #if DEBUG
-        internal
-        #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(TargetType!);
-
         #if DEBUG
         internal
         #endif
@@ -38,31 +30,18 @@ namespace Solti.Utils.Proxy.Internals
             yield return ResolveClass(context, cancellation);
         }
 
+        public override string ExposedClass => $"DelegateProxy_{TargetType!.GetMD5HashCode()}";
+
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) =>
+        protected override IReadOnlyList<ITypeInfo> Bases =>
         [
             MetadataTypeInfo.CreateFrom(typeof(IDelegateWrapper)),
-            ..base.ResolveBases(context)
+            ..base.Bases
         ];
 
-        public DelegateProxySyntaxFactory
-        (
-            ITypeInfo targetType,
-            string? containingAssembly,
-            OutputType outputType,
-            ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest
-        )
-        : base
-        (
-            targetType,
-            outputType,
-            containingAssembly ?? ResolveClassName(targetType),
-            referenceCollector,
-            languageVersion
-        )
+        public DelegateProxySyntaxFactory(ITypeInfo targetType, SyntaxFactoryContext context) : base(targetType, context)
         {
             if (!targetType.Flags.HasFlag(TypeInfoFlags.IsDelegate))
                 throw new ArgumentException(Resources.NOT_A_DELEGATE, nameof(targetType));

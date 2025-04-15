@@ -22,8 +22,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private static DelegateProxySyntaxFactory CreateSyntaxFactory(Type target, OutputType outputType) => new
         (
             MetadataTypeInfo.CreateFrom(target),
-            typeof(DelegateProxySyntaxFactory).Assembly.GetName().Name,
-            outputType
+            new SyntaxFactoryContext
+            {
+                OutputType = outputType,
+                AssemblyNameOverride = typeof(DelegateProxySyntaxFactory).Assembly.GetName().Name
+            }
         );
 
         [TestCase(typeof(Func<List<string>, int>), OutputType.Module, "FuncProxySrcModule.txt")]

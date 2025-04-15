@@ -19,9 +19,9 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IEventInfo evt in InterfaceType.Events)
+            foreach (IEventInfo evt in FInterfaceType.Events)
             {
-                if (AlreadyImplemented(evt, InterceptorType.Events, SignatureEquals))
+                if (AlreadyImplemented(evt, FInterceptorType.Events, SignatureEquals))
                     continue;
 
                 cls = ResolveEvent(cls, context, evt);
@@ -152,7 +152,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         InvokeMethod
                         (
-                            Invoke,
+                            FInvoke,
                             arguments: Argument
                             (
                                 ResolveObject<InterfaceInvocationContext>

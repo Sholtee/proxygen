@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveUnit_ShouldCreateTheDesiredUnit()
         {
-            ModuleInitializerSyntaxFactory factory = new ModuleInitializerSyntaxFactory(OutputType.Unit, null);
+            ModuleInitializerSyntaxFactory factory = new ModuleInitializerSyntaxFactory(new SyntaxFactoryContext { OutputType = OutputType.Unit });
 
             Assert.That
             (

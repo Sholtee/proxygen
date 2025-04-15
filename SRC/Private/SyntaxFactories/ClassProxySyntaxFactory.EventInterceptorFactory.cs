@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IEventInfo evt in BaseType.Events)
+            foreach (IEventInfo evt in FBaseType.Events)
             {
                 IMethodInfo targetMethod = evt.AddMethod ?? evt.RemoveMethod;  
                 if (targetMethod.IsAbstract || targetMethod.IsVirtual)

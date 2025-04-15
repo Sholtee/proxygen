@@ -3,20 +3,10 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp;
-
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class SyntaxFactoryBase
+    internal abstract partial class SyntaxFactoryBase(SyntaxFactoryContext context)
     {
-        public ReferenceCollector? ReferenceCollector { get; }
-
-        public LanguageVersion LanguageVersion { get; }
-
-        public SyntaxFactoryBase(ReferenceCollector? referenceCollector, LanguageVersion languageVersion)
-        {
-            LanguageVersion= languageVersion;
-            ReferenceCollector = referenceCollector;
-        }
+        public SyntaxFactoryContext Context { get; } = context;
     }
 }

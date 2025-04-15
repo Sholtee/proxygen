@@ -5,11 +5,11 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
@@ -18,45 +18,29 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed partial class DuckSyntaxFactory : ProxyUnitSyntaxFactoryBase
     {
-        private static string ResolveClassName(ITypeInfo interfaceType, ITypeInfo targetType) =>
-            $"Duck_{new ITypeInfo[] { interfaceType, targetType }.GetMD5HashCode()}";
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly ITypeInfo FInterfaceType;
 
-        public ITypeInfo InterfaceType { get; }
+        public override string ExposedClass => $"Duck_{new ITypeInfo[] { FInterfaceType, TargetType! }.GetMD5HashCode()}";
 
-        public DuckSyntaxFactory
-        (
-            ITypeInfo interfaceType,
-            ITypeInfo targetType, 
-            string? containingAssembly,
-            OutputType outputType,
-            ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest   
-        )
-        : base
-        (
-            targetType,
-            outputType,
-            containingAssembly ?? ResolveClassName(interfaceType, targetType),
-            referenceCollector,
-            languageVersion
-        ) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, SyntaxFactoryContext context) : base(targetType, context) 
         {
             if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
-            InterfaceType = interfaceType;
+            FInterfaceType = interfaceType;
         }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            Visibility.Check(InterfaceType, ContainingAssembly);
+            Visibility.Check(FInterfaceType, ContainingAssembly);
             return base.ResolveUnit(context, cancellation);
         }
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => [InterfaceType, ..base.ResolveBases(context)];
+        protected override IReadOnlyList<ITypeInfo> Bases => [FInterfaceType, .. base.Bases];
 
         #if DEBUG
         internal
@@ -65,11 +49,6 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return ResolveClass(context, cancellation);
         }
-
-        #if DEBUG
-        internal
-        #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(InterfaceType, TargetType!);
 
         private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
@@ -80,9 +59,7 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMember.IsAbstract && ifaceMember.IsStatic)
                 throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
-            IReadOnlyList<TMember> possibleTargets = targetMembers
-              .Where(targetMember => signatureEquals(targetMember, ifaceMember))
-              .ToList();
+            IReadOnlyList<TMember> possibleTargets = [..targetMembers.Where(targetMember => signatureEquals(targetMember, ifaceMember))];
 
             return possibleTargets.Count switch
             {

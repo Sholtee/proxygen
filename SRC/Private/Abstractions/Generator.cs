@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly ConcurrentDictionary<object, ContextWrapper> FContextCache = new();
 
-        private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector)
+        private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context)
         {
             //
             // Don't use Type.GetType() here as it would find the internal implementation in this
@@ -45,7 +45,7 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             if (typeof(MethodImplAttribute).Assembly.GetType("System.Runtime.CompilerServices.ModuleInitializerAttribute", throwOnError: false) is null)
-                yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, referenceCollector);
+                yield return new ModuleInitializerSyntaxFactory(context);
         }
 
         private async Task<TypeContext> GetContextAsync(CancellationToken cancellation)

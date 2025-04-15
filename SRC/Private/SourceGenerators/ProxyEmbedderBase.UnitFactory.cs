@@ -39,14 +39,20 @@ namespace Solti.Utils.Proxy.Internals
             return result;
         }
 
-        private static ReferenceCollector? CreateReferenceCollector() =>
+        private static SyntaxFactoryContext CreateContext(CSharpCompilation compilation) => new SyntaxFactoryContext
+        {
+            OutputType = OutputType.Unit,
+            LanguageVersion = compilation.LanguageVersion,
+            AssemblyNameOverride = compilation.Assembly.Name,
+
             //
             // Collecting references required only when dumping the source
             //
 
-            WorkingDirectories.Instance.SourceDump is not null
+            ReferenceCollector = WorkingDirectories.Instance.SourceDump is not null
                 ? new ReferenceCollector()
-                : null;
+                : null
+        };
 
         protected static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
         {
@@ -55,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     generator,
                     compilation,
-                    CreateReferenceCollector()
+                    CreateContext(compilation)
                 )
                 : throw new InvalidOperationException
                 (
@@ -92,7 +98,10 @@ namespace Solti.Utils.Proxy.Internals
                     yield break;
             }
 
-            yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, CreateReferenceCollector(), compilation.LanguageVersion);
+            yield return new ModuleInitializerSyntaxFactory
+            (
+                CreateContext(compilation)
+            );
         }
     }
 }
