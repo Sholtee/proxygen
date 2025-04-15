@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
     {
         public abstract string ExposedClass { get; }
 
-        public virtual string ContainingAssembly => Context.AssemblyNameOverride ?? $"{ExposedClass}.dll";
+        public virtual string ContainingAssembly => Context.AssemblyNameOverride ?? ExposedClass;
 
         #if DEBUG
         internal
