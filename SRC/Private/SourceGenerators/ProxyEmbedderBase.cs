@@ -19,13 +19,15 @@ namespace Solti.Utils.Proxy.Internals
     {
         protected static readonly SymbolEqualityComparer SymbolEqualityComparer = SymbolEqualityComparer.Default;
 
-        protected static void Execute(
+        protected static void Execute
+        (
             Compilation cmp,
             AnalyzerConfigOptions configOptions,
             IReadOnlyCollection<INamedTypeSymbol> aotGenerators,
             Action<Diagnostic> reportDiagnostic,
             Action<SourceCode> addSource,
-            CancellationToken cancellation)
+            CancellationToken cancellation
+        )
         {
 #if DEBUG
             if (SourceGeneratorConfig.Instance.DebugGenerator && !Debugger.IsAttached)
