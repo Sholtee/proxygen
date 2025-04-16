@@ -113,10 +113,14 @@ namespace Solti.Utils.Proxy.Internals
 
                 using Stream asm = Compile.ToAssembly
                 (
-                    [..units.Select(unit => unit.ResolveUnitAndDump(cancellation))],
+                    units
+                        .Select(unit => unit.ResolveUnitAndDump(cancellation)),
                     mainUnit.ContainingAssembly,
                     cacheFile,
-                    [..context.ReferenceCollector!.References.Select(static asm => MetadataReference.CreateFromFile(asm.Location!))],
+                    context
+                        .ReferenceCollector!
+                        .References
+                        .Select(static asm => MetadataReference.CreateFromFile(asm.Location!)),
                     customConfig: null,
                     cancellation
                 );
@@ -130,10 +134,7 @@ namespace Solti.Utils.Proxy.Internals
             }, cancellation);
         }
 #if DEBUG
-        internal string GetDefaultAssemblyName() => CreateMainUnit
-        (
-            SyntaxFactoryContext.Default with { ReferenceCollector = new ReferenceCollector() }
-        ).ContainingAssembly;
+        internal string GetDefaultAssemblyName() => CreateMainUnit(SyntaxFactoryContext.Default).ContainingAssembly;
 #endif
     }
 }

@@ -24,10 +24,10 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static Stream ToAssembly
         (
-            IReadOnlyCollection<CompilationUnitSyntax> units,
+            IEnumerable<CompilationUnitSyntax> units,
             string asmName,
             string? outputFile,
-            IReadOnlyCollection<MetadataReference> references,
+            IEnumerable<MetadataReference> references,
             Func<Compilation, Compilation>? customConfig = default,
             in CancellationToken cancellation = default
         ) 
