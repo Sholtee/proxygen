@@ -60,9 +60,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)), 
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-            new SyntaxFactoryContext
+            SyntaxFactoryContext.Default with
             {
-                OutputType = OutputType.Module,
                 AssemblyNameOverride = asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name
             }
         );
@@ -189,13 +188,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 (
                     type1,
                     type1,
-                    new SyntaxFactoryContext { OutputType = (OutputType) outputType }
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
                 fact2 = new DuckSyntaxFactory
                 (
                     type2, 
                     type2,
-                    new SyntaxFactoryContext { OutputType = (OutputType) outputType }
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
             string

@@ -620,7 +620,24 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.EmitAsync(default, tmpDir, default).GetAwaiter().GetResult();
+            generator.EmitAsync
+            (
+                SyntaxFactoryContext.Default with
+                {
+                    Config = new Config
+                    (
+                        new DictionaryConfigReader
+                        (
+                            new Dictionary<string, string>
+                            {
+                                [nameof(Config.AssemblyCacheDir)] = tmpDir
+                            }
+                        )
+                    ),
+                    ReferenceCollector = new ReferenceCollector()
+                },
+                default
+            ).GetAwaiter().GetResult();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -639,7 +656,26 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
-            Type gt = (await generator.EmitAsync(default, cacheDir, default)).Type;
+            Type gt = 
+            (
+                await generator.EmitAsync
+                (
+                    SyntaxFactoryContext.Default with
+                    {
+                        Config = new Config
+                        (
+                            new DictionaryConfigReader
+                            (
+                                new Dictionary<string, string>
+                                {
+                                    [nameof(Config.AssemblyCacheDir)] = cacheDir
+                                }
+                            )
+                        )
+                    },
+                    default
+                )
+            ).Type;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }

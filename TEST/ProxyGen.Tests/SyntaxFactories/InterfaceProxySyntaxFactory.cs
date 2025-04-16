@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(iface),
             MetadataTypeInfo.CreateFrom(interceptor),
-            new SyntaxFactoryContext
+            SyntaxFactoryContext.Default with
             {
                 OutputType = outputType,
                 AssemblyNameOverride = typeof(InterfaceProxySyntaxFactoryTests).Assembly.GetName().Name
@@ -176,7 +176,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
-                new SyntaxFactoryContext { OutputType = OutputType.Module }
+                SyntaxFactoryContext.Default
             ).ResolveProperties(GetDummyClass(), null).Members;
 
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt")))));
@@ -258,13 +258,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 (
                     type1, 
                     interceptor1.Close(type1),
-                    new SyntaxFactoryContext { OutputType = (OutputType) outputType }
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
                 fact2 = new InterfaceProxySyntaxFactory
                 (
                     type2, 
                     interceptor2.Close(type2),
-                    new SyntaxFactoryContext { OutputType = (OutputType)outputType }
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
             string

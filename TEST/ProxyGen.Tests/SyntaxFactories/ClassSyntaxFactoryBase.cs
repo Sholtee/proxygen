@@ -228,7 +228,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(ClassMethodsToResolve))]
         public void ResolveMethod_ShouldSupportClassMethods((MethodInfo Method, string Expected) param) =>
-            Assert.That(new ClassSyntaxFactory(new SyntaxFactoryContext { OutputType = OutputType.Module, AssemblyNameOverride = typeof(ClassSyntaxFactoryBaseTests).Assembly.GetName().Name }).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default with { AssemblyNameOverride = typeof(ClassSyntaxFactoryBaseTests).Assembly.GetName().Name }).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
 
         private interface INullable 
         {

@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         private static ClassProxySyntaxFactory CreateSyntaxFactory(Type target, OutputType outputType) => new
         (
             MetadataTypeInfo.CreateFrom(target),
-            new SyntaxFactoryContext
+            SyntaxFactoryContext.Default with
             {
                 OutputType = outputType,
                 AssemblyNameOverride = typeof(ClassProxySyntaxFactoryTests).Assembly.GetName().Name

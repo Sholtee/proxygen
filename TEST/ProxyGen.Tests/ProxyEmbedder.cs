@@ -72,42 +72,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.ProxyGenerator<System.Collections.Generic.IList<int>, Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>>"));
         }
 #endif
-        [
-            Test
-#if NETFRAMEWORK
-            , Ignore("AppContext.SetData() not supported in .NET Framework")
-#endif
-        ]
-        public void LogException_ShouldCreateALogFileForTheGivenException()
-        {
-            //
-            // Ha a tesztunket az OpenCover hivta akkor ertelemszeruen a "runtimeconfig.json" nem lesz
-            // alkalmazva
-            //
-
-            if (WorkingDirectories.Instance.LogDump is null)
-            {
-                typeof(AppContext).InvokeMember
-                (
-                    "SetData",
-                    BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod,
-                    null,
-                    null,
-                    new object[]
-                    {
-                        "ProxyGen.LogDump",
-                        Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "Logs")
-                    }
-                );
-
-                WorkingDirectories.Setup(new RuntimeConfigReader());
-            }
-
-            string logFile = ProxyEmbedderBase.LogException(new Exception(), default);
-
-            Assert.That(File.Exists(logFile));
-        }
-
         public static GeneratorDriver CreateDriver(CSharpParseOptions opts)
         {
 #if LEGACY_COMPILER

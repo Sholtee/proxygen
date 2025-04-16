@@ -10,12 +10,17 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Common context used by syntax factories
     /// </summary>
-    internal sealed class SyntaxFactoryContext
+    internal sealed record SyntaxFactoryContext
     {
         /// <summary>
         /// The output type. <see cref="OutputType.Unit"/> for source embedding and <see cref="OutputType.Module"/> for module generation.
         /// </summary>
         public required OutputType OutputType { get; init; }
+
+        /// <summary>
+        /// The configuration associated with the compilation.
+        /// </summary>
+        public required Config Config { get; init; }
 
         /// <summary>
         /// The reference collector instance or null if the source is being embedded.
@@ -32,9 +37,16 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public LanguageVersion LanguageVersion { get; init; } = LanguageVersion.Latest;
 
-        public static SyntaxFactoryContext Default = new()
+        /// <summary>
+        /// The default configuration. Set up for module builds.
+        /// </summary>
+        public static SyntaxFactoryContext Default { get; } = new()
         {
-            OutputType = OutputType.Module
+            OutputType = OutputType.Module,
+            Config = new Config
+            (
+                new RuntimeConfigReader()
+            )
         };
     }
 }

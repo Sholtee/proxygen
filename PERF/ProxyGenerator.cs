@@ -11,6 +11,7 @@ using BenchmarkDotNet.Engines;
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
+    using Internals;
 
     [MemoryDiagnoser]
     [SimpleJob(RunStrategy.Throughput, invocationCount: 30000)]
@@ -28,7 +29,7 @@ namespace Solti.Utils.Proxy.Perf
         [Benchmark]
         public void AssemblingProxyType() => ProxyGenerator<IInterface, InterfaceProxy>
             .Instance
-            .EmitAsync(Guid.NewGuid().ToString(), default, default)
+            .EmitAsync(SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
             .GetAwaiter()
             .GetResult();
 

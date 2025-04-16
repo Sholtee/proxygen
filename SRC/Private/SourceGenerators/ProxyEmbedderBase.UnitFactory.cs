@@ -39,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
             return result;
         }
 
-        private static SyntaxFactoryContext CreateContext(CSharpCompilation compilation) => new SyntaxFactoryContext
+        private static SyntaxFactoryContext CreateContext(CSharpCompilation compilation, Config config) => new SyntaxFactoryContext
         {
             OutputType = OutputType.Unit,
             LanguageVersion = compilation.LanguageVersion,
@@ -49,19 +49,20 @@ namespace Solti.Utils.Proxy.Internals
             // Collecting references required only when dumping the source
             //
 
-            ReferenceCollector = WorkingDirectories.Instance.SourceDump is not null
+            ReferenceCollector = config.SourceDump is not null
                 ? new ReferenceCollector()
-                : null
+                : null,
+            Config = config
         };
 
-        protected static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
+        protected static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, Config config)
         {
             return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
                 ? ssg.CreateMainUnit
                 (
                     generator,
                     compilation,
-                    CreateContext(compilation)
+                    CreateContext(compilation, config)
                 )
                 : throw new InvalidOperationException
                 (
@@ -74,7 +75,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation)
+        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation, Config config)
         {
             INamedTypeSymbol? miaSym = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
 
@@ -100,7 +101,7 @@ namespace Solti.Utils.Proxy.Internals
 
             yield return new ModuleInitializerSyntaxFactory
             (
-                CreateContext(compilation)
+                CreateContext(compilation, config)
             );
         }
     }

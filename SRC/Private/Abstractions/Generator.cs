@@ -60,7 +60,7 @@ namespace Solti.Utils.Proxy.Internals
 
             try
             {
-                context.Context ??= await EmitAsync(null, WorkingDirectories.Instance.AssemblyCacheDir, cancellation);
+                context.Context ??= await EmitAsync(cancellation);
             }
             finally
             {

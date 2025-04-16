@@ -29,8 +29,12 @@ namespace Solti.Utils.Proxy.Internals
             CancellationToken cancellation
         )
         {
+            Config config = new
+            (
+                new AnalyzerConfigReader(configOptions)
+            );
 #if DEBUG
-            if (SourceGeneratorConfig.Instance.DebugGenerator && !Debugger.IsAttached)
+            if (config.DebugGenerator && !Debugger.IsAttached)
                 Debugger.Launch();
 #endif
             //
@@ -49,11 +53,6 @@ namespace Solti.Utils.Proxy.Internals
             if (!aotGenerators.Any())
                 return;
 
-            IConfigReader configReader = new AnalyzerConfigReader(configOptions);
-
-            WorkingDirectories.Setup(configReader);
-            SourceGeneratorConfig.Setup(configReader);
-
             int extensionCount = 0;
 
             foreach (INamedTypeSymbol generator in aotGenerators)
@@ -66,7 +65,7 @@ namespace Solti.Utils.Proxy.Internals
 
                     ExtendWith
                     (
-                        CreateMainUnit(generator, compilation),
+                        CreateMainUnit(generator, compilation, config),
                         location
                     );
 
@@ -92,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 try
                 {
-                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation))
+                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, config))
                     {
                         ExtendWith(chunk, Location.None);
                     }

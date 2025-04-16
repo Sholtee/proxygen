@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             CompilationUnitSyntax unit = src.ResolveUnit(null!, cancellation);
 
-            string? sourceDump = WorkingDirectories.Instance.SourceDump;
+            string? sourceDump = src.Context.Config.SourceDump;
 
             if (sourceDump is not null)
             {
@@ -56,7 +56,7 @@ namespace Solti.Utils.Proxy.Internals
                     );
                 }
 
-                static void Log(string file, string data, CancellationToken cancellation)
+                static void Log(string file, string data, CancellationToken cancellation)  // TODO: implement real logging
                 {
                     try
                     {
