@@ -105,16 +105,17 @@ namespace Solti.Utils.Proxy.Internals
                 // 3) Compile the assembly from the scratch.
                 //
 
-                List<UnitSyntaxFactoryBase> units =
-                [
-                    .. CreateChunks(context),
-                    mainUnit
-                ];
-
                 using Stream asm = Compile.ToAssembly
                 (
-                    units
-                        .Select(unit => unit.ResolveUnitAndDump(cancellation)),
+                    CreateChunks(context)
+                        .Append(mainUnit)
+                        .Select(unit => unit.ResolveUnitAndDump(cancellation))
+
+                        //
+                        // We need to craft the syntax trees first in order to have the references available
+                        //
+
+                        .ToList(),
                     mainUnit.ContainingAssembly,
                     cacheFile,
                     context
