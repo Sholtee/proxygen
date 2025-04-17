@@ -9,8 +9,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal sealed class AnalyzerConfigReader(AnalyzerConfigOptions configOptions) : IConfigReader
     {
-        public AnalyzerConfigOptions ConfigOptions { get; } = configOptions;
-
         public string BasePath => ReadValueInternal("MSBuildProjectDirectory")!;
 
         //
@@ -18,7 +16,7 @@ namespace Solti.Utils.Proxy.Internals
         // property is known, the TryGetValue() will return true even if the property is not defined.
         //
 
-        private string? ReadValueInternal(string name) => ConfigOptions.TryGetValue($"build_property.{name}", out string? value) && !string.IsNullOrEmpty(value)
+        private string? ReadValueInternal(string name) => configOptions.TryGetValue($"build_property.{name}", out string? value) && !string.IsNullOrEmpty(value)
             ? value
             : null;
 
