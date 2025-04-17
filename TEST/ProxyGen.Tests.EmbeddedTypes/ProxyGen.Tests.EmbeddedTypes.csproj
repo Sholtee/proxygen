@@ -22,8 +22,8 @@
   <Import Project="..\..\SRC\ProxyGen.NET.targets" />
     
   <PropertyGroup>
-    <ProxyGen_SourceDump>$(OutputPath)\Logs</ProxyGen_SourceDump>
-    <ProxyGen_LogDump>$(OutputPath)\Logs</ProxyGen_LogDump>
+    <ProxyGen_SourceDump>$(OutputPath)Logs</ProxyGen_SourceDump>
+    <ProxyGen_LogDump>$(OutputPath)Logs</ProxyGen_LogDump>
     <ProxyGen_DebugGenerator>false</ProxyGen_DebugGenerator>
   </PropertyGroup>
 

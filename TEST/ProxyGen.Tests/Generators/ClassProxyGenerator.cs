@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldHook()
         {
-            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
 
             int i = 0;
             Assert.That(proxy.Bar(ref i, out _, default), Is.EqualTo(1));
@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldHandleCtorParams()
         {
-            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
 
             Assert.That(proxy.Param, Is.EqualTo(1986));
         }
@@ -66,7 +66,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public async Task GeneratedProxy_ShouldExposeTheGenericArguments()
         {
             FooInterceptor interceptor = new();
-            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
             proxy.Bar(ref i, out _, default);
@@ -81,7 +81,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public async Task GeneratedProxy_ShouldExposeTheTargetMember()
         {
             FooInterceptor interceptor = new();
-            Foo proxy = await ProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
             proxy.Bar(ref i, out _, default);

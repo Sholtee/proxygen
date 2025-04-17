@@ -41,7 +41,9 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the underlying proxy type.
         /// </summary>
-        public object Activate(IInterceptor interceptor, Tuple ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None).GetAwaiter().GetResult();
+        public object Activate(IInterceptor interceptor, Tuple ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
 
         private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context) => new ClassProxySyntaxFactory
         (

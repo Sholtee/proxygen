@@ -543,7 +543,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<{cls}>))]
+                    [assembly: EmbedGeneratedType(typeof(ClassProxyGenerator<{cls}>))]
 
                 ",
                 typeof(EmbedGeneratedTypeAttribute).Assembly

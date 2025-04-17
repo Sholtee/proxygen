@@ -1,5 +1,5 @@
 /********************************************************************************
-* ProxyGenerator{TClass}.cs                                                     *
+* ClassProxyGenerator{TClass}.cs                                                *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
@@ -34,7 +34,7 @@ namespace Solti.Utils.Proxy.Generators
     /// </summary>
     /// <typeparam name="TClass">The class to be proxied</typeparam>
     [SupportsSourceGeneration]
-    public sealed class ProxyGenerator<TClass> : Generator<TClass, ClassProxyGenerator, ProxyGenerator<TClass>> where TClass : class
+    public sealed class ClassProxyGenerator<TClass> : Generator<TClass, ClassProxyGenerator, ClassProxyGenerator<TClass>> where TClass : class
     {
         /// <inheritdoc/>
         protected override ClassProxyGenerator GetConcreteGenerator() => new(typeof(TClass));

@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class DelegateProxySyntaxFactoryTests
     {
-        public delegate ref int MyDelegate<T>(string a, ref T[] b, out object c);
+        public delegate int MyDelegate<T>(string a, ref T[] b, out object c);
 
         private static DelegateProxySyntaxFactory CreateSyntaxFactory(Type target, OutputType outputType) => new
         (
