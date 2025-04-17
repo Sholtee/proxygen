@@ -195,7 +195,9 @@ namespace Solti.Utils.Proxy.Internals
                     yield return member;
             else
             {
+                #pragma warning disable RS1024
                 HashSet<IMethodSymbol> overriddenMethods = new(SymbolEqualityComparer.Default);
+                #pragma warning restore RS1024
 
                 //
                 // Order matters: we're processing the hierarchy towards the ancestor
