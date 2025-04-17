@@ -23,7 +23,13 @@ namespace Solti.Utils.Proxy.Generators.Tests
     {
         public abstract class Foo(int myParam)
         {
-            public abstract int Bar<T>(ref T x, out string y, in List<T> z) where T: struct;
+            public virtual int BarVirtual<T>(ref T x, out string y, in List<T> z) where T : struct
+            {
+                y = default;
+                return 0;
+            }
+
+            public abstract void BarAbstract();
 
             public virtual int Prop { get; protected set; }
 
@@ -32,7 +38,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             public int Param { get; } = myParam;
         }
 
-        private sealed class FooInterceptor : IInterceptor
+        private sealed class FooInterceptorChangingTheRetVal : IInterceptor
         {
             public IInvocationContext Context { get; private set; }
 
@@ -43,21 +49,48 @@ namespace Solti.Utils.Proxy.Generators.Tests
             }
         }
 
-        [Test]
-        public async Task GeneratedProxy_ShouldHook()
+        private sealed class FooInterceptorNotChangingTheRetVal : IInterceptor
         {
-            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
+            public IInvocationContext Context { get; private set; }
+
+            public object Invoke(IInvocationContext context)
+            {
+                Context = context;
+                return context.Dispatch();
+            }
+        }
+
+        public static IEnumerable<object[]> Interceptors
+        {
+            get
+            {
+                yield return [new FooInterceptorChangingTheRetVal(), 1];
+                yield return [new FooInterceptorNotChangingTheRetVal(), 0];
+            }
+        }
+
+        [TestCaseSource(nameof(Interceptors))]
+        public async Task GeneratedProxy_ShouldHook(IInterceptor interceptor, int retVal)
+        {
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
-            Assert.That(proxy.Bar(ref i, out _, default), Is.EqualTo(1));
+            Assert.That(proxy.BarVirtual(ref i, out _, default), Is.EqualTo(retVal));
 
-            Assert.That(proxy.Prop, Is.EqualTo(1));
+            Assert.That(proxy.Prop, Is.EqualTo(retVal));
+        }
+
+        [Test]
+        public async Task GeneratedProxy_ShouldThrowOnAbstractMemberInvocation()
+        {
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptorNotChangingTheRetVal(), Tuple.Create(1986));
+            Assert.Throws<NotImplementedException>(proxy.BarAbstract);
         }
 
         [Test]
         public async Task GeneratedProxy_ShouldHandleCtorParams()
         {
-            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptor(), Tuple.Create(1986));
+            Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(new FooInterceptorNotChangingTheRetVal(), Tuple.Create(1986));
 
             Assert.That(proxy.Param, Is.EqualTo(1986));
         }
@@ -65,11 +98,11 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldExposeTheGenericArguments()
         {
-            FooInterceptor interceptor = new();
+            FooInterceptorNotChangingTheRetVal interceptor = new();
             Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
-            proxy.Bar(ref i, out _, default);
+            proxy.BarVirtual(ref i, out _, default);
 
             Assert.That(interceptor.Context.GenericArguments.SequenceEqual([typeof(int)]));
 
@@ -80,14 +113,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldExposeTheTargetMember()
         {
-            FooInterceptor interceptor = new();
+            FooInterceptorNotChangingTheRetVal interceptor = new();
             Foo proxy = await ClassProxyGenerator<Foo>.ActivateAsync(interceptor, Tuple.Create(1986));
 
             int i = 0;
-            proxy.Bar(ref i, out _, default);
+            proxy.BarVirtual(ref i, out _, default);
 
             string s;
-            Assert.That(interceptor.Context.Member.Member, Is.EqualTo(MethodInfoExtensions.ExtractFrom<Foo>(f => f.Bar(ref i, out s ,default)).GetGenericMethodDefinition()));
+            Assert.That(interceptor.Context.Member.Member, Is.EqualTo(MethodInfoExtensions.ExtractFrom<Foo>(f => f.BarVirtual(ref i, out s ,default)).GetGenericMethodDefinition()));
 
             _ = proxy.Prop;
             Assert.That(interceptor.Context.Member.Member, Is.EqualTo(PropertyInfoExtensions.ExtractFrom((Foo f) => f.Prop)));
