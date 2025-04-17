@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -15,13 +16,11 @@ namespace Solti.Utils.Proxy.Generators
 
     file sealed class SupportsSourceGenerationAttribute : SupportsSourceGenerationAttributeBase
     {
-        public override ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new DuckSyntaxFactory
+        public override ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, SyntaxFactoryContext context) => new DuckSyntaxFactory
         (
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-            compilation.Assembly.Name,
-            OutputType.Unit,
-            referenceCollector
+            context
         );
     }
 

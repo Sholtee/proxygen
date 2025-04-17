@@ -33,10 +33,17 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context)
+        protected override IReadOnlyList<ITypeInfo> Bases
         {
-            if (TargetType is not null)
-                yield return MetadataTypeInfo.CreateFrom(typeof(ITargetAccess));
+            get
+            {
+                List<ITypeInfo> result = [];
+                if (TargetType is not null) result.Add
+                (
+                    MetadataTypeInfo.CreateFrom(typeof(ITargetAccess))
+                );
+                return result;
+            }
         }
 
         #if DEBUG

@@ -15,9 +15,16 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ClassSyntaxFactoryBase(string containingAssembly, ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : SyntaxFactoryBase(referenceCollector, languageVersion)
+    internal abstract partial class ClassSyntaxFactoryBase(SyntaxFactoryContext context) : SyntaxFactoryBase(context)
     {
-        public string ContainingAssembly { get; } = containingAssembly;
+        public abstract string ExposedClass { get; }
+
+        public virtual string ContainingAssembly => Context.AssemblyNameOverride ?? ExposedClass;
+
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IReadOnlyList<ITypeInfo> Bases { get; }
 
         #if DEBUG
         internal
@@ -26,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals
         (
             ClassDeclaration
             (
-                identifier: ResolveClassName(context)
+                identifier: ExposedClass
             )
             .WithModifiers
             (
@@ -44,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    ResolveBases(context).ToSyntaxList
+                    Bases.ToSyntaxList
                     (
                         t => (BaseTypeSyntax) SimpleBaseType
                         (
@@ -74,20 +81,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => MemberResolvers.Aggregate(cls, (cls, resolver) =>
-        {
-            cancellation.ThrowIfCancellationRequested();
-            return resolver(cls, context);
-        });
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract string ResolveClassName(object context);
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract IEnumerable<ITypeInfo> ResolveBases(object context);
+        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => MemberResolvers.Aggregate
+        (
+            cls,
+            (cls, resolver) =>
+            {
+                cancellation.ThrowIfCancellationRequested();
+                return resolver(cls, context);
+            }
+        );
     }
 }

@@ -5,10 +5,10 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
@@ -17,20 +17,21 @@ namespace Solti.Utils.Proxy.Internals
 
     internal sealed partial class InterfaceProxySyntaxFactory: ProxyUnitSyntaxFactory
     {
-        private static string ResolveClassName(ITypeInfo interceptorType) => $"Proxy_{interceptorType.GetMD5HashCode()}";
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly ITypeInfo
+            FInterfaceType,
+            FInterceptorType,
+            FTargetType;
 
-        public ITypeInfo InterfaceType { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly IMethodInfo FInvoke;
 
-        public ITypeInfo InterceptorType { get; }
-
-        public new ITypeInfo TargetType { get; }
-
-        public IMethodInfo Invoke { get; }
+        public override string ExposedClass => $"Proxy_{FInterceptorType.GetMD5HashCode()}";
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => new[] { InterceptorType, InterfaceType };
+        protected override IReadOnlyList<ITypeInfo> Bases => [FInterceptorType, FInterfaceType];
 
         #if DEBUG
         internal
@@ -40,28 +41,7 @@ namespace Solti.Utils.Proxy.Internals
             yield return ResolveClass(context, cancellation);
         }
 
-        #if DEBUG
-        internal
-        #endif
-        protected override string ResolveClassName(object context) => ResolveClassName(InterceptorType);
-
-        public InterfaceProxySyntaxFactory
-        (
-            ITypeInfo interfaceType,
-            ITypeInfo interceptorType,
-            string? containingAssembly,
-            OutputType outputType,
-            ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest
-        )
-        : base
-        (
-            null!,
-            outputType,
-            containingAssembly ?? ResolveClassName(interceptorType),
-            referenceCollector,
-            languageVersion
-        ) 
+        public InterfaceProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, SyntaxFactoryContext context) : base(null!, context) 
         {
             if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
@@ -89,16 +69,16 @@ namespace Solti.Utils.Proxy.Internals
             if (!validInterceptor)
                 throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
 
-            InterfaceType = interfaceType;        
-            InterceptorType = interceptorType;
-            TargetType = baseInterceptor!.GenericArguments[1];
+            FInterfaceType = interfaceType;        
+            FInterceptorType = interceptorType;
+            FTargetType = baseInterceptor!.GenericArguments[1];
 
             IMethodInfo invoke = MetadataMethodInfo.CreateFrom
             (
                 MethodInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(static ic => ic.Invoke(default!))
             );
 
-            Invoke = InterceptorType.Methods.Single
+            FInvoke = FInterceptorType.Methods.Single
             (
                 met => met.SignatureEquals(invoke)
             )!;
@@ -106,14 +86,14 @@ namespace Solti.Utils.Proxy.Internals
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (InterceptorType.Flags.HasFlag(TypeInfoFlags.IsFinal))
+            if (FInterceptorType.Flags.HasFlag(TypeInfoFlags.IsFinal))
                 throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
 
-            if (InterceptorType.Flags.HasFlag(TypeInfoFlags.IsAbstract))
+            if (FInterceptorType.Flags.HasFlag(TypeInfoFlags.IsAbstract))
                 throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
 
-            Visibility.Check(InterfaceType, ContainingAssembly);
-            Visibility.Check(InterceptorType, ContainingAssembly);
+            Visibility.Check(FInterfaceType, ContainingAssembly);
+            Visibility.Check(FInterceptorType, ContainingAssembly);
 
             return base.ResolveUnit(context, cancellation);
         }

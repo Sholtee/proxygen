@@ -60,9 +60,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)), 
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-            asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name,
-            OutputType.Module,
-            null
+            SyntaxFactoryContext.Default with
+            {
+                AssemblyNameOverride = asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name
+            }
         );
 
         [Test]
@@ -185,19 +186,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             DuckSyntaxFactory
                 fact1 = new DuckSyntaxFactory
                 (
-                    type1, 
-                    type1, 
-                    "cica", 
-                    (OutputType) outputType, 
-                    new ReferenceCollector()
+                    type1,
+                    type1,
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
                 fact2 = new DuckSyntaxFactory
                 (
                     type2, 
-                    type2, 
-                    "cica", 
-                    (OutputType) outputType,
-                    new ReferenceCollector()
+                    type2,
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
             string

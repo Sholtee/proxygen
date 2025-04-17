@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IPropertyInfo ifaceProperty in InterfaceType.Properties)
+            foreach (IPropertyInfo ifaceProperty in FInterfaceType.Properties)
             {
                 IPropertyInfo targetProperty = GetTargetMember(ifaceProperty, TargetType!.Properties, SignatureEquals);
 

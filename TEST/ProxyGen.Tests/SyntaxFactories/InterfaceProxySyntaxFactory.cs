@@ -47,9 +47,11 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(iface),
             MetadataTypeInfo.CreateFrom(interceptor),
-            typeof(InterfaceProxySyntaxFactoryTests).Assembly.GetName().Name,
-            outputType,
-            null
+            SyntaxFactoryContext.Default with
+            {
+                OutputType = outputType,
+                AssemblyNameOverride = typeof(InterfaceProxySyntaxFactoryTests).Assembly.GetName().Name
+            }
         );
 
         private static InterfaceProxySyntaxFactory CreateSyntaxFactory<TInterface, TInterceptor>(OutputType outputType) => CreateSyntaxFactory(typeof(TInterface), typeof(TInterceptor), outputType);
@@ -174,9 +176,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
-                "cica", 
-                OutputType.Module,
-                null
+                SyntaxFactoryContext.Default
             ).ResolveProperties(GetDummyClass(), null).Members;
 
             Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt")))));
@@ -257,18 +257,14 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 fact1 = new InterfaceProxySyntaxFactory
                 (
                     type1, 
-                    interceptor1.Close(type1), 
-                    "cica", 
-                    (OutputType) outputType,
-                    new ReferenceCollector()
+                    interceptor1.Close(type1),
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
                 fact2 = new InterfaceProxySyntaxFactory
                 (
                     type2, 
-                    interceptor2.Close(type2), 
-                    "cica", 
-                    (OutputType) outputType,
-                    new ReferenceCollector()
+                    interceptor2.Close(type2),
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
             string

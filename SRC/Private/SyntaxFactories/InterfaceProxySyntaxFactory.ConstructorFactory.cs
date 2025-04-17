@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveConstructors(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IConstructorInfo ctor in InterceptorType.GetConstructors(AccessModifiers.Public))
+            foreach (IConstructorInfo ctor in FInterceptorType.GetConstructors(AccessModifiers.Public))
             {
                 cls = ResolveConstructor(cls, context, ctor);
             }
@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
                             kind: SyntaxKind.SimpleAssignmentExpression,
                             left: PropertyAccess
                             (
-                                InterceptorType.Properties.Single
+                                FInterceptorType.Properties.Single
                                 (
                                     static prop => prop.Name == nameof(InterfaceInterceptor<object>.Proxy)
                                 ),

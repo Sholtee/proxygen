@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
                 throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
             return
-                InterceptorType.Interfaces.Any(iface => iface.EqualsTo(ifaceMember.DeclaringType)) ||
+                FInterceptorType.Interfaces.Any(iface => iface.EqualsTo(ifaceMember.DeclaringType)) ||
                 targetMembers.Any(targetMember => signatureEquals(targetMember, ifaceMember));
         }
 
@@ -51,13 +51,13 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         ExpressionSyntax ResolveInterfaceMap()
         {
-            if (TargetType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            if (FTargetType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 return LiteralExpression(SyntaxKind.NullLiteralExpression);
 
             IGenericTypeInfo map = 
             (
                 (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceMap<,>))
-            ).Close(InterfaceType, TargetType);
+            ).Close(FInterfaceType, FTargetType);
 
             return MemberAccessExpression
             (

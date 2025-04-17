@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 
 using Tuple =
     #if NETSTANDARD2_1_OR_GREATER
@@ -21,13 +22,11 @@ namespace Solti.Utils.Proxy.Generators
 
     file sealed class SupportsSourceGenerationAttribute : SupportsSourceGenerationAttributeBase
     {
-        public override ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, Compilation compilation, ReferenceCollector? referenceCollector) => new InterfaceProxySyntaxFactory
+        public override ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, SyntaxFactoryContext context) => new InterfaceProxySyntaxFactory
         (
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[0], compilation),
             SymbolTypeInfo.CreateFrom(generator.TypeArguments[1], compilation),
-            compilation.Assembly.Name,
-            OutputType.Unit,
-            referenceCollector
+            context
         );
     }
 

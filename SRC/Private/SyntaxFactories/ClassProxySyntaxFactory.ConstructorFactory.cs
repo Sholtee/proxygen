@@ -20,7 +20,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             int found = 0;
 
-            foreach (IConstructorInfo ctor in BaseType.GetConstructors(AccessModifiers.Protected))
+            foreach (IConstructorInfo ctor in FBaseType.GetConstructors(AccessModifiers.Protected))
                 if (IsVisible(ctor))
                 {
                     cls = ResolveConstructor(cls, context, ctor);
@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
                 }
 
             if (found is 0)
-                throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, BaseType.Name));
+                throw new InvalidOperationException(string.Format(Resources.NO_ACCESSIBLE_CTOR, FBaseType.Name));
 
             return cls;
         }

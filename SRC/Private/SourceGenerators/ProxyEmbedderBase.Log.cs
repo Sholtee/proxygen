@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
         internal protected static string? LogException(Exception ex, in CancellationToken cancellation)
         {
-            string? logDump = WorkingDirectories.Instance.LogDump;
+            string? logDump = null;  // TODO: implement real logging
             if (logDump is not null)
             {
                 string logFile = Path.Combine(logDump, $"ProxyGen_{Guid.NewGuid()}.log");

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -30,9 +31,7 @@ namespace Solti.Utils.Proxy.Internals
             //
 
             foreach (Module module in assembly.GetModules())
-            {
                 RuntimeHelpers.RunModuleConstructor(module.ModuleHandle);
-            }
         }
 
         private static TypeContext? GetInstanceFromCache(string className, bool throwOnMissing)
@@ -42,15 +41,27 @@ namespace Solti.Utils.Proxy.Internals
             return type;
         }
 
-        private protected abstract ProxyUnitSyntaxFactoryBase CreateMainUnit(string? asmName, ReferenceCollector referenceCollector);
+        private protected abstract ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context);
 
-        private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(ReferenceCollector referenceCollector);
+        private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context);
 
-        internal Task<TypeContext> EmitAsync(string? asmName, string? asmCacheDir, CancellationToken cancellation)
+        private protected Task<TypeContext> EmitAsync(CancellationToken cancellation) => EmitAsync
+        (
+            SyntaxFactoryContext.Default with { ReferenceCollector = new ReferenceCollector() },
+            cancellation
+        );
+
+        #if DEBUG
+        internal
+        #else
+        private protected
+        #endif
+        Task<TypeContext> EmitAsync(SyntaxFactoryContext context, CancellationToken cancellation)
         {
-            ReferenceCollector referenceCollector = new();
+            Debug.Assert(context.OutputType is OutputType.Module, $"Incompatible {nameof(context.OutputType)}");
+            Debug.Assert(context.ReferenceCollector is not null, $"{nameof(context.ReferenceCollector)} cannot be null when compiling a module");
 
-            ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(asmName, referenceCollector);
+            ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
 
             //
             // 1) Type already loaded (for e.g. in case of embedded types)
@@ -68,9 +79,9 @@ namespace Solti.Utils.Proxy.Internals
 
                 string? cacheFile = null;
 
-                if (!string.IsNullOrEmpty(asmCacheDir))
+                if (!string.IsNullOrEmpty(context.Config.AssemblyCacheDir))
                 {
-                    cacheFile = Path.Combine(asmCacheDir, $"{mainUnit.ContainingAssembly}.dll");
+                    cacheFile = Path.Combine(context.Config.AssemblyCacheDir, $"{mainUnit.ContainingAssembly}.dll");
 
                     if (File.Exists(cacheFile))
                     {
@@ -87,27 +98,29 @@ namespace Solti.Utils.Proxy.Internals
                     // cache directory exits.
                     //
 
-                    Directory.CreateDirectory(asmCacheDir);
+                    Directory.CreateDirectory(context.Config.AssemblyCacheDir);
                 }
 
                 //
                 // 3) Compile the assembly from the scratch.
                 //
 
-                List<UnitSyntaxFactoryBase> units = new
-                (
-                    CreateChunks(referenceCollector)
-                )
-                {
+                List<UnitSyntaxFactoryBase> units =
+                [
+                    .. CreateChunks(context),
                     mainUnit
-                };
+                ];
 
                 using Stream asm = Compile.ToAssembly
                 (
-                    [..units.Select(unit => unit.ResolveUnitAndDump(cancellation))],
+                    units
+                        .Select(unit => unit.ResolveUnitAndDump(cancellation)),
                     mainUnit.ContainingAssembly,
                     cacheFile,
-                    [..referenceCollector.References.Select(static asm => MetadataReference.CreateFromFile(asm.Location!))],
+                    context
+                        .ReferenceCollector!
+                        .References
+                        .Select(static asm => MetadataReference.CreateFromFile(asm.Location!)),
                     customConfig: null,
                     cancellation
                 );
@@ -121,7 +134,7 @@ namespace Solti.Utils.Proxy.Internals
             }, cancellation);
         }
 #if DEBUG
-        internal string GetDefaultAssemblyName() => CreateMainUnit(null, null!).ContainingAssembly;
+        internal string GetDefaultAssemblyName() => CreateMainUnit(SyntaxFactoryContext.Default).ContainingAssembly;
 #endif
     }
 }

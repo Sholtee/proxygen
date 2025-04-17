@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         private NameSyntax GetQualifiedName(ITypeInfo type)
         {
-            ReferenceCollector?.AddType(type);
+            Context.ReferenceCollector?.AddType(type);
 
             string[] parts = type.Name.Split(Type.Delimiter);
 

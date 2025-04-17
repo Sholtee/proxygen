@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IPropertyInfo prop in BaseType.Properties)
+            foreach (IPropertyInfo prop in FBaseType.Properties)
             {
                 IMethodInfo targetMethod = prop.GetMethod ?? prop.SetMethod!;
                 if (targetMethod.IsAbstract || targetMethod.IsVirtual)

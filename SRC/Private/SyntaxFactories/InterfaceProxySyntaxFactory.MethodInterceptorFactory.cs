@@ -23,13 +23,13 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo ifaceMethod in InterfaceType.Methods)
+            foreach (IMethodInfo ifaceMethod in FInterfaceType.Methods)
             {
                 //
                 // Starting from .NET Core 5.0 interface methods may have visibility
                 //
 
-                if (AlreadyImplemented(ifaceMethod, InterceptorType.Methods, SignatureEquals) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
+                if (AlreadyImplemented(ifaceMethod, FInterceptorType.Methods, SignatureEquals) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
                     continue;
 
                 //
@@ -139,7 +139,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 InvocationExpressionSyntax invocation = InvokeMethod
                 (
-                    Invoke,
+                    FInvoke,
                     arguments: Argument
                     (
                         ResolveObject<InterfaceInvocationContext>

@@ -44,13 +44,11 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public object Activate(object target) => ActivateAsync(target, CancellationToken.None).GetAwaiter().GetResult();
 
-        private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(string? asmName, ReferenceCollector referenceCollector) => new DuckSyntaxFactory
+        private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context) => new DuckSyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(Interface),
             MetadataTypeInfo.CreateFrom(Target),
-            asmName,
-            OutputType.Module,
-            referenceCollector
+            context
         );
     }
 }

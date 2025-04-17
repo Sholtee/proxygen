@@ -20,9 +20,9 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IPropertyInfo prop in InterfaceType.Properties)
+            foreach (IPropertyInfo prop in FInterfaceType.Properties)
             {
-                if (AlreadyImplemented(prop, InterceptorType.Properties, SignatureEquals))
+                if (AlreadyImplemented(prop, FInterceptorType.Properties, SignatureEquals))
                     continue;
 
                 cls = ResolveProperty(cls, context, prop);
@@ -90,7 +90,7 @@ namespace Solti.Utils.Proxy.Internals
 
             const int CALL_INDEX = 0;
 
-            List<MemberDeclarationSyntax> members = new();
+            List<MemberDeclarationSyntax> members = [];
 
             BlockSyntax?
                 get = null,
@@ -133,7 +133,7 @@ namespace Solti.Utils.Proxy.Internals
                         property.Type,
                         InvokeMethod
                         (
-                            Invoke,
+                            FInvoke,
                             arguments: Argument
                             (
                                 ResolveObject<InterfaceInvocationContext>
@@ -189,7 +189,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         InvokeMethod
                         (
-                            Invoke,
+                            FInvoke,
                             arguments: Argument
                             (
                                 ResolveObject<InterfaceInvocationContext>

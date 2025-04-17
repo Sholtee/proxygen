@@ -264,7 +264,7 @@ namespace Solti.Utils.Proxy.Internals
                     Block(body)
                 );
 
-            if (hasTarget && LanguageVersion >= LanguageVersion.CSharp9)
+            if (hasTarget && Context.LanguageVersion >= LanguageVersion.CSharp9)
                 lambda = lambda.WithModifiers
                 (
                     modifiers: TokenList

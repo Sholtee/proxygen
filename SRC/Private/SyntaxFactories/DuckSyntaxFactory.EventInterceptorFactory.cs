@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IEventInfo ifaceEvt in InterfaceType.Events)
+            foreach (IEventInfo ifaceEvt in FInterfaceType.Events)
             {
                 IEventInfo targetEvt = GetTargetMember
                 (
