@@ -285,7 +285,8 @@ namespace Solti.Utils.Proxy.Generators.Tests
                                     [nameof(Config.AssemblyCacheDir)] = cacheDir
                                 }
                             )
-                        )
+                        ),
+                        ReferenceCollector = new ReferenceCollector()
                     },
                     default
                 )
