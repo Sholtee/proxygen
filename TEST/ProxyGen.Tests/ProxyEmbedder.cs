@@ -560,9 +560,8 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
         public static IEnumerable<string> ProxyGeneration_AgainstRandomDelegates_Params => DelegateProxyGeneratorTests
             .GeneratedProxy_AgainstSystemType_Params
-            .Where(et => !et.IsNested)
-            .Except([typeof(ConditionalWeakTable<object, object>)])
-            .Select(static del => del.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
+            .Except([typeof(ConditionalWeakTable<object, object>.CreateValueCallback)])  // GetFriendlyName() messes up the name
+            .Select(static del => del.GetFriendlyName().Replace('{', '<').Replace('}', '>').Replace('+', '.'));
 
         [TestCaseSource(nameof(ProxyGeneration_AgainstRandomDelegates_Params))]
         public void ProxyGeneration_AgainstRandomDelegates(string del)

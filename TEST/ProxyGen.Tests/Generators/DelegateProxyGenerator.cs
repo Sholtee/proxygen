@@ -106,6 +106,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public static IEnumerable<Type> GeneratedProxy_AgainstSystemType_Params => typeof(object)
             .Assembly
             .GetExportedTypes()
+            .Except
+            ([
+#if NET6_0_OR_GREATER
+                typeof(System.Runtime.InteropServices.ObjectiveC.ObjectiveCMarshal.UnhandledExceptionPropagationHandler)
+#endif
+            ])
             .Where
             (
                 et => 
@@ -122,7 +128,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
             )
             .Where
             (
-                et => !et.GetMethod("Invoke").GetParameters().Any(p => p.ParameterType.GetRefType() is RefType.Ref or RefType.Pointer)
+                et =>
+                {
+                    return et.GetMethod("Invoke").GetParameters().All
+                    (
+                        p => Valid(p.ParameterType.IsByRef ? p.ParameterType.GetElementType() : p.ParameterType)
+                    );
+
+                    static bool Valid(Type t) => t.GetRefType() switch
+                    {
+                        RefType.Array => Valid(t.GetElementType()),
+                        RefType.None => true,
+                        _ => false
+                    };
+                }
             );
 
         [TestCaseSource(nameof(GeneratedProxy_AgainstSystemType_Params))]
