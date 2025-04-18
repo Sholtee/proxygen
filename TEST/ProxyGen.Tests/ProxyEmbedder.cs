@@ -26,6 +26,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
     using Proxy.Generators.Tests;
     using Proxy.Tests.EmbeddedTypes;
     using Proxy.Tests;
+    using System.Runtime.CompilerServices;
 
     public interface IMyService { }
 
@@ -557,10 +558,40 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(diags.Count(diag => diag.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error), Is.EqualTo(0));
         }
 
+        public static IEnumerable<string> ProxyGeneration_AgainstRandomDelegates_Params => DelegateProxyGeneratorTests
+            .GeneratedProxy_AgainstSystemType_Params
+            .Where(et => !et.IsNested)
+            .Except([typeof(ConditionalWeakTable<object, object>)])
+            .Select(static del => del.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
+
+        [TestCaseSource(nameof(ProxyGeneration_AgainstRandomDelegates_Params))]
+        public void ProxyGeneration_AgainstRandomDelegates(string del)
+        {
+            Compilation compilation = CreateCompilation
+            (
+                @$"
+                    using Solti.Utils.Proxy;
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DelegateProxyGenerator<{del}>))]
+
+                ",
+                typeof(EmbedGeneratedTypeAttribute).Assembly
+            );
+
+            Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
+
+            GeneratorDriver driver = CreateDriver(null);
+            driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
+
+            Assert.That(diags.Count(diag => diag.Severity is DiagnosticSeverity.Warning or DiagnosticSeverity.Error), Is.EqualTo(0));
+        }
+
         public static IEnumerable<string> DuckGeneration_AgainstRandomInterfaces_Params => RandomInterfaces<object>
             .Values
             // ambiguous match
-            .Except(new[] { typeof(ITypeLib2), typeof(ITypeInfo2), typeof(IEnumerator<object>) })
+            .Except([typeof(ITypeLib2), typeof(ITypeInfo2), typeof(IEnumerator<object>)])
             .Select(static iface => iface.GetFriendlyName().Replace('{', '<').Replace('}', '>'));
 
         [TestCaseSource(nameof(DuckGeneration_AgainstRandomInterfaces_Params))]

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -12,6 +13,8 @@ using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
+    using Internals;
+
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class DelegateProxyGeneratorTests
     {
@@ -99,5 +102,31 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(interceptor.Context.Member.Method.GetCustomAttribute<MyAnnotationAttribute>(), Is.Not.Null);
         }
+
+        public static IEnumerable<Type> GeneratedProxy_AgainstSystemType_Params => typeof(object)
+            .Assembly
+            .GetExportedTypes()
+            .Where
+            (
+                et => 
+                    et.IsDelegate() && 
+                    (!et.IsGenericType || !et.GetGenericArguments().SelectMany(ga => ga.GetGenericParameterConstraints()).Any())
+            )
+            .Select
+            (
+                et =>
+                    et.IsGenericType &&
+                    et.IsGenericTypeDefinition
+                        ? et.MakeGenericType(et.GetGenericArguments().Length.Times(() => typeof(object)).ToArray())
+                        : et
+            )
+            .Where
+            (
+                et => !et.GetMethod("Invoke").GetParameters().Any(p => p.ParameterType.GetRefType() is RefType.Ref or RefType.Pointer)
+            );
+
+        [TestCaseSource(nameof(GeneratedProxy_AgainstSystemType_Params))]
+        public void GeneratedProxy_AgainstSystemType(Type type) =>
+            Assert.DoesNotThrow(() => new DelegateProxyGenerator(type).GetGeneratedType());
     }
 }

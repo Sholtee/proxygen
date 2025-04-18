@@ -303,7 +303,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         public static bool IsDelegate(this Type src) =>
-            (src.GetInnermostElementType() ?? src).GetBaseTypes().Any(static bt => bt == typeof(Delegate)) && src != typeof(MulticastDelegate);
+            (src.GetInnermostElementType() ?? src).GetBaseTypes().Contains(typeof(Delegate)) && src != typeof(MulticastDelegate);
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
