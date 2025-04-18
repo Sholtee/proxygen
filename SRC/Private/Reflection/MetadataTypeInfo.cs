@@ -19,11 +19,9 @@ namespace Solti.Utils.Proxy.Internals
         public static ITypeInfo CreateFrom(Type underlyingType)
         {
             while (underlyingType.IsByRef)
-            {
                 underlyingType = underlyingType.GetElementType();
-            }
 
-            if (underlyingType.IsFunctionPointer())
+            if (underlyingType.IsFunctionPointer())  // TODO: FIXME: remove this workaround
                 underlyingType = typeof(IntPtr);
 
             return underlyingType switch
