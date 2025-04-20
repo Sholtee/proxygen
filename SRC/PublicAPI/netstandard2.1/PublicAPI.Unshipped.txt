@@ -106,6 +106,7 @@ static Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.ActivateA
 static Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.Activate(System.Runtime.CompilerServices.ITuple! ctorParamz) -> TInterface!
 static Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.ActivateAsync(System.Runtime.CompilerServices.ITuple! ctorParamz, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
 static Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
+static Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
 static Solti.Utils.Proxy.Internals.Generator.GenerateId(string! prefix, params System.Collections.Generic.IEnumerable<System.Type!>! types) -> string!
 static Solti.Utils.Proxy.Internals.Generator<TTarget, TGenerator, TDescendant>.GetGeneratedType() -> System.Type!
 static Solti.Utils.Proxy.Internals.Generator<TTarget, TGenerator, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Type!>!

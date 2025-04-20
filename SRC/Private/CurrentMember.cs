@@ -40,5 +40,29 @@ namespace Solti.Utils.Proxy.Internals
 
             return true;
         }
+
+        /// <summary>
+        /// Gets the interface member that is implemented by the currently executing method.
+        /// </summary>
+        /// <returns>Returns false if the <paramref name="memberInfo"/> is not null</returns>
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        public static bool GetImplementedInterfaceMethod(ref ExtendedMemberInfo memberInfo)
+        {
+            if (memberInfo is not null)
+                return false;
+
+            //
+            // Get the calling method
+            //
+
+            MethodInfo callingMethod = (MethodInfo) new StackTrace().GetFrame(1).GetMethod();
+
+            MethodInfo[] implementedInterfaceMethods = [.. callingMethod.GetImplementedInterfaceMethods()];
+            if (implementedInterfaceMethods.Length is not 1)
+                throw new InvalidOperationException(string.Format(Resources.AMBIGUOUS_MATCH, callingMethod));
+
+            memberInfo = new ExtendedMemberInfo(implementedInterfaceMethods[0]);
+            return true;
+        }
     }
 }
