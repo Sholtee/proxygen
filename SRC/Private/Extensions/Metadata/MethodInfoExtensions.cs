@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -33,7 +34,7 @@ namespace Solti.Utils.Proxy.Internals
                 .GetImplementedInterfaceMethods()
                 .Select(static m => m.ReflectedType);
 
-        public static IEnumerable<MethodBase> GetImplementedInterfaceMethods(this MethodBase src)
+        public static IEnumerable<MethodInfo> GetImplementedInterfaceMethods(this MethodBase src)
         {
             //
             // As of C# 11 interfaces may have static abstract methods... We don't deal with
@@ -58,12 +59,12 @@ namespace Solti.Utils.Proxy.Internals
 
                 InterfaceMapping mapping = reflectedType.GetInterfaceMap(iface);
 
-                int? mapIndex = mapping
+                int mapIndex = mapping
                     .TargetMethods
                     .IndexOf(method);
 
                 if (mapIndex >= 0) 
-                    yield return mapping.InterfaceMethods[mapIndex.Value];
+                    yield return mapping.InterfaceMethods[mapIndex];
             }
         }
 
@@ -79,8 +80,7 @@ namespace Solti.Utils.Proxy.Internals
             }
             */
 
-            if (method.IsGenericMethod)
-                method = method.GetGenericMethodDefinition();
+            Debug.Assert(!method.IsGenericMethod || method.IsGenericMethodDefinition, "The original method cannot be closed generic");
 
             //
             // GetBaseDefinition() won't work for "new" override as well as it always return the declaring
@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (Type baseType in method.ReflectedType.GetBaseTypes())
             {
                 //
-                // baseType.GetMethod(method.Name, types: paramz) won't for for generic methods
+                // baseType.GetMethod(method.Name, types: paramz) won't work for generic methods
                 //
 
                 foreach(MethodInfo baseMethod in  baseType.GetMethods(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.NonPublic | (method.IsStatic ? BindingFlags.Static : BindingFlags.Instance)))
@@ -102,26 +102,21 @@ namespace Solti.Utils.Proxy.Internals
 
                     if (baseMethod.IsGenericMethod)
                     {
+                        Debug.Assert(baseMethod.IsGenericMethodDefinition, "The inspected method cannot be closed generic");
+
+                        //
+                        // We don't need to compare the generic parameters, just check the arity
+                        //
+
                         if (!method.IsGenericMethod || baseMethod.GetGenericArguments().Length != method.GetGenericArguments().Length)
                             continue;
-
-                        //
-                        // We don't need to compare the generic parameters
-                        //
                     }
 
-                    ParameterInfo[] baseParamz = baseMethod.GetParameters();
-                    if (baseParamz.Length != paramz.Length)
-                        continue;
-
-                    for (int i = 0; i < baseParamz.Length; i++)
-                        if (!paramz[i].EqualsTo(baseParamz[i].ParameterType))
-                            goto next;
-
-                    return baseMethod;
-                    next:;
+                    if (baseMethod.GetParameters().Select(static p => p.ParameterType).SequenceEqual(paramz, TypeComparer.Instance))
+                        return baseMethod;
                 }
             }
+
             return null;
         }
 
