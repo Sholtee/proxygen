@@ -23,8 +23,9 @@ namespace Solti.Utils.Proxy.Internals
         ///     
         ///     System.Object result = FInterceptor.Invoke
         ///     (
-        ///         new ClassInvocationContext
+        ///         new InvocationContext
         ///         (
+        ///             this,
         ///             new ExtendedMemberInfo(FTarget.Method),
         ///             args =>
         ///             {
@@ -70,11 +71,15 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         Block
                         (
-                            ResolveInvokeInterceptor<ClassInvocationContext>
+                            ResolveInvokeInterceptor<InvocationContext>
                             (
                                 FInvokeDelegate,
                                 argsArray =>
                                 [
+                                    Argument
+                                    (
+                                        ThisExpression()
+                                    ),
                                     Argument
                                     (
                                         ResolveObject<ExtendedMemberInfo>
@@ -90,7 +95,6 @@ namespace Solti.Utils.Proxy.Internals
                                         ResolveInvokeTarget
                                         (
                                             FInvokeDelegate,
-                                            hasTarget: false,
                                             (_, locals) => InvokeMethod
                                             (
                                                 FInvokeDelegate,

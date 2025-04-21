@@ -67,6 +67,11 @@ namespace Solti.Utils.Proxy.Internals
             IPropertyInfo ifaceProperty = (IPropertyInfo) context;
 
             Visibility.Check(targetProperty, ContainingAssembly);
+
+            //
+            // Starting from .NET 5.0 interfaces may have visibility.
+            //
+
             Visibility.Check(ifaceProperty, ContainingAssembly);
 
             IMethodInfo accessor = targetProperty.GetMethod ?? targetProperty.SetMethod!;

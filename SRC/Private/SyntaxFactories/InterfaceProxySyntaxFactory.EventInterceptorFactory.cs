@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,60 +20,40 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvents(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IEventInfo evt in FInterfaceType.Events)
-            {
-                if (AlreadyImplemented(evt, FInterceptorType.Events, SignatureEquals))
-                    continue;
-
+            foreach (IEventInfo evt in TargetType!.Events)
                 cls = ResolveEvent(cls, context, evt);
-            }
 
             return cls;
-
-            static bool SignatureEquals(IEventInfo targetEvent, IEventInfo ifaceEvent)
-            {
-                if (ifaceEvent.AddMethod is not null)
-                {
-                    if (targetEvent.AddMethod?.SignatureEquals(ifaceEvent.AddMethod) is not true)
-                        return false;
-                }
-
-                if (ifaceEvent.RemoveMethod is not null)
-                {
-                    if (targetEvent.RemoveMethod?.SignatureEquals(ifaceEvent.RemoveMethod) is not true)
-                        return false;
-                }
-
-                return true;
-            }
         }
 
         /// <summary>
-        /// <code>
-        /// private static readonly InterfaceInterceptionContext FXxX = new InterfaceInterceptionContext((object target, object[] args) =>
-        /// {                                                                                                
-        ///     EventType _value = (EventType) args[0];                                                      
-        ///     ((ITarget)target).Event += _value;                                                                      
-        ///     return null;                                                                                  
-        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                              
-        /// private static readonly InterfaceInterceptionContext FYyY = new InterfaceInterceptionContext((object target, object[] args) => 
-        /// {                                                                                                 
-        ///     EventType _value = (EventType) args[0];                                                      
-        ///     ((ITarget)target).Event -= _value;                                                                       
-        ///     return null;                                                                                 
-        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                             
+        /// <code>       
+        /// private static ExtendedMemberInfo FXxX;
         /// event EventType IInterface.Event                                                                  
         /// {                                                                                                 
-        ///     add                                                                                          
-        ///     {                                                                                           
-        ///         object[] args = new object[] { value };                                                
-        ///         Invoke(new InterfaceInvocationContext(args, FXxX));                                               
-        ///     }                                                                                            
-        ///     remove                                                                                       
-        ///     {                                                                                          
-        ///         object[] args = new object[] { value };                                             
-        ///         Invoke(new InterfaceInvocationContext(args, FYyY));                                              
-        ///     }                                                                                           
+        ///     add
+        ///     {
+        ///         CurrentMethod.GetBase(ref FXxX);
+        ///     
+        ///         object[] args = new object[] {value};
+        ///         
+        ///         FInterceptor.Invoke
+        ///         (
+        ///             new InvocationContext
+        ///             (
+        ///                 this,
+        ///                 FXxX,
+        ///                 args =>
+        ///                 {
+        ///                     TCallback cb_value = (TCallback) args[0];
+        ///                     base.Event += cb_value;         
+        ///                     return null;    
+        ///                 },
+        ///                 args,
+        ///                 new Type[] {}
+        ///             )
+        ///         ); 
+        ///     }                                                                                          
         /// }
         /// </code>
         /// </summary>
@@ -81,35 +62,40 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt)
         {
-            //
-            // For now, we only have call-index of 0
-            //
-
-            const int CALL_INDEX = 0;
-
             FieldDeclarationSyntax
-                addContext = BuildField(true),
-                removeContext = BuildField(false);
+                addField = ResolveField<ExtendedMemberInfo>
+                (
+                    $"F{evt.AddMethod.GetMD5HashCode()}",
+                    @readonly: false
+                ),
+                removeField = ResolveField<ExtendedMemberInfo>
+                (
+                    $"F{evt.RemoveMethod.GetMD5HashCode()}",
+                    @readonly: false
+                );
 
-            List<MemberDeclarationSyntax> members = 
-            [
-                addContext,
-                removeContext,
+            return cls.AddMembers
+            (
+                addField,
+                removeField,
                 ResolveEvent
                 (
                     evt,
-                    BuildBody(evt.AddMethod, addContext),
-                    BuildBody(evt.RemoveMethod, removeContext)
+                    Block
+                    (
+                        BuildBody(true)
+                    ),
+                    Block
+                    (
+                        BuildBody(false)
+                    )
                 )
-            ];
-
-            return cls.WithMembers
-            (
-                cls.Members.AddRange(members)
             );
 
-            FieldDeclarationSyntax BuildField(bool add)
+            IEnumerable<StatementSyntax> BuildBody(bool add)
             {
+                FieldDeclarationSyntax field = add ? addField : removeField;
+
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
 
                 //
@@ -118,57 +104,61 @@ namespace Solti.Utils.Proxy.Internals
 
                 Visibility.Check(backingMethod, ContainingAssembly);
 
-                return ResolveMethodContext
+                yield return ExpressionStatement
                 (
-                    backingMethod.GetMD5HashCode(),
-                    ResolveInvokeTarget
+                    InvokeMethod
                     (
-                        backingMethod,
-                        hasTarget: true,
-                        (paramz, locals) => RegisterEvent
+                        FGetImplementedInterfaceMethod,
+                        arguments: Argument
                         (
-                            evt,
-                            IdentifierName(paramz[0].Identifier),
-                            add,
-                            ResolveIdentifierName
-                            (
-                                locals.Single()
-                            ),
-                            castTargetTo: evt.DeclaringType
+                            StaticMemberAccess(cls, field)
                         )
-                    ),
-                    CALL_INDEX
+                    )
                 );
-            }
 
-            BlockSyntax BuildBody(IMethodInfo method, FieldDeclarationSyntax field)
-            {
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
-
-                StatementSyntax[] statements =
-                [
-                    argsArray,
-                    ExpressionStatement
-                    (
-                        InvokeMethod
+                IEnumerable<StatementSyntax> interceptorInvocation = ResolveInvokeInterceptor<InvocationContext>
+                (
+                    backingMethod,
+                    argsArray =>
+                    [
+                        Argument
                         (
-                            FInvoke,
-                            arguments: Argument
+                            ThisExpression()
+                        ),
+                        Argument
+                        (
+                            StaticMemberAccess(cls, field)
+                        ),
+                        Argument
+                        (
+                            ResolveInvokeTarget
                             (
-                                ResolveObject<InterfaceInvocationContext>
+                                backingMethod,
+                                (_, locals) => RegisterEvent
                                 (
-                                    ResolveArgument(argsArray),
-                                    Argument
+                                    evt,
+                                    target: GetTarget(),
+                                    add,
+                                    ResolveIdentifierName
                                     (
-                                        StaticMemberAccess(cls, field)
+                                        locals.Single()
                                     )
                                 )
                             )
+                        ),
+                        Argument
+                        (
+                            ResolveIdentifierName(argsArray)
+                        ),
+                        Argument
+                        (
+                            ResolveArray<Type>([])
                         )
-                    )
-                ];
+                    ]
+                );
 
-                return Block(statements);
+                foreach (StatementSyntax statement in interceptorInvocation)
+                    yield return statement;
             }
         }
     }

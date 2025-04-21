@@ -43,8 +43,9 @@ namespace Solti.Utils.Proxy.Internals
         ///         
         ///         FInterceptor.Invoke
         ///         (
-        ///             new ClassInvocationContext
+        ///             new InvocationContext
         ///             (
+        ///                 this,
         ///                 FXxX,
         ///                 args =>
         ///                 {
@@ -115,11 +116,15 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 );
 
-                IEnumerable<StatementSyntax> interceptorInvocation = ResolveInvokeInterceptor<ClassInvocationContext>
+                IEnumerable<StatementSyntax> interceptorInvocation = ResolveInvokeInterceptor<InvocationContext>
                 (
                     backingMethod,
                     argsArray =>
                     [
+                        Argument
+                        (
+                            ThisExpression()
+                        ),
                         Argument
                         (
                             StaticMemberAccess(cls, field)
@@ -129,7 +134,6 @@ namespace Solti.Utils.Proxy.Internals
                             backingMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
                             (
                                 backingMethod,
-                                hasTarget: false,
                                 (_, locals) => RegisterEvent
                                 (
                                     evt,

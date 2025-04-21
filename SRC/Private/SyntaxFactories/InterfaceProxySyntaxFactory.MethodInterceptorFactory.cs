@@ -4,18 +4,14 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    using Properties;
-
     internal partial class InterfaceProxySyntaxFactory
     {
         #if DEBUG
@@ -23,55 +19,50 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethods(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IMethodInfo ifaceMethod in FInterfaceType.Methods)
-            {
-                //
-                // Starting from .NET Core 5.0 interface methods may have visibility
-                //
-
-                if (AlreadyImplemented(ifaceMethod, FInterceptorType.Methods, SignatureEquals) || ifaceMethod.IsSpecial || ifaceMethod.AccessModifiers <= AccessModifiers.Protected)
-                    continue;
-
-                //
-                // "ref return"s not supported
-                //
-
-                if (ifaceMethod.ReturnValue.Kind >= ParameterKind.Ref)
-                    throw new NotSupportedException(Resources.REF_VALUE);
-
+            foreach (IMethodInfo ifaceMethod in TargetType!.Methods)
                 cls = ResolveMethod(cls, context, ifaceMethod);
-            }
 
             return cls;
-
-            static bool SignatureEquals(IMethodInfo targetMethod, IMethodInfo ifaceMethod) =>
-                targetMethod.SignatureEquals(ifaceMethod);
         }
 
         /// <summary>
         /// <code>
-        /// private static readonly InterfaceInterceptionContext FXxX = new InterfaceInterceptionContext((object target, object[] args) =>       
-        /// {                                                                                                    
-        ///     System.Int32 cb_a = (System.Int32) args[0];                                                       
-        ///     System.String cb_b;                                                                               
-        ///     TT cb_c = (TT) args[2];                                                                          
-        ///     System.Object result;                                                                                
-        ///     result = ((TInterface) target).Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);                                  
+        /// private static ExtendedMemberInfo FXxX;
+        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)
+        /// {
+        ///     CurrentMethod.GetImplementedInterfaceMethod(ref FXxX);
+        ///     
+        ///     object[] args = new object[] {para1, para2, default(T3), para4};
+        ///     
+        ///     System.Object result = FInterceptor.Invoke
+        ///     (
+        ///         new ClassInvocationContext
+        ///         (
+        ///             this,
+        ///             FXxX,
+        ///             args =>
+        ///             {
+        ///                 TGeneric1 cb_a = (T1) args[0];
+        ///                 T2 cb_b = (T2) args[1];                                                                                 
+        ///                 T3 cb_c;
+        ///                 cb_d = (TGeneric) args[3]
+        ///                 
+        ///                 System.Object result;                                                                                
+        ///                 result = this.Target.Foo&lt;TGeneric&gt;(cb_a, ref cb_b, out cb_c, cb_d);                                  
         ///                                                                                                        
-        ///     args[1] = (System.Object) cb_b;                                                                  
-        ///     args[2] = (System.Object) cb_c;                                                                     
-        ///     return result;                                                                                       
-        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                   
-        ///                                                                                                          
-        /// TResult IInterface.Foo&lt;TGeneric&gt;(T1 para1, ref T2 para2, out T3 para3, TGeneric para4)            
-        /// {                                                                                                     
-        ///     object[] args = new object[] {para1, para2, default(T3), para4};                                   
-        ///                                                                                                         
-        ///     System.Object result = Invoke(new InvocationContext(args, FXxX));                                   
-        ///                                                                                                       
-        ///     para2 = (T2) args[1];                                                                            
-        ///     para3 = (T3) args[2];                                                                               
-        ///     return (TResult) result;                                                                         
+        ///                 args[1] = (System.Object) cb_b;                                                                  
+        ///                 args[2] = (System.Object) cb_c;   
+        ///                 
+        ///                 return result;    
+        ///             },
+        ///             args,
+        ///             new Type[] {typeof(TGeneric)}
+        ///         )
+        ///     );
+        ///     
+        ///     para2 = (T1) args[1];                                                                            
+        ///     para3 = (T2) args[2];                                                                               
+        ///     return (TResult) result;   
         /// }
         /// </code>
         /// </summary>
@@ -86,137 +77,82 @@ namespace Solti.Utils.Proxy.Internals
 
             Visibility.Check(method, ContainingAssembly);
 
-            //
-            // For now, we only have call-index of 0
-            //
-
-            const int CALL_INDEX = 0;
-
-            MemberDeclarationSyntax methodCtx = method is IGenericMethodInfo genericMethod
-                ? ResolveMethodContext
-                (
-                    method.GetMD5HashCode(),
-                    ResolveInvokeTarget(method),
-                    CALL_INDEX,
-                    genericMethod.GenericArguments,
-                    genericMethod.GenericConstraints
-                )
-                : ResolveMethodContext
-                (
-                    method.GetMD5HashCode(),
-                    ResolveInvokeTarget(method),
-                    CALL_INDEX
-                );
+            FieldDeclarationSyntax memberInfo = ResolveField<ExtendedMemberInfo>
+            (
+                $"F{method.GetMD5HashCode()}",
+                @readonly: false
+            );
 
             return cls.AddMembers
             (
-                methodCtx,
+                memberInfo,
                 ResolveMethod(method).WithBody
                 (
-                    body: Block
+                    Block
                     (
-                        BuildBody()
+                        (StatementSyntax[])
+                        [
+                            ExpressionStatement
+                            (
+                                InvokeMethod
+                                (
+                                    FGetImplementedInterfaceMethod,
+                                    arguments: Argument
+                                    (
+                                        StaticMemberAccess(cls, memberInfo)
+                                    )
+                                )
+                            ),
+                            ..ResolveInvokeInterceptor<InvocationContext>
+                            (
+                                method,
+                                argsArray =>
+                                [
+                                    Argument
+                                    (
+                                        ThisExpression()
+                                    ),
+                                    Argument
+                                    (
+                                        StaticMemberAccess(cls, memberInfo)
+                                    ),
+                                    Argument
+                                    (
+                                        ResolveInvokeTarget
+                                        (
+                                            method,
+                                            (_, locals) => InvokeMethod
+                                            (
+                                                method,
+                                                target: GetTarget(),
+                                                castTargetTo: null,
+                                                arguments: locals.Select(ResolveArgument).ToArray()
+                                            )
+                                        )
+                                    ),
+                                    Argument
+                                    (
+                                        ResolveIdentifierName(argsArray)
+                                    ),
+                                    Argument
+                                    (
+                                        ResolveArray<Type>
+                                        (
+                                            (method as IGenericMethodInfo)?.GenericArguments.Select
+                                            (
+                                                static ga => TypeOfExpression
+                                                (
+                                                    IdentifierName(ga.Name)
+                                                )
+                                            ) ?? []
+                                        )
+                                    )
+                                ]
+                            )
+                        ]
                     )
                 )
             );
-
-            IEnumerable<StatementSyntax> BuildBody()
-            {
-                List<StatementSyntax> statements = new();
-
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(method);
-                statements.Add(argsArray);
-
-                MemberAccessExpressionSyntax accessContext = StaticMemberAccess(cls, methodCtx);
-                if (method is IGenericMethodInfo) accessContext = SimpleMemberAccess
-                (
-                    accessContext,
-                    ResolveIdentifierName
-                    (
-                        (FieldDeclarationSyntax) ((ClassDeclarationSyntax) methodCtx).Members.Single()
-                    )
-                );
-
-                InvocationExpressionSyntax invocation = InvokeMethod
-                (
-                    FInvoke,
-                    arguments: Argument
-                    (
-                        ResolveObject<InterfaceInvocationContext>
-                        (
-                            ResolveArgument(argsArray),
-                            Argument(accessContext)
-                        )
-                    )
-                );
-
-                if (!method.ReturnValue.Type.Flags.HasFlag(TypeInfoFlags.IsVoid))
-                {
-                    LocalDeclarationStatementSyntax result = ResolveLocal<object>
-                    (
-                        EnsureUnused(method, nameof(result)),
-                        invocation
-                    );
-
-                    statements.Add(result);
-                    statements.AddRange
-                    (
-                        AssignByRefParameters(method, argsArray)
-                    );
-                    statements.Add
-                    (
-                        ReturnResult(method.ReturnValue.Type, result)
-                    );
-                }
-                else
-                {
-                    statements.Add
-                    (
-                        ExpressionStatement(invocation)
-                    );
-                    statements.AddRange
-                    (
-                        AssignByRefParameters(method, argsArray)
-                    );
-                }
-
-                return statements;
-            }
         }
-
-        /// <summary>    
-        /// <code>
-        /// args =>
-        /// {
-        ///     TGeneric1 cb_a = (TGeneric1) args[0];
-        ///     T1 cb_b;                                                                               
-        ///     T2 cb_c = (T2) args[2];
-        ///     
-        ///     [result =] target.Foo&lt;TT&gt;(cb_a, out cb_b, ref cb_c);
-        ///     
-        ///     args[1] = (System.Object) cb_b;                                                                  
-        ///     args[2] = (System.Object) cb_c;   
-        ///                 
-        ///     return [result|null];
-        /// }
-        /// </code>
-        /// </summary>   
-        #if DEBUG
-        internal
-        #else
-        private
-        #endif
-        ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method) => ResolveInvokeTarget
-        (
-            method,
-            hasTarget: true,
-            (paramz, locals) => InvokeMethod
-            (
-                method,
-                target: IdentifierName(paramz[0].Identifier),
-                castTargetTo: method.DeclaringType,
-                arguments: locals.Select(ResolveArgument).ToArray()
-            )
-        ); 
     }
 }

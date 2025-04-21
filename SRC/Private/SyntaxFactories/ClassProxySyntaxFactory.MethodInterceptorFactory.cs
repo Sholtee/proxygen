@@ -41,8 +41,9 @@ namespace Solti.Utils.Proxy.Internals
         ///     
         ///     System.Object result = FInterceptor.Invoke
         ///     (
-        ///         new ClassInvocationContext
+        ///         new InvocationContext
         ///         (
+        ///             this,
         ///             FXxX,
         ///             args =>
         ///             {
@@ -107,11 +108,15 @@ namespace Solti.Utils.Proxy.Internals
                                     )
                                 )
                             ),
-                            ..ResolveInvokeInterceptor<ClassInvocationContext>
+                            ..ResolveInvokeInterceptor<InvocationContext>
                             (
                                 targetMethod,
                                 argsArray =>
                                 [
+                                    Argument
+                                    (
+                                        ThisExpression()
+                                    ),
                                     Argument
                                     (
                                         StaticMemberAccess(cls, memberInfo)
@@ -121,7 +126,6 @@ namespace Solti.Utils.Proxy.Internals
                                         targetMethod.IsAbstract ? ResolveNotImplemented() : ResolveInvokeTarget
                                         (
                                             targetMethod,
-                                            hasTarget: false,
                                             (_, locals) => InvokeMethod
                                             (
                                                 targetMethod,

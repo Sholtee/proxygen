@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private const string TARGET_FIELD = nameof(FTarget);
 
-        protected static MemberAccessExpressionSyntax GetTarget() => SimpleMemberAccess
+        protected virtual ExpressionSyntax GetTarget() => SimpleMemberAccess
         (
             ThisExpression(),
             TARGET_FIELD

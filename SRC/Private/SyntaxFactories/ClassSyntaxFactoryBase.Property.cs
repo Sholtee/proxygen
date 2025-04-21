@@ -71,6 +71,8 @@ namespace Solti.Utils.Proxy.Internals
 
             if (property.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
             {
+                CheckNotStaticAbstract(property);
+
                 result = (TDeclaration) result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
