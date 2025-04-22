@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Language version to be used.
         /// </summary>
-        public LanguageVersion LanguageVersion { get; init; } = LanguageVersion.Latest;
+        public LanguageVersion LanguageVersion { get; init; } = LanguageVersion.CSharp9;
 
         /// <summary>
         /// The default configuration. Set up for module builds.

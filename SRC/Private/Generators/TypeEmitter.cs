@@ -117,11 +117,12 @@ namespace Solti.Utils.Proxy.Internals
 
                         .ToList(),
                     mainUnit.ContainingAssembly,
-                    cacheFile,
+                    cacheFile,      
                     context
                         .ReferenceCollector!
                         .References
                         .Select(static asm => MetadataReference.CreateFromFile(asm.Location!)),
+                    context.LanguageVersion,
                     customConfig: null,
                     cancellation
                 );

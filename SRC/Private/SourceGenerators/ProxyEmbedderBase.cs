@@ -41,7 +41,7 @@ namespace Solti.Utils.Proxy.Internals
             // Only C# 8.0+ is supported
             //
 
-            if (cmp is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp8 } compilation)
+            if (cmp is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp9 } compilation)
             {
                 reportDiagnostic
                 (

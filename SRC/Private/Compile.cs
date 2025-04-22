@@ -28,6 +28,7 @@ namespace Solti.Utils.Proxy.Internals
             string asmName,
             string? outputFile,
             IEnumerable<MetadataReference> references,
+            LanguageVersion languageVersion,
             Func<Compilation, Compilation>? customConfig = default,
             in CancellationToken cancellation = default
         ) 
@@ -35,7 +36,10 @@ namespace Solti.Utils.Proxy.Internals
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: units.Select(static unit => CSharpSyntaxTree.Create(unit)),
+                syntaxTrees: units.Select
+                (
+                    unit => CSharpSyntaxTree.Create(unit, new CSharpParseOptions(languageVersion))
+                ),
                 references: references.Union
                 (              
                     PlatformAssemblies.References,
