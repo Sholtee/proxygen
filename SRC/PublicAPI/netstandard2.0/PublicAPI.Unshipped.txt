@@ -82,8 +82,7 @@ static Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.Activate(S
 static Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, TDelegate! delegate, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TDelegate!>!
 static Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.Activate(TTarget target) -> TInterface!
 static Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.ActivateAsync(TTarget target, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
-static Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, object? target = null) -> TInterface!
-static Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, object? target = null, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
+static Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, TInterface? target = null, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
 static Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
 static Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
 static Solti.Utils.Proxy.Internals.Generator.GenerateId(string! prefix, params System.Collections.Generic.IEnumerable<System.Type!>! types) -> string!

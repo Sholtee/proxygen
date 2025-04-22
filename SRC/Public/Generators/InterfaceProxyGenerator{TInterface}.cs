@@ -35,13 +35,13 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static async Task<TInterface> ActivateAsync(IInterceptor interceptor, object? target = null, CancellationToken cancellation = default) =>
+        public static async Task<TInterface> ActivateAsync(IInterceptor interceptor, TInterface? target = null, CancellationToken cancellation = default) =>
             (TInterface) await Instance.ActivateAsync(interceptor, target, cancellation);
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static TInterface Activate(IInterceptor interceptor, object? target = null) =>
+        public static TInterface Activate(IInterceptor interceptor, TInterface? target = null) =>
             (TInterface) Instance.Activate(interceptor, target);
     }
 }
