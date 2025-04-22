@@ -15,7 +15,6 @@
   <ItemGroup>
     <!-- "OutputItemType" is needed because we reference ProxyGen as a csproj. -->
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" OutputItemType="Analyzer" />
-    <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
   </ItemGroup>
 
   <!-- Enable ProxyGen compile time logging. Note that <import> section is needed because we reference ProxyGen as a csproj. -->

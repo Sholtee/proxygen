@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IPropertyInfo prop in TargetType!.Properties)
                 cls = ResolveProperty(cls, context, prop);
 
-            return cls;
+            return base.ResolveProperties(cls, context);
         }
 
         /// <summary>

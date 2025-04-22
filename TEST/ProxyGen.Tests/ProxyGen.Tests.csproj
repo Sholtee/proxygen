@@ -43,7 +43,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" />
     <ProjectReference Include="..\ProxyGen.Tests.EmbeddedTypes\ProxyGen.Tests.EmbeddedTypes.csproj" />
-    <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -75,9 +74,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BarSrc.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="CallbackSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="IfaceProxySrcModule.txt">
