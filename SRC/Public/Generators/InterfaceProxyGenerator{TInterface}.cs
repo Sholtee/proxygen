@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Generators
     /// </summary>
     /// <typeparam name="TInterface">The interface for which the proxy will be created.</typeparam>
     [SupportsSourceGeneration]
-    public sealed class InterfaceProxyGenerator<TInterface> : Generator<TInterface, InterfaceProxyGenerator, InterfaceProxyGenerator<TInterface>> where TInterface : class
+    public sealed class InterfaceProxyGenerator<TInterface> : Generator<InterfaceProxyGenerator, InterfaceProxyGenerator<TInterface>> where TInterface : class
     {
         /// <inheritdoc/>
         protected override InterfaceProxyGenerator GetConcreteGenerator() => new(typeof(TInterface));
