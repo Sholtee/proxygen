@@ -45,6 +45,9 @@ namespace Solti.Utils.Proxy.Internals
             );
 
             if (@event.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            {
+                CheckNotStaticAbstract(@event);
+
                 result = result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
@@ -52,6 +55,7 @@ namespace Solti.Utils.Proxy.Internals
                         (NameSyntax) ResolveType(@event.DeclaringType)
                     )
                 );
+            }
             else
             {
                 //

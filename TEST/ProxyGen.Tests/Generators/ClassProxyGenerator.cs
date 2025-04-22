@@ -33,7 +33,9 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             public virtual int Prop { get; protected set; }
 
+            #pragma warning disable CS0067
             public virtual event Action Event;
+            #pragma warning restore
 
             public int Param { get; } = myParam;
         }

@@ -95,9 +95,7 @@ namespace Solti.Utils.Proxy.Internals
             if (type is IGenericTypeInfo genericType && !genericType.IsGenericDefinition)
             {
                 foreach (ITypeInfo ga in genericType.GenericArguments)
-                {
                     Check(ga, assemblyName);
-                }
 
                 Check(genericType.GenericDefinition, assemblyName);
                 return;

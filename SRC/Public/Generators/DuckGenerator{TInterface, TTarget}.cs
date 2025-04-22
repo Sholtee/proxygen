@@ -30,7 +30,7 @@ namespace Solti.Utils.Proxy.Generators
     /// <typeparam name="TInterface">The interface for which the proxy will be created.</typeparam>
     /// <typeparam name="TTarget">The target implementing all the <typeparamref name="TInterface"/> members.</typeparam>
     [SupportsSourceGeneration]
-    public sealed class DuckGenerator<TInterface, TTarget>: Generator<TInterface, DuckGenerator, DuckGenerator<TInterface, TTarget>> where TInterface: class
+    public sealed class DuckGenerator<TInterface, TTarget>: Generator<DuckGenerator, DuckGenerator<TInterface, TTarget>> where TInterface: class
     {
         /// <inheritdoc/>
         protected override DuckGenerator GetConcreteGenerator() => new(typeof(TInterface), typeof(TTarget));

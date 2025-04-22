@@ -7,13 +7,6 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Tuple =
-    #if NETSTANDARD2_1_OR_GREATER
-    System.Runtime.CompilerServices.ITuple;
-    #else
-    object;
-    #endif
-
 namespace Solti.Utils.Proxy.Generators
 {
     using Internals;
@@ -22,8 +15,7 @@ namespace Solti.Utils.Proxy.Generators
     /// Creates a new <see cref="InterfaceProxyGenerator"/> instance which hooks into the given <paramref name="interface"/>.
     /// </summary>
     /// <param name="interface">The interface to be proxied</param>
-    /// <param name="interceptor">The interceptor implementation. Should be an <see cref="InterfaceInterceptor{TInterface, TTarget}"/> descendant</param>
-    public sealed class InterfaceProxyGenerator(Type @interface, Type interceptor) : Generator(id: GenerateId(nameof(InterfaceProxyGenerator), @interface, interceptor))
+    public sealed class InterfaceProxyGenerator(Type @interface) : Generator(id: GenerateId(nameof(InterfaceProxyGenerator), @interface))
     {
         /// <summary>
         /// The target class or interface for which the proxy will be created.
@@ -31,25 +23,26 @@ namespace Solti.Utils.Proxy.Generators
         public Type Interface { get; } = @interface ?? throw new ArgumentNullException(nameof(@interface));
 
         /// <summary>
-        /// An <see cref="InterfaceInterceptor{TInterface}"/> descendant having at least one public constructor.
-        /// </summary>
-        public Type Interceptor { get; } = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
-
-        /// <summary>
         /// Activates the proxy type.
         /// </summary>
-        public new Task<object> ActivateAsync(Tuple ctorParamz, CancellationToken cancellation = default) =>
-            base.ActivateAsync(ctorParamz, cancellation);
+        public async Task<object> ActivateAsync(IInterceptor interceptor, object? target = null, CancellationToken cancellation = default)
+        {
+            object result = await base.ActivateAsync(null, cancellation);
+            ((ITargetAccess) result).Target = target;
+            ((IInterceptorAccess) result).Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
+            return result;
+        }
 
         /// <summary>
         /// Activates the underlying duck type.
         /// </summary>
-        public object Activate(Tuple ctorParamz) => ActivateAsync(ctorParamz, CancellationToken.None).GetAwaiter().GetResult();
+        public object Activate(IInterceptor interceptor, object? target = null) => ActivateAsync(interceptor, target, CancellationToken.None)
+            .GetAwaiter()
+            .GetResult();
 
         private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context) => new InterfaceProxySyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(Interface),
-            MetadataTypeInfo.CreateFrom(Interceptor),
             context
         );
     }

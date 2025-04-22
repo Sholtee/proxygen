@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Attributes
     public sealed class EmbedGeneratedTypeAttribute: Attribute
     {
         /// <summary>
-        /// The related <see cref="Generator{TInterface, TGenerator, TDescendant}"/>.
+        /// The related <see cref="Generator{TUntypedGenerator, TDescendant}"/>.
         /// </summary>
         public Type Generator { get; }
 
@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Attributes
             if (generator is null)
                 throw new ArgumentNullException(nameof(generator));
 
-            if (!generator.GetBaseTypes().Any(static @base => @base.IsConstructedGenericType && @base.GetGenericTypeDefinition().FullName == typeof(Generator<,,>).FullName))
+            if (!generator.GetBaseTypes().Any(static @base => @base.IsConstructedGenericType && @base.GetGenericTypeDefinition().FullName == typeof(Generator<,>).FullName))
                 throw new ArgumentException(Resources.NOT_A_GENERATOR, nameof(generator));
 
             Generator = generator;

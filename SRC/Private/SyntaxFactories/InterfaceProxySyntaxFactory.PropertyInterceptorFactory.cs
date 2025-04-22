@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,203 +21,156 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context)
         {
-            foreach (IPropertyInfo prop in FInterfaceType.Properties)
-            {
-                if (AlreadyImplemented(prop, FInterceptorType.Properties, SignatureEquals))
-                    continue;
-
+            foreach (IPropertyInfo prop in TargetType!.Properties)
                 cls = ResolveProperty(cls, context, prop);
-            }
 
-            return cls;
-
-            static bool SignatureEquals(IPropertyInfo targetProp, IPropertyInfo ifaceProp)
-            {
-                //
-                // We allow the implementation to declare a getter or setter that is not required by the interface.
-                //
-
-                if (ifaceProp.GetMethod is not null)
-                {
-                    if (targetProp.GetMethod?.SignatureEquals(ifaceProp.GetMethod) is not true)
-                        return false;
-                }
-
-                if (ifaceProp.SetMethod is not null)
-                {
-                    if (targetProp.SetMethod?.SignatureEquals(ifaceProp.SetMethod) is not true)
-                        return false;
-                }
-
-                return true;
-            }
+            return base.ResolveProperties(cls, context);
         }
 
         /// <summary>
         /// <code>
-        /// private static readonly InterfaceInterceptionContext FxXx = new InterfaceInterceptionContext(static (ITarget target, object[] args) =>  
-        /// {                                                                                                 
-        ///     return target.Prop;                                                                           
-        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                          
-        /// private static readonly InterfaceInterceptionContext FyYy = new InterfaceInterceptionContext(static (ITarget target, object[] args) =>  
-        /// {                                                                                                
-        ///     TValue _value = (TValue) args[0];                                                             
-        ///     target.Prop = _value;                                                                         
-        ///     return null;                                                                                   
-        /// }, CALL_INDEX, InterfaceMap&lt;TInterface, TTarget&gt;.Value | null);                                                                                            
-        /// TResult IInterface.Prop                                                                          
-        /// {                                                                                                 
-        ///     get                                                                                            
-        ///     {                                                                                            
-        ///         object[] args = new object[] { };                                                          
-        ///         return (TResult) Invoke(new InvocationContext(args, FxXx));                               
-        ///     }                                                                                            
-        ///     set                                                                                         
-        ///     {                                                                                            
-        ///         object[] args = new object[] { value };                                                  
-        ///         Invoke(new InvocationContext(args, FyYy));                                               
-        ///     }                                                                                              
+        /// private static ExtendedMemberInfo FXxX;
+        /// T Interface.Prop
+        /// {
+        ///     get
+        ///     {
+        ///         CurrentMethod.GetImplementedInterfaceMethod(ref FXxX);
+        ///     
+        ///         object[] args = new object[] {value};
+        ///         
+        ///         return (T) FInterceptor.Invoke
+        ///         (
+        ///             new InvocationContext
+        ///             (
+        ///                 this,
+        ///                 FXxX,
+        ///                 args => FTarget.Prop;
+        ///                 args,
+        ///                 new Type[] {}
+        ///             )
+        ///         ); 
+        ///     }
         /// }
         /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property)
+        protected override ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo prop)
         {
-            //
-            // For now, we only have call-index of 0
-            //
-
-            const int CALL_INDEX = 0;
-
             List<MemberDeclarationSyntax> members = [];
 
             BlockSyntax?
                 get = null,
                 set = null;
 
-            if (property.GetMethod is not null)
+            if (prop.GetMethod is not null)
             {
                 //
-                // Starting from .NET 5.0 interfaces may have visibility.
+                // Starting from .NET 5.0 interface members may have visibility.
                 //
 
-                Visibility.Check(property.GetMethod, ContainingAssembly);
+                Visibility.Check(prop.GetMethod, ContainingAssembly);
 
-                FieldDeclarationSyntax getCtx = ResolveMethodContext
+                get = BuildBody
                 (
-                    property.GetMethod.GetMD5HashCode(),
-                    ResolveInvokeTarget
+                    prop.GetMethod,
+                    (_, locals) => PropertyAccess
                     (
-                        property.GetMethod,
-                        hasTarget: true,
-                        (paramz, locals) => PropertyAccess
-                        (
-                            property,
-                            IdentifierName(paramz[0].Identifier),
-                            castTargetTo: property.DeclaringType,
-                            indices: locals.Select(ResolveArgument)
-                        )
-                    ),
-                    CALL_INDEX
-                );
-                members.Add(getCtx);
-
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.GetMethod);
-
-                get = Block
-                (
-                    argsArray,
-                    ReturnResult
-                    (
-                        property.Type,
-                        InvokeMethod
-                        (
-                            FInvoke,
-                            arguments: Argument
-                            (
-                                ResolveObject<InterfaceInvocationContext>
-                                (
-                                    ResolveArgument(argsArray),
-                                    Argument
-                                    (
-                                        StaticMemberAccess(cls, getCtx)
-                                    )
-                                )
-                            )
-                        )
+                        prop,
+                        GetTarget(),
+                        indices: locals.Select(ResolveArgument)
                     )
                 );
             }
 
-            if (property.SetMethod is not null)
+            if (prop.SetMethod is not null)
             {
-                Visibility.Check(property.SetMethod, ContainingAssembly);
+                Visibility.Check(prop.SetMethod, ContainingAssembly);
 
-                FieldDeclarationSyntax setCtx = ResolveMethodContext
+                set = BuildBody
                 (
-                    property.SetMethod.GetMD5HashCode(),
-                    ResolveInvokeTarget
+                    prop.SetMethod,
+                    (_, locals) => AssignmentExpression // FTarget.Prop = _value
                     (
-                        property.SetMethod,
-                        hasTarget: true,
-                        (paramz, locals) => AssignmentExpression // target.Prop = _value
+                        kind: SyntaxKind.SimpleAssignmentExpression,
+                        left: PropertyAccess
                         (
-                            kind: SyntaxKind.SimpleAssignmentExpression,
-                            left: PropertyAccess
-                            (
-                                property,
-                                IdentifierName(paramz[0].Identifier),
-                                castTargetTo: property.DeclaringType,
-                                indices: locals
-                                    .Take(locals.Count - 1)
-                                    .Select(ResolveArgument)
-                            ),
-                            right: ResolveIdentifierName(locals[locals.Count - 1])
-                        )
-                    ),
-                    CALL_INDEX
-                );
-                members.Add(setCtx);
-
-                LocalDeclarationStatementSyntax argsArray = ResolveArgumentsArray(property.SetMethod);
-
-                set = Block
-                (
-                    argsArray,
-                    ExpressionStatement
-                    (
-                        InvokeMethod
-                        (
-                            FInvoke,
-                            arguments: Argument
-                            (
-                                ResolveObject<InterfaceInvocationContext>
-                                (
-                                    ResolveArgument(argsArray),
-                                    Argument
-                                    (
-                                        StaticMemberAccess(cls, setCtx)
-                                    )
-                                )
-                            )
-                        )
+                            prop,
+                            GetTarget(),
+                            indices: locals
+                                .Take(locals.Count - 1)
+                                .Select(ResolveArgument)
+                        ),
+                        right: ResolveIdentifierName(locals.Last())  // "value" always the last parameter
                     )
                 );
             }
 
             members.Add
             (
-                property.Indices.Any() 
-                    ? ResolveIndexer(property, get, set)
-                    : ResolveProperty(property, get, set)
+                prop.Indices.Any()
+                    ? ResolveIndexer(prop, get, set)
+                    : ResolveProperty(prop, get, set)
             );
 
-            return cls.WithMembers
-            (
-                cls.Members.AddRange(members)
-            );
+            return cls.AddMembers([.. members]);
+
+            BlockSyntax? BuildBody(IMethodInfo backingMethod, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
+            {
+                FieldDeclarationSyntax field = ResolveField<ExtendedMemberInfo>
+                (
+                    $"F{backingMethod.GetMD5HashCode()}",
+                    @readonly: false
+                );
+
+                members.Add(field);
+
+                return Block
+                (
+                    (StatementSyntax[])
+                    [
+                        ExpressionStatement
+                        (
+                            InvokeMethod
+                            (
+                                FGetImplementedInterfaceMethod,
+                                arguments: Argument
+                                (
+                                    StaticMemberAccess(cls, field)
+                                )
+                            )
+                        ),
+                        ..ResolveInvokeInterceptor<InvocationContext>
+                        (
+                            backingMethod,
+                            argsArray =>
+                            [
+                                Argument
+                                (
+                                    ThisExpression()
+                                ),
+                                Argument
+                                (
+                                    StaticMemberAccess(cls, field)
+                                ),
+                                Argument
+                                (
+                                    ResolveInvokeTarget(backingMethod, invocationFactory)
+                                ),
+                                Argument
+                                (
+                                    ResolveIdentifierName(argsArray)
+                                ),
+                                Argument
+                                (
+                                    ResolveArray<Type>([])
+                                )
+                            ]
+                        )
+                    ]
+                );
+            }
         }
     }
 }

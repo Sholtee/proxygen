@@ -6,10 +6,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -18,20 +20,30 @@ namespace Solti.Utils.Proxy.Internals
     internal sealed partial class InterfaceProxySyntaxFactory: ProxyUnitSyntaxFactory
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly ITypeInfo
-            FInterfaceType,
-            FInterceptorType,
-            FTargetType;
+        private static readonly IMethodInfo FGetImplementedInterfaceMethod = MetadataMethodInfo.CreateFrom
+        (
+            MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetImplementedInterfaceMethod(ref output))
+        );
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly IMethodInfo FInvoke;
+        protected override ExpressionSyntax GetTarget() => ParenthesizedExpression
+        (
+            BinaryExpression
+            (
+                SyntaxKind.CoalesceExpression,
+                base.GetTarget(),
+                ThrowExpression
+                (
+                    ResolveObject<InvalidOperationException>()
+                )
+            )
+        );
 
-        public override string ExposedClass => $"Proxy_{FInterceptorType.GetMD5HashCode()}";
+        public override string ExposedClass => $"Proxy_{TargetType!.GetMD5HashCode()}";
 
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases => [FInterceptorType, FInterfaceType];
+        protected override IReadOnlyList<ITypeInfo> Bases => [TargetType!, ..base.Bases];
 
         #if DEBUG
         internal
@@ -41,59 +53,18 @@ namespace Solti.Utils.Proxy.Internals
             yield return ResolveClass(context, cancellation);
         }
 
-        public InterfaceProxySyntaxFactory(ITypeInfo interfaceType, ITypeInfo interceptorType, SyntaxFactoryContext context) : base(null!, context) 
+        public InterfaceProxySyntaxFactory(ITypeInfo interfaceType, SyntaxFactoryContext context) : base(interfaceType, context) 
         {
             if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
             if (interfaceType is IGenericTypeInfo genericIface && genericIface.IsGenericDefinition)
                 throw new ArgumentException(Resources.GENERIC_IFACE, nameof(interfaceType));
-
-            if (interceptorType is IGenericTypeInfo genericInterceptor && genericInterceptor.IsGenericDefinition)
-                throw new ArgumentException(Resources.GENERIC_INTERCEPTOR, nameof(interceptorType));
-
-            string baseInterceptorName = typeof(InterfaceInterceptor<,>).FullName;
-
-            IGenericTypeInfo? baseInterceptor = (IGenericTypeInfo?)
-            (
-                interceptorType.QualifiedName == baseInterceptorName
-                    ? interceptorType
-                    : interceptorType.GetBaseTypes().SingleOrDefault(ic => ic.QualifiedName == baseInterceptorName)
-            );
-
-            bool validInterceptor =
-                baseInterceptor is not null &&
-                baseInterceptor.GenericArguments[0].Equals(interfaceType) &&
-                interfaceType.IsAccessibleFrom(baseInterceptor.GenericArguments[1]);
-
-            if (!validInterceptor)
-                throw new ArgumentException(Resources.NOT_AN_INTERCEPTOR, nameof(interceptorType));
-
-            FInterfaceType = interfaceType;        
-            FInterceptorType = interceptorType;
-            FTargetType = baseInterceptor!.GenericArguments[1];
-
-            IMethodInfo invoke = MetadataMethodInfo.CreateFrom
-            (
-                MethodInfoExtensions.ExtractFrom<InterfaceInterceptor<object>>(static ic => ic.Invoke(default!))
-            );
-
-            FInvoke = FInterceptorType.Methods.Single
-            (
-                met => met.SignatureEquals(invoke)
-            )!;
         }
 
         public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
         {
-            if (FInterceptorType.Flags.HasFlag(TypeInfoFlags.IsFinal))
-                throw new InvalidOperationException(Resources.SEALED_INTERCEPTOR);
-
-            if (FInterceptorType.Flags.HasFlag(TypeInfoFlags.IsAbstract))
-                throw new InvalidOperationException(Resources.ABSTRACT_INTERCEPTOR);
-
-            Visibility.Check(FInterfaceType, ContainingAssembly);
-            Visibility.Check(FInterceptorType, ContainingAssembly);
+            Visibility.Check(TargetType!, ContainingAssembly);
 
             return base.ResolveUnit(context, cancellation);
         }

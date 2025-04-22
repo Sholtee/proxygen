@@ -50,13 +50,6 @@ namespace Solti.Utils.Proxy.Internals
                 throw new ArgumentException(Resources.GENERIC_TARGET, nameof(targetType));
 
             FInvokeDelegate = targetType.Methods.Single(static m => m.Name == INVOKE_METHOD_NAME);
-
-            //
-            // "ref return"s not supported
-            //
-
-            if (FInvokeDelegate.ReturnValue.Kind >= ParameterKind.Ref)
-                throw new NotSupportedException(Resources.REF_VALUE);
         }
     }
 }

@@ -54,6 +54,11 @@ namespace Solti.Utils.Proxy.Internals
             IMethodInfo ifaceMethod = (IMethodInfo) context;
 
             Visibility.Check(targetMethod, ContainingAssembly);
+
+            //
+            // Starting from .NET 5.0 interface members may have visibility.
+            //
+
             Visibility.Check(ifaceMethod, ContainingAssembly);
 
             //

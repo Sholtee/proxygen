@@ -39,11 +39,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
             using System.Collections.Generic;
 
-            using Solti.Utils.Proxy;
             using Solti.Utils.Proxy.Attributes;
             using Solti.Utils.Proxy.Generators;
 
-            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IList<int>>))]
             "
         ),
         TestCase
@@ -51,12 +50,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             @"
             using System.Collections.Generic;
 
-            using Solti.Utils.Proxy;
             using Solti.Utils.Proxy.Attributes;
             using Solti.Utils.Proxy.Generators;
 
-            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>)), EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
-            [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+            [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IList<int>>)), EmbedGeneratedType(typeof(InterfaceProxyGenerator<IList<int>>))]
+            [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IList<int>>))]
             "
         )]
         public void GetAOTGenerators_ShouldReturnAllValidGeneratorsFromAnnotations(string src)
@@ -70,7 +68,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             INamedTypeSymbol[] res = ProxyEmbedder.GetAOTGenerators(compilation).ToArray();
 
             Assert.That(res.Length, Is.EqualTo(1));
-            Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.ProxyGenerator<System.Collections.Generic.IList<int>, Solti.Utils.Proxy.InterfaceInterceptor<System.Collections.Generic.IList<int>>>"));
+            Assert.That(res[0].ToDisplayString(), Is.EqualTo("Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<System.Collections.Generic.IList<int>>"));
         }
 #endif
         public static GeneratorDriver CreateDriver(CSharpParseOptions opts)
@@ -90,25 +88,23 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System.Collections.Generic;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>))]
+                    [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IList<int>>))]
                     ";
                 yield return
                     @"
                     using System.Collections.Generic;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<MyNamespace.IMyInterface, InterfaceInterceptor<MyNamespace.IMyInterface>>))]
+                    [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<MyNamespace.IMyInterface>))]
 
                     namespace MyNamespace
                     {
-                        internal interface IMyInterface // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
+                        internal interface IMyInterface // InternalsVisibleTo not required as we embed the proxy type into the same asm
                         {
                             void Foo();
                         }
@@ -118,11 +114,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IGenericInterfaceHavingConstraint, InterfaceInterceptor<IGenericInterfaceHavingConstraint>>))]
+                    [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IGenericInterfaceHavingConstraint>))]
 
                     public interface IGenericInterfaceHavingConstraint
                     {
@@ -134,7 +129,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System.Collections;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -144,7 +138,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System.Collections.Generic;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -157,14 +150,13 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                     public class MyImpl 
                     {
-                        internal void Foo() {} // nem kell InternalsVisibleTo mert ugyanabban a szerelvenybe lesz a proxy agyazva
+                        internal void Foo() {} // InternalsVisibleTo not required as we embed the proxy type into the same asm
                     } 
                     ";
                 yield return
                     @"
                     using System;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -226,7 +218,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System.Collections.Generic;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -336,7 +327,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     @"
                     using System.Collections;
 
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -344,7 +334,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     ";
                 yield return
                     @"
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -385,7 +374,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 @"
                 using System.Collections;
 
-                using Solti.Utils.Proxy;
                 using Solti.Utils.Proxy.Attributes;
                 using Solti.Utils.Proxy.Generators;
 
@@ -418,7 +406,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                         @"
                         Imports System.Collections
 
-                        Imports Solti.Utils.Proxy
                         Imports Solti.Utils.Proxy.Attributes
                         Imports Solti.Utils.Proxy.Generators
 
@@ -452,7 +439,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 @"
                 using System.Collections;
 
-                using Solti.Utils.Proxy;
                 using Solti.Utils.Proxy.Attributes;
                 using Solti.Utils.Proxy.Generators;
 
@@ -512,11 +498,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Compilation compilation = CreateCompilation
             (
                 @$"
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<{iface}, InterfaceInterceptor<{iface}>>))]
+                    [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<{iface}>))]
 
                 ",
                 typeof(EmbedGeneratedTypeAttribute).Assembly
@@ -540,7 +525,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Compilation compilation = CreateCompilation
             (
                 @$"
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -569,7 +553,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Compilation compilation = CreateCompilation
             (
                 @$"
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
@@ -599,7 +582,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Compilation compilation = CreateCompilation
             (
                 @$"
-                    using Solti.Utils.Proxy;
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 

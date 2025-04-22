@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29613.14
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyGen", "SRC\ProxyGen.csproj", "{BFEF5090-4419-4972-9773-E39B79C8D10E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyGen.Tests", "TEST\ProxyGen.Tests\ProxyGen.Tests.csproj", "{8BEA3918-352E-43C2-8C65-70C1A5D7F2BB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyGen.Perf", "PERF\ProxyGen.Perf.csproj", "{4B927F1C-260E-4725-94C4-296F1CC6B29B}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyGen.Tests.External", "TEST\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj", "{D1D66324-B994-409F-AFA3-AEBECA874289}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyGen.Tests.EmbeddedTypes", "TEST\ProxyGen.Tests.EmbeddedTypes\ProxyGen.Tests.EmbeddedTypes.csproj", "{5029D512-C599-4C97-B744-E769E9A28C5E}"
 EndProject
@@ -35,10 +33,6 @@ Global
 		{4B927F1C-260E-4725-94C4-296F1CC6B29B}.Perf|Any CPU.ActiveCfg = Release|Any CPU
 		{4B927F1C-260E-4725-94C4-296F1CC6B29B}.Perf|Any CPU.Build.0 = Release|Any CPU
 		{4B927F1C-260E-4725-94C4-296F1CC6B29B}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D66324-B994-409F-AFA3-AEBECA874289}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D66324-B994-409F-AFA3-AEBECA874289}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1D66324-B994-409F-AFA3-AEBECA874289}.Perf|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1D66324-B994-409F-AFA3-AEBECA874289}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{5029D512-C599-4C97-B744-E769E9A28C5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5029D512-C599-4C97-B744-E769E9A28C5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5029D512-C599-4C97-B744-E769E9A28C5E}.Perf|Any CPU.ActiveCfg = Debug|Any CPU

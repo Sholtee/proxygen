@@ -24,9 +24,8 @@ namespace Solti.Utils.Proxy.Internals
         protected static string EnsureUnused(IEnumerable<IParameterInfo> parameters, string variable)
         {
             while (parameters.Any(param => param.Name == variable))
-            {
                 variable = $"_{variable}";
-            }
+
             return variable;
         }
 
@@ -176,7 +175,7 @@ namespace Solti.Utils.Proxy.Internals
 
         /// <summary>
         /// <code>
-        /// [static] ([object target,] object[] args) =>   
+        /// (object[] args) =>   
         /// {                                             
         ///     System.Int32 cb_a = (System.Int32) args[0]; 
         ///     System.String cb_b;                   
@@ -192,7 +191,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, bool hasTarget /*TODO: REMOVE*/, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
+        protected ParenthesizedLambdaExpressionSyntax ResolveInvokeTarget(IMethodInfo method, Func<IReadOnlyList<ParameterSyntax>, IReadOnlyList<LocalDeclarationStatementSyntax>, ExpressionSyntax> invocationFactory)
         {
             ParameterSyntax args =
                 Parameter
@@ -204,38 +203,33 @@ namespace Solti.Utils.Proxy.Internals
                     ResolveType<object[]>()
                 );
 
-            List<ParameterSyntax> paramz = [];
-            if (hasTarget) paramz.Add
-            (
-                Parameter
-                (
-                    identifier: Identifier("target")
-                )
-                .WithType
-                (
-                    ResolveType<object>()
-                )
-            );
-            paramz.Add(args);
-        
-            List<StatementSyntax> body = [];
+            List<ParameterSyntax> paramz = [args];
+     
+            List<LocalDeclarationStatementSyntax> locals = [.. ResolveInvokeTargetLocals(args, method)];
 
-            List<LocalDeclarationStatementSyntax> locals = new(ResolveInvokeTargetLocals(args, method));
-            body.AddRange(locals);
+            List<StatementSyntax> body = [.. locals];
 
-            LocalDeclarationStatementSyntax? result;
+            StatementSyntax @return;
             if (!method.ReturnValue.Type.Flags.HasFlag(TypeInfoFlags.IsVoid))
             {
-                result = ResolveLocal<object>
+                //
+                // "ref return"s not supported
+                //
+
+                if (method.ReturnValue.Kind >= ParameterKind.Ref)
+                    throw new NotSupportedException(Resources.REF_VALUE);
+
+                LocalDeclarationStatementSyntax result = ResolveLocal<object>
                 (
                     nameof(result),
                     invocationFactory(paramz, locals)
                 );
                 body.Add(result);
+
+                @return = ReturnResult(null, result);
             }
             else
             {
-                result = null;
                 body.Add
                 (
                     ExpressionStatement
@@ -243,15 +237,19 @@ namespace Solti.Utils.Proxy.Internals
                         invocationFactory(paramz, locals)
                     )
                 );
+
+                @return = ReturnNull();
             }
 
             body.AddRange
             (
-                ReassignArgsArray(method, args, locals)
+                [
+                    .. ReassignArgsArray(method, args, locals),
+                    @return
+                ]
             );
-            body.Add(result is null ? ReturnNull() : ReturnResult(null, result));
 
-            ParenthesizedLambdaExpressionSyntax lambda = ParenthesizedLambdaExpression()
+            return ParenthesizedLambdaExpression()
                 .WithParameterList
                 (
                     ParameterList
@@ -263,17 +261,6 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     Block(body)
                 );
-
-            if (hasTarget && Context.LanguageVersion >= LanguageVersion.CSharp9)
-                lambda = lambda.WithModifiers
-                (
-                    modifiers: TokenList
-                    (
-                        Token(SyntaxKind.StaticKeyword)
-                    )
-                );
-
-            return lambda;
         }
 
         /// <summary>
@@ -373,6 +360,5 @@ namespace Solti.Utils.Proxy.Internals
                 i++;
             }
         }
-
     }
 }

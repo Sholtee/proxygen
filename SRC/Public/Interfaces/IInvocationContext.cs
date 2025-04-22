@@ -15,6 +15,11 @@ namespace Solti.Utils.Proxy
     public interface IInvocationContext
     {
         /// <summary>
+        /// The proxy object on which the call was made.
+        /// </summary>
+        object Proxy { get; }
+
+        /// <summary>
         /// The member (property, event or method) that is being proxied.
         /// </summary>
         ExtendedMemberInfo Member { get; }

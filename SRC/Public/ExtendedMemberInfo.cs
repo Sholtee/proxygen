@@ -34,7 +34,7 @@ namespace Solti.Utils.Proxy
                         ? BindingFlags.Instance | BindingFlags.Public
                         : BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy;
 
-                    Dictionary<MethodInfo, MemberInfo> bindings = new();
+                    Dictionary<MethodInfo, MemberInfo> bindings = [];
 
                     foreach (MemberInfo member in t.GetMembers(flags))
                     {

@@ -21,7 +21,6 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 {
-    using Generators;
     using Internals;
     using static Internals.Tests.CodeAnalysisTestsBase;
 
@@ -30,23 +29,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     {
         private static ClassDeclarationSyntax GetDummyClass() => ClassDeclaration("Dummy");
 
-        internal class FooInterceptor : InterfaceInterceptor<IFoo<int>> // direkt internal
-        {
-            public FooInterceptor(IFoo<int> target) : base(target)
-            {
-            }
-        }
-
         public static (object Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
             ((object) FooMethod, "global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};"),
             (BarMethod, "global::System.Object[] args = new global::System.Object[0];")
         };
 
-        private static InterfaceProxySyntaxFactory CreateSyntaxFactory(Type iface, Type interceptor, OutputType outputType) => new
+        private static InterfaceProxySyntaxFactory CreateSyntaxFactory(Type iface, OutputType outputType) => new
         (
             MetadataTypeInfo.CreateFrom(iface),
-            MetadataTypeInfo.CreateFrom(interceptor),
             SyntaxFactoryContext.Default with
             {
                 OutputType = outputType,
@@ -54,16 +45,16 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             }
         );
 
-        private static InterfaceProxySyntaxFactory CreateSyntaxFactory<TInterface, TInterceptor>(OutputType outputType) => CreateSyntaxFactory(typeof(TInterface), typeof(TInterceptor), outputType);
+        private static InterfaceProxySyntaxFactory CreateSyntaxFactory<TInterface>(OutputType outputType) => CreateSyntaxFactory(typeof(TInterface), outputType);
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
-            Assert.That(CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
             IReadOnlyList<ExpressionStatementSyntax> assignments = gen.AssignByRefParameters
             (
@@ -78,7 +69,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void LocalArgs_ShouldBeDeclaredForEachArgument()
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
             IReadOnlyList<LocalDeclarationStatementSyntax> locals = gen.ResolveInvokeTargetLocals
             (
@@ -102,7 +93,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ReassignArgsArray_ShouldCopyByRefArgumentsBack()
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
             ParameterSyntax args = Parameter
             (
@@ -125,14 +116,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (global::System.Object)_c;"));
         }
 
-        [Test]
-        public void ResolveInvokeTarget_ShouldCreateTheProperMethod()
-        {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
-
-            Assert.That(gen.ResolveInvokeTarget(FooMethod).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CallbackSrc.txt"))));
-        }
-
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
         {
             (typeof(void), "@void", "return;"),
@@ -142,7 +125,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(ReturnTypes))]
         public void ReturnResult_ShouldCreateTheProperExpression((Type Type, string Local, string Expected) para)
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
             Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
         }
@@ -156,7 +139,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(Methods))]
         public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
-            SyntaxList<MemberDeclarationSyntax> methods = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> methods = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members.Where(m => m is MethodDeclarationSyntax);
 
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, para.File)))));
         }
@@ -164,38 +147,36 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members.Where(m => m is PropertyDeclarationSyntax);
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
+            Assert.That(props.Any(prop => prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
         }
 
         [Test]
         public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = new InterfaceProxySyntaxFactory
+            MemberDeclarationSyntax prop = new InterfaceProxySyntaxFactory
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
-                MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<IList<int>>)), 
                 SyntaxFactoryContext.Default
-            ).ResolveProperties(GetDummyClass(), null).Members;
+            ).ResolveProperties(GetDummyClass(), null).Members.Single(m => m is IndexerDeclarationSyntax);
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt")))));
+            Assert.That(prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt"))));
         }
 
         [Test]
         public void GenerateProxyEvent_Test()
         {
-            SyntaxList<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members.Where(m => m is EventDeclarationSyntax);
 
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
         }
 
-        [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Module, "IfaceProxySrcModule.txt")]
-        [TestCase(typeof(IFoo<int>), typeof(FooInterceptor), OutputType.Unit, "IfaceProxySrcUnit.txt")]
-        [TestCase(typeof(IList), typeof(InterfaceInterceptor<IList, List<object>>), OutputType.Module, "IfaceProxyHavingTargetSrcModule.txt")]
-        public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, Type interceptor, int outputType, string fileName)
+        [TestCase(typeof(IFoo<int>), OutputType.Module, "IfaceProxySrcModule.txt")]
+        [TestCase(typeof(IFoo<int>), OutputType.Unit, "IfaceProxySrcUnit.txt")]
+        public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, int outputType, string fileName)
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory(iface, interceptor, (OutputType) outputType);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory(iface, (OutputType) outputType);
 
             Assert.That
             (
@@ -211,7 +192,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 #if LEGACY_COMPILER
                         .Replace(") :", "):")
 #endif
-                        .Replace("{version}", typeof(ProxyGenerator<,>)
+                        .Replace("{version}", typeof(Generator)
                             .Assembly
                             .GetName()
                             .Version
@@ -239,7 +220,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Concat([type.Assembly, typeof(InterfaceInterceptor<>).Assembly])
+                .Concat([type.Assembly, typeof(Generator).Assembly])
                 .Distinct()
                 .ToArray();
 
@@ -249,21 +230,15 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 type1 = MetadataTypeInfo.CreateFrom(type),
                 type2 = SymbolTypeInfo.CreateFrom(type1.ToSymbol(compilation), compilation);
 
-            IGenericTypeInfo
-                interceptor1 = (IGenericTypeInfo) MetadataTypeInfo.CreateFrom(typeof(InterfaceInterceptor<>)),
-                interceptor2 = (IGenericTypeInfo) SymbolTypeInfo.CreateFrom(compilation.GetTypeByMetadataName(typeof(InterfaceInterceptor<>).FullName), compilation);
-
             InterfaceProxySyntaxFactory
-                fact1 = new InterfaceProxySyntaxFactory
+                fact1 = new
                 (
-                    type1, 
-                    interceptor1.Close(type1),
+                    type1,
                     SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
-                fact2 = new InterfaceProxySyntaxFactory
+                fact2 = new
                 (
-                    type2, 
-                    interceptor2.Close(type2),
+                    type2,
                     SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
@@ -277,14 +252,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void Factory_CanBeCancelled()
         {
-            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>, FooInterceptor>(OutputType.Module);
+            InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
-            using (CancellationTokenSource cancellation = new CancellationTokenSource())
-            {
-                cancellation.Cancel();
+            using CancellationTokenSource cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
 
-                Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(null, cancellation.Token));
-            }
+            Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(null, cancellation.Token));
         }
     }
 }

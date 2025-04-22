@@ -14,6 +14,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassSyntaxFactoryBase
     {
         private ExpressionSyntax AmendTarget(ExpressionSyntax? target, IMemberInfo member, ITypeInfo? castTargetTo)
@@ -31,6 +33,15 @@ namespace Solti.Utils.Proxy.Internals
             }
 
             return target;
+        }
+
+        /// <summary>
+        /// Starting from .NET7.0 interfaces may have abstract static members. This method throw <see cref="NotSupportedException"/> in that case.
+        /// </summary>
+        private static void CheckNotStaticAbstract(IMemberInfo member)
+        {
+            if (member.IsAbstract && member.IsStatic)
+                throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
         }
 
         protected static string EnsureUnused(ClassDeclarationSyntax cls, string member) => cls.Members.Any(m => m switch

@@ -51,8 +51,13 @@ namespace Solti.Utils.Proxy.Internals
         {
             IEventInfo ifaceEvt = (IEventInfo) context;
 
-            Visibility.Check(ifaceEvt, ContainingAssembly);
             Visibility.Check(targetEvt, ContainingAssembly);
+
+            //
+            // Starting from .NET 5.0 interface members may have visibility.
+            //
+
+            Visibility.Check(ifaceEvt, ContainingAssembly);
 
             IMethodInfo accessor = targetEvt.AddMethod ?? targetEvt.RemoveMethod!;
 

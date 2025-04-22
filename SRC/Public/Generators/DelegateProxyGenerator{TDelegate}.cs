@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Generators
     /// </summary>
     /// <typeparam name="TDelegate">The delegate to be proxied</typeparam>
     [SupportsSourceGeneration]
-    public sealed class DelegateProxyGenerator<TDelegate> : Generator<TDelegate, DelegateProxyGenerator, DelegateProxyGenerator<TDelegate>> where TDelegate : Delegate
+    public sealed class DelegateProxyGenerator<TDelegate> : Generator<DelegateProxyGenerator, DelegateProxyGenerator<TDelegate>> where TDelegate : Delegate
     {
         /// <inheritdoc/>
         protected override DelegateProxyGenerator GetConcreteGenerator() => new(typeof(TDelegate));

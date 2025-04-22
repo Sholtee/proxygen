@@ -15,9 +15,9 @@ using Moq;
 using NUnit.Framework;
 
 [assembly: 
-    InternalsVisibleTo("Proxy_33CB287866A082C02051FC68A9510E79")
+    InternalsVisibleTo("Proxy_0CCCBCC05D2DAEF1EA398B60806CCA29")
 #if NET5_0_OR_GREATER
-    , InternalsVisibleTo("Proxy_46DFD72DDDF255F1784EF659ADFCD692")
+    , InternalsVisibleTo("Proxy_0D009316AFE8DB66C191DEB867B3B850")
 #endif
 ]
 
@@ -26,7 +26,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
     using Generators;
     using Internals;
     using Primitives;
-    using Proxy.Tests.External;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
     public sealed class InterfaceProxyGeneratorTests
@@ -37,16 +36,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int NotHooked(int val);
         }
 
-        public class MyInterceptor : InterfaceInterceptor<IMyInterface>
+        public class MyInterceptor : IInterceptor
         {
-            public override object Invoke(InterfaceInvocationContext context)
+            public object Invoke(IInvocationContext context)
             {
                 if (context.Member.Method.Name == nameof(IMyInterface.Hooked)) return 1986;
-                return base.Invoke(context);
-            }
-
-            public MyInterceptor(IMyInterface target) : base(target)
-            {
+                return context.Dispatch();
             }
         }
 
@@ -66,19 +61,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldHook()
         {
-            IMyInterface proxy = await ProxyGenerator<IMyInterface, MyInterceptor>.ActivateAsync(Tuple.Create((IMyInterface) new MyClass()));
+            IMyInterface proxy = await InterfaceProxyGenerator<IMyInterface>.ActivateAsync(new MyInterceptor(), new MyClass());
 
             Assert.That(proxy.NotHooked(1), Is.EqualTo(1));
             Assert.That(proxy.Hooked(1), Is.EqualTo(1986));
         }
 
         [Test]
-        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => ProxyGenerator<IMyInterface, MyInterceptor>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass())))));
+        public void GeneratedProxy_ShouldBeAccessibleParallelly() => Assert.DoesNotThrowAsync(() => Task.WhenAll(100.Times(() => InterfaceProxyGenerator<IMyInterface>.ActivateAsync(new MyInterceptor(), new MyClass()))));
 
         [Test]
         public async Task GeneratedProxy_MayBeThreadSafe()
         {
-            IMyInterface proxy = await ProxyGenerator<IMyInterface, InterfaceInterceptor<IMyInterface>>.ActivateAsync(Tuple.Create((IMyInterface)new MyClass()));
+            IMyInterface proxy = await InterfaceProxyGenerator<IMyInterface>.ActivateAsync(new MyInterceptor(), new MyClass());
 
             Assert.DoesNotThrow(() => Parallel.For(1, 1000, _ => proxy.Hooked(0)));
         }
@@ -86,7 +81,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithComplexInterfaces()
         {
-            IList<string> proxy = await ProxyGenerator<IList<string>, InterfaceInterceptor<IList<string>>>.ActivateAsync(Tuple.Create((IList<string>)new List<string>()));
+            IList<string> proxy = await InterfaceProxyGenerator<IList<string>>.ActivateAsync(new MyInterceptor(), new List<string>());
 
             proxy.Add("Cica");
 
@@ -97,14 +92,14 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithTuples()
         {
-            IList<(string Foo, object Bar)> proxy = await ProxyGenerator<IList<(string Foo, object Bar)>, InterfaceInterceptor<IList<(string Foo, object Bar)>>>.ActivateAsync(Tuple.Create((IList<(string Foo, object Bar)>)new List<(string Foo, object Bar)>()));
+            IList<(string Foo, object Bar)> proxy = await InterfaceProxyGenerator<IList<(string Foo, object Bar)>>.ActivateAsync(new MyInterceptor(), new List<(string Foo, object Bar)>());
 
             Assert.DoesNotThrow(() => proxy.Add(("...", 1)));
         }
 
         [Test]
         public void GeneratedProxy_ShouldWorkWithGenerics() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IList<List<object>>, InterfaceInterceptor<IList<List<object>>>>.ActivateAsync(Tuple.Create((IList<List<object>>)new List<List<object>>())));
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IList<List<object>>>.ActivateAsync(new MyInterceptor(), new List<List<object>>()));
 
         public interface IMyGenericInterfaceHavingConstraint
         {
@@ -114,7 +109,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void GeneratedProxy_ShouldWorkWithGenericsHavingConstraint() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IMyGenericInterfaceHavingConstraint, InterfaceInterceptor<IMyGenericInterfaceHavingConstraint>>.ActivateAsync(Tuple.Create((IMyGenericInterfaceHavingConstraint)null)));
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IMyGenericInterfaceHavingConstraint>.ActivateAsync(new MyInterceptor()));
 
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithOverloadedProperties()
@@ -123,17 +118,10 @@ namespace Solti.Utils.Proxy.Generators.Tests
             // IEnumerator.Current, IEnumerator<string>.Current
             //
 
-            using (IEnumerator<string> proxy = await ProxyGenerator<IEnumerator<string>, InterfaceInterceptor<IEnumerator<string>>>.ActivateAsync(Tuple.Create((IEnumerator<string>)new List<string> { "cica" }.GetEnumerator())))
+            using (IEnumerator<string> proxy = await InterfaceProxyGenerator<IEnumerator<string>>.ActivateAsync(new MyInterceptor(), new List<string> { "cica" }.GetEnumerator()))
             {
                 Assert.That(proxy.MoveNext);
                 Assert.That(proxy.Current, Is.EqualTo("cica"));
-            }
-        }
-
-        public class ListProxy : InterfaceInterceptor<IList<int>>
-        {
-            public ListProxy(IList<int> target) : base(target)
-            {
             }
         }
 
@@ -142,7 +130,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             IList<int>
                 src = new List<int>(),
-                proxy = await ProxyGenerator<IList<int>, ListProxy>.ActivateAsync(Tuple.Create(src));
+                proxy = await InterfaceProxyGenerator<IList<int>>.ActivateAsync(new MyInterceptor(), src);
 
             proxy.Add(1986);
 
@@ -158,22 +146,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int Foo<T>(int a, out string b, ref T c);
         }
 
-        public class FooProxy : InterfaceInterceptor<IFoo>
+        public class FooInterceptor : IInterceptor
         {
-            public override object Invoke(InterfaceInvocationContext context)
-            {
-                return 1;
-            }
-
-            public FooProxy(IFoo target) : base(target)
-            {
-            }
+            public object Invoke(IInvocationContext context) => 1;
         }
 
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithRefParameters()
         {
-            IFoo proxy = await ProxyGenerator<IFoo, FooProxy>.ActivateAsync(Tuple.Create((IFoo)null));
+            IFoo proxy = await InterfaceProxyGenerator<IFoo>.ActivateAsync(new FooInterceptor());
 
             string x = string.Empty;
 
@@ -185,79 +166,54 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int Foo();
         }
 
-        internal class InternalInterfaceProxy : InterfaceInterceptor<IInternalInterface>
+        internal class InternalInterfaceInterceptor : IInterceptor
         {
-            public InternalInterfaceProxy() : base(null) { }
-
-            public override object Invoke(InterfaceInvocationContext context) => 1;
+            public object Invoke(IInvocationContext context) => 1;
         }
 
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithInternalTypes()
         {
-            IInternalInterface proxy = await ProxyGenerator<IInternalInterface, InternalInterfaceProxy>.ActivateAsync(null);
+            IInternalInterface proxy = await InterfaceProxyGenerator<IInternalInterface>.ActivateAsync(new InternalInterfaceInterceptor());
             Assert.That(proxy.Foo(), Is.EqualTo(1));
         }
 #if NET5_0_OR_GREATER
         public interface IInterfaceContainingMembersHavingAccessibility
         {
             public void Foo();
-            protected void Bar() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
             internal void Baz() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
-            private void FooBar() { } // muszaj legyen torzse
         }
 
         [Test]
         public void GeneratedProxy_ShouldWorkWithInterfaceMembersHavingAccessibility() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IInterfaceContainingMembersHavingAccessibility, InterfaceInterceptor<IInterfaceContainingMembersHavingAccessibility>>.ActivateAsync(Tuple.Create((IInterfaceContainingMembersHavingAccessibility) null)));
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IInterfaceContainingMembersHavingAccessibility>.ActivateAsync(new MyInterceptor()));
 #endif
-        public class InterceptorPersistingContext<TInterface, TTarget> : InterfaceInterceptor<TInterface, TTarget>
-            where TInterface : class
-            where TTarget : TInterface
+        public class InterceptorPersistingContext : IInterceptor
         {
-            public InterceptorPersistingContext(TTarget target) : base(target) { }
-
-            public override object Invoke(InterfaceInvocationContext context)
+            public object Invoke(IInvocationContext context)
             {
                 Contexts.Add(context);
-                return base.Invoke(context);
+                return context.Dispatch();
             }
 
-            public List<InterfaceInvocationContext> Contexts { get; } = new List<InterfaceInvocationContext>();
+            public List<IInvocationContext> Contexts { get; } = [];
         }
 
         [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperMethodInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperMethodInfo()
         {
-            IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, IList<int>>>.ActivateAsync(Tuple.Create((IList<int>)new List<int>()));
+            InterceptorPersistingContext interceptor = new();
+
+            IList<int> proxy = await InterfaceProxyGenerator<IList<int>>.ActivateAsync(interceptor, new List<int>());
             proxy.Add(100);
 
-            InterceptorPersistingContext<IList<int>, IList<int>> interceptor = (InterceptorPersistingContext<IList<int>, IList<int>>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
+            IInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
             Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.Add(default))));
             Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Method));
-        }
-
-        [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperMethodInfo_ClassTarget()
-        {
-            IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, List<int>>>.ActivateAsync(Tuple.Create(new List<int>()));
-            proxy.Add(100);
-
-            InterceptorPersistingContext<IList<int>, List<int>> interceptor = (InterceptorPersistingContext<IList<int>, List<int>>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
-
-            Assert.That(context.Args.Length, Is.EqualTo(1));
-            Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract<IList<int>>(lst => lst.Add(100))));
-            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Method, Is.EqualTo(MethodInfoExtractor.Extract<List<int>>(lst => lst.Add(100))));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Target.Method));
+            Assert.That(context.GenericArguments, Is.Empty);
         }
 
         public interface IMyInterfaceHavingGenericMethod
@@ -271,49 +227,32 @@ namespace Solti.Utils.Proxy.Generators.Tests
         }
 
         [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperGenericMethodInfo_InterfaceTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperGenericMethodInfo()
         {
-            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod>>.ActivateAsync
+            InterceptorPersistingContext interceptor = new();
+
+            IMyInterfaceHavingGenericMethod proxy = await InterfaceProxyGenerator<IMyInterfaceHavingGenericMethod>.ActivateAsync
             (
-                Tuple.Create((IMyInterfaceHavingGenericMethod)new MyInterfaceHavingGenericMethodImpl())
+                interceptor,
+                new MyInterfaceHavingGenericMethodImpl()
             );
             proxy.GenericMethod(100);
 
-            InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, IMyInterfaceHavingGenericMethod>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
+            IInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
             Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100))));
+            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract(() => proxy.GenericMethod(100)).GetGenericMethodDefinition()));
             Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Method));
+            Assert.That(context.GenericArguments, Is.EquivalentTo(new Type[] {typeof(int)}));
         }
 
         [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperGenericMethodInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperPropertyInfo()
         {
-            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl>>.ActivateAsync
-            (
-                Tuple.Create(new MyInterfaceHavingGenericMethodImpl())
-            );
-            proxy.GenericMethod(100);
+            InterceptorPersistingContext interceptor = new();
 
-            InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl> interceptor = (InterceptorPersistingContext<IMyInterfaceHavingGenericMethod, MyInterfaceHavingGenericMethodImpl>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
-
-            Assert.That(context.Args.Length, Is.EqualTo(1));
-            Assert.That(context.Args[0], Is.EqualTo(100));
-            Assert.That(context.Member.Method, Is.EqualTo(MethodInfoExtractor.Extract<IMyInterfaceHavingGenericMethod>(iface => iface.GenericMethod(100))));
-            Assert.That(context.Member.Member, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Method, Is.EqualTo(MethodInfoExtractor.Extract<MyInterfaceHavingGenericMethodImpl>(impl => impl.GenericMethod(100))));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Target.Method));
-        }
-
-        [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperPropertyInfo_InterfaceTarget()
-        {
-            IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, IList<int>>>.ActivateAsync(Tuple.Create((IList<int>)new List<int>()));
+            IList<int> proxy = await InterfaceProxyGenerator<IList<int>>.ActivateAsync(interceptor, new List<int>());
 
             //
             // IList.Count IS "inherited" from ICollection
@@ -321,8 +260,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             _ = proxy.Count;
 
-            InterceptorPersistingContext<IList<int>, IList<int>> interceptor = (InterceptorPersistingContext<IList<int>, IList<int>>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
+            IInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(0));
 
@@ -330,50 +268,19 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Member.Method, Is.EqualTo(prop.GetMethod));
             Assert.That(context.Member.Member, Is.EqualTo(prop));
-            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Member));
+            Assert.That(context.GenericArguments, Is.Empty);
         }
 
         [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperPropertyInfo_ClassTarget()
+        public async Task GeneratedProxy_ShouldPassTheProperEventInfo()
         {
-            IList<int> proxy = await ProxyGenerator<IList<int>, InterceptorPersistingContext<IList<int>, List<int>>>.ActivateAsync(Tuple.Create(new List<int>()));
+            InterceptorPersistingContext interceptor = new();
 
-            //
-            // IList.Count IS "inherited" from ICollection
-            //
-
-            _ = proxy.Count;
-
-            InterceptorPersistingContext<IList<int>, List<int>> interceptor = (InterceptorPersistingContext<IList<int>, List<int>>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
-
-            Assert.That(context.Args.Length, Is.EqualTo(0));
-
-            PropertyInfo prop = PropertyInfoExtractor.Extract<IList<int>, int>(lst => lst.Count);
-
-            Assert.That(context.Member.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.Member.Member, Is.EqualTo(prop));
-
-            prop = PropertyInfoExtractor.Extract<List<int>, int>(lst => lst.Count);
-
-            Assert.That(context.Target.Method, Is.EqualTo(prop.GetMethod));
-            Assert.That(context.Target.Member, Is.EqualTo(prop));
-        }
-
-        [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperEventInfo_InterfaceTarget()
-        {
-            IEventSource proxy = await ProxyGenerator<IEventSource, InterceptorPersistingContext<IEventSource, IEventSource>>.ActivateAsync(Tuple.Create((IEventSource)new EventSource()));
-
-            //
-            // IList.Count IS "inherited" from ICollection
-            //
+            IEventSource proxy = await InterfaceProxyGenerator<IEventSource>.ActivateAsync(interceptor, new EventSource());
 
             proxy.Event += null;
 
-            InterceptorPersistingContext<IEventSource, IEventSource> interceptor = (InterceptorPersistingContext<IEventSource, IEventSource>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
+            IInvocationContext context = interceptor.Contexts[0];
 
             Assert.That(context.Args.Length, Is.EqualTo(1));
 
@@ -381,41 +288,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
             Assert.That(context.Member.Method, Is.EqualTo(evt.AddMethod));
             Assert.That(context.Member.Member, Is.EqualTo(evt));
-            Assert.That(context.Target.Method, Is.EqualTo(context.Member.Method));
-            Assert.That(context.Target.Member, Is.EqualTo(context.Member.Member));
-        }
-
-        [Test]
-        public async Task GeneratedProxy_ShouldPassTheProperEventInfo_ClassTarget()
-        {
-            IEventSource proxy = await ProxyGenerator<IEventSource, InterceptorPersistingContext<IEventSource, EventSource>>.ActivateAsync(Tuple.Create(new EventSource()));
-
-            //
-            // IList.Count IS "inherited" from ICollection
-            //
-
-            proxy.Event += null;
-
-            InterceptorPersistingContext<IEventSource, EventSource> interceptor = (InterceptorPersistingContext<IEventSource, EventSource>)proxy;
-            InterfaceInvocationContext context = interceptor.Contexts[0];
-
-            Assert.That(context.Args.Length, Is.EqualTo(1));
-
-            EventInfo evt = typeof(IEventSource).GetEvent("Event");
-            Assert.That(context.Member.Method, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.Member.Member, Is.EqualTo(evt));
-
-            evt = typeof(EventSource).GetEvent("Event");
-            Assert.That(context.Target.Method, Is.EqualTo(evt.AddMethod));
-            Assert.That(context.Target.Member, Is.EqualTo(evt));
+            Assert.That(context.GenericArguments, Is.Empty);
         }
 
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithGenericMethods()
         {
-            IMyInterfaceHavingGenericMethod proxy = await ProxyGenerator<IMyInterfaceHavingGenericMethod, InterfaceInterceptor<IMyInterfaceHavingGenericMethod>>.ActivateAsync
+            IMyInterfaceHavingGenericMethod proxy = await InterfaceProxyGenerator<IMyInterfaceHavingGenericMethod>.ActivateAsync
             (
-                Tuple.Create((IMyInterfaceHavingGenericMethod)new MyInterfaceHavingGenericMethodImpl())
+                new MyInterceptor(),
+                new MyInterfaceHavingGenericMethodImpl()
             );
 
             Assert.That(proxy.GenericMethod(10), Is.EqualTo(10));
@@ -434,7 +316,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         [Test]
         public async Task GeneratedProxy_ShouldWorkWithExplicitImplementations()
         {
-            IBar proxy = await ProxyGenerator<IBar, InterfaceInterceptor<IBar>>.ActivateAsync(Tuple.Create((IBar)new BarExplicit()));
+            IBar proxy = await InterfaceProxyGenerator<IBar>.ActivateAsync(new MyInterceptor(), new BarExplicit());
             Assert.That(proxy.Baz(), Is.EqualTo(1986));
         }
 
@@ -454,7 +336,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         {
             var src = new EventSource();
 
-            IEventSource proxy = await ProxyGenerator<IEventSource, InterfaceInterceptor<IEventSource>>.ActivateAsync(Tuple.Create((IEventSource)src));
+            IEventSource proxy = await InterfaceProxyGenerator<IEventSource>.ActivateAsync(new MyInterceptor(), src);
 
             int callCount = 0;
             proxy.Event += (s, a) => callCount++;
@@ -462,26 +344,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
             src.Raise();
 
             Assert.That(callCount, Is.EqualTo(1));
-        }
-
-        public abstract class AbstractInterceptor : InterfaceInterceptor<IMyInterface>
-        {
-            public AbstractInterceptor() : base(null) { }
-        }
-
-        public class InterceptorWithPrivateCtor : InterfaceInterceptor<IMyInterface>
-        {
-            private InterceptorWithPrivateCtor() : base(null) { }
-        }
-
-        private class PrivateInterceptor : InterfaceInterceptor<IMyInterface>
-        {
-            public PrivateInterceptor() : base(null) { }
-        }
-
-        public sealed class SealedInterceptor : InterfaceInterceptor<IMyInterface>
-        {
-            public SealedInterceptor() : base(null) { }
         }
 
         [Test]
@@ -492,7 +354,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 .Setup(calc => calc.Add(2, 1))
                 .Returns<int, int>((a, b) => a + b);
 
-            ICalculator calculator = await ProxyGenerator<ICalculator, CalculatorInterceptor>.ActivateAsync(Tuple.Create(mockCalculator.Object));
+            ICalculator calculator = await InterfaceProxyGenerator<ICalculator>.ActivateAsync(new CalculatorInterceptor(), mockCalculator.Object);
             calculator.Add(0, 1); // elso parameter direkt 0
 
             mockCalculator.Verify(calc => calc.Add(2, 1), Times.Once);
@@ -503,56 +365,23 @@ namespace Solti.Utils.Proxy.Generators.Tests
             int Add(int a, int b);
         }
 
-        public class CalculatorInterceptor : InterfaceInterceptor<ICalculator>
+        public class CalculatorInterceptor : IInterceptor
         {
-            public CalculatorInterceptor(ICalculator target) : base(target)
-            {
-            }
-
-            public override object Invoke(InterfaceInvocationContext context)
+            public object Invoke(IInvocationContext context)
             {
                 context.Args[0] = 2;
-                return base.Invoke(context);
-            }
-        }
-
-        [Test]
-        public void ProxyGenerator_ShouldValidate()
-        {
-            Assert.Throws<ArgumentException>(() => ProxyGenerator<object, InterfaceInterceptor<object>>.GetGeneratedType());
-            Assert.Throws<ArgumentException>(() => new InterfaceProxyGenerator(typeof(IList<string>), typeof(InterfaceInterceptor<IList<int>>)).GetGeneratedType());
-            Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, AbstractInterceptor>.GetGeneratedType());
-            Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, SealedInterceptor>.GetGeneratedType());
-            Assert.Throws<InvalidOperationException>(() => ProxyGenerator<IMyInterface, InterceptorWithPrivateCtor>.GetGeneratedType());
-            Assert.Throws<MemberAccessException>(() => ProxyGenerator<IMyInterface, PrivateInterceptor>.GetGeneratedType());
-        }
-
-        [Test]
-        public void ProxyGenerator_ShouldHandleInterceptorsWithMultipleCtors()
-        {
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IList<int>, InterceptorWithMultipleCtors>.ActivateAsync(Tuple.Create((IList<int>)new List<int>())));
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IList<int>, InterceptorWithMultipleCtors>.ActivateAsync(Tuple.Create((IList<int>)new List<int>(), "cica")));
-        }
-
-        public class InterceptorWithMultipleCtors : InterfaceInterceptor<IList<int>>
-        {
-            public InterceptorWithMultipleCtors(IList<int> target) : base(target)
-            {
-            }
-
-            public InterceptorWithMultipleCtors(IList<int> target, string cica) : this(target)
-            {
+                return context.Dispatch();
             }
         }
 
         [Test]
         public void ProxyGenerator_ShouldHandleIdentifierNameCollision() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IInterfaceHavingNaughtyParameterNames, InterfaceInterceptor<IInterfaceHavingNaughtyParameterNames>>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IInterfaceHavingNaughtyParameterNames>.GetGeneratedTypeAsync());
 
         public interface IInterfaceHavingNaughtyParameterNames
         {
             //
-            // Mindket nev hasznalva van belsoleg
+            // "result" and "args" are known identifiers in the generated type
             //
 
             void Foo(int result, object[] args);
@@ -567,19 +396,15 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void ProxyGenerator_ShouldWorkWithByRefStructs() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IByRef<Guid>, InterfaceInterceptor<IByRef<Guid>>>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IByRef<Guid>>.GetGeneratedTypeAsync());
 
         [Test]
         public void ProxyGenerator_ShouldWorkWithByRefObjects() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IByRef<object>, InterfaceInterceptor<IByRef<object>>>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IByRef<object>>.GetGeneratedTypeAsync());
 
         [Test]
         public void ProxyGenerator_ShouldWorkWithByRefArrays() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IByRef<object[]>, InterfaceInterceptor<IByRef<object[]>>>.GetGeneratedTypeAsync());
-
-        [Test]
-        public void ProxyGenerator_ShouldWorkWithInterceptorFromExternalLibrary() =>
-            Assert.DoesNotThrowAsync(() => ProxyGenerator<IMyInterface, ExternalInterceptor<IMyInterface>>.GetGeneratedTypeAsync());
+            Assert.DoesNotThrowAsync(() => InterfaceProxyGenerator<IByRef<object[]>>.GetGeneratedTypeAsync());
 
         //
         // RandomInterfaces generikusa ne "object" legyen mert akkor tartalmazni fogja IEnumerator<object>-t
@@ -605,12 +430,12 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [TestCaseSource(nameof(RandomInterfaces)), Parallelizable]
         public void ProxyGenerator_ShouldWorkWith(Type iface) =>
-            Assert.DoesNotThrow(() => new InterfaceProxyGenerator(iface, typeof(InterfaceInterceptor<>).MakeGenericType(iface)).GetGeneratedType());
+            Assert.DoesNotThrow(() => new InterfaceProxyGenerator(iface).GetGeneratedType());
 
         [Test]
         public void ProxyGenerator_ShouldCacheTheGeneratedAssemblyIfCacheDirectoryIsSet()
         {
-            Generator generator = ProxyGenerator<IEnumerator<Guid>, InterfaceInterceptor<IEnumerator<Guid>>>.Instance;
+            Generator generator = InterfaceProxyGenerator<IEnumerator<Guid>>.Instance;
 
             string tmpDir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "tmp");
             Directory.CreateDirectory(tmpDir);
@@ -650,7 +475,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         ]
         public async Task ProxyGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
-            Generator generator = ProxyGenerator<IEnumerator<object>, InterfaceInterceptor<IEnumerator<object>>>.Instance;
+            Generator generator = InterfaceProxyGenerator<IEnumerator<object>>.Instance;
 
             string
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
@@ -681,40 +506,22 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        private const string WIRED_NAME = "Proxy_D1B9AA85D98FC339836984A532386366"; // amig a tipus nem valtozik addig ez sem valtozhat
+        private const string WIRED_NAME = "Proxy_DDD429D5DBEE9FCDEB315DB6AFDC6605"; // amig a tipus nem valtozik addig ez sem valtozhat
 
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
         {
-            Assert.AreEqual(WIRED_NAME, ProxyGenerator<IList<int>, InterfaceInterceptor<IList<int>>>.GetGeneratedType().Assembly.GetName().Name);
-            Assert.AreNotEqual(WIRED_NAME, ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>.GetGeneratedType().Assembly.GetName().Name);
+            Assert.AreEqual(WIRED_NAME, InterfaceProxyGenerator<IList<int>>.GetGeneratedType().Assembly.GetName().Name);
+            Assert.AreNotEqual(WIRED_NAME, InterfaceProxyGenerator<IList<object>>.GetGeneratedType().Assembly.GetName().Name);
         }
 
         [Test]
         public void ProxyGenerator_ShouldAssembleTheProxyOnce() =>
-            Assert.AreSame(ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType(), ProxyGenerator<ICloneable, InterfaceInterceptor<ICloneable>>.GetGeneratedType());
+            Assert.AreSame(InterfaceProxyGenerator<ICloneable>.GetGeneratedType(), InterfaceProxyGenerator<ICloneable>.GetGeneratedType());
 
         [Test]
         public void ProxyGenerator_ShouldAssembleTheProxyOnce2() =>
-            Assert.AreSame(ProxyGenerator<IQueryable, InterfaceInterceptor<IQueryable>>.GetGeneratedType(), new InterfaceProxyGenerator(typeof(IQueryable), typeof(InterfaceInterceptor<IQueryable>)).GetGeneratedType());
-
-        [Test]
-        public async Task Target_MayAccessTheMostOuterEnclosingProxyInstance()
-        {
-            var target = new ProxyAccess();
-            Assert.IsNull(target.Proxy);
-
-            IList<object>
-                proxy1 = await ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>.ActivateAsync(Tuple.Create((IList<object>)target)),
-                proxy2 = await ProxyGenerator<IList<object>, InterfaceInterceptor<IList<object>>>.ActivateAsync(Tuple.Create(proxy1));
-
-            Assert.AreSame(proxy2, target.Proxy);
-        }
-
-        public class ProxyAccess : List<object>, IProxyAccess<IList<object>>
-        {
-            public IList<object> Proxy { get; set; }
-        }
+            Assert.AreSame(InterfaceProxyGenerator<IQueryable>.GetGeneratedType(), new InterfaceProxyGenerator(typeof(IQueryable)).GetGeneratedType());
 
         public interface IRefReturn
         {
@@ -723,7 +530,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void ProxyGenerator_ShouldThrowOnRefReturnValues() =>
-            Assert.Throws<NotSupportedException>(() => ProxyGenerator<IRefReturn, InterfaceInterceptor<IRefReturn>>.GetGeneratedType());
+            Assert.Throws<NotSupportedException>(() => InterfaceProxyGenerator<IRefReturn>.GetGeneratedType());
 
         public interface IRefStructUsage
         {
@@ -737,7 +544,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
 #endif
         ]
         public void ProxyGenerator_ShouldThrowOnRefStructs() =>
-            Assert.Throws<NotSupportedException>(() => ProxyGenerator<IRefStructUsage, InterfaceInterceptor<IRefStructUsage>>.GetGeneratedType());
+            Assert.Throws<NotSupportedException>(() => InterfaceProxyGenerator<IRefStructUsage>.GetGeneratedType());
 
         public interface IBase
         {
@@ -751,31 +558,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void ProxyGenerator_ShouldHandleOverrides() =>
-            Assert.DoesNotThrow(() => ProxyGenerator<IDescendant, InterfaceInterceptor<IDescendant>>.GetGeneratedType());
-
-        public class InterceptorHavingPartialImplementation : InterfaceInterceptor<IMyInterface>
-        {
-            public int NotHooked(int val) => val;
-
-            internal int Hooked(in int val) => val;  // this won't be treated as implementation since it's not public
-
-            public override object Invoke(InterfaceInvocationContext context)
-            {
-                return 1986;
-            }
-
-            public InterceptorHavingPartialImplementation() : base(null)
-            {
-            }
-        }
-
-        [Test]
-        public void ProxyGenerator_ShouldSupportPartialImplementations()
-        {
-            IMyInterface proxy = ProxyGenerator<IMyInterface, InterceptorHavingPartialImplementation>.Activate(null);
-
-            Assert.That(proxy.Hooked(1990), Is.EqualTo(1986));
-            Assert.That(proxy.NotHooked(1990), Is.EqualTo(1990));
-        }
+            Assert.DoesNotThrow(() => InterfaceProxyGenerator<IDescendant>.GetGeneratedType());
     }
 }

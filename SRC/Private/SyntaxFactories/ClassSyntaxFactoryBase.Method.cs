@@ -154,13 +154,17 @@ namespace Solti.Utils.Proxy.Internals
             MethodDeclarationSyntax result = ResolveMethodCore(method);
 
             if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            {
+                CheckNotStaticAbstract(method);
+
                 result = result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
                 );
+            }
             else
             {
-                List<SyntaxKind> tokens = [..ResolveAccessModifiers(method)];
+                List<SyntaxKind> tokens = [.. ResolveAccessModifiers(method)];
 
                 tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
 
