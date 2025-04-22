@@ -54,7 +54,7 @@ namespace Solti.Utils.Proxy.Internals
             Visibility.Check(targetEvt, ContainingAssembly);
 
             //
-            // Starting from .NET 5.0 interfaces may have visibility.
+            // Starting from .NET 5.0 interface members may have visibility.
             //
 
             Visibility.Check(ifaceEvt, ContainingAssembly);

@@ -211,7 +211,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 #if LEGACY_COMPILER
                         .Replace(") :", "):")
 #endif
-                        .Replace("{version}", typeof(ProxyGenerator<,>)
+                        .Replace("{version}", typeof(InterfaceProxyGenerator<,>)
                             .Assembly
                             .GetName()
                             .Version

@@ -92,7 +92,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 typeof(NestedGeneric<>), 
                 typeof(NestedGeneric<List<string>>), 
                 typeof(InterfaceInterceptor<>),
-                typeof(Generators.ProxyGenerator<,>), 
+                typeof(Generators.InterfaceProxyGenerator<,>), 
                 typeof(System.ComponentModel.Component), // van esemenye
                 typeof(HasInternal),
                 typeof(MyDelegate),
