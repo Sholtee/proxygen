@@ -9,7 +9,7 @@ internal sealed class DelegateProxy_2F9A6934DF4602A77AF8367A6D7A92F4 : global::S
     private global::System.Int32 Invoke(global::System.Collections.Generic.List<global::System.String> arg)
     {
         global::System.Object[] args = new global::System.Object[]{arg};
-        global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.ClassInvocationContext(new global::Solti.Utils.Proxy.ExtendedMemberInfo(this.FTarget.Method), (global::System.Object[] args) =>
+        global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, new global::Solti.Utils.Proxy.ExtendedMemberInfo(this.FTarget.Method), (global::System.Object[] args) =>
         {
             global::System.Collections.Generic.List<global::System.String> _arg = (global::System.Collections.Generic.List<global::System.String>)args[0];
             global::System.Object result = this.FTarget.Invoke(_arg);

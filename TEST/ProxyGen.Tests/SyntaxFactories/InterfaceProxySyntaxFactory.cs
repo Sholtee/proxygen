@@ -139,7 +139,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCaseSource(nameof(Methods))]
         public void ResolveMethod_ShouldGenerateTheProperInterceptor((object Method, string File) para)
         {
-            SyntaxList<MemberDeclarationSyntax> methods = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> methods = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members.Where(m => m is MethodDeclarationSyntax);
 
             Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, para.File)))));
         }
@@ -147,34 +147,33 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheProperInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members.Where(m => m is PropertyDeclarationSyntax);
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
+            Assert.That(props.Any(prop => prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
         }
 
         [Test]
         public void ResolveProperty_ShouldGenerateTheIndexerInterceptor()
         {
-            SyntaxList<MemberDeclarationSyntax> props = new InterfaceProxySyntaxFactory
+            MemberDeclarationSyntax prop = new InterfaceProxySyntaxFactory
             (
                 MetadataTypeInfo.CreateFrom(typeof(IList<int>)), 
                 SyntaxFactoryContext.Default
-            ).ResolveProperties(GetDummyClass(), null).Members;
+            ).ResolveProperties(GetDummyClass(), null).Members.Single(m => m is IndexerDeclarationSyntax);
 
-            Assert.That(props.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt")))));
+            Assert.That(prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt"))));
         }
 
         [Test]
         public void GenerateProxyEvent_Test()
         {
-            SyntaxList<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members;
+            IEnumerable<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members.Where(m => m is EventDeclarationSyntax);
 
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
         }
 
         [TestCase(typeof(IFoo<int>), OutputType.Module, "IfaceProxySrcModule.txt")]
         [TestCase(typeof(IFoo<int>), OutputType.Unit, "IfaceProxySrcUnit.txt")]
-        [TestCase(typeof(IList), OutputType.Module, "IfaceProxyHavingTargetSrcModule.txt")]
         public void ResolveUnit_ShouldGenerateTheDesiredUnit(Type iface, int outputType, string fileName)
         {
             InterfaceProxySyntaxFactory gen = CreateSyntaxFactory(iface, (OutputType) outputType);
@@ -255,12 +254,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
-            using (CancellationTokenSource cancellation = new CancellationTokenSource())
-            {
-                cancellation.Cancel();
+            using CancellationTokenSource cancellation = new CancellationTokenSource();
+            cancellation.Cancel();
 
-                Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(null, cancellation.Token));
-            }
+            Assert.Throws<OperationCanceledException>(() => gen.ResolveUnit(null, cancellation.Token));
         }
     }
 }

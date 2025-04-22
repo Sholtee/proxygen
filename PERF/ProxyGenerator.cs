@@ -19,15 +19,15 @@ namespace Solti.Utils.Proxy.Perf
     {
         private const int OPERATIONS_PER_INVOKE = 100;
 
-        public class InterfaceProxy: InterfaceInterceptor<IInterface>
+        private sealed class Interceptor : IInterceptor
         {
-            public InterfaceProxy(IInterface target) : base(target)
-            {
-            }
+            public object Invoke(IInvocationContext context) => context.Dispatch();
         }
 
+        private static readonly Interceptor FInterceptor = new();
+
         [Benchmark]
-        public void AssemblingProxyType() => ProxyGenerator<IInterface, InterfaceProxy>
+        public void AssemblingProxyType() => InterfaceProxyGenerator<IInterface>
             .Instance
             .EmitAsync(SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
             .GetAwaiter()
@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                ProxyGenerator<IInterface, InterfaceProxy>.GetGeneratedType();
+                _ = InterfaceProxyGenerator<IInterface>.GetGeneratedType();
             }
         }
 
@@ -47,7 +47,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                ProxyGenerator<IInterface, InterfaceProxy>.Activate(Tuple.Create((IInterface) null));
+                _ = InterfaceProxyGenerator<IInterface>.Activate(FInterceptor);
             }
         }
     }

@@ -15,9 +15,9 @@ using Moq;
 using NUnit.Framework;
 
 [assembly: 
-    InternalsVisibleTo("Proxy_33CB287866A082C02051FC68A9510E79")
+    InternalsVisibleTo("Proxy_0CCCBCC05D2DAEF1EA398B60806CCA29")
 #if NET5_0_OR_GREATER
-    , InternalsVisibleTo("Proxy_46DFD72DDDF255F1784EF659ADFCD692")
+    , InternalsVisibleTo("Proxy_0D009316AFE8DB66C191DEB867B3B850")
 #endif
 ]
 
@@ -181,9 +181,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
         public interface IInterfaceContainingMembersHavingAccessibility
         {
             public void Foo();
-            protected void Bar() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
             internal void Baz() { } // TODO: FEXME: ez torzs nelkul is valid de akkor a forditas elhasal
-            private void FooBar() { } // muszaj legyen torzse
         }
 
         [Test]
@@ -508,7 +506,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
 
-        private const string WIRED_NAME = "Proxy_D1B9AA85D98FC339836984A532386366"; // amig a tipus nem valtozik addig ez sem valtozhat
+        private const string WIRED_NAME = "Proxy_DDD429D5DBEE9FCDEB315DB6AFDC6605"; // amig a tipus nem valtozik addig ez sem valtozhat
 
         [Test]
         public void ProxyGenerator_ShouldGenerateUniqueAssemblyName()
