@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
                 Debugger.Launch();
 #endif
             //
-            // Only C# 8.0+ is supported
+            // Only C# 9.0+ is supported
             //
 
             if (cmp is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp9 } compilation)
