@@ -18,14 +18,14 @@ namespace Solti.Utils.Proxy.Internals
         public required OutputType OutputType { get; init; }
 
         /// <summary>
-        /// The configuration associated with the compilation.
+        /// The logger factory associated with this context. Concrete loggers can be instantiated by providing a log scope.
         /// </summary>
-        public required Config Config { get; init; }
+        public required ILoggerFactory LoggerFactory { get; init; }
 
         /// <summary>
         /// The reference collector instance or null if the source is being embedded.
         /// </summary>
-        public ReferenceCollector? ReferenceCollector { get; init; }
+        public IReferenceCollector? ReferenceCollector { get; init; }
 
         /// <summary>
         /// The name of assembly being compiled. Intended for test purposes
@@ -43,10 +43,7 @@ namespace Solti.Utils.Proxy.Internals
         public static SyntaxFactoryContext Default { get; } = new()
         {
             OutputType = OutputType.Module,
-            Config = new Config
-            (
-                new RuntimeConfigReader()
-            )
+            LoggerFactory = new LoggerFactory(null)
         };
     }
 }

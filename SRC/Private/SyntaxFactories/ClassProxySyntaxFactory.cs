@@ -99,14 +99,17 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ExposedClass => $"ClsProxy_{FBaseType.GetMD5HashCode()}";
 
-        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        #if DEBUG
+        internal
+        #endif
+        protected override CompilationUnitSyntax ResolveUnitCore(object context, CancellationToken cancellation)
         {
             if (FBaseType.Flags.HasFlag(TypeInfoFlags.IsFinal))
                 throw new InvalidOperationException(Resources.SEALED_TARGET);
 
             Visibility.Check(FBaseType, ContainingAssembly);
 
-            return base.ResolveUnit(context, cancellation);
+            return base.ResolveUnitCore(context, cancellation);
         }
 
         public ClassProxySyntaxFactory(ITypeInfo baseType, SyntaxFactoryContext context) : base(null, context)
