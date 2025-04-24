@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyEmbedderBase
     {
-        protected static readonly SymbolEqualityComparer SymbolEqualityComparer = SymbolEqualityComparer.Default;
+        protected static SymbolEqualityComparer SymbolEqualityComparer { get; } = SymbolEqualityComparer.Default;
 
         protected static void Execute
         (
@@ -29,10 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             CancellationToken cancellation
         )
         {
-            Config config = new
-            (
-                new AnalyzerConfigReader(configOptions)
-            );
+            AnalyzerConfig config = new(configOptions);
 #if DEBUG
             if (config.DebugGenerator && !Debugger.IsAttached)
                 Debugger.Launch();
@@ -53,21 +50,41 @@ namespace Solti.Utils.Proxy.Internals
             if (!aotGenerators.Any())
                 return;
 
+            LoggerFactory loggerFactory = new(config);
+
+            using ILogger logger = loggerFactory.CreateLogger($"SourceGenerator-{cmp.AssemblyName}-{Guid.NewGuid():N}");
+
+            SyntaxFactoryContext context = new()
+            {
+                OutputType = OutputType.Unit,
+                LanguageVersion = compilation.LanguageVersion,
+                AssemblyNameOverride = compilation.Assembly.Name,
+
+                //
+                // In analyzer mode, collecting references required only when dumping the source
+                //
+
+                ReferenceCollector = config.SourceDump is not null
+                    ? new ReferenceCollector()
+                    : null,
+                LoggerFactory = loggerFactory
+            };
+
             int extensionCount = 0;
 
             foreach (INamedTypeSymbol generator in aotGenerators)
             {
                 Location location = generator.Locations[0];  // don't use Single() here
 
+                logger.Log(LogLevel.Info, "PREM-200", $"Found generator ({generator.Name}) on location: {location}");
+
                 try
                 {
                     generator.EnsureNotError();
 
-                    ExtendWith
-                    (
-                        CreateMainUnit(generator, compilation, config),
-                        location
-                    );
+                    using ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(generator, compilation, context);
+
+                    ExtendWith(mainUnit, location);
 
                     extensionCount++;
                 }
@@ -76,6 +93,8 @@ namespace Solti.Utils.Proxy.Internals
                     //
                     // Jump to the next generator
                     //
+
+                    logger.Log(LogLevel.Info, "PREM-201", $"Invalid generator symbol on location: {location}. Skipping");
                 }
                 catch (Exception e)
                 {
@@ -91,7 +110,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 try
                 {
-                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, config))
+                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, context).AsVolatile())
                     {
                         ExtendWith(chunk, Location.None);
                     }
@@ -104,17 +123,16 @@ namespace Solti.Utils.Proxy.Internals
 
             void ReportError(Exception ex, Location location) => reportDiagnostic
             (
-                Diagnostics.PGE01
-                (
-                    location,
-                    ex.Message,
-                    LogException(ex, cancellation) ?? "NULL"
-                )
+                Diagnostics.PGE01(location, ex.Message)
             );
 
             void ExtendWith(UnitSyntaxFactoryBase syntaxFactory, Location location)
             {
-                SourceCode source = syntaxFactory.GetSourceCode(cancellation); 
+                SourceCode source = new
+                (
+                    $"{syntaxFactory.ExposedClass}.cs",
+                    syntaxFactory.ResolveUnit(null!, cancellation)
+                );
 
                 addSource(source);
 
