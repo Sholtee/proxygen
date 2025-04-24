@@ -45,23 +45,33 @@ namespace Solti.Utils.Proxy.Internals
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context);
 
-        private protected Task<TypeContext> EmitAsync(CancellationToken cancellation) => EmitAsync
-        (
-            SyntaxFactoryContext.Default with { ReferenceCollector = new ReferenceCollector() },
-            cancellation
-        );
+        private protected Task<TypeContext> EmitAsync(CancellationToken cancellation)
+        {
+            RuntimeConfig config = new();
+
+            return EmitAsync
+            (
+                config,
+                SyntaxFactoryContext.Default with
+                {
+                    ReferenceCollector = new ReferenceCollector(),
+                    LoggerFactory = new LoggerFactory(config)
+                },
+                cancellation
+            );
+        }
 
         #if DEBUG
         internal
         #else
-        private protected
+        private 
         #endif
-        Task<TypeContext> EmitAsync(SyntaxFactoryContext context, CancellationToken cancellation)
+        Task<TypeContext> EmitAsync(IAssemblyCachingConfiguration cachingConfiguration, SyntaxFactoryContext context, CancellationToken cancellation)
         {
             Debug.Assert(context.OutputType is OutputType.Module, $"Incompatible {nameof(context.OutputType)}");
             Debug.Assert(context.ReferenceCollector is not null, $"{nameof(context.ReferenceCollector)} cannot be null when compiling a module");
 
-            ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
+            using ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
 
             //
             // 1) Type already loaded (for e.g. in case of embedded types)
@@ -79,9 +89,9 @@ namespace Solti.Utils.Proxy.Internals
 
                 string? cacheFile = null;
 
-                if (!string.IsNullOrEmpty(context.Config.AssemblyCacheDir))
+                if (!string.IsNullOrEmpty(cachingConfiguration.AssemblyCacheDir))
                 {
-                    cacheFile = Path.Combine(context.Config.AssemblyCacheDir, $"{mainUnit.ContainingAssembly}.dll");
+                    cacheFile = Path.Combine(cachingConfiguration.AssemblyCacheDir, $"{mainUnit.ContainingAssembly}.dll");
 
                     if (File.Exists(cacheFile))
                     {
@@ -98,7 +108,7 @@ namespace Solti.Utils.Proxy.Internals
                     // cache directory exits.
                     //
 
-                    Directory.CreateDirectory(context.Config.AssemblyCacheDir);
+                    Directory.CreateDirectory(cachingConfiguration.AssemblyCacheDir);
                 }
 
                 //
@@ -108,8 +118,9 @@ namespace Solti.Utils.Proxy.Internals
                 using Stream asm = Compile.ToAssembly
                 (
                     CreateChunks(context)
+                        .AsVolatile()
                         .Append(mainUnit)
-                        .Select(unit => unit.ResolveUnitAndDump(cancellation))
+                        .Select(unit => unit.ResolveUnit(null!, cancellation))
 
                         //
                         // We need to craft the syntax trees first in order to have the references available
