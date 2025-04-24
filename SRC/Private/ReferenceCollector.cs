@@ -6,20 +6,21 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal sealed class ReferenceCollector
+    internal sealed class ReferenceCollector: IReferenceCollector
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<IAssemblyInfo> FReferences = new(IAssemblyInfoComparer.Instance);
-        public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
+        public IReadOnlyCollection<IAssemblyInfo> References => [..FReferences.OrderBy(static r => r.Name)];
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<ITypeInfo> FTypes = new(ITypeInfoComparer.Instance);
-        public IReadOnlyCollection<ITypeInfo> Types => FTypes;
+        public IReadOnlyCollection<ITypeInfo> Types => [..FTypes.OrderBy(static t => t.QualifiedName)];
 
         public void AddType(ITypeInfo type) 
         {
