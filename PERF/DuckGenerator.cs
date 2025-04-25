@@ -7,6 +7,7 @@ using System;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Moq;
 
 namespace Solti.Utils.Proxy.Perf
 {
@@ -19,6 +20,8 @@ namespace Solti.Utils.Proxy.Perf
     {
         private const int OPERATIONS_PER_INVOKE = 100;
 
+        private static readonly IAssemblyCachingConfiguration FCachingConfiguration = new Mock<IAssemblyCachingConfiguration>().Object;
+
         public class Implementation
         {
             public int DoSomething(string param) => param.GetHashCode();
@@ -27,7 +30,7 @@ namespace Solti.Utils.Proxy.Perf
         [Benchmark]
         public void AssemblingProxyType() => DuckGenerator<IInterface, Implementation>
             .Instance
-            .EmitAsync(SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
+            .EmitAsync(FCachingConfiguration, SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
             .GetAwaiter()
             .GetResult();
 
