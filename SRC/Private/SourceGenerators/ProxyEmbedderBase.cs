@@ -61,7 +61,7 @@ namespace Solti.Utils.Proxy.Internals
                 AssemblyNameOverride = compilation.Assembly.Name,
 
                 //
-                // In analyzer mode, collecting references required only when dumping the source
+                // In analyzer mode, collecting references required only for logging
                 //
 
                 ReferenceCollector = config.LogDirectory is not null
@@ -76,7 +76,7 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Location location = generator.Locations[0];  // don't use Single() here
 
-                logger.Log(LogLevel.Info, "PREM-200", $"Found generator ({generator.Name}) on location: {location}");
+                logger.Log(LogLevel.Info, "PREM-200", $"Found generator ({generator.Name}) in location: {location}");
 
                 try
                 {
@@ -94,7 +94,7 @@ namespace Solti.Utils.Proxy.Internals
                     // Jump to the next generator
                     //
 
-                    logger.Log(LogLevel.Info, "PREM-201", $"Invalid generator symbol on location: {location}. Skipping");
+                    logger.Log(LogLevel.Info, "PREM-201", $"Invalid generator symbol in location: {location}. Skipping");
                 }
                 catch (Exception e)
                 {

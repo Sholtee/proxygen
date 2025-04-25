@@ -167,13 +167,13 @@ namespace Solti.Utils.Proxy.Internals
             {
                 string references = string.Join
                 (
-                    Environment.NewLine,
+                    string.Empty,
                     Context
                         .ReferenceCollector
                         .References
-                        .Select(static @ref => $"    {@ref.Name}: {@ref.Location ?? "NULL"}")
+                        .Select(static @ref => $"{Environment.NewLine}    {@ref.Name}: {@ref.Location ?? "NULL"}")
                 );
-                Logger.Log(LogLevel.Info, "REUN-202", $"References: {references}");
+                Logger.Log(LogLevel.Info, "REUN-202", $"References:{references}");
             }
 
             Logger.WriteSource(result);

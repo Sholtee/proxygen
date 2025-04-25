@@ -28,6 +28,7 @@ namespace Solti.Utils.Proxy.Internals
             Directory.CreateDirectory(FLogDirectory);
 
             FLogWriter = File.CreateText(Path.Combine(FLogDirectory, $"{scope}.log"));
+            FLogWriter.AutoFlush = true;
 
             Scope = scope;
             Level = config.LogLevel;
