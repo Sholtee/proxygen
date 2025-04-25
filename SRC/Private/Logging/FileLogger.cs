@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.IO;
 
 namespace Solti.Utils.Proxy.Internals
@@ -25,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals
 
             File.WriteAllText(Path.Combine(FLogDirectory, $"{Scope}.cs"), src);
 
-        public FileLogger(string scope, ILogConfiguration config): base(scope, config.LogLevel)
+        public FileLogger(string scope, ILogConfiguration config): base($"{scope} - {Environment.CurrentManagedThreadId}", config.LogLevel)
         {
             FLogDirectory = config.LogDirectory!;
 
