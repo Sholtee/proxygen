@@ -4,22 +4,19 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class SyntaxFactoryBase: IDisposable
+    internal abstract partial class SyntaxFactoryBase(SyntaxFactoryContext context) : IDisposable
     {
-        protected SyntaxFactoryBase(SyntaxFactoryContext context)
-        {
-            Context = context;
-            ContainingAssembly = Context.AssemblyNameOverride ?? ExposedClass;
-            Logger = Context.LoggerFactory.CreateLogger(ExposedClass);
-        }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ILogger? FLogger;
 
         /// <summary>
         /// The context associated with this factory.
         /// </summary>
-        public SyntaxFactoryContext Context { get; }
+        public SyntaxFactoryContext Context { get; } = context;
 
         /// <summary>
         /// The class that is implemented by this factory. After compiling the code the caller can acquire the generated type using this property.
@@ -29,20 +26,16 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// The assembly defined by this factory.
         /// </summary>
-        public string ContainingAssembly { get; }
+        public string ContainingAssembly => Context.AssemblyNameOverride ?? ExposedClass;
 
         /// <summary>
         /// The logger associated with this instance. Log scopes are created using the <see cref="ExposedClass"/> property
         /// </summary>
-        public ILogger Logger { get; private set; }
+        public ILogger Logger => FLogger ??= Context.LoggerFactory.CreateLogger(ExposedClass);
 
         /// <summary>
         /// Disposes this object. Since this is an internal class we won't implement the disposable pattern.
         /// </summary>
-        public virtual void Dispose()
-        {
-            Logger?.Dispose();
-            Logger = null!;
-        }
+        public virtual void Dispose() => FLogger?.Dispose();
     }
 }
