@@ -8,7 +8,7 @@ using System.Diagnostics;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Logger that logs nothing.
+    /// Logger that writes the input to the debug output. Note that for production builds this logger does nothing since under the hood it uses the <see cref="Debug.WriteLine(string)"/> method.
     /// </summary>
     internal sealed class DebugLogger(string scope) : LoggerBase(scope, LogLevel.Debug)
     {
