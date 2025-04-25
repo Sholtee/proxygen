@@ -143,41 +143,22 @@ namespace Solti.Utils.Proxy.Internals
 
             CompilationUnitSyntax result;
 
-            Stopwatch sw = Stopwatch.StartNew();
             try
             {
-                result = ResolveUnitCore(null!, cancellation);
+                result = ResolveUnitCore(context, cancellation);            
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                if (ex is OperationCanceledException || ex.IsUser())
+                if (ex.IsUser())
                     Logger.Log(LogLevel.Warn, "REUN-300", ex.ToString());
                 else
                     Logger.Log(LogLevel.Error, "REUN-400", $"Failed to resolve the unit: {ex}");
                 throw;
             }
-            finally
-            {
-                sw.Stop();
-            }
 
-            Logger.Log(LogLevel.Info, "REUN-201", $"Unit resolved in {sw.ElapsedMilliseconds}ms");
-
-            if (Context.ReferenceCollector is not null)
-            {
-                string references = string.Join
-                (
-                    string.Empty,
-                    Context
-                        .ReferenceCollector
-                        .References
-                        .Select(static @ref => $"{Environment.NewLine}    {@ref.Name}: {@ref.Location ?? "NULL"}")
-                );
-                Logger.Log(LogLevel.Info, "REUN-202", $"References:{references}");
-            }
+            Logger.Log(LogLevel.Info, "REUN-201", $"Unit resolved");
 
             Logger.WriteSource(result);
-
             return result;
         }
     }

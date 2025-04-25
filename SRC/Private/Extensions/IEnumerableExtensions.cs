@@ -46,5 +46,5 @@ namespace Solti.Utils.Proxy.Internals
             }
             previous?.Dispose();
         }
-    } 
+    }
 }

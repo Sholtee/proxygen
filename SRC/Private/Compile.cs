@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -29,10 +28,19 @@ namespace Solti.Utils.Proxy.Internals
             string? outputFile,
             IEnumerable<MetadataReference> references,
             LanguageVersion languageVersion,
+            ILogger logger,
             Func<Compilation, Compilation>? customConfig = default,
             in CancellationToken cancellation = default
         ) 
         {
+            logger.Log(LogLevel.Info, "COMP-200", "Starting compilation", new Dictionary<string, object?>
+            {
+                ["References"] = references.Select(static @ref => @ref.Display).ToList(),
+                ["LanguageVersion"] = languageVersion.ToString(),
+                ["AssemblyName"] = asmName,
+                ["OutputFile"] = outputFile
+            });
+
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
@@ -61,46 +69,41 @@ namespace Solti.Utils.Proxy.Internals
             {
                 EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
-                Debug.WriteLine(string.Join($",{Environment.NewLine}", result.Diagnostics));
+                logger.Log(LogLevel.Info, "COMP-201", "Compilation finished", new Dictionary<string, object?>
+                {
+                    ["Diagnostics"] = result.Diagnostics.Select(static d => d.ToString()).ToList(),
+                    ["Success"] = result.Success
+                });
 
                 if (!result.Success)
                 {
-                    string src = string.Join
+                    InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
+
+                    IDictionary extra = ex.Data;
+                    extra.Add
                     (
-                        Environment.NewLine,
-                        compilation
-                            .SyntaxTrees
-                            .Select
+                        "failures",
+                        result
+                            .Diagnostics
+                            .Where(static d => d.Severity is DiagnosticSeverity.Error)
+                            .Select(static d => d.ToString())
+                            .ToList()
+                    );
+                    extra.Add
+                    (
+                        "src",
+                        string.Join
+                        (
+                            Environment.NewLine,
+                            compilation.SyntaxTrees.Select
                             (
                                 static unit => unit
                                     .GetCompilationUnitRoot()
                                     .NormalizeWhitespace(eol: Environment.NewLine)
                                     .ToFullString()
                             )
+                        )
                     );
-
-                    string[]
-                        failures = 
-                        [
-                            ..result
-                                .Diagnostics
-                                .Where(static d => d.Severity is DiagnosticSeverity.Error)
-                                .Select(static d => d.ToString())
-                        ],
-                        refs =
-                        [
-                            ..compilation
-                                .References
-                                .Select(static r => r.Display!)
-                        ];
-
-                    InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
-
-                    IDictionary extra = ex.Data;
-
-                    extra.Add(nameof(failures), failures);
-                    extra.Add(nameof(src), src);
-                    extra.Add(nameof(references), refs);
 
                     throw ex;
                 }

@@ -59,14 +59,6 @@ namespace Solti.Utils.Proxy.Internals
                 OutputType = OutputType.Unit,
                 LanguageVersion = compilation.LanguageVersion,
                 AssemblyNameOverride = compilation.Assembly.Name,
-
-                //
-                // In analyzer mode, collecting references required only for logging
-                //
-
-                ReferenceCollector = config.LogDirectory is not null
-                    ? new ReferenceCollector()
-                    : null,
                 LoggerFactory = loggerFactory
             };
 

@@ -1,25 +1,19 @@
 ﻿/********************************************************************************
-* VoidLogger.cs                                                                 *
+* DebugLogger.cs                                                                *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
     /// Logger that logs nothing.
     /// </summary>
-    internal sealed  class VoidLogger: ILogger
+    internal sealed class DebugLogger(string scope) : LoggerBase(scope, LogLevel.Debug)
     {
-        public void WriteSource(CompilationUnitSyntax src) { }
+        protected override void WriteSourceCore(string src) => Debug.WriteLine(src);
 
-        public void Log(LogLevel level, object id, string message) { }
-
-        public LogLevel? Level { get; }
-
-        public string Scope { get; } = null!;
-
-        public void Dispose() { }
+        protected override void LogCore(string message) => Debug.WriteLine(message);
     }
 }

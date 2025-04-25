@@ -12,6 +12,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Moq;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
@@ -67,6 +68,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     )
                 ).ToArray(),
                 LanguageVersion.Latest,
+                new Mock<ILogger>().Object,
                 customConfig
             );
 

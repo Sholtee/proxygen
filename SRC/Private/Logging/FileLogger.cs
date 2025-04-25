@@ -3,65 +3,41 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.IO;
-
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
     /// Logger that outputs the logs to a file
     /// </summary>
-    internal sealed class FileLogger : ILogger
+    internal sealed class FileLogger : LoggerBase
     {
-        private readonly StreamWriter? FLogWriter;
-        private readonly string? FLogDirectory;
+        private readonly StreamWriter FLogWriter;
+        private readonly string FLogDirectory;
 
-        public FileLogger(string scope, ILogConfiguration config)
+        protected override void LogCore(string message) =>
+            FLogWriter.WriteLine(message);
+
+        protected override void WriteSourceCore(string src) =>
+            //
+            // Overwrite the target file for every invocation
+            //
+
+            File.WriteAllText(Path.Combine(FLogDirectory, $"{Scope}.cs"), src);
+
+        public FileLogger(string scope, ILogConfiguration config): base(scope, config.LogLevel)
         {
-            FLogDirectory = config.LogDirectory;
-            if (FLogDirectory is null)
-                return;
+            FLogDirectory = config.LogDirectory!;
 
             Directory.CreateDirectory(FLogDirectory);
 
-            FLogWriter = File.CreateText(Path.Combine(FLogDirectory, $"{scope}.log"));
+            FLogWriter = File.CreateText(Path.Combine(FLogDirectory, $"{Scope}.log"));
             FLogWriter.AutoFlush = true;
-
-            Scope = scope;
-            Level = config.LogLevel;
         }
 
         /// <summary>
         /// Disposes this instance. Since this is an internal class we won't implement the disposable pattern.
         /// </summary>
-        public void Dispose() => FLogWriter?.Dispose();
-
-        public void WriteSource(CompilationUnitSyntax src)
-        {
-            if (FLogDirectory is null)
-                return;
-
-            //
-            // Overwrite the target file for every WriteSource invocation
-            //
-
-            using StreamWriter srcFile = File.CreateText(Path.Combine(FLogDirectory, $"{Scope}.cs"));
-            srcFile.Write(src.NormalizeWhitespace(eol: Environment.NewLine).ToFullString());
-        }
-
-        public void Log(LogLevel level, object id, string message)
-        {
-            if (level < Level)
-                return;
-
-            FLogWriter?.WriteLine($"{DateTime.UtcNow:o} [{level}] {id} - {message}");
-        }
-
-        public LogLevel? Level { get; }
-
-        public string Scope { get; } = null!;
+        public override void Dispose() => FLogWriter?.Dispose();
     }
 }

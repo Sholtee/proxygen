@@ -66,12 +66,21 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private 
         #endif
-        Task<TypeContext> EmitAsync(IAssemblyCachingConfiguration cachingConfiguration, SyntaxFactoryContext context, CancellationToken cancellation)
+        async Task<TypeContext> EmitAsync(IAssemblyCachingConfiguration cachingConfiguration, SyntaxFactoryContext context, CancellationToken cancellation)
         {
             Debug.Assert(context.OutputType is OutputType.Module, $"Incompatible {nameof(context.OutputType)}");
             Debug.Assert(context.ReferenceCollector is not null, $"{nameof(context.ReferenceCollector)} cannot be null when compiling a module");
 
             using ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
+            
+            //
+            // We don't want to put the compilation logs into a separate file so reuse the log
+            // session created by the syntax factory.
+            //
+
+            ILogger logger = mainUnit.Logger;
+            
+            logger.Log(LogLevel.Info, "EMIT-200", $"Emitting type: \"{mainUnit.ExposedClass}\"");
 
             //
             // 1) Type already loaded (for e.g. in case of embedded types)
@@ -79,10 +88,15 @@ namespace Solti.Utils.Proxy.Internals
 
             TypeContext? type = GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: false);
             if (type is not null)
-                return Task.FromResult(type);
-
-            return Task<TypeContext>.Factory.StartNew(() =>
             {
+                logger.Log(LogLevel.Info, "EMIT-201", $"\"{mainUnit.ExposedClass}\" found in cache");
+                return type;
+            }
+
+            return await Task<TypeContext>.Factory.StartNew(() =>
+            {
+                logger.Log(LogLevel.Info, "EMIT-202", $"Starting new compilation task");
+
                 //
                 // 2) If the assembly physically stored, try to load it from the cache directory.
                 // 
@@ -95,6 +109,8 @@ namespace Solti.Utils.Proxy.Internals
 
                     if (File.Exists(cacheFile))
                     {
+                        logger.Log(LogLevel.Info, "EMIT-203", $"Cache file exists, loading it");
+
                         RunInitializers
                         (
                             Assembly.LoadFile(cacheFile)
@@ -114,6 +130,8 @@ namespace Solti.Utils.Proxy.Internals
                 //
                 // 3) Compile the assembly from the scratch.
                 //
+          
+                logger.Log(LogLevel.Info, "EMIT-204", $"Invoking the compiler");
 
                 using Stream asm = Compile.ToAssembly
                 (
@@ -128,12 +146,13 @@ namespace Solti.Utils.Proxy.Internals
 
                         .ToList(),
                     mainUnit.ContainingAssembly,
-                    cacheFile,      
+                    cacheFile,
                     context
                         .ReferenceCollector!
                         .References
                         .Select(static asm => MetadataReference.CreateFromFile(asm.Location!)),
                     context.LanguageVersion,
+                    logger,
                     customConfig: null,
                     cancellation
                 );
@@ -142,6 +161,8 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     Assembly.Load(asm.ToArray())
                 );
+
+                logger.Log(LogLevel.Info, "EMIT-204", $"Built type is ready");
 
                 return GetInstanceFromCache(mainUnit.ExposedClass, throwOnMissing: true)!;
             }, cancellation);

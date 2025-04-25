@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -22,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Appends the system log
         /// </summary>
-        void Log(LogLevel level, object id, string message);
+        void Log(LogLevel level, object id, string message, IDictionary<string, object?>? additionalData = null);
 
         /// <summary>
         /// The minimum log level under which the logger should not dump information or null when logging is turned off.
