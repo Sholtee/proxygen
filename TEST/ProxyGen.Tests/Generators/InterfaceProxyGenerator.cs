@@ -445,20 +445,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(tmpDir);
+
             generator.EmitAsync
             (
+                mockCachingConfig.Object,
                 SyntaxFactoryContext.Default with
                 {
-                    Config = new Config
-                    (
-                        new DictionaryConfigReader
-                        (
-                            new Dictionary<string, string>
-                            {
-                                [nameof(Config.AssemblyCacheDir)] = tmpDir
-                            }
-                        )
-                    ),
                     ReferenceCollector = new ReferenceCollector()
                 },
                 default
@@ -481,22 +477,18 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(cacheDir);
+
             Type gt = 
             (
                 await generator.EmitAsync
                 (
+                    mockCachingConfig.Object,
                     SyntaxFactoryContext.Default with
                     {
-                        Config = new Config
-                        (
-                            new DictionaryConfigReader
-                            (
-                                new Dictionary<string, string>
-                                {
-                                    [nameof(Config.AssemblyCacheDir)] = cacheDir
-                                }
-                            )
-                        ),
                         ReferenceCollector = new ReferenceCollector()
                     },
                     default
