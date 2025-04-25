@@ -16,21 +16,21 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class LoggerBase(string scope, LogLevel? level) : ILogger
     {
+        private readonly DataContractJsonSerializer FSerializer = new
+        (
+            typeof(IDictionary<string, object>),
+            new DataContractJsonSerializerSettings
+            {
+                UseSimpleDictionaryFormat = true,
+                KnownTypes = [typeof(List<string>)]
+            }
+        );
+
         protected virtual string StringifyObject(IDictionary<string, object?> additionalData)
         {
-            DataContractJsonSerializer serializer = new
-            (
-                typeof(IDictionary<string, object>),
-                new DataContractJsonSerializerSettings
-                {
-                    UseSimpleDictionaryFormat = true,
-                    KnownTypes = [typeof(List<string>)]
-                }
-            );
-
             using MemoryStream stm = new();
 
-            serializer.WriteObject(stm, additionalData);
+            FSerializer.WriteObject(stm, additionalData);
 
             return Encoding.UTF8.GetString(stm.GetBuffer(), 0, (int) stm.Length);
         }
