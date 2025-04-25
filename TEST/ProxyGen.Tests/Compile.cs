@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using Moq;
 using NUnit.Framework;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -32,7 +33,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 )
             );
 
-            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(new CompilationUnitSyntax[] { unit }, "cica", null, Array.Empty<MetadataReference>(), LanguageVersion.Latest));
+            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(new CompilationUnitSyntax[] { unit }, "cica", null, Array.Empty<MetadataReference>(), LanguageVersion.Latest, new Mock<ILogger>().Object));
 
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);

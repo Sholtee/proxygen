@@ -12,6 +12,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
+using Moq;
 using NUnit.Framework;
 
 [assembly: InternalsVisibleTo("Duck_6191D0BB1603D9ADCE5DC9C7263A20D7")]
@@ -234,20 +235,16 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(tmpDir);
+
             generator.EmitAsync
             (
+                mockCachingConfig.Object,
                 SyntaxFactoryContext.Default with
                 {
-                    Config = new Config
-                    (
-                        new DictionaryConfigReader
-                        (
-                            new Dictionary<string, string>
-                            {
-                                [nameof(Config.AssemblyCacheDir)] = tmpDir
-                            }
-                        )
-                    ),
                     ReferenceCollector = new ReferenceCollector()
                 },
                 default
@@ -270,22 +267,18 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(cacheDir);
+
             Type gt = 
-            (
+            (           
                 await generator.EmitAsync
                 (
+                    mockCachingConfig.Object,
                     SyntaxFactoryContext.Default with
                     {
-                        Config = new Config
-                        (
-                            new DictionaryConfigReader
-                            (
-                                new Dictionary<string, string>
-                                {
-                                    [nameof(Config.AssemblyCacheDir)] = cacheDir
-                                }
-                            )
-                        ),
                         ReferenceCollector = new ReferenceCollector()
                     },
                     default

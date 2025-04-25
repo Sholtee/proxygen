@@ -77,6 +77,12 @@
     <None Include="..\icon.png" Pack="true" PackagePath="\" />
     <None Include="..\README.MD" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   
   <PropertyGroup>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>

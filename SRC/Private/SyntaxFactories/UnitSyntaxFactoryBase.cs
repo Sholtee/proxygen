@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -30,7 +31,10 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
-        public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        #if DEBUG
+        internal
+        #endif
+        protected virtual CompilationUnitSyntax ResolveUnitCore(object context, CancellationToken cancellation)
         {
             List<MemberDeclarationSyntax> members = [..ResolveUnitMembers(context, cancellation)];
 
@@ -132,5 +136,30 @@ namespace Solti.Utils.Proxy.Internals
                 )
             )
         );
+
+        public CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        {
+            Logger.Log(LogLevel.Info, "REUN-200", $"Starting unit resolution in \"{Context.OutputType}\" mode");
+
+            CompilationUnitSyntax result;
+
+            try
+            {
+                result = ResolveUnitCore(context, cancellation);            
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                if (ex.IsUser())
+                    Logger.Log(LogLevel.Warn, "REUN-300", ex.ToString());
+                else
+                    Logger.Log(LogLevel.Error, "REUN-400", $"Failed to resolve the unit: {ex}");
+                throw;
+            }
+
+            Logger.Log(LogLevel.Info, "REUN-201", $"Unit resolved");
+
+            Logger.WriteSource(result);
+            return result;
+        }
     }
 }

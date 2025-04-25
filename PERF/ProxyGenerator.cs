@@ -7,6 +7,7 @@ using System;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Moq;
 
 namespace Solti.Utils.Proxy.Perf
 {
@@ -19,6 +20,8 @@ namespace Solti.Utils.Proxy.Perf
     {
         private const int OPERATIONS_PER_INVOKE = 100;
 
+        private static readonly IAssemblyCachingConfiguration FCachingConfiguration = new Mock<IAssemblyCachingConfiguration>().Object;
+
         private sealed class Interceptor : IInterceptor
         {
             public object Invoke(IInvocationContext context) => context.Dispatch();
@@ -29,7 +32,7 @@ namespace Solti.Utils.Proxy.Perf
         [Benchmark]
         public void AssemblingProxyType() => InterfaceProxyGenerator<IInterface>
             .Instance
-            .EmitAsync(SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
+            .EmitAsync(FCachingConfiguration, SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
             .GetAwaiter()
             .GetResult();
 

@@ -39,30 +39,14 @@ namespace Solti.Utils.Proxy.Internals
             return result;
         }
 
-        private static SyntaxFactoryContext CreateContext(CSharpCompilation compilation, Config config) => new SyntaxFactoryContext
-        {
-            OutputType = OutputType.Unit,
-            LanguageVersion = compilation.LanguageVersion,
-            AssemblyNameOverride = compilation.Assembly.Name,
-
-            //
-            // Collecting references required only when dumping the source
-            //
-
-            ReferenceCollector = config.SourceDump is not null
-                ? new ReferenceCollector()
-                : null,
-            Config = config
-        };
-
-        protected static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, Config config)
+        private static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, SyntaxFactoryContext context)
         {
             return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
                 ? ssg.CreateMainUnit
                 (
                     generator,
                     compilation,
-                    CreateContext(compilation, config)
+                    context
                 )
                 : throw new InvalidOperationException
                 (
@@ -75,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation, Config config)
+        private static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation, SyntaxFactoryContext context)
         {
             INamedTypeSymbol? miaSym = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
 
@@ -99,10 +83,7 @@ namespace Solti.Utils.Proxy.Internals
                     yield break;
             }
 
-            yield return new ModuleInitializerSyntaxFactory
-            (
-                CreateContext(compilation, config)
-            );
+            yield return new ModuleInitializerSyntaxFactory(context);
         }
     }
 }

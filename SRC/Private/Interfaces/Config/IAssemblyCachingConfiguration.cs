@@ -1,14 +1,12 @@
 ﻿/********************************************************************************
-* IConfigReader.cs                                                              *
+* IAssemblyCachingConfiguration.cs                                              *
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
-    internal interface IConfigReader
+    internal interface IAssemblyCachingConfiguration 
     {
-        string? ReadValue(string name);
-
-        string BasePath { get; }
+        string? AssemblyCacheDir { get; }
     }
 }

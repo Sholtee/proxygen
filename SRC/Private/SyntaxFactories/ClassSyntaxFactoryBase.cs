@@ -17,10 +17,6 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ClassSyntaxFactoryBase(SyntaxFactoryContext context) : SyntaxFactoryBase(context)
     {
-        public abstract string ExposedClass { get; }
-
-        public virtual string ContainingAssembly => Context.AssemblyNameOverride ?? ExposedClass;
-
         #if DEBUG
         internal
         #endif

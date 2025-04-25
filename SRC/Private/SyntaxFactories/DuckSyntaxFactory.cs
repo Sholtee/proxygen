@@ -31,10 +31,13 @@ namespace Solti.Utils.Proxy.Internals
             FInterfaceType = interfaceType;
         }
 
-        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        #if DEBUG
+        internal
+        #endif
+        protected override CompilationUnitSyntax ResolveUnitCore(object context, CancellationToken cancellation)
         {
             Visibility.Check(FInterfaceType, ContainingAssembly);
-            return base.ResolveUnit(context, cancellation);
+            return base.ResolveUnitCore(context, cancellation);
         }
 
         #if DEBUG
