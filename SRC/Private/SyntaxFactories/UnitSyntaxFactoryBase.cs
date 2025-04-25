@@ -146,7 +146,7 @@ namespace Solti.Utils.Proxy.Internals
             Stopwatch sw = Stopwatch.StartNew();
             try
             {
-                result = ResolveUnit(null!, cancellation);
+                result = ResolveUnitCore(null!, cancellation);
             }
             catch (Exception ex)
             {
