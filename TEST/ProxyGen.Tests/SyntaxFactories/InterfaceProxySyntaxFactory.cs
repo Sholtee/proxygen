@@ -145,7 +145,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         }
 
         [Test]
-        public void ResolveProperty_ShouldGenerateTheProperInterceptor()
+        public void ResolveProperty_ShouldGenerateThePropertyInterceptor()
         {
             IEnumerable<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members.Where(m => m is PropertyDeclarationSyntax);
 
