@@ -64,7 +64,7 @@ namespace Solti.Utils.Proxy.Internals
                 // In analyzer mode, collecting references required only when dumping the source
                 //
 
-                ReferenceCollector = config.SourceDump is not null
+                ReferenceCollector = config.LogDirectory is not null
                     ? new ReferenceCollector()
                     : null,
                 LoggerFactory = loggerFactory

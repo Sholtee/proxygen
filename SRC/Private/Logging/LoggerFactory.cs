@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <remarks>To create a <see cref="VoidLogger"/> pass null for <paramref name="configuration"/></remarks>
     internal sealed class LoggerFactory(ILogConfiguration? configuration) : ILoggerFactory
     {
-        public ILogger CreateLogger(string scope) => configuration?.LogDump is not null || configuration?.SourceDump is not null
+        public ILogger CreateLogger(string scope) => configuration?.LogDirectory is not null
             ? new FileLogger(scope, configuration)
             : new VoidLogger();
     }

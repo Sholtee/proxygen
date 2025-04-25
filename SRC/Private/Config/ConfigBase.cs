@@ -24,10 +24,7 @@ namespace Solti.Utils.Proxy.Internals
         protected abstract string BasePath { get; }
 
         /// <inheritdoc/>
-        public string? SourceDump => GetPath(nameof(SourceDump));
-
-        /// <inheritdoc/>
-        public string? LogDump => GetPath(nameof(LogDump));
+        public string? LogDirectory => GetPath(nameof(LogDirectory));
 
         /// <inheritdoc/>
         public LogLevel LogLevel => Enum.TryParse(ReadValue(nameof(LogLevel)), out LogLevel logLevel)

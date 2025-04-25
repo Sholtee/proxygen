@@ -16,46 +16,38 @@ namespace Solti.Utils.Proxy.Internals
     /// </summary>
     internal sealed class FileLogger : ILogger
     {
-        private StreamWriter? FLogWriter;
-        private readonly string? FSourceDump;
+        private readonly StreamWriter? FLogWriter;
+        private readonly string? FLogDirectory;
 
         public FileLogger(string scope, ILogConfiguration config)
         {
-            if (config.LogDump is not null)
-            {
-                Directory.CreateDirectory(config.LogDump);
+            FLogDirectory = config.LogDirectory;
+            if (FLogDirectory is null)
+                return;
 
-                FLogWriter = File.CreateText(Path.Combine(config.LogDump, $"{scope}.log"));
+            Directory.CreateDirectory(FLogDirectory);
 
-                Scope = scope;
-                Level = config.LogLevel;
-            }
+            FLogWriter = File.CreateText(Path.Combine(FLogDirectory, $"{scope}.log"));
 
-            FSourceDump = config.SourceDump;
             Scope = scope;
+            Level = config.LogLevel;
         }
 
         /// <summary>
         /// Disposes this instance. Since this is an internal class we won't implement the disposable pattern.
         /// </summary>
-        public void Dispose()
-        {
-            FLogWriter?.Dispose();
-            FLogWriter = null;
-        }
+        public void Dispose() => FLogWriter?.Dispose();
 
         public void WriteSource(CompilationUnitSyntax src)
         {
-            if (FSourceDump is null)
+            if (FLogDirectory is null)
                 return;
-
-            Directory.CreateDirectory(FSourceDump);
 
             //
             // Overwrite the target file for every WriteSource invocation
             //
 
-            using StreamWriter srcFile = File.CreateText(Path.Combine(FSourceDump, $"{Scope}.cs"));
+            using StreamWriter srcFile = File.CreateText(Path.Combine(FLogDirectory, $"{Scope}.cs"));
             srcFile.Write(src.NormalizeWhitespace(eol: Environment.NewLine).ToFullString());
         }
 

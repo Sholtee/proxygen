@@ -11,17 +11,12 @@ namespace Solti.Utils.Proxy.Internals
     internal interface ILogConfiguration
     {
         /// <summary>
-        /// Where to put the generated source files, or null if we don't need them.
-        /// </summary>
-        string? SourceDump { get; }
-
-        /// <summary>
         /// Where to put the logs, or null if we don't need them.
         /// </summary>
-        string? LogDump { get; }
+        string? LogDirectory { get; }
 
         /// <summary>
-        /// Log level to be used. Considered only when <see cref="LogDump"/> is not null.
+        /// Log level to be used. Considered only when the <see cref="LogDirectory"/> is set.
         /// </summary>
         LogLevel LogLevel { get; }
     }
