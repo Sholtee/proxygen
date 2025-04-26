@@ -26,14 +26,14 @@ namespace Solti.Utils.Proxy.Internals
             TypeKind.Pointer
         ];
 
-        public static bool IsClass(this ITypeSymbol src) => ClassTypes.IndexOf(src.TypeKind) >= 0;
+        public static bool IsClass(this ITypeSymbol src) => ClassTypes.Contains(src.TypeKind);
 
         private static readonly IReadOnlyList<TypeKind> SealedTypes =
         [
             TypeKind.Array
         ];
 
-        public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.IndexOf(src.TypeKind) >= 0;
+        public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.Contains(src.TypeKind);
 
         public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => (src.GetElementType(recurse: true) ?? src).ContainingType;
 
@@ -364,46 +364,6 @@ namespace Solti.Utils.Proxy.Internals
                 if (returnedSymbols.Add(iface))
                     yield return iface;
             }
-        }
-
-        public static string GetDebugString(this ITypeSymbol src, string? eol = null) 
-        {
-            SymbolDisplayFormat fmt = new
-            (
-                typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces,
-                genericsOptions: SymbolDisplayGenericsOptions.IncludeTypeParameters,
-                memberOptions: SymbolDisplayMemberOptions.IncludeAccessibility | SymbolDisplayMemberOptions.IncludeExplicitInterface | SymbolDisplayMemberOptions.IncludeParameters | SymbolDisplayMemberOptions.IncludeModifiers | SymbolDisplayMemberOptions.IncludeRef,
-                parameterOptions: SymbolDisplayParameterOptions.IncludeName | SymbolDisplayParameterOptions.IncludeParamsRefOut | SymbolDisplayParameterOptions.IncludeType,
-                propertyStyle: SymbolDisplayPropertyStyle.ShowReadWriteDescriptor,
-                miscellaneousOptions: SymbolDisplayMiscellaneousOptions.UseSpecialTypes
-            );
-
-            eol ??= Environment.NewLine;
-
-            StringBuilder sb = new StringBuilder().Append(src.ToDisplayString(fmt));
-
-            List<ITypeSymbol> bases = new();
-            if (src.BaseType is not null)
-                bases.Add(src.BaseType);
-            bases.AddRange(src.AllInterfaces);
-
-            if (bases.Any())
-                sb.Append($": {string.Join(", ", bases.Select(@base => @base.ToDisplayString(fmt)))}");
-
-            sb.Append($"{eol}{{");
-
-            foreach (IMethodSymbol method in src.ListMethods(includeStatic: true).Where(static m => !m.IsSpecial()))
-                sb.Append($"{eol}  {method.ToDisplayString(fmt)};");
-
-            foreach (IPropertySymbol property in src.ListProperties(includeStatic: true))
-                sb.Append($"{eol}  {property.ToDisplayString(fmt)}");
-
-            foreach (IEventSymbol evt in src.ListEvents(includeStatic: true))
-                sb.Append($"{eol}  {evt.ToDisplayString(fmt)}");
-
-            sb.Append($"{eol}}}");
-
-            return sb.ToString();
         }
 
         public static AccessModifiers GetAccessModifiers(this ITypeSymbol src)

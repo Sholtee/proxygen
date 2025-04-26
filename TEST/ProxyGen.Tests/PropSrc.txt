@@ -15,7 +15,10 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
     set
     {
         global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F1481120FC9DA1A152C56B72C6EC8CFB6);
-        global::System.Object[] args = new global::System.Object[]{value};
+        global::System.Object[] args = new global::System.Object[]
+        {
+            value
+        };
         ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F1481120FC9DA1A152C56B72C6EC8CFB6, (global::System.Object[] args) =>
         {
             global::System.Int32 _value = (global::System.Int32)args[0];

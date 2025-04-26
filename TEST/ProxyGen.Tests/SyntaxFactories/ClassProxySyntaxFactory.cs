@@ -14,6 +14,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using Internals;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
+#if LEGACY_COMPILER
+    [Ignore("Roslyn v3 has different formatting rules than v4")]
+#endif
     public sealed class ClassProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         private static ClassProxySyntaxFactory CreateSyntaxFactory(Type target, OutputType outputType) => new
@@ -43,9 +46,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName))
                         .Replace("\r", string.Empty)
-#if LEGACY_COMPILER
-                        .Replace(") :", "):")
-#endif
                         .Replace("{version}", typeof(ClassProxySyntaxFactory)
                             .Assembly
                             .GetName()

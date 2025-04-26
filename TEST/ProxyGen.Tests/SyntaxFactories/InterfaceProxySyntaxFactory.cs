@@ -25,13 +25,16 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using static Internals.Tests.CodeAnalysisTestsBase;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
+#if LEGACY_COMPILER
+    [Ignore("Roslyn v3 has different formatting rules than v4")]
+#endif
     public sealed class InterfaceProxySyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         private static ClassDeclarationSyntax GetDummyClass() => ClassDeclaration("Dummy");
 
         public static (object Method, string Expected)[] MethodsToWhichTheArrayIsCreated = new[]
         {
-            ((object) FooMethod, "global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};"),
+            ((object) FooMethod, "global::System.Object[] args = new global::System.Object[]\r\n{\r\n    a,\r\n    default(global::System.String),\r\n    c\r\n};"),
             (BarMethod, "global::System.Object[] args = new global::System.Object[0];")
         };
 
@@ -189,9 +192,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName))
                         .Replace("\r", string.Empty)
-#if LEGACY_COMPILER
-                        .Replace(") :", "):")
-#endif
                         .Replace("{version}", typeof(Generator)
                             .Assembly
                             .GetName()

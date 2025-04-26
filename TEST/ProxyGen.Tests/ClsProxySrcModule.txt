@@ -9,7 +9,11 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
     public override global::System.Int32 Bar<TT>(ref global::System.Int32 param1, TT param2)
     {
         global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F31E5FFE3FB9CF599346D7BE73D6FEA91);
-        global::System.Object[] args = new global::System.Object[]{param1, param2};
+        global::System.Object[] args = new global::System.Object[]
+        {
+            param1,
+            param2
+        };
         global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F31E5FFE3FB9CF599346D7BE73D6FEA91, (global::System.Object[] args) =>
         {
             global::System.Int32 _param1 = (global::System.Int32)args[0];
@@ -17,7 +21,7 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
             global::System.Object result = base.Bar<TT>(ref _param1, _param2);
             args[0] = (global::System.Object)_param1;
             return result;
-        }, args, new global::System.Type[]{typeof(TT)}));
+        }, args, new global::System.Type[] { typeof(TT) }));
         param1 = (global::System.Int32)args[0];
         return (global::System.Int32)result;
     }
@@ -26,7 +30,10 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
     public override global::System.Boolean Equals(global::System.Object obj)
     {
         global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F22D4079C1B854C405B8D483DABDD2CCD);
-        global::System.Object[] args = new global::System.Object[]{obj};
+        global::System.Object[] args = new global::System.Object[]
+        {
+            obj
+        };
         global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F22D4079C1B854C405B8D483DABDD2CCD, (global::System.Object[] args) =>
         {
             global::System.Object _obj = (global::System.Object)args[0];
@@ -69,7 +76,10 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         get
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F20A9297E8C10BA9B04329D9E20030285);
-            global::System.Object[] args = new global::System.Object[]{i};
+            global::System.Object[] args = new global::System.Object[]
+            {
+                i
+            };
             global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F20A9297E8C10BA9B04329D9E20030285, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
             return (global::System.Int32)result;
         }
@@ -77,7 +87,11 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         protected set
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F443EACA34BBBA6884315F874A75D67FB);
-            global::System.Object[] args = new global::System.Object[]{i, value};
+            global::System.Object[] args = new global::System.Object[]
+            {
+                i,
+                value
+            };
             ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F443EACA34BBBA6884315F874A75D67FB, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
         }
     }
@@ -101,7 +115,10 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         protected set
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F624A9F1CAD87F9CC19570C895C768969);
-            global::System.Object[] args = new global::System.Object[]{value};
+            global::System.Object[] args = new global::System.Object[]
+            {
+                value
+            };
             ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F624A9F1CAD87F9CC19570C895C768969, (global::System.Object[] args) =>
             {
                 global::System.Int32 _value = (global::System.Int32)args[0];
@@ -120,14 +137,20 @@ internal sealed class ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C : global::Solti.
         add
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F6289B4D4870397852DEC37010F533A8C);
-            global::System.Object[] args = new global::System.Object[]{value};
+            global::System.Object[] args = new global::System.Object[]
+            {
+                value
+            };
             ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.F6289B4D4870397852DEC37010F533A8C, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
         }
 
         remove
         {
             global::Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.FBD5A84564397FCD3617BCCD73A524809);
-            global::System.Object[] args = new global::System.Object[]{value};
+            global::System.Object[] args = new global::System.Object[]
+            {
+                value
+            };
             ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::ClsProxy_D354FF7A81AFE50F52C7FC89C350C62C.FBD5A84564397FCD3617BCCD73A524809, (global::System.Object[] _) => throw new global::System.NotImplementedException(), args, new global::System.Type[0]));
         }
     }

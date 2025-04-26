@@ -26,6 +26,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using static Internals.Tests.CodeAnalysisTestsBase;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
+#if LEGACY_COMPILER
+    [Ignore("Roslyn v3 has different formatting rules than v4")]
+#endif
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         private static ClassDeclarationSyntax GetDummyClass() => SyntaxFactory.ClassDeclaration("Dummy");
@@ -144,9 +147,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DuckClsSrc.txt"))
                         .Replace("\r", string.Empty)
-#if LEGACY_COMPILER
-                        .Replace(") :", "):")
-#endif
                         .Replace("{version}", typeof(DuckGenerator<,>)
                             .Assembly
                             .GetName()

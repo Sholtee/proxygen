@@ -20,7 +20,9 @@ namespace Solti.Utils.Proxy.Internals
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingParameter.ParameterType);
 
-        public ParameterKind Kind => UnderlyingParameter.GetParameterKind();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ParameterKind? FKind;
+        public ParameterKind Kind => FKind ??= UnderlyingParameter.GetParameterKind();
 
         public string Name => UnderlyingParameter.Name ?? string.Empty;
 

@@ -22,17 +22,16 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static SeparatedSyntaxList<TNode> ToSyntaxList<T, TNode>(this IEnumerable<T> src, Func<T, int, TNode> factory) where TNode : SyntaxNode
         {
-            List<SyntaxNodeOrToken> nodesAndTokens = new();
+            List<SyntaxNodeOrToken> nodesAndTokens = [];
 
             int i = 0;
 
             foreach (T item in src)
             {
-                if (nodesAndTokens.Count > 0)
-                    nodesAndTokens.Add
-                    (
-                        Token(SyntaxKind.CommaToken)
-                    );
+                if (i > 0) nodesAndTokens.Add
+                (
+                    Token(SyntaxKind.CommaToken)
+                );
 
                 nodesAndTokens.Add
                 (

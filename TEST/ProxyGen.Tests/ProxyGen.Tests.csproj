@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Variant)' != 'ROSLYN_LEGACY'">
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.3.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.10.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Variant)' == 'ROSLYN_LEGACY'">
@@ -86,9 +86,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="IndexerSrc.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="ListDbg.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="ModuleInitializerAttribute.txt">

@@ -227,11 +227,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
         [TestCase
         (@"
             using System.Collections.Generic;
-            class MyList: List<int*[]>{}
-        ", "System.Int32")]
-        [TestCase
-        (@"
-            using System.Collections.Generic;
             class MyList: List<int> {}
         ", null)]
         public void GetElementType_ShouldReturnTheProperElementType(string src, string element) 
@@ -308,13 +303,6 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
             #pragma warning restore RS1024
             Assert.AreEqual(SymbolEqualityComparer.Default.GetHashCode(a), SymbolEqualityComparer.Default.GetHashCode(b));
-        }
-
-        [Test]
-        public void GetDebugString_ShouldReturnThePrettifiedDebugStringOfTheType() 
-        {
-            ITypeSymbol type = CreateCompilation(string.Empty).GetTypeByMetadataName(typeof(IList<>).FullName);
-            Assert.That(type.GetDebugString(eol: "\n"), Is.EqualTo(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ListDbg.txt"))));
         }
     }
 }

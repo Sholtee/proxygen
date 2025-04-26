@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,10 +24,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
             var result = CSharpCompilation.Create
             (
                 "cica",
-                new[]
-                {
+                [
                     CSharpSyntaxTree.ParseText(src, new CSharpParseOptions(languageVersion))
-                },
+                ],
                 PlatformAssemblies.References.Concat
                 (
                     additionalReferences
@@ -57,7 +57,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             using Stream asm = Internals.Compile.ToAssembly
             (
-                new CompilationUnitSyntax[] { CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot() },
+                [CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot()],
                 Guid.NewGuid().ToString(),
                 null,
                 PlatformAssemblies.References.Concat
@@ -75,7 +75,11 @@ namespace Solti.Utils.Proxy.Internals.Tests
             return Assembly.Load(asm.ToArray());
         }
 
-        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
+        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation
+        (
+            src,
+            additionalReferences.Select(asm => asm.Location)
+        );
 
         protected class FindAllTypesVisitor : SymbolVisitor
         {
