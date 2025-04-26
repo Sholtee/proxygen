@@ -337,7 +337,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                     using Solti.Utils.Proxy.Attributes;
                     using Solti.Utils.Proxy.Generators;
 
-                    [assembly: EmbedGeneratedType(typeof(ProxyGenerator<IMyInterface, InterfaceInterceptor<IMyInterface>>))]
+                    [assembly: EmbedGeneratedType(typeof(InterfaceProxyGenerator<IMyInterface>))]
 
                     public interface IMyInterface
                     {
@@ -366,19 +366,41 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
 
-        [Test]
-        public void Execute_ShouldReportDiagnosticOnError() 
+        public static IEnumerable<object[]> InvalidSources2
+        {
+            get
+            {
+                yield return new object[]
+                {
+                    @"
+                    using System.Collections;
+
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, object>))]
+                    ",
+                    string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator))
+                };
+                yield return new object[]
+                {
+                    @"
+                    using Solti.Utils.Proxy.Attributes;
+                    using Solti.Utils.Proxy.Generators;
+
+                    [assembly: EmbedGeneratedType(typeof(object))]
+                    ",
+                    string.Format(SGResources.NOT_A_GENERATOR, "object")
+                };
+            }
+        }
+
+        [TestCaseSource(nameof(InvalidSources2))]
+        public void Execute_ShouldReportDiagnosticOnError(string src, string expectedError) 
         {
             Compilation compilation = CreateCompilation
             (
-                @"
-                using System.Collections;
-
-                using Solti.Utils.Proxy.Attributes;
-                using Solti.Utils.Proxy.Generators;
-
-                [assembly: EmbedGeneratedType(typeof(DuckGenerator<IEnumerable, object>))]
-                ",
+                src,
                 new[] { typeof(EmbedGeneratedTypeAttribute).Assembly.Location },
                 suppressErrors: true
             );
@@ -388,7 +410,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
             GeneratorDriver driver = CreateDriver(null);
             driver.RunGeneratorsAndUpdateCompilation(compilation, out compilation, out ImmutableArray<Diagnostic> diags);
 
-            Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(string.Format(Resources.MISSING_IMPLEMENTATION, nameof(IEnumerable.GetEnumerator)))));
+            Assert.That(diags.Any(diag => diag.Id.StartsWith("PGE") && diag.Severity == DiagnosticSeverity.Warning && diag.GetMessage().Contains(expectedError)));
             Assert.That(diags.Length, Is.EqualTo(1));
             Assert.That(compilation.SyntaxTrees.Count(), Is.EqualTo(1));
         }
