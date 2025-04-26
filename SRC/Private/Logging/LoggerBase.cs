@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals
             }
         );
 
-        protected virtual string StringifyObject(IDictionary<string, object?> additionalData)
+        protected virtual string Stringify(IDictionary<string, object?> additionalData)
         {
             using MemoryStream stm = new();
 
@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
 
             string msg = $"{DateTime.UtcNow:o} [{level}] {id} - {message}";
             if (additionalData is not null)
-                msg += $"{Environment.NewLine}    {StringifyObject(additionalData)}";
+                msg += $"{Environment.NewLine}    {Stringify(additionalData)}";
 
             LogCore(msg);
         }
@@ -61,7 +61,5 @@ namespace Solti.Utils.Proxy.Internals
                 .NormalizeWhitespace(eol: Environment.NewLine)
                 .ToFullString()
         );
-
-        public virtual void Dispose() { }
     }
 }

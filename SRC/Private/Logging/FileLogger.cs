@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Logger that outputs the logs to a file
     /// </summary>
-    internal sealed class FileLogger : LoggerBase
+    internal sealed class FileLogger : LoggerBase, IDisposable
     {
         private readonly StreamWriter FLogWriter;
         private readonly string FLogDirectory;
@@ -39,6 +39,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Disposes this instance. Since this is an internal class we won't implement the disposable pattern.
         /// </summary>
-        public override void Dispose() => FLogWriter?.Dispose();
+        public void Dispose() => FLogWriter?.Dispose();
     }
 }

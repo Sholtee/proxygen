@@ -3,12 +3,11 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class SyntaxFactoryBase(SyntaxFactoryContext context) : IDisposable
+    internal abstract partial class SyntaxFactoryBase(SyntaxFactoryContext context)
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ILogger? FLogger;
@@ -32,10 +31,5 @@ namespace Solti.Utils.Proxy.Internals
         /// The logger associated with this instance. Log scopes are created using the <see cref="ExposedClass"/> property
         /// </summary>
         public ILogger Logger => FLogger ??= Context.LoggerFactory.CreateLogger(ExposedClass);
-
-        /// <summary>
-        /// Disposes this object. Since this is an internal class we won't implement the disposable pattern.
-        /// </summary>
-        public virtual void Dispose() => FLogger?.Dispose();
     }
 }

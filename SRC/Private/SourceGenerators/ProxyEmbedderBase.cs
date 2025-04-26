@@ -50,9 +50,9 @@ namespace Solti.Utils.Proxy.Internals
             if (!aotGenerators.Any())
                 return;
 
-            LoggerFactory loggerFactory = new(config);
+            using LoggerFactory loggerFactory = new(config);
 
-            using ILogger logger = loggerFactory.CreateLogger($"SourceGenerator-{cmp.AssemblyName}-{Guid.NewGuid():N}");
+            ILogger logger = loggerFactory.CreateLogger($"SourceGenerator-{cmp.AssemblyName}-{Guid.NewGuid():N}");
 
             SyntaxFactoryContext context = new()
             {
@@ -74,7 +74,7 @@ namespace Solti.Utils.Proxy.Internals
                 {
                     generator.EnsureNotError();
 
-                    using ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(generator, compilation, context);
+                    ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(generator, compilation, context);
 
                     ExtendWith(mainUnit, location);
 
@@ -102,8 +102,10 @@ namespace Solti.Utils.Proxy.Internals
             {
                 try
                 {
-                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, context).AsVolatile())
+                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, context))
                     {
+                        logger.Log(LogLevel.Info, "PREM-202", "Applying chunk", new Dictionary<string, object?> { ["Name"] = chunk.ExposedClass });
+
                         ExtendWith(chunk, Location.None);
                     }
                 }

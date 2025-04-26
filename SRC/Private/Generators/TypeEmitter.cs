@@ -45,17 +45,19 @@ namespace Solti.Utils.Proxy.Internals
 
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context);
 
-        private protected Task<TypeContext> EmitAsync(CancellationToken cancellation)
+        private protected async Task<TypeContext> EmitAsync(CancellationToken cancellation)
         {
             RuntimeConfig config = new();
 
-            return EmitAsync
+            using LoggerFactory loggerFactory = new(config);
+
+            return await EmitAsync
             (
                 config,
                 SyntaxFactoryContext.Default with
                 {
                     ReferenceCollector = new ReferenceCollector(),
-                    LoggerFactory = new LoggerFactory(config)
+                    LoggerFactory = loggerFactory
                 },
                 cancellation
             );
@@ -66,12 +68,12 @@ namespace Solti.Utils.Proxy.Internals
         #else
         private 
         #endif
-        async Task<TypeContext> EmitAsync(IAssemblyCachingConfiguration cachingConfiguration, SyntaxFactoryContext context, CancellationToken cancellation)
+        Task<TypeContext> EmitAsync(IAssemblyCachingConfiguration cachingConfiguration, SyntaxFactoryContext context, CancellationToken cancellation)
         {
             Debug.Assert(context.OutputType is OutputType.Module, $"Incompatible {nameof(context.OutputType)}");
             Debug.Assert(context.ReferenceCollector is not null, $"{nameof(context.ReferenceCollector)} cannot be null when compiling a module");
 
-            using ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
+            ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(context);
             
             //
             // We don't want to put the compilation logs into a separate file so reuse the log
@@ -90,10 +92,10 @@ namespace Solti.Utils.Proxy.Internals
             if (type is not null)
             {
                 logger.Log(LogLevel.Info, "EMIT-201", $"\"{mainUnit.ExposedClass}\" found in cache");
-                return type;
+                return Task.FromResult(type);
             }
 
-            return await Task<TypeContext>.Factory.StartNew(() =>
+            return Task<TypeContext>.Factory.StartNew(() =>
             {
                 logger.Log(LogLevel.Info, "EMIT-202", $"Starting new compilation task");
 
@@ -136,7 +138,6 @@ namespace Solti.Utils.Proxy.Internals
                 using Stream asm = Compile.ToAssembly
                 (
                     CreateChunks(context)
-                        .AsVolatile()
                         .Append(mainUnit)
                         .Select(unit => unit.ResolveUnit(null!, cancellation))
 

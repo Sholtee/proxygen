@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Collections.Generic;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,7 +12,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// The logger maintains two separate logs. The 1st contains collection of system logs, the 2nd is for the source being crafted.
     /// </summary>
-    internal interface ILogger: IDisposable
+    internal interface ILogger
     {
         /// <summary>
         /// Creates/overwrites the source log.
