@@ -8,10 +8,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-
-using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
@@ -23,19 +20,6 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly IMethodInfo FGetImplementedInterfaceMethod = MetadataMethodInfo.CreateFrom
         (
             MethodInfoExtensions.ExtractFrom<ExtendedMemberInfo>(static output => CurrentMember.GetImplementedInterfaceMethod(ref output))
-        );
-
-        protected override ExpressionSyntax GetTarget() => ParenthesizedExpression
-        (
-            BinaryExpression
-            (
-                SyntaxKind.CoalesceExpression,
-                base.GetTarget(),
-                ThrowExpression
-                (
-                    ResolveObject<InvalidOperationException>()
-                )
-            )
         );
 
         public override string ExposedClass => $"Proxy_{TargetType!.GetMD5HashCode()}";

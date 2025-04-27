@@ -36,13 +36,13 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static async Task<TDelegate> ActivateAsync(IInterceptor interceptor, TDelegate @delegate, CancellationToken cancellation = default) =>
+        public static async Task<TDelegate> ActivateAsync(IInterceptor interceptor, TDelegate? @delegate, CancellationToken cancellation = default) =>
             (TDelegate) await Instance.ActivateAsync(interceptor, @delegate, cancellation);
 
         /// <summary>
         /// Creates an instance of the generated type.
         /// </summary>
-        public static TDelegate Activate(IInterceptor interceptor, TDelegate @delegate) =>
+        public static TDelegate Activate(IInterceptor interceptor, TDelegate? @delegate) =>
             (TDelegate) Instance.Activate(interceptor, @delegate);
     }
 }

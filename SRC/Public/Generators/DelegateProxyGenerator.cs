@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the proxy type.
         /// </summary>
-        public async Task<object> ActivateAsync(IInterceptor interceptor, Delegate @delegate, CancellationToken cancellation = default)
+        public async Task<object> ActivateAsync(IInterceptor interceptor, Delegate? @delegate, CancellationToken cancellation = default)
         {
             object result = await ActivateAsync(null, cancellation);
 
@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the underlying proxy type.
         /// </summary>
-        public object Activate(IInterceptor interceptor, Delegate @delegate) => ActivateAsync(interceptor, @delegate, CancellationToken.None)
+        public object Activate(IInterceptor interceptor, Delegate? @delegate) => ActivateAsync(interceptor, @delegate, CancellationToken.None)
             .GetAwaiter()
             .GetResult();
 
