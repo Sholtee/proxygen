@@ -43,6 +43,11 @@ namespace Solti.Utils.Proxy.Internals
         public static SyntaxFactoryContext Default { get; } = new()
         {
             OutputType = OutputType.Module,
+
+            //
+            // We don't need to dispose the LoggerFactory as it always returns DebugLogger instances
+            //
+
             LoggerFactory = new LoggerFactory(null)
         };
     }
