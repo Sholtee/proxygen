@@ -7,7 +7,7 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
         default(global::System.String),
         c
     };
-    global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F6DED5524BB02EB5ED49F044A93A795D6, (global::System.Object[] args) =>
+    global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F6DED5524BB02EB5ED49F044A93A795D6, (global::System.Object[] args) =>
     {
         global::System.Int32 _a = (global::System.Int32)args[0];
         global::System.String _b;

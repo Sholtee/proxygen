@@ -79,7 +79,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [Test]
         public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported() =>
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.FTarget.Foo<TT>(a, out b, ref c);")));
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => (this.FTarget ?? throw new global::System.InvalidOperationException()).Foo<TT>(a, out b, ref c);")));
 
         public class ExplicitFoo : IFoo<int>
         {
@@ -99,7 +99,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             MemberDeclarationSyntax m = CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(GetDummyClass(), null).Members.Single(m => m is MethodDeclarationSyntax method && method.Identifier.Text.Contains("Foo"));
 
-            Assert.That(m.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.FTarget).Foo<TT>(a, out b, ref c);"));
+            Assert.That(m.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)(this.FTarget ?? throw new global::System.InvalidOperationException())).Foo<TT>(a, out b, ref c);"));
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             MemberDeclarationSyntax p = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(GetDummyClass(), default).Members.Single(m => m is PropertyDeclarationSyntax p && p.Identifier.Text.Contains("Prop"));
 
-            Assert.That(p.NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => this.FTarget.Prop; set => this.FTarget.Prop = value; }"));
+            Assert.That(p.NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop; set => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop = value; }"));
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             MemberDeclarationSyntax e = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(GetDummyClass(), null).Members.Single(m => m is EventDeclarationSyntax);
 
-            Assert.That(e.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => this.FTarget.Event += value; remove => this.FTarget.Event -= value; }"));
+            Assert.That(e.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += value; remove => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= value; }"));
         }
 
         [Test]

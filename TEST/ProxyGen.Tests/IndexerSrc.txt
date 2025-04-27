@@ -7,7 +7,7 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
         {
             index
         };
-        global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F928810E559CA247F6317B6154D26128C, (global::System.Object[] args) =>
+        global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F928810E559CA247F6317B6154D26128C, (global::System.Object[] args) =>
         {
             global::System.Int32 _index = (global::System.Int32)args[0];
             global::System.Object result = (this.FTarget ?? throw new global::System.InvalidOperationException())[_index];
@@ -24,7 +24,7 @@ global::System.Int32 global::System.Collections.Generic.IList<global::System.Int
             index,
             value
         };
-        ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.FC34DD35E83A0839578967C405AAE20D7, (global::System.Object[] args) =>
+        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.FC34DD35E83A0839578967C405AAE20D7, (global::System.Object[] args) =>
         {
             global::System.Int32 _index = (global::System.Int32)args[0];
             global::System.Int32 _value = (global::System.Int32)args[1];

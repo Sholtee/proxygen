@@ -1,6 +1,6 @@
 #pragma warning disable
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::Solti.Utils.Proxy.IDelegateWrapper, global::Solti.Utils.Proxy.IInterceptorAccess, global::Solti.Utils.Proxy.ITargetAccess
+internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::Solti.Utils.Proxy.Internals.IDelegateWrapper, global::Solti.Utils.Proxy.Internals.IInterceptorAccess, global::Solti.Utils.Proxy.Internals.ITargetAccess
 {
     private global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>> FTarget;
     public DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A() : base()
@@ -15,12 +15,12 @@ internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::S
             b,
             default(global::System.Object)
         };
-        global::System.Object result = ((global::Solti.Utils.Proxy.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, new global::Solti.Utils.Proxy.ExtendedMemberInfo(this.FTarget.Method), (global::System.Object[] args) =>
+        global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, new global::Solti.Utils.Proxy.ExtendedMemberInfo((this.FTarget ?? throw new global::System.InvalidOperationException()).Method), (global::System.Object[] args) =>
         {
             global::System.String _a = (global::System.String)args[0];
             global::System.Collections.Generic.IList<global::System.Int64>[] _b = (global::System.Collections.Generic.IList<global::System.Int64>[])args[1];
             global::System.Object _c;
-            global::System.Object result = this.FTarget.Invoke(_a, ref _b, out _c);
+            global::System.Object result = (this.FTarget ?? throw new global::System.InvalidOperationException()).Invoke(_a, ref _b, out _c);
             args[1] = (global::System.Object)_b;
             args[2] = (global::System.Object)_c;
             return result;
@@ -30,11 +30,11 @@ internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::S
         return (global::System.Int32)result;
     }
 
-    global::System.Delegate global::Solti.Utils.Proxy.IDelegateWrapper.Wrapped { get => (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)this.Invoke; }
+    global::System.Delegate global::Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped { get => (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)this.Invoke; }
 
-    global::Solti.Utils.Proxy.IInterceptor global::Solti.Utils.Proxy.IInterceptorAccess.Interceptor { get; set; }
+    global::Solti.Utils.Proxy.IInterceptor global::Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor { get; set; }
 
-    global::System.Object global::Solti.Utils.Proxy.ITargetAccess.Target { get => this.FTarget; set => this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)value; }
+    global::System.Object global::Solti.Utils.Proxy.Internals.ITargetAccess.Target { get => this.FTarget; set => this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)value; }
 
     public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
