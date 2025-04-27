@@ -3,13 +3,24 @@
 
 **This documentation refers the version 10.X of the library**
 
-*ATTENTION:* This version represents a complete revamp of the library. It provides a brand new (more generic) API so it is NOT compatible with the previous versions at all. 
+*ATTENTION:* This version represents a complete revamp of the library. It introduces a brand new (more generic) API which is NOT compatible with the previous versions at all. 
 If you are interested in the legacy -v9- API you can find its documentation [here](https://github.com/Sholtee/proxygen/blob/65539b78a9772c8541fb5f643ce51cea47f02bd5/README.MD).
+
+**ProxyGen.NET** is a lightweight, powerful proxy generator for .NET, built on top of Roslyn.
+It allows you to easily create dynamic [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) that can intercept *interfaces*, *virtual methods* and *delegates* as well as it has support for [duck typing](https://en.wikipedia.org/wiki/Duck_typing ) — meaning you can proxy objects without requiring them to implement a specific interface.
+Whether you're building AOP frameworks, logging systems, mock objects, or sophisticated middleware, ProxyGen.NET gives you full control over method interception with a clean and minimal API.
+
 ## Features
-This library currently supports generating [proxies](https://en.wikipedia.org/wiki/Proxy_pattern ) for *interface*, *virtual method* and *delegate* interception as well as [duck typing](https://en.wikipedia.org/wiki/Duck_typing ).
+- Interface, virtual method, and delegate interception
+- Duck typing support (no explicit interfaces needed!)
+- Create proxies with or without a target object
+- Customize method call behavior via interceptors
+- Roslyn-powered dynamic code generation
+- Compile-time type embedding 
+- Minimal runtime dependencies
 
 ### To hook into interface member calls:
-1. Implement the `IInterceptor` class:
+1. Define your interceptor by implementing the `IInterceptor` interface:
   ```csharp
   using Solti.Utils.Proxy;
   ...
@@ -34,10 +45,10 @@ This library currently supports generating [proxies](https://en.wikipedia.org/wi
   ```
 
   The `IInvocationContext` provides the following essential properties:
-  - `Proxy`: The generated proxy instance that called the `Invoke()` method on the interceptor
+  - `Proxy`: The generated proxy instance
   - `Member`: The member (property, event or method) being invoked by the caller
   - `GenericArguments`: Since the `Member` property always points to the generic definition, the user code should use this value to grab the generic arguments.
-  - `Args`: Argument passed by the caller. The user code is allowed to modify this array. This is to let the user code change the input and output (`ref` or `out`) parameters
+  - `Args`: Arguments passed by the caller. The user code is allowed to modify this array in order to change the input and output (`ref` or `out`) parameters
 
 2. Generate a proxy instance:
   ```csharp
@@ -107,7 +118,7 @@ For further usage examples see [this](https://github.com/Sholtee/proxygen/blob/3
   ```
 3. Quack
   
-Related tests can be seen [here](https://github.com/Sholtee/proxygen/blob/3740e6d608d30aec0f5a88aabfc89f8897cbd211/TEST/ProxyGen.Tests/Generators/DuckGenerator.cs ).
+Related tests can be found [here](https://github.com/Sholtee/proxygen/blob/3740e6d608d30aec0f5a88aabfc89f8897cbd211/TEST/ProxyGen.Tests/Generators/DuckGenerator.cs ).
 ## Caching the generated assembly
 By setting the `ProxyGen.AssemblyCacheDir` property in [YourApp.runtimeconfig.json](https://docs.microsoft.com/en-us/dotnet/core/run-time-config/ ) you can make the system cache the generated assembly, so next time your app starts and requests the proxy there won't be time consuming emitting operation.
 
