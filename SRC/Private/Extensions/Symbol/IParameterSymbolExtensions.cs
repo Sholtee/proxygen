@@ -14,14 +14,14 @@ namespace Solti.Utils.Proxy.Internals
         /// </summary>
         public static ParameterKind GetParameterKind(this IParameterSymbol src) => src switch
         {
-            _ when src.IsParams => ParameterKind.Params,
-            _ when src.RefKind is RefKind.RefReadOnly => ParameterKind.In,
-            _ when src.RefKind is RefKind.Out => ParameterKind.Out,
-            _ when src.RefKind is RefKind.Ref
+            { IsParams: true } => ParameterKind.Params,
+            { RefKind: RefKind.RefReadOnly} => ParameterKind.In,
+            { RefKind: RefKind.Out} => ParameterKind.Out,
+            { RefKind: RefKind.Ref
 #if !LEGACY_COMPILER
                 or RefKind.RefReadOnlyParameter
 #endif
-                => ParameterKind.Ref,
+            } => ParameterKind.Ref,
             _ => ParameterKind.None
         };
     }

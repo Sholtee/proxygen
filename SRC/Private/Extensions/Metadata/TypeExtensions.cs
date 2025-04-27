@@ -350,12 +350,12 @@ namespace Solti.Utils.Proxy.Internals
 
             AccessModifiers am = src switch
             {
-                _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
-                _ when src.IsNestedFamily => AccessModifiers.Protected,
-                _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
-                _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
-                _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
-                _ when src.IsNestedPrivate => AccessModifiers.Private,
+                { IsPublic: true, IsVisible: true } or { IsNestedPublic: true } => AccessModifiers.Public,
+                { IsNestedFamily: true } => AccessModifiers.Protected,
+                { IsNestedFamORAssem: true } => AccessModifiers.Protected | AccessModifiers.Internal,
+                { IsNestedFamANDAssem: true }  => AccessModifiers.Protected | AccessModifiers.Private,
+                { IsNestedAssembly: true } or { IsVisible: false, IsNested: false } => AccessModifiers.Internal,
+                { IsNestedPrivate: true } => AccessModifiers.Private,
                 _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
             };
 
@@ -390,17 +390,17 @@ namespace Solti.Utils.Proxy.Internals
         /// <remarks>Since this method may inspect attributes to determine the result, callers better cache the returned data.</remarks>
         public static RefType GetRefType(this Type src) => src switch
         {
-            _ when
-            #if NETSTANDARD2_1_OR_GREATER
-                src.IsByRefLike ||
-            #endif
-                src
+#if NETSTANDARD2_1_OR_GREATER
+            { IsByRefLike: true }
+#else
+            _ when src
                     .GetCustomAttributes()
                     .Select(static ca => ca.GetType().FullName)
                     .Contains("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparer.OrdinalIgnoreCase)
+#endif
                 => RefType.Ref, // ref struct
-            _ when src.IsPointer => RefType.Pointer,
-            _ when src.IsArray => RefType.Array,
+            { IsPointer: true } => RefType.Pointer,
+            { IsArray: true } => RefType.Array,
             _ => RefType.None
         };
 

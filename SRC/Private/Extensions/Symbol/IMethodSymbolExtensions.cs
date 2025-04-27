@@ -77,21 +77,21 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static readonly IReadOnlyList<MethodKind> SpecialMethods = new[]
-        {
+        private static readonly IReadOnlyList<MethodKind> SpecialMethods =
+        [
             MethodKind.Constructor, MethodKind.StaticConstructor,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
             MethodKind.UserDefinedOperator,
             MethodKind.Conversion // explicit, implicit
-        };
+        ];
 
         public static bool IsSpecial(this IMethodSymbol src)
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation && !src.ContainingType.IsInterface())
                 src = src.GetImplementedInterfaceMethods().Single();
 
-            return SpecialMethods.Any(mk => mk == src.MethodKind);
+            return SpecialMethods.Contains(src.MethodKind);
         }
 
         private static readonly IReadOnlyList<MethodKind> ClassMethods =
@@ -105,7 +105,7 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.DelegateInvoke
         ];
 
-        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Any(mk => mk == src.MethodKind);
+        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
 
         //
         // OverriddenMethod won't work in case of "new" override.

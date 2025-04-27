@@ -18,13 +18,13 @@ namespace Solti.Utils.Proxy.Internals
     {
         public static AccessModifiers GetAccessModifiers(this MethodBase src) => src switch
         {
-            _ when src.IsFamily => AccessModifiers.Protected,
-            _ when src.IsAssembly => AccessModifiers.Internal,
-            _ when src.IsFamilyOrAssembly => AccessModifiers.Protected | AccessModifiers.Internal,
-            _ when src.IsFamilyAndAssembly => AccessModifiers.Protected | AccessModifiers.Private,
-            _ when src.IsPublic => AccessModifiers.Public,
-            _ when src.IsPrivate && src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
-            _ when src.IsPrivate => AccessModifiers.Private,
+            { IsFamily: true } => AccessModifiers.Protected,
+            { IsAssembly: true } => AccessModifiers.Internal,
+            { IsFamilyOrAssembly: true } => AccessModifiers.Protected | AccessModifiers.Internal,
+            { IsFamilyAndAssembly: true } => AccessModifiers.Protected | AccessModifiers.Private,
+            { IsPublic: true } => AccessModifiers.Public,
+            { IsPrivate: true } when src.GetImplementedInterfaceMethods().Any() => AccessModifiers.Explicit,
+            { IsPrivate: true} => AccessModifiers.Private,
             _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 

@@ -43,23 +43,26 @@ namespace Solti.Utils.Proxy.Internals
             // nint => System.IntPtr, (T Item1, TT item2) => System.Tuple<T, TT>
             //
 
-            _ when src.IsTupleType || src.IsNativeIntegerType => src.ContainingNamespace.ToString() + Type.Delimiter + src.Name,
-            _ when src is INamedTypeSymbol named && named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
-            _ when src is IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
+            { IsTupleType: true } or { IsNativeIntegerType: true } => src.ContainingNamespace.ToString() + Type.Delimiter + src.Name,
+
+            INamedTypeSymbol named when named.IsBoundNullable() => named.ConstructedFrom.GetFriendlyName(),
+
+            IPointerTypeSymbol pointer => pointer.PointedAtType.GetFriendlyName(),
 
             //
             // delegate*<T, TT> => TRetVal(T, TT)
             //
 
-            _ when src is IFunctionPointerTypeSymbol functionPointer =>
+            IFunctionPointerTypeSymbol functionPointer =>
                 $"{functionPointer.Signature.ReturnType.GetFriendlyName()}({string.Join(", ", functionPointer.Signature.Parameters.Select(static p => p.Type.GetFriendlyName()))})",
 
             //
             // nint[,] => System.IntPtr[,]
             //
 
-            _ when src is IArrayTypeSymbol array =>
+            IArrayTypeSymbol array =>
                 $"{array.ElementType.GetFriendlyName()}[{new string(Enumerable.Repeat(',', array.Rank - 1).ToArray())}]",
+
             _ => src.ToDisplayString
             (
                 new SymbolDisplayFormat

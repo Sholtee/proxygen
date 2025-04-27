@@ -32,8 +32,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.Position is -1) return src switch
             {
-                _ when src.ParameterType.IsByRef && IsReadOnly() => ParameterKind.RefReadonly,
-                _ when src.ParameterType.IsByRef => ParameterKind.Ref,
+                { ParameterType.IsByRef: true } => IsReadOnly() ? ParameterKind.RefReadonly : ParameterKind.Ref,
                 _ => ParameterKind.Out
             };
 
@@ -41,20 +40,16 @@ namespace Solti.Utils.Proxy.Internals
             // We have a "regular" parameter
             //
 
-            if (src.ParameterType.IsByRef)
+            if (src.ParameterType.IsByRef) return src switch
             {
                 //
                 // "native by ref" (e.g. IntPtr) is out of play from here.
                 //
 
-                if (src.IsIn && IsReadOnly()) // src.IsIn is not enough
-                    return ParameterKind.In;
-
-                if (!src.IsIn && src.IsOut)
-                    return ParameterKind.Out;
-
-                return ParameterKind.Ref;
-            }
+                { IsIn: true } when IsReadOnly() => ParameterKind.In, // src.IsIn is not enough
+                { IsIn: false, IsOut: true } => ParameterKind.Out,
+                _ => ParameterKind.Ref
+            };
 
             //
             // "params" and by ref parameters are mutually exclusives.
