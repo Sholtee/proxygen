@@ -35,7 +35,7 @@ namespace Solti.Utils.Proxy.Generators
         public async Task<object> ActivateAsync(object target, CancellationToken cancellation = default)
         {
             ITargetAccess targetAccess = (ITargetAccess) await base.ActivateAsync(null, cancellation);
-            targetAccess.Target = target;
+            targetAccess.Target = target ?? throw new ArgumentNullException(nameof(target));
             return targetAccess;
         }
 
