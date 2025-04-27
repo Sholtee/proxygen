@@ -9,12 +9,19 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class IParameterSymbolExtensions
     {
+        /// <summary>
+        /// Associates <see cref="ParameterKind"/> to the given <see cref="IParameterSymbol"/>.
+        /// </summary>
         public static ParameterKind GetParameterKind(this IParameterSymbol src) => src switch
         {
-            _ when src.IsParams => ParameterKind.Params,
-            _ when src.RefKind == RefKind.RefReadOnly => ParameterKind.In,
-            _ when src.RefKind == RefKind.Out => ParameterKind.Out,
-            _ when src.RefKind == RefKind.Ref => ParameterKind.Ref,
+            { IsParams: true } => ParameterKind.Params,
+            { RefKind: RefKind.RefReadOnly} => ParameterKind.In,
+            { RefKind: RefKind.Out} => ParameterKind.Out,
+            { RefKind: RefKind.Ref
+#if !LEGACY_COMPILER
+                or RefKind.RefReadOnlyParameter
+#endif
+            } => ParameterKind.Ref,
             _ => ParameterKind.None
         };
     }

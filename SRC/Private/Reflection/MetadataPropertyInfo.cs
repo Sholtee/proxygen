@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
@@ -14,24 +15,29 @@ namespace Solti.Utils.Proxy.Internals
     {
         private PropertyInfo UnderlyingProperty { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingProperty.GetMethod is not null
-            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
+        public IMethodInfo? GetMethod => UnderlyingProperty.GetMethod is not null
+            ? FGetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.GetMethod) 
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingProperty.SetMethod is not null
-            ? MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
+        public IMethodInfo? SetMethod => UnderlyingProperty.SetMethod is not null 
+            ? FSetMethod ??= MetadataMethodInfo.CreateFrom(UnderlyingProperty.SetMethod)
             : null;
 
         public string Name => UnderlyingProperty.StrippedName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingProperty.PropertyType);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IParameterInfo>? FIndices;
         public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingProperty
             .GetIndexParameters()
@@ -41,6 +47,8 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 
         public bool IsAbstract => (GetMethod ?? SetMethod!).IsAbstract;
+
+        public bool IsVirtual => (GetMethod ?? SetMethod!).IsVirtual;
 
         private MetadataPropertyInfo(PropertyInfo prop) => UnderlyingProperty = prop;
 

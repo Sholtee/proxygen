@@ -9,6 +9,9 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class IEnumerableExtensions
     {
+        /// <summary>
+        /// Returns the index of a particular <paramref name="item"/> within the provided list. Returns -1 if the list doesn't include the <paramref name="item"/>.
+        /// </summary>
         public static int IndexOf<T>(this IEnumerable<T> src, T item, IEqualityComparer<T> comparer)
         {
             int index = 0;
@@ -22,6 +25,9 @@ namespace Solti.Utils.Proxy.Internals
             return -1;
         }
 
+        /// <summary>
+        /// Returns the index of a particular <paramref name="item"/> within the provided list using the default <see cref="EqualityComparer{T}"/>. Returns -1 if the list doesn't include the <paramref name="item"/>.
+        /// </summary>
         public static int IndexOf<T>(this IEnumerable<T> src, T item) => src.IndexOf(item, EqualityComparer<T>.Default);
     }
 }

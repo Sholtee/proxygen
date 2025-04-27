@@ -3,18 +3,18 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
     <Authors>Denes Solti</Authors>
-    <Version>9.1.1</Version>
+    <Version>10.0.0-preview1</Version>
     <Version Condition="'$(Variant)' == 'ROSLYN_LEGACY'">$(Version)-RoslynV3</Version>
     <AssemblyName>Solti.Utils.Proxy</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy</RootNamespace>
     <Configurations>Debug;Release</Configurations>
     <OutputPath>..\BIN\$(Configuration)\$(Variant)</OutputPath>
-    <LangVersion>11</LangVersion>
+    <LangVersion>13</LangVersion>
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IsRoslynComponent>true</IsRoslynComponent>
-    <NoWarn>CA2007;</NoWarn>
+    <NoWarn>CA2007;CA2022;RS1036</NoWarn>
     <DefineConstants Condition="'$(Variant)' == 'ROSLYN_LEGACY'">LEGACY_COMPILER</DefineConstants>
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditLevel>moderate</NuGetAuditLevel>
@@ -31,9 +31,9 @@
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 	</PackageReference>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" Condition="'$(Variant)' != 'ROSLYN_LEGACY'" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.*" Condition="'$(Variant)' != 'ROSLYN_LEGACY'" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.11.*" Condition="'$(Variant)' == 'ROSLYN_LEGACY'" />
-    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="8.*">
+    <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.*">
       <!-- This package is a develpement dependency -->
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -42,7 +42,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Mono.Reflection" Version="2.*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +77,12 @@
     <None Include="..\icon.png" Pack="true" PackagePath="\" />
     <None Include="..\README.MD" Pack="true" PackagePath="\" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   
   <PropertyGroup>
     <DocumentationFile>$(OutputPath)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -85,7 +90,7 @@
     <Description>.NET proxy generator powered by Roslyn</Description>
     <PackageId>ProxyGen.NET</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
+    <PackageTags>Proxy;Interface-Proxy;Delegate-Proxy;VirtualMethod-Proxy;Duck-Typing;Interceptor</PackageTags>
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.MD</PackageReadmeFile>

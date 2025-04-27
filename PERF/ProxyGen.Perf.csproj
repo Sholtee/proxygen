@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.12.*" />
+	<PackageReference Include="Moq" Version="4.*" />
     <PackageReference Include="Solti.Utils.Primitives" Version="8.*" />
     <PackageReference Condition="'$(LibVersion)' != ''" Include="ProxyGen.NET" Version="$(LibVersion)"></PackageReference>
   </ItemGroup>

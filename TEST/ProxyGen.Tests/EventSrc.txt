@@ -2,13 +2,31 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
 {
     add
     {
-        global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FB87DFB32A2DD0754D6374F9CF1ED5F08));
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F8AFB6CA98CF89121422C106996C9C75B);
+        global::System.Object[] args = new global::System.Object[]
+        {
+            value
+        };
+        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F8AFB6CA98CF89121422C106996C9C75B, (global::System.Object[] args) =>
+        {
+            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
+            (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += _value;
+            return null;
+        }, args, new global::System.Type[0]));
     }
 
     remove
     {
-        global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.FFBD84B95FB3FB5584930D41ADD52FEC9));
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F75E8723887FE87A170AE953C4D35B5B4);
+        global::System.Object[] args = new global::System.Object[]
+        {
+            value
+        };
+        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F75E8723887FE87A170AE953C4D35B5B4, (global::System.Object[] args) =>
+        {
+            global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
+            (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= _value;
+            return null;
+        }, args, new global::System.Type[0]));
     }
 }

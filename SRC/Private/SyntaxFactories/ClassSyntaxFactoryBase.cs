@@ -15,18 +15,21 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract partial class ClassSyntaxFactoryBase: SyntaxFactoryBase
+    internal abstract partial class ClassSyntaxFactoryBase(SyntaxFactoryContext context) : SyntaxFactoryBase(context)
     {
-        public ClassSyntaxFactoryBase(ReferenceCollector? referenceCollector, LanguageVersion languageVersion) : base(referenceCollector, languageVersion) { }
+        #if DEBUG
+        internal
+        #endif
+        protected abstract IReadOnlyList<ITypeInfo> Bases { get; }
 
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation)
-        {
-            ClassDeclarationSyntax cls = ClassDeclaration
+        protected virtual ClassDeclarationSyntax ResolveClass(object context, CancellationToken cancellation) => ResolveMembers
+        (
+            ClassDeclaration
             (
-                identifier: ResolveClassName(context)
+                identifier: ExposedClass
             )
             .WithModifiers
             (
@@ -44,7 +47,7 @@ namespace Solti.Utils.Proxy.Internals
             (
                 baseList: BaseList
                 (
-                    ResolveBases(context).ToSyntaxList
+                    Bases.ToSyntaxList
                     (
                         t => (BaseTypeSyntax) SimpleBaseType
                         (
@@ -52,10 +55,10 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     )
                 )
-            );
-
-            return ResolveMembers(cls, context, cancellation);
-        }
+            ),
+            context,
+            cancellation
+        );
 
         #if DEBUG
         internal
@@ -74,20 +77,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => MemberResolvers.Aggregate(cls, (cls, resolver) =>
-        {
-            cancellation.ThrowIfCancellationRequested();
-            return resolver(cls, context);
-        });
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract string ResolveClassName(object context);
-
-        #if DEBUG
-        internal
-        #endif
-        protected abstract IEnumerable<ITypeInfo> ResolveBases(object context);
+        protected virtual ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => MemberResolvers.Aggregate
+        (
+            cls,
+            (cls, resolver) =>
+            {
+                cancellation.ThrowIfCancellationRequested();
+                return resolver(cls, context);
+            }
+        );
     }
 }

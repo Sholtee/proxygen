@@ -6,48 +6,49 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal sealed class MetadataGenericConstraint : IGenericConstraint
+    internal sealed class MetadataGenericConstraint: IGenericConstraint
     {
-        private MetadataGenericConstraint(Type genericArgument)
+        private Type UnderlyingType { get; }
+
+        private MemberInfo DeclaringMember { get; }
+
+        private MetadataGenericConstraint(Type genericArgument, MemberInfo declaringMember)
         {
-            Struct = genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint);
-            DefaultConstructor = !Struct && genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.DefaultConstructorConstraint);
-            Reference = genericArgument.GenericParameterAttributes.HasFlag(GenericParameterAttributes.ReferenceTypeConstraint);
-            ConstraintTypes = genericArgument
-                .GetGenericParameterConstraints()
-
-                //
-                // We don't want a
-                //     "where TT : struct, global::System.ValueType"
-                //
-
-                .Where(t => t != typeof(ValueType) || !Struct)
-                .Select(MetadataTypeInfo.CreateFrom)
-                .ToImmutableList();
-            Target = MetadataTypeInfo.CreateFrom(genericArgument);
+            UnderlyingType = genericArgument;
+            DeclaringMember = declaringMember;
         }
 
-        public static IGenericConstraint? CreateFrom(Type genericArgument)
-        {
-            MetadataGenericConstraint result = new(genericArgument);
-            return !result.DefaultConstructor && !result.Reference && !result.Struct && !result.ConstraintTypes.Any()
-                ? null
-                : result;
-        }
+        public static IGenericConstraint? CreateFrom(Type genericArgument, MemberInfo declaringMember) =>
+            genericArgument.GenericParameterAttributes is > GenericParameterAttributes.VarianceMask and < (GenericParameterAttributes) 32 /*AllowByRefLike*/ || genericArgument.GetGenericConstraints(declaringMember).Any()
+                ? new MetadataGenericConstraint(genericArgument, declaringMember)
+                : null;
 
-        public bool DefaultConstructor { get; }
+        public bool DefaultConstructor => !Struct && UnderlyingType
+            .GenericParameterAttributes
+            .HasFlag(GenericParameterAttributes.DefaultConstructorConstraint);
 
-        public bool Reference { get; }
+        public bool Reference => UnderlyingType
+            .GenericParameterAttributes
+            .HasFlag(GenericParameterAttributes.ReferenceTypeConstraint);
 
-        public bool Struct { get; }
+        public bool Struct => UnderlyingType
+            .GenericParameterAttributes
+            .HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint);
 
-        public IReadOnlyList<ITypeInfo> ConstraintTypes { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private IReadOnlyList<ITypeInfo>? FConstraintTypes;
+        public IReadOnlyList<ITypeInfo> ConstraintTypes => FConstraintTypes ??= UnderlyingType
+            .GetGenericConstraints(DeclaringMember)
+            .Select(MetadataTypeInfo.CreateFrom)
+            .ToImmutableList();
 
-        public ITypeInfo Target { get; }
+        private ITypeInfo? FTarget;
+        public ITypeInfo Target => FTarget ??= MetadataTypeInfo.CreateFrom(UnderlyingType);
     }
 }

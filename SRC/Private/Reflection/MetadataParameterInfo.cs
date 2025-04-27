@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
@@ -15,10 +16,13 @@ namespace Solti.Utils.Proxy.Internals
 
         public static IParameterInfo CreateFrom(ParameterInfo para) => new MetadataParameterInfo(para);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= MetadataTypeInfo.CreateFrom(UnderlyingParameter.ParameterType);
 
-        public ParameterKind Kind => UnderlyingParameter.GetParameterKind();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private ParameterKind? FKind;
+        public ParameterKind Kind => FKind ??= UnderlyingParameter.GetParameterKind();
 
         public string Name => UnderlyingParameter.Name ?? string.Empty;
 

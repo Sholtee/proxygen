@@ -35,9 +35,7 @@ namespace Solti.Utils.Proxy.Internals
                     ? AccessModifiers.Private
                     : AccessModifiers.Explicit,
             Accessibility.Private => AccessModifiers.Private,
-            #pragma warning disable CA2201 // In theory we should never reach here.
-            _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-            #pragma warning restore CA2201
+            _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 
         public static IEnumerable<INamedTypeSymbol> GetDeclaringInterfaces(this IMethodSymbol src) => src.ContainingType.IsInterface()
@@ -79,34 +77,35 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static readonly IReadOnlyList<MethodKind> SpecialMethods = new[]
-        {
+        private static readonly IReadOnlyList<MethodKind> SpecialMethods =
+        [
             MethodKind.Constructor, MethodKind.StaticConstructor,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
             MethodKind.UserDefinedOperator,
             MethodKind.Conversion // explicit, implicit
-        };
+        ];
 
         public static bool IsSpecial(this IMethodSymbol src)
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation && !src.ContainingType.IsInterface())
                 src = src.GetImplementedInterfaceMethods().Single();
 
-            return SpecialMethods.Any(mk => mk == src.MethodKind);
+            return SpecialMethods.Contains(src.MethodKind);
         }
 
-        private static readonly IReadOnlyList<MethodKind> ClassMethods = new MethodKind[]
-        {
+        private static readonly IReadOnlyList<MethodKind> ClassMethods =
+        [
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
             MethodKind.EventAdd, MethodKind.EventRemove, MethodKind.EventRaise,
             MethodKind.PropertyGet, MethodKind.PropertySet,
             MethodKind.UserDefinedOperator,
-            MethodKind.Conversion // explicit, implicit
-        };
+            MethodKind.Conversion, // explicit, implicit
+            MethodKind.DelegateInvoke
+        ];
 
-        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Any(mk => mk == src.MethodKind);
+        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
 
         //
         // OverriddenMethod won't work in case of "new" override.
@@ -156,5 +155,8 @@ namespace Solti.Utils.Proxy.Internals
                 }
             }
         }
+
+        public static bool IsVirtual(this IMethodSymbol src) =>
+            (src.IsVirtual || src.IsAbstract || (src.OverriddenMethod is not null && !src.IsSealed)) && !src.ContainingType.IsInterface();
     }
 }

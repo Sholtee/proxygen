@@ -12,10 +12,11 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
+using Moq;
 using NUnit.Framework;
 
 [assembly: InternalsVisibleTo("Duck_6191D0BB1603D9ADCE5DC9C7263A20D7")]
-[assembly: InternalsVisibleTo("Duck_D794BCF6F9BF1A73E2F1353F68AD23BB")]
+[assembly: InternalsVisibleTo("Duck_B18DECEF59D57C6AB68D9A8E24528852")]
 
 namespace Solti.Utils.Proxy.Generators.Tests
 {
@@ -25,7 +26,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
     public sealed class DuckGeneratorTests
     {
         private static Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface : class =>
-            DuckGenerator<TInterface, TTarget>.ActivateAsync(Tuple.Create(target));
+            DuckGenerator<TInterface, TTarget>.ActivateAsync(target);
 
         [Test]
         public async Task GeneratedDuck_ShouldWorkWithComplexInterfaces()
@@ -234,7 +235,20 @@ namespace Solti.Utils.Proxy.Generators.Tests
             if (File.Exists(cacheFile))
                 File.Delete(cacheFile);
 
-            generator.Emit(default, tmpDir, default);
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(tmpDir);
+
+            generator.EmitAsync
+            (
+                mockCachingConfig.Object,
+                SyntaxFactoryContext.Default with
+                {
+                    ReferenceCollector = new ReferenceCollector()
+                },
+                default
+            ).GetAwaiter().GetResult();
 
             Assert.That(File.Exists(cacheFile));
         }
@@ -245,7 +259,7 @@ namespace Solti.Utils.Proxy.Generators.Tests
             , Ignore(".NET Framework cannot load assembly targeting .NET Core")
 #endif
         ]
-        public void DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
+        public async Task DuckGenerator_ShouldUseTheCachedAssemblyIfTheCacheDirectoryIsSet()
         {
             Generator generator = DuckGenerator<IGeneric<object>, Generic<object>>.Instance;
             
@@ -253,7 +267,23 @@ namespace Solti.Utils.Proxy.Generators.Tests
                 cacheDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
                 cacheFile = Path.Combine(cacheDir, $"{generator.GetDefaultAssemblyName()}.dll");
 
-            Type gt = generator.Emit(default, cacheDir, default);
+            Mock<IAssemblyCachingConfiguration> mockCachingConfig = new(MockBehavior.Strict);
+            mockCachingConfig
+                .SetupGet(c => c.AssemblyCacheDir)
+                .Returns(cacheDir);
+
+            Type gt = 
+            (           
+                await generator.EmitAsync
+                (
+                    mockCachingConfig.Object,
+                    SyntaxFactoryContext.Default with
+                    {
+                        ReferenceCollector = new ReferenceCollector()
+                    },
+                    default
+                )
+            ).Type;
 
             Assert.That(gt.Assembly.Location, Is.EqualTo(cacheFile));
         }
@@ -304,6 +334,6 @@ namespace Solti.Utils.Proxy.Generators.Tests
 
         [Test]
         public void DuckGenerator_ShouldHandleOverrides() =>
-            Assert.DoesNotThrow(() => DuckGenerator<IDescendant, MockDescendant>.Activate(Tuple.Create(new MockDescendant())));
+            Assert.DoesNotThrow(() => DuckGenerator<IDescendant, MockDescendant>.Activate(new MockDescendant()));
     }
 }

@@ -50,7 +50,7 @@ namespace Solti.Utils.Proxy.Internals
                 : null;
         }
 
-        public string? Location => UnderlyingAssembly.IsDynamic ? null : UnderlyingAssembly.Location;
+        public string? Location => IsDynamic ? null : UnderlyingAssembly.Location;
 
         public bool IsDynamic => UnderlyingAssembly.IsDynamic;
 

@@ -6,30 +6,27 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class MetadataTypeInfo : ITypeInfo
+    internal class MetadataTypeInfo(Type underlyingType) : ITypeInfo
     {
-        protected Type UnderlyingType { get; }
-
-        protected MetadataTypeInfo(Type underlyingType) => UnderlyingType = underlyingType;
+        protected Type UnderlyingType { get; } = underlyingType;
 
         public static ITypeInfo CreateFrom(Type underlyingType)
         {
             while (underlyingType.IsByRef)
-            {
                 underlyingType = underlyingType.GetElementType();
-            }
 
-            if (underlyingType.IsFunctionPointer())
+            if (underlyingType.IsFunctionPointer())  // TODO: FIXME: remove this workaround
                 underlyingType = typeof(IntPtr);
 
             return underlyingType switch
             {
-                _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
+                { IsArray: true } => new MetadataArrayTypeInfo(underlyingType),
                 _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
                 _ => new MetadataTypeInfo(underlyingType)
             };
@@ -41,33 +38,29 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingType.ToString();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IAssemblyInfo? FDeclaringAssembly;
         public IAssemblyInfo DeclaringAssembly => FDeclaringAssembly ??= MetadataAssemblyInfo.CreateFrom(UnderlyingType.Assembly);
 
-        public bool IsVoid => UnderlyingType == typeof(void);
-
-        private ITypeInfo? FEnclosingType;
-        public ITypeInfo? EnclosingType
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<ITypeInfo?> FEnclosingType = new(() =>
         {
-            get
-            {
-                if (FEnclosingType is null)
-                {
-                    Type? enclosingType = UnderlyingType.GetEnclosingType();
+            Type? enclosingType = underlyingType.GetEnclosingType();
 
-                    if (enclosingType is not null)
-                        FEnclosingType = CreateFrom(enclosingType);
-                }
-                return FEnclosingType;
-            }
-        }
+            return enclosingType is not null
+                ? CreateFrom(enclosingType)
+                : null;
+        });
+        public ITypeInfo? EnclosingType => FEnclosingType.Value;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingType
             .GetAllInterfaces()
             .Select(CreateFrom)
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingType.GetBaseType() is not null
             ? FBaseType ??= CreateFrom(UnderlyingType.GetBaseType()!)
@@ -75,42 +68,68 @@ namespace Solti.Utils.Proxy.Internals
 
         public virtual string Name => UnderlyingType.GetFriendlyName();
 
-        public RefType RefType => UnderlyingType.GetRefType();
-
-        private ITypeInfo? FElementType;
-        public ITypeInfo? ElementType
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<TypeInfoFlags> FFlags = new(() =>
         {
-            get
-            {
-                if (FElementType is null)
-                {
-                    Type? realType = UnderlyingType.GetElementType();
+            TypeInfoFlags flags = TypeInfoFlags.None;
 
-                    if (realType is not null)
-                        FElementType = CreateFrom(realType);
-                }
-                return FElementType;
-            }
-        }
+            if (underlyingType == typeof(void))
+                flags |= TypeInfoFlags.IsVoid;
 
-        //
-        // In case of "Cica<T>.Mica<TT>", "TT" is embedded which is inappropriate to us
-        //
+            if (underlyingType.IsDelegate())
+                flags |= TypeInfoFlags.IsDelegate;
 
-        public bool IsNested => UnderlyingType.IsNested() && !IsGenericParameter;
+            if ((underlyingType.GetInnermostElementType() ?? underlyingType).IsGenericParameter)
+                flags |= TypeInfoFlags.IsGenericParameter;
 
-        public bool IsInterface => UnderlyingType.IsInterface;
+            if (underlyingType.IsNested() && !flags.HasFlag(TypeInfoFlags.IsGenericParameter))
+                flags |= TypeInfoFlags.IsNested;
 
+            if (underlyingType.IsInterface)
+                flags |= TypeInfoFlags.IsInterface;
+
+            if (underlyingType.IsClass())
+                flags |= TypeInfoFlags.IsClass;
+
+            if (underlyingType.IsSealed)
+                flags |= TypeInfoFlags.IsFinal;
+                
+            if (underlyingType.IsAbstract())
+                flags |= TypeInfoFlags.IsAbstract;
+
+            return flags;
+        });
+        public TypeInfoFlags Flags => FFlags.Value;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private RefType? FRefType;
+        public RefType RefType => FRefType ??= UnderlyingType.GetRefType();
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<ITypeInfo?> FElementType = new(() =>
+        {
+            Type? realType = underlyingType.GetElementType();
+
+            return realType is not null
+                ? CreateFrom(realType)
+                : null;
+        }) ;
+        public ITypeInfo? ElementType => FElementType.Value;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingType
             .ListProperties(includeStatic: true)
             .Select(MetadataPropertyInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingType
             .ListEvents(includeStatic: true)
             .Select(MetadataEventInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
         //
@@ -118,77 +137,72 @@ namespace Solti.Utils.Proxy.Internals
         //
 
         private static bool ShouldSkip(MethodInfo m) =>
-            (m.DeclaringType.IsClass && m.Name == "Finalize") || // destructor
-            (m.DeclaringType.IsArray && m.Name == "Get") || // = array[i]
+            (m.DeclaringType.IsClass && m.Name == "Finalize") ||  // destructor
+            (m.DeclaringType.IsArray && m.Name == "Get") ||  // = array[i]
             (m.DeclaringType.IsArray && m.Name == "Set") ||  // array[i] =
-            (m.DeclaringType.IsArray && m.Name == "Address") || // = ref array[i]
-            (typeof(Delegate).IsAssignableFrom(m.DeclaringType) && m.Name == "Invoke") // delegate.Invoke(...)
-#if DEBUG
-            //
-            // https://github.com/OpenCover/opencover/blob/master/main/OpenCover.Profiler/CodeCoverage_Cuckoo.cpp
-            //
+            (m.DeclaringType.IsArray && m.Name == "Address");  // = ref array[i]
 
-            || new string[] { "SafeVisited", "VisitedCritical" }.IndexOf(m.Name) >= 0
-#endif
-        ;
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingType
             .ListMethods(includeStatic: true)
-            .Where(meth => !ShouldSkip(meth))
+            .Where(static meth => !ShouldSkip(meth))
             .Select(MetadataMethodInfo.CreateFrom)
+            .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingType
                 .GetDeclaredConstructors()
                 .Select(static ctor => (IConstructorInfo) MetadataMethodInfo.CreateFrom(ctor))
+                .Sort()
                 .ToImmutableList();
 
-        public string? AssemblyQualifiedName => QualifiedName is not null //  (UnderlyingType.IsGenericType ? UnderlyingType.GetGenericTypeDefinition() : UnderlyingType).AssemblyQualifiedName;
-            ? $"{QualifiedName}, {UnderlyingType.Assembly}"
-            : null;
-
-        public bool IsGenericParameter => (UnderlyingType.GetInnermostElementType() ?? UnderlyingType).IsGenericParameter;
-
-        public string? QualifiedName => UnderlyingType.GetQualifiedName();
-
-        public bool IsClass => UnderlyingType.IsClass();
-
-        public bool IsFinal => UnderlyingType.IsSealed;
-
-        public bool IsAbstract => UnderlyingType.IsAbstract();
-
-        private IHasName? FContainingMember;
-        public IHasName? ContainingMember
-        {
-            get
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FAssemblyQualifiedName = new
+        (
+            () =>
             {
-                if (FContainingMember is null)
-                {
-                    Type concreteType = UnderlyingType.GetInnermostElementType() ?? UnderlyingType;
-
-                    FContainingMember = concreteType switch
-                    {
-                        _ when concreteType.IsGenericParameter && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
-                        _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
-                        _ => null
-                    };
-                }
-                return FContainingMember;
+                string? qualifiedName = underlyingType.GetQualifiedName();
+                return qualifiedName is not null
+                    ? $"{qualifiedName}, {underlyingType.Assembly}"
+                    : null;
             }
-        }
+        );
+        public string? AssemblyQualifiedName => FAssemblyQualifiedName.Value;
 
-        public AccessModifiers AccessModifiers => UnderlyingType.GetAccessModifiers();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FQualifiedName = new(() => underlyingType.GetQualifiedName());
+        public string? QualifiedName => FQualifiedName.Value;
 
-        private sealed class MetadataGenericTypeInfo : MetadataTypeInfo, IGenericTypeInfo
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            public MetadataGenericTypeInfo(Type underlyingType) : base(underlyingType) { }
+            Type concreteType = underlyingType.GetInnermostElementType() ?? underlyingType;
 
-            public bool IsGenericDefinition => UnderlyingType
+            return concreteType switch
+            {
+                { IsGenericParameter: true, DeclaringMethod: not null } => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
+                _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
+                _ => null
+            };
+        });
+        public IHasName? ContainingMember => FContainingMember.Value;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private AccessModifiers? FAccessModifiers;
+        public AccessModifiers AccessModifiers => FAccessModifiers ??= UnderlyingType.GetAccessModifiers();
+
+        private sealed class MetadataGenericTypeInfo(Type underlyingType) : MetadataTypeInfo(underlyingType), IGenericTypeInfo
+        {
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            private bool? FIsGenericDefinition;
+            public bool IsGenericDefinition => FIsGenericDefinition ??= UnderlyingType
                 .GetGenericArguments()
                 .Any(static ga => ga.IsGenericParameter);
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingType
                 .GetOwnGenericArguments()
@@ -199,9 +213,16 @@ namespace Solti.Utils.Proxy.Internals
                 ? base.Name
                 : GenericDefinition.Name;
 
-            public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            private IGenericTypeInfo? FGenericDefinition;
+            public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints =>
+                //
+                // We never generate open generic proxies so implementing this property not required
+                //
+
+                throw new NotImplementedException();
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
@@ -211,18 +232,14 @@ namespace Solti.Utils.Proxy.Internals
                 Type[] gas = new Type[genericArgs.Length];
 
                 for (int i = 0; i < genericArgs.Length; i++)
-                {
                     gas[i] = genericArgs[i].ToMetadata();
-                }
 
                 return (IGenericTypeInfo) CreateFrom(UnderlyingType.MakeGenericType(gas));
             }
         }
 
-        private sealed class MetadataArrayTypeInfo : MetadataTypeInfo, IArrayTypeInfo 
+        private sealed class MetadataArrayTypeInfo(Type underlyingType) : MetadataTypeInfo(underlyingType), IArrayTypeInfo 
         {
-            public MetadataArrayTypeInfo(Type underlyingType) : base(underlyingType) { }
-
             public int Rank => UnderlyingType.GetArrayRank();
         }
     }

@@ -136,6 +136,6 @@
     <value>Type embedding failed</value>
   </data>
   <data name="TE_FAILED_FULL" xml:space="preserve">
-    <value>Type embedding failed: {0} - Details stored in: {1}</value>
+    <value>Type embedding failed: {0}</value>
   </data>
 </root>

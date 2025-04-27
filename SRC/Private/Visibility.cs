@@ -19,25 +19,23 @@ namespace Solti.Utils.Proxy.Internals
 
             if (am.HasFlag(AccessModifiers.Internal))
             {
-                bool grantedByAttr = method
-                    .DeclaringType
-                    .DeclaringAssembly
-                    ?.IsFriend(assemblyName) is true;
-
-                if (grantedByAttr)
+                if (IsFriend())
                     return;
 
                 if (!am.HasFlag(AccessModifiers.Protected) /*protected-internal*/)
-                {
-                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
-                }
+                    ThrowIVTRequired();
             }
 
             if (am.HasFlag(AccessModifiers.Protected)) 
             {
                 if (allowProtected)
+                {
+                    if (am.HasFlag(AccessModifiers.Private) /*private-protected*/ && !IsFriend())
+                        ThrowIVTRequired();
+
                     return;
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+                }
+                ThrowNotVisible();
             }
 
             //
@@ -48,52 +46,36 @@ namespace Solti.Utils.Proxy.Internals
                 return; // The method is visible after a type-cast
 
             if (am is AccessModifiers.Private)
-                throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+                ThrowNotVisible();
 
             Assert(am is AccessModifiers.Public, $"Unknown AccessModifier: {am}");
+
+            bool IsFriend() => method.DeclaringType.DeclaringAssembly?.IsFriend(assemblyName) is true;
+
+            void ThrowNotVisible() => throw new MemberAccessException(string.Format(Resources.Culture, Resources.METHOD_NOT_VISIBLE, method.Name));
+
+            void ThrowIVTRequired() => throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, method.Name, assemblyName));
         }
 
-        public static void Check(IPropertyInfo property, string assemblyName, bool checkGet = true, bool checkSet = true, bool allowProtected = false) 
+        public static void Check(IPropertyInfo property, string assemblyName, bool allowProtected = false) 
         {
-            if (checkGet) 
-            {
-                IMethodInfo? get = property.GetMethod;
-                Assert(get is not null, "property.GetMethod == NULL");
+            if (property.GetMethod is not null) 
+                Check(property.GetMethod, assemblyName, allowProtected);
 
-                Check(get!, assemblyName, allowProtected);
-            }
-
-            if (checkSet)
-            {
-                IMethodInfo? set = property.SetMethod;
-                Assert(set is not null, "property.SetMethod == NULL");
-
-                Check(set!, assemblyName, allowProtected);
-            }
+            if (property.SetMethod is not null)
+                Check(property.SetMethod, assemblyName, allowProtected);
         }
 
-        public static void Check(IEventInfo @event, string assemblyName, bool checkAdd = true, bool checkRemove = true, bool allowProtected = false) 
+        public static void Check(IEventInfo @event, string assemblyName, bool allowProtected = false) 
         {
-            if (checkAdd)
-            {
-                IMethodInfo? add = @event.AddMethod;
-                Assert(add is not null, "event.AddMethod == NULL");
+            Check(@event.AddMethod, assemblyName, allowProtected);
 
-                Check(add!, assemblyName, allowProtected);
-            }
-
-            if (checkRemove)
-            {
-                IMethodInfo? remove = @event.RemoveMethod;
-                Assert(remove is not null, "event.RemoveMethod == NULL");
-
-                Check(remove!, assemblyName, allowProtected);
-            }
+            Check(@event.RemoveMethod, assemblyName, allowProtected);
         }
 
         public static void Check(ITypeInfo type, string assemblyName)
         {
-            if (type.IsGenericParameter)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return;
 
             //
@@ -110,16 +92,12 @@ namespace Solti.Utils.Proxy.Internals
             // In case of generics we have to inspect all the generic arguments, too
             //
 
-            if (type is IGenericTypeInfo genericType)
+            if (type is IGenericTypeInfo genericType && !genericType.IsGenericDefinition)
             {
                 foreach (ITypeInfo ga in genericType.GenericArguments)
-                {
                     Check(ga, assemblyName);
-                }
 
-                if (!genericType.IsGenericDefinition)
-                    Check(genericType.GenericDefinition, assemblyName);
-
+                Check(genericType.GenericDefinition, assemblyName);
                 return;
             }
 
@@ -128,7 +106,7 @@ namespace Solti.Utils.Proxy.Internals
 
             switch (type.AccessModifiers) 
             {
-                case AccessModifiers.Private:
+                case AccessModifiers.Private: case AccessModifiers.Protected when type.Flags.HasFlag(TypeInfoFlags.IsNested):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
                 case AccessModifiers.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));

@@ -21,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
 
         private static IReadOnlyDictionary<string, ISupportsSourceGeneration> GetSourceFactories()
         {
-            Dictionary<string, ISupportsSourceGeneration> result = new();
+            Dictionary<string, ISupportsSourceGeneration> result = [];
 
             foreach (Type type in typeof(Generator).Assembly.GetExportedTypes())
             {
@@ -39,23 +39,14 @@ namespace Solti.Utils.Proxy.Internals
             return result;
         }
 
-        private static ReferenceCollector? CreateReferenceCollector() =>
-            //
-            // Collectiong references required only when dumping the source
-            //
-
-            WorkingDirectories.Instance.SourceDump is not null
-                ? new ReferenceCollector()
-                : null;
-
-        protected static ProxyUnitSyntaxFactory CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation)
+        private static ProxyUnitSyntaxFactoryBase CreateMainUnit(INamedTypeSymbol generator, CSharpCompilation compilation, SyntaxFactoryContext context)
         {
             return SourceFactories.TryGetValue(generator.GetQualifiedMetadataName()!, out ISupportsSourceGeneration ssg)
                 ? ssg.CreateMainUnit
                 (
                     generator,
                     compilation,
-                    CreateReferenceCollector()
+                    context
                 )
                 : throw new InvalidOperationException
                 (
@@ -68,7 +59,7 @@ namespace Solti.Utils.Proxy.Internals
                 );
         }
 
-        protected static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation)
+        private static IEnumerable<UnitSyntaxFactoryBase> CreateChunks(CSharpCompilation compilation, SyntaxFactoryContext context)
         {
             INamedTypeSymbol? miaSym = compilation.GetTypeByMetadataName(typeof(ModuleInitializerAttribute).FullName);
 
@@ -92,7 +83,7 @@ namespace Solti.Utils.Proxy.Internals
                     yield break;
             }
 
-            yield return new ModuleInitializerSyntaxFactory(OutputType.Unit, CreateReferenceCollector(), compilation.LanguageVersion);
+            yield return new ModuleInitializerSyntaxFactory(context);
         }
     }
 }

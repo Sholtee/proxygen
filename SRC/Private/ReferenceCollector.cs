@@ -5,26 +5,26 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal class ReferenceCollector
+    internal sealed class ReferenceCollector: IReferenceCollector
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<IAssemblyInfo> FReferences = new(IAssemblyInfoComparer.Instance);
+        public IReadOnlyCollection<IAssemblyInfo> References => [..FReferences.OrderBy(static r => r.Name)];
 
-        public IReadOnlyCollection<IAssemblyInfo> References => FReferences;
-
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly HashSet<ITypeInfo> FTypes = new(ITypeInfoComparer.Instance);
+        public IReadOnlyCollection<ITypeInfo> Types => [..FTypes.OrderBy(static t => t.QualifiedName)];
 
-        public IReadOnlyCollection<ITypeInfo> Types => FTypes;
-
-        protected internal void AddType(ITypeInfo type) 
+        public void AddType(ITypeInfo type) 
         {
-            IGenericTypeInfo? genericType = type as IGenericTypeInfo;
-
-            if (genericType?.IsGenericDefinition is true)
+            if (type.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
                 return;
 
             if (!FTypes.Add(type)) // circular reference fix
@@ -58,7 +58,7 @@ namespace Solti.Utils.Proxy.Internals
             // Generic parameters may come from different assemblies.
             //
 
-            if (genericType is not null)
+            if (type is IGenericTypeInfo genericType)
                 AddTypesFrom(genericType.GenericArguments);
 
             //

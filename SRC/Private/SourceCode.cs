@@ -12,20 +12,14 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SourceCode 
+    internal sealed class SourceCode(string hint, CompilationUnitSyntax unit)
     {
-        public string Hint { get; }
+        public string Hint { get; } = hint;
 
-        public SourceText Value { get; }
-
-        public SourceCode(string hint, CompilationUnitSyntax unit) 
-        {
-            Hint = hint;
-            Value = SourceText.From
-            (
-                unit.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
-                Encoding.UTF8
-            );
-        }
+        public SourceText Value { get; } = SourceText.From
+        (
+            unit.NormalizeWhitespace(eol: Environment.NewLine).ToFullString(),
+            Encoding.UTF8
+        );
     }
 }

@@ -154,11 +154,18 @@ namespace Solti.Utils.Proxy.Internals.Tests
             Assert.AreEqual("System.Int32", Internals.TypeExtensions.GetFriendlyName(refType));
         }
 
-        [Test]
-        public void GetOwnGenericArguments_ShouldDoWhatTheNameSuggests() 
+        public static IEnumerable<Type> GetOwnGenericArguments_ShouldReturnGenericArgumentsDeclaredOnTheTargetType_Params
         {
-            Type child = typeof(GenericParent<>.GenericChild<>);
+            get
+            {
+                yield return typeof(GenericParent<>.GenericChild<>);
+                yield return typeof(GenericParent<int>.GenericChild<string>);
+            }
+        }
 
+        [TestCaseSource(nameof(GetOwnGenericArguments_ShouldReturnGenericArgumentsDeclaredOnTheTargetType_Params))]
+        public void GetOwnGenericArguments_ShouldReturnGenericArgumentsDeclaredOnTheTargetType(Type child) 
+        {
             Assert.That(child.GetGenericArguments().Length, Is.EqualTo(2));
             Assert.That(child.GetOwnGenericArguments().SequenceEqual(child.GetGenericArguments().Skip(1)));
         }

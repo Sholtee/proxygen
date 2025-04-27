@@ -1,7 +1,22 @@
 global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c)
 {
-    global::System.Object[] args = new global::System.Object[]{a, default(global::System.String), c};
-    global::System.Object result = this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.WrapperDEE7EA963FA18B0FFA714300E3E35F25<TT>.Value));
+    global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F6DED5524BB02EB5ED49F044A93A795D6);
+    global::System.Object[] args = new global::System.Object[]
+    {
+        a,
+        default(global::System.String),
+        c
+    };
+    global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F6DED5524BB02EB5ED49F044A93A795D6, (global::System.Object[] args) =>
+    {
+        global::System.Int32 _a = (global::System.Int32)args[0];
+        global::System.String _b;
+        TT _c = (TT)args[2];
+        global::System.Object result = (this.FTarget ?? throw new global::System.InvalidOperationException()).Foo<TT>(_a, out _b, ref _c);
+        args[1] = (global::System.Object)_b;
+        args[2] = (global::System.Object)_c;
+        return result;
+    }, args, new global::System.Type[] { typeof(TT) }));
     b = (global::System.String)args[1];
     c = (TT)args[2];
     return (global::System.Int32)result;

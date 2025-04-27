@@ -8,7 +8,7 @@
 	<CheckEolTargetFramework>false</CheckEolTargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-	<LangVersion>10</LangVersion>
+	<LangVersion>13</LangVersion>
     <AssemblyName>Solti.Utils.Proxy.Tests</AssemblyName>
     <RootNamespace>Solti.Utils.Proxy.Tests</RootNamespace>
     <Configurations>Debug</Configurations>
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(Variant)' != 'ROSLYN_LEGACY'">
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.*" />
-    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.3.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.10.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.VisualBasic" Version="4.10.*" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(Variant)' == 'ROSLYN_LEGACY'">
@@ -43,29 +43,40 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SRC\ProxyGen.csproj" />
     <ProjectReference Include="..\ProxyGen.Tests.EmbeddedTypes\ProxyGen.Tests.EmbeddedTypes.csproj" />
-    <ProjectReference Include="..\ProxyGen.Tests.External\ProxyGen.Tests.External.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ClsSrcUnit.txt">
+    <None Update="ClsProxySrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="TargetClsSrcModule.txt">
+    <None Update="ClsProxySrcUnit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DelegateProxySrcModule.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DelegateProxySrcUnit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Duck_E40AA6C9C0242588555A55F2A4533DAB.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FuncProxySrcModule.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="FuncProxySrcUnit.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="IfaceProxySrcUnit.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="BarSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="CallbackSrc.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="ClsSrcModule.txt">
+    <None Update="IfaceProxySrcModule.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="DuckClsSrc.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Duck_BDC3F352D7006029026A47DF190814B3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="EventSrc.txt">
@@ -77,16 +88,13 @@
     <None Update="IndexerSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="ListDbg.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="ModuleInitializerAttribute.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="PropSrc.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Proxy_EC92C59252CD801169A8506A0EF1E4F4.dll">
+    <None Update="Proxy_24AA6ACBF0DFAE64A588818FEE12BF26.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

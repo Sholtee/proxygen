@@ -17,25 +17,28 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyEmbedderBase
     {
-        protected static readonly SymbolEqualityComparer SymbolEqualityComparer = SymbolEqualityComparer.Default;
+        protected static SymbolEqualityComparer SymbolEqualityComparer { get; } = SymbolEqualityComparer.Default;
 
-        protected static void Execute(
+        protected static void Execute
+        (
             Compilation cmp,
             AnalyzerConfigOptions configOptions,
             IReadOnlyCollection<INamedTypeSymbol> aotGenerators,
             Action<Diagnostic> reportDiagnostic,
             Action<SourceCode> addSource,
-            CancellationToken cancellation)
+            CancellationToken cancellation
+        )
         {
+            AnalyzerConfig config = new(configOptions);
 #if DEBUG
-            if (SourceGeneratorConfig.Instance.DebugGenerator && !Debugger.IsAttached)
+            if (config.DebugGenerator && !Debugger.IsAttached)
                 Debugger.Launch();
 #endif
             //
-            // Only C# 7.0+ is supported
+            // Only C# 9.0+ is supported
             //
 
-            if (cmp is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp7 } compilation)
+            if (cmp is not CSharpCompilation { LanguageVersion: >= LanguageVersion.CSharp9 } compilation)
             {
                 reportDiagnostic
                 (
@@ -47,10 +50,17 @@ namespace Solti.Utils.Proxy.Internals
             if (!aotGenerators.Any())
                 return;
 
-            IConfigReader configReader = new AnalyzerConfigReader(configOptions);
+            using LoggerFactory loggerFactory = new(config);
 
-            WorkingDirectories.Setup(configReader);
-            SourceGeneratorConfig.Setup(configReader);
+            ILogger logger = loggerFactory.CreateLogger($"SourceGenerator-{cmp.AssemblyName}-{Guid.NewGuid():N}");
+
+            SyntaxFactoryContext context = new()
+            {
+                OutputType = OutputType.Unit,
+                LanguageVersion = compilation.LanguageVersion,
+                AssemblyNameOverride = compilation.Assembly.Name,
+                LoggerFactory = loggerFactory
+            };
 
             int extensionCount = 0;
 
@@ -58,15 +68,15 @@ namespace Solti.Utils.Proxy.Internals
             {
                 Location location = generator.Locations[0];  // don't use Single() here
 
+                logger.Log(LogLevel.Info, "PREM-200", $"Found generator ({generator.Name}) in location: {location}");
+
                 try
                 {
                     generator.EnsureNotError();
 
-                    ExtendWith
-                    (
-                        CreateMainUnit(generator, compilation),
-                        location
-                    );
+                    ProxyUnitSyntaxFactoryBase mainUnit = CreateMainUnit(generator, compilation, context);
+
+                    ExtendWith(mainUnit, location);
 
                     extensionCount++;
                 }
@@ -75,6 +85,8 @@ namespace Solti.Utils.Proxy.Internals
                     //
                     // Jump to the next generator
                     //
+
+                    logger.Log(LogLevel.Info, "PREM-201", $"Invalid generator symbol in location: {location}. Skipping");
                 }
                 catch (Exception e)
                 {
@@ -90,8 +102,10 @@ namespace Solti.Utils.Proxy.Internals
             {
                 try
                 {
-                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation))
+                    foreach (UnitSyntaxFactoryBase chunk in CreateChunks(compilation, context))
                     {
+                        logger.Log(LogLevel.Info, "PREM-202", "Applying chunk", new Dictionary<string, object?> { ["Name"] = chunk.ExposedClass });
+
                         ExtendWith(chunk, Location.None);
                     }
                 }
@@ -103,17 +117,16 @@ namespace Solti.Utils.Proxy.Internals
 
             void ReportError(Exception ex, Location location) => reportDiagnostic
             (
-                Diagnostics.PGE01
-                (
-                    location,
-                    ex.Message,
-                    LogException(ex, cancellation) ?? "NULL"
-                )
+                Diagnostics.PGE01(location, ex.Message)
             );
 
             void ExtendWith(UnitSyntaxFactoryBase syntaxFactory, Location location)
             {
-                SourceCode source = syntaxFactory.GetSourceCode(cancellation); 
+                SourceCode source = new
+                (
+                    $"{syntaxFactory.ExposedClass}.cs",
+                    syntaxFactory.ResolveUnit(null!, cancellation)
+                );
 
                 addSource(source);
 

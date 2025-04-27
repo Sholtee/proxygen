@@ -2,13 +2,28 @@ global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFacto
 {
     get
     {
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F1666AD268EDC7839CF072E87227E9335);
         global::System.Object[] args = new global::System.Object[0];
-        return (global::System.Int32)this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F36800AD4553C8E13BEEE3C1DEE3EF22B));
+        global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F1666AD268EDC7839CF072E87227E9335, (global::System.Object[] args) =>
+        {
+            global::System.Object result = (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop;
+            return result;
+        }, args, new global::System.Type[0]));
+        return (global::System.Int32)result;
     }
 
     set
     {
-        global::System.Object[] args = new global::System.Object[]{value};
-        this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F8236DF1B3F472BCDAE2FEF2D45620331));
+        global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F1481120FC9DA1A152C56B72C6EC8CFB6);
+        global::System.Object[] args = new global::System.Object[]
+        {
+            value
+        };
+        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F1481120FC9DA1A152C56B72C6EC8CFB6, (global::System.Object[] args) =>
+        {
+            global::System.Int32 _value = (global::System.Int32)args[0];
+            (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop = _value;
+            return null;
+        }, args, new global::System.Type[0]));
     }
 }

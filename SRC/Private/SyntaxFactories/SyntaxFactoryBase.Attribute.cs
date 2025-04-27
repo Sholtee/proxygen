@@ -4,7 +4,9 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected AttributeSyntax ResolveAttribute(Type attribute, params ExpressionSyntax[] paramz)
+        protected AttributeSyntax ResolveAttribute(Type attribute, params IEnumerable<ExpressionSyntax> paramz)
         {
             Debug.Assert(typeof(Attribute).IsAssignableFrom(attribute));
 
@@ -26,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
                 (NameSyntax) ResolveType(MetadataTypeInfo.CreateFrom(attribute))
             );
 
-            if (paramz.Length > 0) attr = attr.WithArgumentList
+            if (paramz.Any()) attr = attr.WithArgumentList
             (
                 argumentList: AttributeArgumentList
                 (
@@ -40,6 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected AttributeSyntax ResolveAttribute<TAttribute>(params ExpressionSyntax[] paramz) where TAttribute : Attribute => ResolveAttribute(typeof(TAttribute), paramz);
+        protected AttributeSyntax ResolveAttribute<TAttribute>(params IEnumerable<ExpressionSyntax> paramz) where TAttribute : Attribute =>
+            ResolveAttribute(typeof(TAttribute), paramz);
     }
 }

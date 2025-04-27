@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -92,12 +93,12 @@ namespace Solti.Utils.Proxy.Internals
         {
             src = src.GetInnermostElementType() ?? src;
 
-            if (src.IsGenericParameter)
-                return null;
-
             Type? enclosingType = src.DeclaringType;
             if (enclosingType is null)
                 return null;
+
+            if (src.IsGenericParameter)
+                return enclosingType;
 
             //
             // "Cica<T>.Mica<TT>.Kutya" counts as generic, too: In open form it is returned as Cica<T>.Mica<TT>.Kutya<T, TT>
@@ -197,12 +198,14 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private static IEnumerable<TMember> ListMembersInternal<TMember>(
+        private static IEnumerable<TMember> ListMembersInternal<TMember>
+        (
             this Type src, 
             Func<Type, BindingFlags, TMember[]> getter, 
             Func<TMember, MethodInfo> getUnderlyingMethod, 
             Func<TMember, MethodInfo?> getOverriddenMethod, 
-            bool includeStatic) where TMember: MemberInfo
+            bool includeStatic
+        ) where TMember: MemberInfo
         {
             if (src.IsGenericParameter)
                 yield break;
@@ -229,46 +232,38 @@ namespace Solti.Utils.Proxy.Internals
                 flags |= BindingFlags.Static;
 
             if (src.IsInterface)
-            {
-                foreach (Type t in src.GetHierarchy())
-                {
-                    foreach (TMember member in getter(t, flags))
-                    {
-                        yield return member;
-                    }
-                }
-            }
+                foreach (TMember member in GetMembers())
+                    yield return member;
             else
             {
-                HashSet<MethodInfo> overriddenMethods = new();
+                HashSet<MethodInfo> overriddenMethods = [];
 
                 //
                 // Order matters: we're processing the hierarchy towards the ancestor
                 //
 
-                foreach (Type t in src.GetHierarchy())
+                foreach (TMember member in GetMembers())
                 {
-                    foreach (TMember member in getter(t, flags))
-                    {
-                        MethodInfo? 
-                            overriddenMethod = getOverriddenMethod(member),
-                            underlyingMethod = getUnderlyingMethod(member);
+                    MethodInfo? 
+                        overriddenMethod = getOverriddenMethod(member),
+                        underlyingMethod = getUnderlyingMethod(member);
 
-                        if (overriddenMethod is not null)
-                            overriddenMethods.Add(overriddenMethod);
+                    if (overriddenMethod is not null)
+                        overriddenMethods.Add(overriddenMethod);
 
-                        if (overriddenMethods.Contains(underlyingMethod))
-                            continue;
+                    if (overriddenMethods.Contains(underlyingMethod))
+                        continue;
 
-                        //
-                        // If it was not yielded before (due to "new" or "override") and not private then we are fine.
-                        //
+                    //
+                    // If it was not yielded before (due to "new" or "override") and not private then we are fine.
+                    //
 
-                        if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
-                            yield return member;
-                    }
+                    if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
+                        yield return member;
                 }
             }
+
+            IEnumerable<TMember> GetMembers() => src.GetHierarchy().SelectMany(t => getter(t, flags));
         }
 
         public static IEnumerable<ConstructorInfo> GetDeclaredConstructors(this Type type)
@@ -282,15 +277,12 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             foreach (ConstructorInfo ctor in type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
-            {
-                if (ctor.GetAccessModifiers() > AccessModifiers.Private)
-                    yield return ctor;
-            }
+                yield return ctor;
         }
 
         public static IEnumerable<Type> GetBaseTypes(this Type type) 
         {
-            for (Type? baseType = type.GetBaseType(); baseType is not null; baseType = baseType.GetBaseType())
+            for (Type? baseType = type; (baseType = baseType!.GetBaseType()) is not null; )
                 yield return baseType;
         }
 
@@ -307,10 +299,11 @@ namespace Solti.Utils.Proxy.Internals
             yield return src;
 
             foreach (Type t in src.IsInterface ? src.GetAllInterfaces() : src.GetBaseTypes())
-            {
                 yield return t;
-            }
         }
+
+        public static bool IsDelegate(this Type src) =>
+            (src.GetInnermostElementType() ?? src).GetBaseTypes().Contains(typeof(Delegate)) && src != typeof(MulticastDelegate);
 
         public static IEnumerable<Type> GetOwnGenericArguments(this Type src)
         {
@@ -322,81 +315,92 @@ namespace Solti.Utils.Proxy.Internals
             // while in closed as "Cica<T>.Mica<TT>.Kutya<TConcrete1, TConcrete2>".
             //
 
-            IReadOnlyList<Type> 
+            Type[] 
                 closedArgs = src.GetGenericArguments(),
                 openArgs = (src = src.GetGenericTypeDefinition()).GetGenericArguments();
 
-            for(int i = 0; i < openArgs.Count; i++)
+            for(int i = 0; i < openArgs.Length; i++)
             {
+                Type openArg = openArgs[i];
+
                 bool own = true;
                 for (Type? parent = src; (parent = parent!.DeclaringType) is not null;)
-                {
                     //
-                    // GetGenericArguments() may return empty array if "parent" is not generic
+                    // GetGenericArguments() will return empty array if "parent" is not generic
                     //
 
-                    if (parent.GetGenericArguments().Any(arg => ArgumentComparer.Instance.Equals(arg, openArgs[i])))
+                    if (parent.GetGenericArguments().Any(arg => openArg.IsGenericParameter ? arg.IsGenericParameter && arg.Name == openArg.Name : arg == openArg))
                     {
                         own = false;
                         break;
                     }
-                }
+
                 if (own) 
                     yield return closedArgs[i];
             } 
         }
 
+        /// <summary>
+        /// Associates <see cref="AccessModifiers"/> to the given <see cref="Type"/>.
+        /// </summary>
+        /// <remarks>Since this method may use reflection to determine the result, callers better cache the returned data</remarks>
         public static AccessModifiers GetAccessModifiers(this Type src)
         {
             src = src.GetInnermostElementType() ?? src;
 
             AccessModifiers am = src switch
             {
-                _ when (src.IsPublic && src.IsVisible) || src.IsNestedPublic => AccessModifiers.Public,
-                _ when src.IsNestedFamily => AccessModifiers.Protected,
-                _ when src.IsNestedFamORAssem => AccessModifiers.Protected | AccessModifiers.Internal,
-                _ when src.IsNestedFamANDAssem => AccessModifiers.Protected | AccessModifiers.Private,
-                _ when src.IsNestedAssembly || (!src.IsVisible && !src.IsNested) => AccessModifiers.Internal,
-                _ when src.IsNestedPrivate => AccessModifiers.Private,
-                #pragma warning disable CA2201 // In theory we should never reach here.
-                _ => throw new Exception(Resources.UNDETERMINED_ACCESS_MODIFIER)
-                #pragma warning restore CA2201
+                { IsPublic: true, IsVisible: true } or { IsNestedPublic: true } => AccessModifiers.Public,
+                { IsNestedFamily: true } => AccessModifiers.Protected,
+                { IsNestedFamORAssem: true } => AccessModifiers.Protected | AccessModifiers.Internal,
+                { IsNestedFamANDAssem: true }  => AccessModifiers.Protected | AccessModifiers.Private,
+                { IsNestedAssembly: true } or { IsVisible: false, IsNested: false } => AccessModifiers.Internal,
+                { IsNestedPrivate: true } => AccessModifiers.Private,
+                _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
             };
+
+            if (src.IsGenericParameter)
+                return am;
 
             //
             // Generic arguments may impact the visibility.
             //
 
             if (src.IsConstructedGenericType)
-            {
                 foreach (Type ga in src.GetGenericArguments())
-                {
-                    AccessModifiers gaAm = ga.GetAccessModifiers();
-                    if (gaAm < am)
-                        am = gaAm;
-                }
-            }
+                    UpdateAm(ref am, ga);
 
             Type? enclosingType = src.GetEnclosingType();
             if (enclosingType is not null)
-            {
-                AccessModifiers etAm = enclosingType.GetAccessModifiers();
-                if (etAm < am)
-                    am = etAm;
-            }
+                UpdateAm(ref am, enclosingType);
 
             return am;
+
+            static void UpdateAm(ref AccessModifiers am, Type t)
+            {
+                AccessModifiers @new = t.GetAccessModifiers();
+                if (@new < am)
+                    am = @new;
+            }
         }
 
+        /// <summary>
+        /// Associates <see cref="RefType"/> to the given <see cref="Type"/>.
+        /// </summary>
+        /// <remarks>Since this method may inspect attributes to determine the result, callers better cache the returned data.</remarks>
         public static RefType GetRefType(this Type src) => src switch
         {
-            _ when
-            #if NETSTANDARD2_1_OR_GREATER
-                src.IsByRefLike ||
-            #endif
-                src.GetCustomAttributes().Any(static ca => ca.GetType().FullName?.Equals("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.OrdinalIgnoreCase) is true) => RefType.Ref, // ref struct
-            _ when src.IsPointer => RefType.Pointer,
-            _ when src.IsArray => RefType.Array,
+#if NETSTANDARD2_1_OR_GREATER
+            { IsByRefLike: true }
+#else
+            _ when src
+                    .GetCustomAttributes()
+                    .Select(static ca => ca.GetType().FullName)
+                    .Contains("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparer.OrdinalIgnoreCase)
+#endif
+                => RefType.Ref, // ref struct
+            { IsPointer: true } => RefType.Pointer,
+            { IsArray: true } => RefType.Array,
             _ => RefType.None
         };
 
@@ -418,5 +422,101 @@ namespace Solti.Utils.Proxy.Internals
         private static readonly Func<Type, bool> FIsFunctionPointerCore = GetIsFunctionPointerCore();
 
         public static bool IsFunctionPointer(this Type src) => FIsFunctionPointerCore(src);
+
+        public static IEnumerable<Type> GetGenericConstraints(this Type src, MemberInfo declaringMember)
+        {
+            foreach(Type gpc in src.GetGenericParameterConstraints())
+            {      
+                //
+                // We don't want a
+                //     "where TT : struct, global::System.ValueType"
+                //
+
+                if (gpc == typeof(ValueType) && src.GenericParameterAttributes.HasFlag(GenericParameterAttributes.NotNullableValueTypeConstraint))
+                    continue;
+
+                Type? declaringType = declaringMember switch
+                {
+                    MethodInfo method => method.DeclaringType,
+                    Type type => type.DeclaringType,
+                    _ => null
+                };
+                if (declaringType?.IsConstructedGenericType is true)
+                {
+                    //
+                    // Get the specialized constraint from the declaring member
+                    // (note that gpc.DeclaringXxX always returns the generic definition)
+                    //
+
+                    int position = declaringType.GetGenericTypeDefinition().GetGenericArguments().IndexOf(gpc);
+                    if (position >= 0)
+                    {
+                        yield return declaringType.GetGenericArguments()[position];
+                        continue;
+                    }
+                }
+
+                yield return gpc;
+            }
+        }
+
+        public static int GetGenericParameterIndex(this Type src)
+        {
+            if (!src.IsGenericParameter)
+                return 0;
+
+            return src.DeclaringMethod is not null
+                ? GetIndex(src.DeclaringMethod.GetGenericArguments(), src)
+                : GetIndex(src.DeclaringType.GetGenericArguments(), src) * -1;
+
+            static int GetIndex(IEnumerable<Type> gas, Type src)
+            {
+                int result = gas.Select(static t => t.Name).IndexOf(src.Name);
+                Debug.Assert(result >= 0);
+
+                return result + 1;
+            }
+        }
+
+        public static bool EqualsTo(this Type src, Type that)
+        {
+            if (!GetBasicProps(src).Equals(GetBasicProps(that)))
+                return false;
+
+            Type? srcElement = src.GetElementType();
+            if (srcElement is not null)
+            {
+                Type? thatElement = that.GetElementType();
+                return thatElement is not null && srcElement.EqualsTo(thatElement);
+            }
+
+            if (src.IsGenericType)
+                return 
+                    that.IsGenericType && 
+                    src.GetGenericTypeDefinition().Equals(that.GetGenericTypeDefinition()) && 
+                    src.GetGenericArguments().SequenceEqual(that.GetGenericArguments(), TypeComparer.Instance);
+
+            if (src.IsGenericParameter)
+                return that.IsGenericParameter && src.GetGenericParameterIndex() == that.GetGenericParameterIndex();
+                
+            return src == that;
+
+            static object GetBasicProps(Type t) => new
+            {
+                t.IsPrimitive,
+                t.IsPointer,
+                t.IsEnum,
+                t.IsValueType,
+                t.IsArray,
+                t.IsByRef
+            };
+        }
+
+        private sealed class TypeComparer : ComparerBase<TypeComparer, Type>
+        {
+            public override bool Equals(Type x, Type y) => x.EqualsTo(y);
+
+            public override int GetHashCode(Type obj) => throw new NotImplementedException();
+        }
     }
 }

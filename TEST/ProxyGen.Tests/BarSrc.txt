@@ -1,5 +1,10 @@
 void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar()
 {
+    global::Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref global::Dummy.F3B606FE3C22242AFF40CD772EDD0F7D4);
     global::System.Object[] args = new global::System.Object[0];
-    this.Invoke(new global::Solti.Utils.Proxy.InvocationContext(args, global::Dummy.F5E3B2780A596B1EF75378976B5406D84));
+    ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F3B606FE3C22242AFF40CD772EDD0F7D4, (global::System.Object[] args) =>
+    {
+        (this.FTarget ?? throw new global::System.InvalidOperationException()).Bar();
+        return null;
+    }, args, new global::System.Type[0]));
 }

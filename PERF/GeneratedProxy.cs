@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -23,9 +22,6 @@ namespace Solti.Utils.Proxy.Perf
 
         private IInterface FInstance;
 
-        private static async Task<TInterface> CreateProxy<TInterface, TInterceptor>(ITuple paramz) where TInterceptor : InterfaceInterceptor<TInterface> where TInterface : class =>
-            await ProxyGenerator<TInterface, TInterceptor>.ActivateAsync(paramz);
-
         #region Helper classes
         public class Implementation : IInterface
         {
@@ -33,19 +29,14 @@ namespace Solti.Utils.Proxy.Perf
             int IInterface.DoSomething(string param) => 0;
         }
 
-        public class InterfaceProxyWithTarget : InterfaceInterceptor<IInterface>
+        private sealed class InterceptorCallingTheTarget : IInterceptor
         {
-            public InterfaceProxyWithTarget(IInterface target) : base(target)
-            {
-            }
+            public object Invoke(IInvocationContext context) => context.Dispatch();
         }
 
-        public class InterfaceProxyWithoutTarget : InterfaceInterceptor<IInterface>
+        private sealed class InterceptorNotCallingTheTarget: IInterceptor
         {
-            public InterfaceProxyWithoutTarget() : base(null)
-            {
-            }
-            public override object Invoke(InvocationContext context) => 0;
+            public object Invoke(IInvocationContext context) => 1;
         }
 
         public class DispatchProxyWithTarget : DispatchProxy // DispatchProxy cannot support target
@@ -58,10 +49,10 @@ namespace Solti.Utils.Proxy.Perf
         public void SetupNoProxy() => FInstance = new Implementation();
 
         [GlobalSetup(Target = nameof(ProxyWithTarget))]
-        public async Task SetupProxy() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithTarget>(Tuple.Create((IInterface) new Implementation()));
+        public async Task SetupProxy() => FInstance = await InterfaceProxyGenerator<IInterface>.ActivateAsync(new InterceptorCallingTheTarget(), new Implementation());
 
         [GlobalSetup(Target = nameof(ProxyWithoutTarget))]
-        public async Task SetupProxyWithoutTarget() => FInstance = await CreateProxy<IInterface, InterfaceProxyWithoutTarget>(null);
+        public async Task SetupProxyWithoutTarget() => FInstance = await InterfaceProxyGenerator<IInterface>.ActivateAsync(new InterceptorNotCallingTheTarget());
 
         [GlobalSetup(Target = nameof(DispatchProxyWithoutTarget))]
         public void SetupDispatchProxyWithoutTarget() => FInstance = DispatchProxy.Create<IInterface, DispatchProxyWithTarget>();

@@ -26,6 +26,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
     using static Internals.Tests.CodeAnalysisTestsBase;
 
     [TestFixture, Parallelizable(ParallelScope.All)]
+#if LEGACY_COMPILER
+    [Ignore("Roslyn v3 has different formatting rules than v4")]
+#endif
     public sealed class DuckSyntaxFactoryTests : SyntaxFactoryTestsBase
     {
         private static ClassDeclarationSyntax GetDummyClass() => SyntaxFactory.ClassDeclaration("Dummy");
@@ -47,6 +50,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             {
             }
 
+            public T this[int i] { get => default; set { } }
             public T Prop { get; set; }
 
 #pragma warning disable 67  // impliciten hasznalva van
@@ -59,10 +63,10 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         (
             MetadataTypeInfo.CreateFrom(typeof(TInterface)), 
             MetadataTypeInfo.CreateFrom(typeof(TTarget)),
-            asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name,
-            OutputType.Module, 
-            MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<TInterface, TTarget>).Assembly),
-            null
+            SyntaxFactoryContext.Default with
+            {
+                AssemblyNameOverride = asm ?? typeof(DuckSyntaxFactoryTests).Assembly.GetName().Name
+            }
         );
 
         [Test]
@@ -74,13 +78,12 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
         [Test]
-        public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported()
-        {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);")));
-        }
+        public void ResolveMethod_ShouldGenerateTheDesiredMethodIfSupported() =>
+            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => (this.FTarget ?? throw new global::System.InvalidOperationException()).Foo<TT>(a, out b, ref c);")));
 
         public class ExplicitFoo : IFoo<int>
         {
+            public int this[int i] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             int IFoo<int>.Prop { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
             event TestDelegate<int> IFoo<int>.Event
             {
@@ -94,7 +97,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveMethod_ShouldHandleExplicitImplementations()
         {
-            Assert.That(CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: "\n").ToFullString().Equals("[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]\nglobal::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)this.Target).Foo<TT>(a, out b, ref c);")));
+            MemberDeclarationSyntax m = CreateGenerator<IFoo<int>, ExplicitFoo>().ResolveMethods(GetDummyClass(), null).Members.Single(m => m is MethodDeclarationSyntax method && method.Identifier.Text.Contains("Foo"));
+
+            Assert.That(m.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => ((global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>)(this.FTarget ?? throw new global::System.InvalidOperationException())).Foo<TT>(a, out b, ref c);"));
         }
 
         [Test]
@@ -108,7 +113,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveProperty_ShouldGenerateTheDesiredPropertyIfSupported()
         {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(GetDummyClass(), default).Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     set => this.Target.Prop = value; }")));
+            MemberDeclarationSyntax p = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveProperties(GetDummyClass(), default).Members.Single(m => m is PropertyDeclarationSyntax p && p.Identifier.Text.Contains("Prop"));
+
+            Assert.That(p.NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo("global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop; set => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop = value; }"));
         }
 
         [Test]
@@ -122,12 +129,13 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [Test]
         public void ResolveEvent_ShouldGenerateTheDesiredEventIfSupported()
         {
-            Assert.That(CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(GetDummyClass(), null).Members.Any(m => m.NormalizeWhitespace(eol: " ").ToFullString().Equals("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]     remove => this.Target.Event -= value; }")));
+            MemberDeclarationSyntax e = CreateGenerator<IFoo<int>, GoodFoo<int>>().ResolveEvents(GetDummyClass(), null).Members.Single(m => m is EventDeclarationSyntax);
+
+            Assert.That(e.NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo("event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += value; remove => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= value; }"));
         }
 
         [Test]
-        public void ResolveUnit_ShouldGenerateTheDesiredClass()
-        {
+        public void ResolveUnit_ShouldGenerateTheDesiredClass() =>
             Assert.That
             (
                 CreateGenerator<IFoo<int>, GoodFoo<int>>()
@@ -139,9 +147,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                     File
                         .ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "DuckClsSrc.txt"))
                         .Replace("\r", string.Empty)
-#if LEGACY_COMPILER
-                        .Replace(") :", "):")
-#endif
                         .Replace("{version}", typeof(DuckGenerator<,>)
                             .Assembly
                             .GetName()
@@ -149,7 +154,6 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                             .ToString())
                 )
             );
-        }
 
         [Test]
         public void ResolveProperty_ShouldThrowOnAmbiguousImplementation() =>
@@ -169,7 +173,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 .Assembly
                 .GetReferencedAssemblies()
                 .Select(Assembly.Load)
-                .Concat(new[] { type.Assembly, typeof(DuckBase<>).Assembly })
+                .Concat([type.Assembly, typeof(DuckGenerator<,>).Assembly])
                 .Distinct()
                 .ToArray();
 
@@ -182,41 +186,22 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             DuckSyntaxFactory
                 fact1 = new DuckSyntaxFactory
                 (
-                    type1, 
-                    type1, 
-                    "cica", 
-                    (OutputType) outputType, 
-                    MetadataAssemblyInfo.CreateFrom(typeof(DuckGenerator<,>).Assembly),
-                    new ReferenceCollector()
+                    type1,
+                    type1,
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 ),
                 fact2 = new DuckSyntaxFactory
                 (
                     type2, 
-                    type2, 
-                    "cica", 
-                    (OutputType) outputType, 
-                    SymbolAssemblyInfo.CreateFrom
-                    (
-                        (IAssemblySymbol) compilation.GetAssemblyOrModuleSymbol(compilation.References.Single(@ref => @ref.Display == typeof(DuckGenerator<,>).Assembly.Location)), 
-                        compilation
-                    ),
-                    new ReferenceCollector()
+                    type2,
+                    SyntaxFactoryContext.Default with { OutputType = (OutputType) outputType }
                 );
 
             string
                 src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
                 src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
 
-            //
-            // Deklaraciok sorrendje nem biztos h azonos ezert ez a csoda
-            //
-
-            string[]
-                lines1 = src1.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray(),
-                lines2 = src2.Split(Environment.NewLine.ToArray()).OrderBy(l => l).ToArray();
-
-            Assert.That(lines1.Length, Is.EqualTo(lines2.Length));
-            Assert.That(lines1.SequenceEqual(lines2));
+            Assert.That(src1.SequenceEqual(src2));
         }
 
         [Test]

@@ -3,10 +3,12 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -16,6 +18,61 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal partial class ClassSyntaxFactoryBase
     {
+        private static ArgumentListSyntax ResolveArgumentList(IMethodInfo method, IEnumerable<ArgumentSyntax> arguments) => ArgumentList
+        (
+            arguments.ToSyntaxList
+            (
+                (arg, i) => method.Parameters[i].Kind switch
+                {
+                    ParameterKind.In => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.InKeyword)
+                    ),
+                    ParameterKind.Out => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.OutKeyword)
+                    ),
+                    ParameterKind.Ref => arg.WithRefKindKeyword
+                    (
+                        refKindKeyword: Token(SyntaxKind.RefKeyword)
+                    ),
+                    _ => arg
+                }
+            )
+        );
+
+        private ParameterListSyntax ResolveParameterList(IMethodInfo method) => ParameterList
+        (
+            method.Parameters.ToSyntaxList(param =>
+            {
+                ParameterSyntax parameter = Parameter
+                (
+                    Identifier(param.Name)
+                )
+                .WithType
+                (
+                    type: ResolveType(param.Type)
+                );
+
+                SyntaxKind? modifier = param.Kind switch
+                {
+                    ParameterKind.In => SyntaxKind.InKeyword,
+                    ParameterKind.Out => SyntaxKind.OutKeyword,
+                    ParameterKind.Ref => SyntaxKind.RefKeyword,
+                    ParameterKind.Params => SyntaxKind.ParamsKeyword,
+                    _ => null
+                };
+
+                return modifier is null ? parameter : parameter.WithModifiers
+                (
+                    TokenList
+                    (
+                        Token(modifier.Value)
+                    )
+                );
+            })
+        );
+
         /// <summary>
         /// <code>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method&lt;...&gt;(...)
@@ -43,21 +100,22 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+
         /// <summary>
         /// <code>
-        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// int Foo(T a, ref TT b)
         /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method, bool forceInlining = false)
+        protected MethodDeclarationSyntax ResolveMethodCore(IMethodInfo method)
         {
-            TypeSyntax returnTypeSytax = ResolveType(method.ReturnValue.Type);
+            TypeSyntax returnTypeSyntax = ResolveType(method.ReturnValue.Type);
 
             if (method.ReturnValue.Kind >= ParameterKind.Ref)
             {
-                RefTypeSyntax refReturnTypeSyntax = RefType(returnTypeSytax);
+                RefTypeSyntax refReturnTypeSyntax = RefType(returnTypeSyntax);
 
                 if (method.ReturnValue.Kind is ParameterKind.RefReadonly)
                     refReturnTypeSyntax = refReturnTypeSyntax.WithReadOnlyKeyword
@@ -65,52 +123,59 @@ namespace Solti.Utils.Proxy.Internals
                         Token(SyntaxKind.ReadOnlyKeyword)
                     );
 
-                returnTypeSytax = refReturnTypeSyntax;
+                returnTypeSyntax = refReturnTypeSyntax;
             }
 
-            MethodDeclarationSyntax result = MethodDeclaration
+            return MethodDeclaration
             (
-                returnType: returnTypeSytax,
+                returnType: returnTypeSyntax,
                 identifier: Identifier(method.Name)
             )
             .WithParameterList
             (
-                ParameterList
-                (
-                    parameters: method.Parameters.ToSyntaxList(param =>
-                    {
-                        ParameterSyntax parameter = Parameter
-                        (
-                            Identifier(param.Name)
-                        )
-                        .WithType
-                        (
-                            type: ResolveType(param.Type)
-                        );
-
-                        SyntaxKind? modifier = param.Kind switch
-                        {
-                            ParameterKind.In => SyntaxKind.InKeyword,
-                            ParameterKind.Out => SyntaxKind.OutKeyword,
-                            ParameterKind.Ref => SyntaxKind.RefKeyword,
-                            ParameterKind.Params => SyntaxKind.ParamsKeyword,
-                            _ => null
-                        };
-
-                        if (modifier is not null)
-                            parameter = parameter.WithModifiers
-                            (
-                                TokenList(Token(modifier.Value))
-                            );
-
-                        return parameter;
-                    })
-                )
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
+                ResolveParameterList(method)
             );
+        }
+
+        /// <summary>
+        /// <code>
+        /// int IInterface.Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// </code>
+        /// or
+        /// <code>
+        /// public override int Foo&lt;...&gt;(T a, ref TT b) [where ...]
+        /// </code>
+        /// </summary>
+        #if DEBUG
+        internal
+        #endif
+        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method)
+        {
+            MethodDeclarationSyntax result = ResolveMethodCore(method);
+
+            if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            {
+                CheckNotStaticAbstract(method);
+
+                result = result.WithExplicitInterfaceSpecifier
+                (
+                    explicitInterfaceSpecifier: ExplicitInterfaceSpecifier((NameSyntax) ResolveType(method.DeclaringType))
+                );
+            }
+            else
+            {
+                List<SyntaxKind> tokens = [.. ResolveAccessModifiers(method)];
+
+                tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
+
+                result = result.WithModifiers
+                (
+                    TokenList
+                    (
+                        tokens.Select(Token)
+                    )
+                );
+            }
 
             if (method is IGenericMethodInfo genericMethod)
             {
@@ -138,10 +203,10 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             genericMethod
                                 .GenericConstraints
-                                .Where(static constraint => GetConstraints(constraint).Any())
+                                .Where(constraint => GetConstraints(constraint).Any())
                                 .Select
                                 (
-                                    static constraint => TypeParameterConstraintClause
+                                    constraint => TypeParameterConstraintClause
                                     (
                                         IdentifierName
                                         (
@@ -156,24 +221,33 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     );
 
-                    static IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
+                    IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
                     {
-                        //
-                        // Explicit interface implementations must not specify type constraints
-                        //
-
                         if (constraint.Struct)
                             yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
                         if (constraint.Reference)
                             yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+
+                        //
+                        // Explicit interface implementations must not specify type constraints
+                        //
+
+                        if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+                            yield break;
+
+                        if (constraint.DefaultConstructor)
+                            yield return ConstructorConstraint();
+
+                        foreach (ITypeInfo typeConstraint in constraint.ConstraintTypes)
+                        {
+                            yield return TypeConstraint
+                            (
+                                ResolveType(typeConstraint)
+                            );
+                        }
                     }
                 }
             }
-
-            if (forceInlining) result = result.WithAttributeLists
-            (
-                attributeLists: ResolveMethodImplAttributeToForceInlining()
-            );
 
             return result;
         }
@@ -186,11 +260,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params ArgumentSyntax[] arguments)
+        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params IEnumerable<ArgumentSyntax> arguments)
         {
-            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
-
-            Debug.Assert(arguments.Length == paramz.Count);
+            Debug.Assert(arguments.Count() == method.Parameters.Count);
 
             return InvocationExpression
             (
@@ -203,28 +275,7 @@ namespace Solti.Utils.Proxy.Internals
             )
             .WithArgumentList
             (
-                argumentList: ArgumentList
-                (
-                    arguments.ToSyntaxList
-                    (
-                        (arg, i) => paramz[i].Kind switch
-                        {
-                            ParameterKind.In => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.InKeyword)
-                            ),
-                            ParameterKind.Out => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.OutKeyword)
-                            ),
-                            ParameterKind.Ref => arg.WithRefKindKeyword
-                            (
-                                refKindKeyword: Token(SyntaxKind.RefKeyword)
-                            ),
-                            _ => arg
-                        }
-                    )
-                )
+                ResolveArgumentList(method, arguments)
             );
         }
 
@@ -236,18 +287,17 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params string[] arguments)
+        protected InvocationExpressionSyntax InvokeMethod(IMethodInfo method, ExpressionSyntax? target = null, ITypeInfo? castTargetTo = null, params IReadOnlyList<string> arguments)
         {
-            IReadOnlyList<IParameterInfo> paramz = method.Parameters;
-
-            Debug.Assert(arguments.Length == paramz.Count);
+            Debug.Assert(arguments.Count == method.Parameters.Count);
 
             return InvokeMethod
             (
                 method,
                 target,
                 castTargetTo,
-                arguments: paramz
+                arguments: method
+                    .Parameters
                     .Select
                     (
                         (param, i) => Argument
@@ -267,6 +317,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => cls;
+        protected virtual ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method) => throw new NotImplementedException();
     }
 }

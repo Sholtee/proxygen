@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,33 +19,26 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class UnitSyntaxFactoryBase : ClassSyntaxFactoryBase
+    internal abstract class UnitSyntaxFactoryBase(SyntaxFactoryContext context) : ClassSyntaxFactoryBase(context)
     {
         private static AttributeListSyntax Attributes(params AttributeSyntax[] attributes) => AttributeList
         (
             attributes.ToSyntaxList()
         );
 
-        protected UnitSyntaxFactoryBase(OutputType outputType, ReferenceCollector? referenceCollector, LanguageVersion languageVersion): base(referenceCollector, languageVersion) =>
-            OutputType = outputType;
-
         #if DEBUG
         internal
         #endif
         protected abstract IEnumerable<ClassDeclarationSyntax> ResolveClasses(object context, CancellationToken cancellation);
 
-        public OutputType OutputType { get; }
-
-        public abstract string ExposedClass { get; }
-
-        public virtual CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        #if DEBUG
+        internal
+        #endif
+        protected virtual CompilationUnitSyntax ResolveUnitCore(object context, CancellationToken cancellation)
         {
-            List<MemberDeclarationSyntax> members = new
-            (
-                ResolveUnitMembers(context, cancellation)
-            );
+            List<MemberDeclarationSyntax> members = [..ResolveUnitMembers(context, cancellation)];
 
-            if (members.Any() && OutputType is OutputType.Unit)
+            if (members.Any() && Context.OutputType is OutputType.Unit)
             {
                 members[0] = members[0] switch
                 {
@@ -142,5 +136,30 @@ namespace Solti.Utils.Proxy.Internals
                 )
             )
         );
+
+        public CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
+        {
+            Logger.Log(LogLevel.Info, "REUN-200", $"Starting unit resolution in \"{Context.OutputType}\" mode");
+
+            CompilationUnitSyntax result;
+
+            try
+            {
+                result = ResolveUnitCore(context, cancellation);            
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                if (ex.IsUser())
+                    Logger.Log(LogLevel.Warn, "REUN-300", ex.ToString());
+                else
+                    Logger.Log(LogLevel.Error, "REUN-400", $"Failed to resolve the unit: {ex}");
+                throw;
+            }
+
+            Logger.Log(LogLevel.Info, "REUN-201", $"Unit resolved");
+
+            Logger.WriteSource(result);
+            return result;
+        }
     }
 }

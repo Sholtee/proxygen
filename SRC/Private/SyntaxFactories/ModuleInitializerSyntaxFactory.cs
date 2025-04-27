@@ -16,13 +16,17 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class ModuleInitializerSyntaxFactory : UnitSyntaxFactoryBase
+    internal sealed class ModuleInitializerSyntaxFactory(SyntaxFactoryContext context) : UnitSyntaxFactoryBase(context)
     {
-        public ModuleInitializerSyntaxFactory(OutputType outputType, ReferenceCollector? referenceCollector = null, LanguageVersion languageVersion = LanguageVersion.Latest) : base(outputType, referenceCollector, languageVersion)
-        {
-        }
-
         public override string ExposedClass { get; } = nameof(ModuleInitializerAttribute);
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IReadOnlyList<ITypeInfo> Bases { get; } = 
+        [
+            MetadataTypeInfo.CreateFrom(typeof(Attribute))
+        ];
 
         #if DEBUG
         internal
@@ -89,18 +93,5 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return ResolveClass(context, cancellation);
         }
-
-        #if DEBUG
-        internal
-        #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context)
-        {
-            yield return MetadataTypeInfo.CreateFrom(typeof(Attribute));
-        }
-
-        #if DEBUG
-        internal
-        #endif
-        protected override string ResolveClassName(object context) => nameof(ModuleInitializerAttribute);
     }
 }

@@ -4,13 +4,12 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using Moq;
 using NUnit.Framework;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -34,29 +33,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 )
             );
 
-            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(new CompilationUnitSyntax[] { unit }, "cica", null, Array.Empty<MetadataReference>()));
+            Exception ex = Assert.Throws<InvalidOperationException>(() => Compile.ToAssembly(new CompilationUnitSyntax[] { unit }, "cica", null, Array.Empty<MetadataReference>(), LanguageVersion.Latest, new Mock<ILogger>().Object));
 
             Assert.That(ex.Data["src"], Is.EqualTo("using bad;"));
             Assert.That(ex.Data["failures"], Is.Not.Empty);
         }
-
-        public static IEnumerable<string> PlatformAsmsDirs
-        {
-            get 
-            {
-                yield return null;
-                yield return Environment.ExpandEnvironmentVariables("%USERPROFILE%\\.nuget\\packages\\netstandard.library\\2.0.0\\build\\netstandard2.0\\ref");
-            }
-        }
-
-        [Test]
-        public void GetPlatformAssemblies_ShouldReturnTheDesiredAsms([ValueSource(nameof(PlatformAsmsDirs))] string platformAsmDir) =>
-            Assert.That
-            (
-                File.Exists
-                (
-                    Compile.GetPlatformAssemblies(platformAsmDir, new string[] { "netstandard.dll" }).Single().Display
-                )
-            );
     }
 }

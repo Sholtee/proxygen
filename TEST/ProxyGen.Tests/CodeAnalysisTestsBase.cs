@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Moq;
 
 namespace Solti.Utils.Proxy.Internals.Tests
 {
@@ -22,11 +24,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
             var result = CSharpCompilation.Create
             (
                 "cica",
-                new[]
-                {
+                [
                     CSharpSyntaxTree.ParseText(src, new CSharpParseOptions(languageVersion))
-                },
-                Internals.Compile.GetPlatformAssemblies(null, TargetFramework.Instance.PlatformAssemblies).Concat
+                ],
+                PlatformAssemblies.References.Concat
                 (
                     additionalReferences
                         .Append(typeof(object).Assembly.Location)
@@ -56,23 +57,29 @@ namespace Solti.Utils.Proxy.Internals.Tests
         {
             using Stream asm = Internals.Compile.ToAssembly
             (
-                new CompilationUnitSyntax[] { CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot() },
+                [CSharpSyntaxTree.ParseText(src).GetCompilationUnitRoot()],
                 Guid.NewGuid().ToString(),
                 null,
-                Internals.Compile.GetPlatformAssemblies(null, TargetFramework.Instance.PlatformAssemblies).Concat
+                PlatformAssemblies.References.Concat
                 (
                     additionalReferences.Append(typeof(object).Assembly).Select
                     (
                         @ref => MetadataReference.CreateFromFile(@ref.Location)
                     )
                 ).ToArray(),
+                LanguageVersion.Latest,
+                new Mock<ILogger>().Object,
                 customConfig
             );
 
             return Assembly.Load(asm.ToArray());
         }
 
-        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation(src, additionalReferences.Select(asm => asm.Location));
+        public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation
+        (
+            src,
+            additionalReferences.Select(asm => asm.Location)
+        );
 
         protected class FindAllTypesVisitor : SymbolVisitor
         {

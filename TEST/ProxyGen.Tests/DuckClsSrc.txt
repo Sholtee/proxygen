@@ -1,32 +1,31 @@
 ﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class Duck_2648115D0AA68B747DBE21865A3A6FC2 : global::Solti.Utils.Proxy.Internals.DuckBase<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>>, global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
+internal sealed class Duck_BBDAC00766728D37DE5666C5248517A4 : global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.Internals.ITargetAccess
 {
-    public Duck_2648115D0AA68B747DBE21865A3A6FC2(global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> target) : base(target)
+    private global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> FTarget;
+    public Duck_BBDAC00766728D37DE5666C5248517A4() : base()
     {
     }
 
-    [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.Target.Foo<TT>(a, out b, ref c);
-    [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-    void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar() => this.Target.Bar();
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        get => this.Target.Prop; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        set => this.Target.Prop = value; }
+    void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar() => (this.FTarget ?? throw new global::System.InvalidOperationException()).Bar();
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => (this.FTarget ?? throw new global::System.InvalidOperationException()).Foo<TT>(a, out b, ref c);
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.this[global::System.Int32 i] { get => (this.FTarget ?? throw new global::System.InvalidOperationException())[i]; set => (this.FTarget ?? throw new global::System.InvalidOperationException())[i] = value; }
 
-    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event {[global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        add => this.Target.Event += value; [global::System.Runtime.CompilerServices.MethodImplAttribute(global::System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-        remove => this.Target.Event -= value; }
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop; set => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop = value; }
 
-    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = tuple =>
+    global::System.Object global::Solti.Utils.Proxy.Internals.ITargetAccess.Target { get => this.FTarget; set => this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)value; }
+
+    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += value; remove => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= value; }
+
+    public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
         switch (tuple)
         {
-            case global::System.Tuple<global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>> t0:
-                return new global::Duck_2648115D0AA68B747DBE21865A3A6FC2(t0.Item1);
+            case null:
+                return new global::Duck_BBDAC00766728D37DE5666C5248517A4();
             default:
                 throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }
     };
     [global::System.Runtime.CompilerServices.ModuleInitializerAttribute]
-    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_2648115D0AA68B747DBE21865A3A6FC2));
+    public static void Initialize() => global::Solti.Utils.Proxy.Internals.LoadedTypes.Register(typeof(global::Duck_BBDAC00766728D37DE5666C5248517A4), global::Duck_BBDAC00766728D37DE5666C5248517A4.__Activator);
 }

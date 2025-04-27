@@ -24,7 +24,7 @@ namespace Solti.Utils.Proxy.Perf
         private IInterface FDuck;
 
         private static async Task<TInterface> CreateDuck<TInterface, TTarget>(TTarget target) where TInterface: class =>
-            await DuckGenerator<TInterface, TTarget>.ActivateAsync(Tuple.Create(target));
+            await DuckGenerator<TInterface, TTarget>.ActivateAsync(target);
 
         public class Implementation
         {

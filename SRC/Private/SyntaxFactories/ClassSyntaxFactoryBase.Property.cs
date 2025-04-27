@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// target.Property                           
         /// // OR                                         
-        /// target.Propery[index]
+        /// target.Property[index]
         /// </code>
         /// </summary>
         #if DEBUG
@@ -38,7 +39,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// target.Property         
         /// // OR        
-        /// target.Propery[index]
+        /// target.Property[index]
         /// </code>
         /// </summary>
         #if DEBUG
@@ -60,6 +61,79 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
+        private TDeclaration ResolveProperty<TDeclaration>(IPropertyInfo property, Func<IPropertyInfo, TDeclaration> fact, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) where TDeclaration : BasePropertyDeclarationSyntax
+        {
+            TDeclaration result = fact(property);
+
+            IMethodInfo backingMethodHavingHigherVisibility = (property.GetMethod?.AccessModifiers ?? AccessModifiers.Unknown) > (property.SetMethod?.AccessModifiers ?? AccessModifiers.Unknown)
+                ? property.GetMethod!
+                : property.SetMethod!;
+
+            if (property.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            {
+                CheckNotStaticAbstract(property);
+
+                result = (TDeclaration) result.WithExplicitInterfaceSpecifier
+                (
+                    explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+                    (
+                        (NameSyntax) ResolveType(property.DeclaringType)
+                    )
+                );
+            }
+            else
+            {
+                List<SyntaxKind> tokens = [..ResolveAccessModifiers(backingMethodHavingHigherVisibility)];
+
+                IMemberInfo underlyingMethod = property.GetMethod ?? property.SetMethod!;
+
+                tokens.Add(underlyingMethod.IsVirtual || underlyingMethod.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
+
+                result = (TDeclaration) result.WithModifiers
+                (
+                    TokenList
+                    (
+                        tokens.Select(Token)
+                    )
+                );
+            }
+
+            List<AccessorDeclarationSyntax> accessors = new(2);
+
+            if (property.GetMethod is not null) accessors.Add
+            (
+                ResolveAccessor(property.GetMethod, getBody, SyntaxKind.GetAccessorDeclaration)
+            );
+
+            if (property.SetMethod is not null) accessors.Add
+            (
+                ResolveAccessor(property.SetMethod, setBody, SyntaxKind.SetAccessorDeclaration)
+            );
+
+            return (TDeclaration) result.WithAccessorList
+            (
+                accessorList: AccessorList
+                (
+                    accessors: List(accessors)
+                )
+            );
+
+            AccessorDeclarationSyntax ResolveAccessor(IMethodInfo backingMethod, CSharpSyntaxNode? body, SyntaxKind kind)
+            {
+                Debug.Assert(backingMethod is not null, "Backing method cannot be null");
+
+                //
+                // Accessor cannot have higher visibility than the property's
+                //
+
+                IEnumerable<SyntaxKind> modifiers = backingMethod!.AccessModifiers < backingMethodHavingHigherVisibility.AccessModifiers
+                    ? ResolveAccessModifiers(backingMethod)
+                    : [];
+
+                return ClassSyntaxFactoryBase.ResolveAccessor(kind, body, modifiers);
+            }
+        }
+
         /// <summary>
         /// <code>
         /// int IInterface[T].Prop
@@ -68,49 +142,29 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}           
         /// }                    
         /// </code>
+        /// or
+        /// <code>
+        /// public override int Prop
+        /// {                      
+        ///   get{...}            
+        ///   protected set{...}           
+        /// }                    
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
-        {
-            Debug.Assert(property.DeclaringType.IsInterface);
-
-            PropertyDeclarationSyntax result = PropertyDeclaration
+        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
+        (
+            property,
+            property => PropertyDeclaration
             (
                 type: ResolveType(property.Type),
                 identifier: Identifier(property.Name)
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
-                (
-                    (NameSyntax) ResolveType(property.DeclaringType)
-                )
-            );
-
-            List<AccessorDeclarationSyntax> accessors = new(2);
-
-            if (property.GetMethod is not null && getBody is not null)
-                accessors.Add
-                (
-                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining)
-                );
-
-            if (property.SetMethod is not null && setBody is not null)
-                accessors.Add
-                (
-                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
-                );
-
-            return !accessors.Any() ? result : result.WithAccessorList
-            (
-                accessorList: AccessorList
-                (
-                    accessors: List(accessors)
-                )
-            );
-        }
+            ),
+            getBody,
+            setBody
+        );
 
         /// <summary>
         /// <code>
@@ -120,66 +174,46 @@ namespace Solti.Utils.Proxy.Internals
         ///   set{...}                           
         /// }            
         /// </code>
+        /// or
+        /// <code>
+        /// public override int this[string index, ...]
+        /// {                                     
+        ///   get{...}                            
+        ///   protected set{...}                           
+        /// }            
+        /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool forceInlining = false)
-        {
-            Debug.Assert(property.DeclaringType.IsInterface);
-            Debug.Assert(property.Indices.Any());
-
-            IndexerDeclarationSyntax result = IndexerDeclaration
-            (
-                type: ResolveType(property.Type)
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
+        (
+            property,
+            property => 
+                IndexerDeclaration
                 (
-                    (NameSyntax) ResolveType(property.DeclaringType)
+                    type: ResolveType(property.Type)
                 )
-            )
-            .WithParameterList
-            (
-                parameterList: BracketedParameterList
+                .WithParameterList
                 (
-                    parameters: property.Indices.ToSyntaxList
+                    parameterList: BracketedParameterList
                     (
-                        index => Parameter
+                        parameters: property.Indices.ToSyntaxList
                         (
-                            identifier: Identifier(index.Name)
-                        )
-                        .WithType
-                        (
-                            type: ResolveType(index.Type)
+                            index => Parameter
+                            (
+                                identifier: Identifier(index.Name)
+                            )
+                            .WithType
+                            (
+                                type: ResolveType(index.Type)
+                            )
                         )
                     )
-                )
-            );
-
-            List<AccessorDeclarationSyntax> accessors = new(2);
-
-            if (property.GetMethod is not null && getBody is not null)
-                accessors.Add
-                (
-                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody, forceInlining)
-                );
-
-            if (property.SetMethod is not null && setBody is not null)
-                accessors.Add
-                (
-                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, forceInlining)
-                );
-
-            return !accessors.Any() ? result : result.WithAccessorList
-            (
-                accessorList: AccessorList
-                (
-                    accessors: List(accessors)
-                )
-            );
-        }
+                ),
+            getBody,
+            setBody
+        );
 
         #if DEBUG
         internal
@@ -189,6 +223,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property) => cls;
+        protected virtual ClassDeclarationSyntax ResolveProperty(ClassDeclarationSyntax cls, object context, IPropertyInfo property) => throw new NotImplementedException();
     }
 }

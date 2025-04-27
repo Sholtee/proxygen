@@ -6,23 +6,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal class SymbolTypeInfo : ITypeInfo
+    internal class SymbolTypeInfo(ITypeSymbol underlyingSymbol, Compilation compilation) : ITypeInfo
     {
-        protected ITypeSymbol UnderlyingSymbol { get; }
+        protected ITypeSymbol UnderlyingSymbol { get; } = underlyingSymbol;
 
-        protected Compilation Compilation { get; }
-
-        private SymbolTypeInfo(ITypeSymbol typeSymbol, Compilation compilation)
-        {
-            UnderlyingSymbol = typeSymbol;
-            Compilation = compilation;
-        }
+        protected Compilation Compilation { get; } = compilation;
 
         public static ITypeInfo CreateFrom(ITypeSymbol typeSymbol, Compilation compilation)
         {
@@ -31,13 +26,13 @@ namespace Solti.Utils.Proxy.Internals
             return typeSymbol switch
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-                INamedTypeSymbol named when named.TypeArguments.Any() => new SymbolGenericTypeInfo(named, compilation),
+                INamedTypeSymbol { TypeArguments.Length: > 0 } named => new SymbolGenericTypeInfo(named, compilation),
 
                 //
                 // NET6_0 workaround
                 //
 
-                _ when typeSymbol.Kind is SymbolKind.FunctionPointerType => CreateFrom
+                { Kind: SymbolKind.FunctionPointerType } => CreateFrom
                 (
                     compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
                     compilation
@@ -46,145 +41,173 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
-        private IAssemblyInfo? FDeclaringAssembly;
-        public IAssemblyInfo? DeclaringAssembly
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<IAssemblyInfo?> FDeclaringAssembly = new(() =>
         {
-            get
-            {
-                if (FDeclaringAssembly is null)
-                {
-                    ITypeSymbol? elementType = UnderlyingSymbol.GetElementType(recurse: true);
+            ITypeSymbol? elementType = underlyingSymbol.GetElementType(recurse: true);
 
-                    IAssemblySymbol? asm = elementType?.ContainingAssembly ?? UnderlyingSymbol.ContainingAssembly;
+            IAssemblySymbol? asm = elementType?.ContainingAssembly ?? underlyingSymbol.ContainingAssembly;
 
-                    if (asm is not null)
-                        FDeclaringAssembly = SymbolAssemblyInfo.CreateFrom(asm, Compilation);
+            if (asm is not null)
+                return SymbolAssemblyInfo.CreateFrom(asm, compilation);
 
-                    else if (asm is null && elementType is IFunctionPointerTypeSymbol)
-                        FDeclaringAssembly = CreateFrom
-                        (
-                            Compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
-                            Compilation
-                        ).DeclaringAssembly;                      
-                }
-                return FDeclaringAssembly;
-            }
-        }
+            if (asm is null && elementType is IFunctionPointerTypeSymbol)
+                return CreateFrom
+                (
+                    compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
+                    compilation
+                ).DeclaringAssembly;
+            return null;
+        });
+        public IAssemblyInfo? DeclaringAssembly => FDeclaringAssembly.Value;
 
-        public bool IsVoid => UnderlyingSymbol.SpecialType == SpecialType.System_Void;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<TypeInfoFlags> FFlags = new(() =>
+        {
+            TypeInfoFlags flags = TypeInfoFlags.None;
+
+            if (underlyingSymbol.SpecialType == SpecialType.System_Void)
+                flags |= TypeInfoFlags.IsVoid;
+
+            if (underlyingSymbol.IsDelegate())
+                flags |= TypeInfoFlags.IsDelegate;
+
+            if (underlyingSymbol.IsGenericParameter())
+                flags |= TypeInfoFlags.IsGenericParameter;
+
+            if (underlyingSymbol.IsNested())
+                flags |= TypeInfoFlags.IsNested;
+
+            if (underlyingSymbol.IsInterface())
+                flags |= TypeInfoFlags.IsInterface;
+
+            if (underlyingSymbol.IsClass())
+                flags |= TypeInfoFlags.IsClass;
+
+            if (underlyingSymbol.IsFinal())
+                flags |= TypeInfoFlags.IsFinal;
+
+            if (underlyingSymbol.IsAbstract)
+                flags |= TypeInfoFlags.IsAbstract;
+
+            return flags;
+        });
+        public TypeInfoFlags Flags => FFlags.Value;
 
         public RefType RefType => UnderlyingSymbol switch
         {
             IPointerTypeSymbol => RefType.Pointer,
             IArrayTypeSymbol => RefType.Array,
-            _ when UnderlyingSymbol.IsRefLikeType => RefType.Ref,
+            { IsRefLikeType: true } => RefType.Ref,
             _ => RefType.None
         };
 
-        public bool IsNested => UnderlyingSymbol.IsNested();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FAssemblyQualifiedName = new
+        (
+            () => !underlyingSymbol.IsGenericParameter()
+                ? underlyingSymbol.GetAssemblyQualifiedName()
+                : null
+        );
+        public string? AssemblyQualifiedName => FAssemblyQualifiedName.Value;
 
-        public bool IsGenericParameter => UnderlyingSymbol.IsGenericParameter();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<string?> FQualifiedName = new
+        (
+            () => !underlyingSymbol.IsGenericParameter()
+                ? underlyingSymbol.GetQualifiedMetadataName()
+                : null
+        );
+        public string? QualifiedName => FQualifiedName.Value;
 
-        public bool IsInterface => UnderlyingSymbol.IsInterface();
-
-        public string? AssemblyQualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetAssemblyQualifiedName() : null;
-
-        public string? QualifiedName => !IsGenericParameter ? UnderlyingSymbol.GetQualifiedMetadataName() : null;
-
-        private ITypeInfo? FElementType;
-        public ITypeInfo? ElementType
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
-            get
-            {
-                if (FElementType is null)
-                {
-                    ITypeSymbol? realType = UnderlyingSymbol.GetElementType();
+            ITypeSymbol? realType = underlyingSymbol.GetElementType();
 
-                    if (realType is not null)
-                        FElementType = CreateFrom(realType, Compilation);
-                }
-                return FElementType;
-            }
-        }
+            return realType is not null
+                ? CreateFrom(realType, compilation)
+                : null;
+        });
+        public ITypeInfo? ElementType => FElementType.Value;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FEnclosingType;
         public ITypeInfo? EnclosingType => UnderlyingSymbol.GetEnclosingType() is not null
             ? FEnclosingType ??= CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation)
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<ITypeInfo>? FInterfaces;
         public IReadOnlyList<ITypeInfo> Interfaces => FInterfaces ??= UnderlyingSymbol
             .GetAllInterfaces()
             .Select(ti => CreateFrom(ti, Compilation))
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FBaseType;
         public ITypeInfo? BaseType => UnderlyingSymbol.BaseType is not null
             ? FBaseType ??= CreateFrom(UnderlyingSymbol.BaseType, Compilation)
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IPropertyInfo>? FProperties;
         public IReadOnlyList<IPropertyInfo> Properties => FProperties ??= UnderlyingSymbol
             .ListProperties(includeStatic: true)
             .Select(p => SymbolPropertyInfo.CreateFrom(p, Compilation))
+            .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IEventInfo>? FEvents;
         public IReadOnlyList<IEventInfo> Events => FEvents ??= UnderlyingSymbol
             .ListEvents(includeStatic: true)
             .Select(evt => SymbolEventInfo.CreateFrom(evt, Compilation))
+            .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IMethodInfo>? FMethods;
         public IReadOnlyList<IMethodInfo> Methods => FMethods ??= UnderlyingSymbol
             .ListMethods(includeStatic: true)
             .Where(IMethodSymbolExtensions.IsClassMethod)
             .Select(m => SymbolMethodInfo.CreateFrom(m, Compilation))
+            .Sort()
             .ToImmutableList();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IConstructorInfo>? FConstructors;
         public IReadOnlyList<IConstructorInfo> Constructors => FConstructors ??= UnderlyingSymbol
             .GetConstructors()
             .Select(m => (IConstructorInfo) SymbolMethodInfo.CreateFrom(m, Compilation))
+            .Sort()
             .ToImmutableList();
 
         public string Name => UnderlyingSymbol.GetFriendlyName();
 
-        public bool IsClass => UnderlyingSymbol.IsClass();
-
-        public bool IsFinal => UnderlyingSymbol.IsFinal();
-
-        public bool IsAbstract => UnderlyingSymbol.IsAbstract;
-
-        private IHasName? FContainingMember;
-        public IHasName? ContainingMember
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            get
+            ITypeSymbol concreteType = underlyingSymbol.GetElementType(recurse: true) ?? underlyingSymbol;
+
+            return concreteType.ContainingSymbol switch
             {
-                if (FContainingMember is null)
-                {
-                    ITypeSymbol concreteType = UnderlyingSymbol.GetElementType(recurse: true) ?? UnderlyingSymbol;
+                IMethodSymbol method => SymbolMethodInfo.CreateFrom
+                (
+                    //
+                    // Mimic the way how reflection works...
+                    //
 
-                    FContainingMember = concreteType.ContainingSymbol switch
-                    {
-                        IMethodSymbol method => SymbolMethodInfo.CreateFrom
-                        (
-                            //
-                            // Mimic the way how reflection works...
-                            //
-
-                            IsGenericParameter && method.IsGenericMethod
-                                ? method.OriginalDefinition
-                                : method,
-                            Compilation
-                        ),
-                        _ when UnderlyingSymbol.GetEnclosingType() is not null => SymbolTypeInfo.CreateFrom(UnderlyingSymbol.GetEnclosingType()!, Compilation),
-                        _ => null
-                    };
-                }
-                return FContainingMember;
-            }
-        }
+                    underlyingSymbol.IsGenericParameter() && method.IsGenericMethod
+                        ? method.OriginalDefinition
+                        : method,
+                    compilation
+                ),
+                _ when underlyingSymbol.GetEnclosingType() is not null => CreateFrom(underlyingSymbol.GetEnclosingType()!, compilation),
+                _ => null
+            };
+        });
+        public IHasName? ContainingMember => FContainingMember.Value;
 
         public AccessModifiers AccessModifiers => UnderlyingSymbol.GetAccessModifiers();
 
@@ -194,11 +217,9 @@ namespace Solti.Utils.Proxy.Internals
 
         public override string ToString() => UnderlyingSymbol.ToString();
 
-        private sealed class SymbolGenericTypeInfo : SymbolTypeInfo, IGenericTypeInfo
+        private sealed class SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : SymbolTypeInfo(underlyingSymbol, compilation), IGenericTypeInfo
         {
             private new INamedTypeSymbol UnderlyingSymbol => (INamedTypeSymbol) base.UnderlyingSymbol;
-
-            public SymbolGenericTypeInfo(INamedTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
 
             //
             // "UnderlyingSymbol.IsUnboundGenericType" doesn't work
@@ -208,16 +229,23 @@ namespace Solti.Utils.Proxy.Internals
                 .TypeArguments
                 .Any(static ta => ta.IsGenericParameter());
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IGenericTypeInfo? FGenericDefinition;
             public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= (IGenericTypeInfo) CreateFrom(UnderlyingSymbol.OriginalDefinition, Compilation);
 
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
             private IReadOnlyList<ITypeInfo>? FGenericArguments;
             public IReadOnlyList<ITypeInfo> GenericArguments => FGenericArguments ??= UnderlyingSymbol
                 .TypeArguments
                 .Select(ti => CreateFrom(ti, Compilation))
                 .ToImmutableList();
 
-            public IReadOnlyList<IGenericConstraint> GenericConstraints => throw new NotImplementedException();
+            public IReadOnlyList<IGenericConstraint> GenericConstraints =>
+                //
+                // We never generate open generic proxies so implementing this property not required
+                //
+
+                throw new NotImplementedException();
 
             public IGenericTypeInfo Close(params ITypeInfo[] genericArgs)
             {
@@ -239,10 +267,8 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        private sealed class SymbolArrayTypeInfo : SymbolTypeInfo, IArrayTypeInfo
+        private sealed class SymbolArrayTypeInfo(IArrayTypeSymbol underlyingSymbol, Compilation compilation) : SymbolTypeInfo(underlyingSymbol, compilation), IArrayTypeInfo
         {
-            public SymbolArrayTypeInfo(IArrayTypeSymbol underlyingSymbol, Compilation compilation) : base(underlyingSymbol, compilation) { }
-
             public int Rank => ((IArrayTypeSymbol) UnderlyingSymbol).Rank;
         }
     }

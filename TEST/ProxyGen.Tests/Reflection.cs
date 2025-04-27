@@ -66,29 +66,39 @@ namespace Solti.Utils.Proxy.Internals.Tests
             );
         }
 
+        private delegate void MyDelegate(int i);
+
+        private sealed class MyClassNoCtor { }
+
         [Test]
-        public void TypeInfo_AbstractionTest([Values(
-            typeof(void), 
-            typeof(object), 
-            typeof(int),
-            typeof(int[]), 
-            typeof(int[,]),
-            typeof((int Int, string String)), 
-            typeof(int*),
-            typeof(nint),
-            typeof(nint[]),
-            typeof(DateTime),
-            typeof(List<>),
-            typeof(Span<int>),
-            typeof(ReadOnlySpan<int>),
-            typeof(List<object>), 
-            typeof(NestedGeneric<>), 
-            typeof(NestedGeneric<List<string>>), 
-            typeof(InterfaceInterceptor<>),
-            typeof(Generators.ProxyGenerator<,>), 
-            typeof(System.ComponentModel.Component), // van esemenye
-            typeof(DuckBase<>), 
-            typeof(HasInternal))] Type type) 
+        public void TypeInfo_AbstractionTest(
+        [
+            Values
+            (
+                typeof(void), 
+                typeof(object), 
+                typeof(int),
+                typeof(int[]), 
+                typeof(int[,]),
+                typeof((int Int, string String)), 
+                typeof(int*),
+                typeof(nint),
+                typeof(nint[]),
+                typeof(DateTime),
+                typeof(List<>),
+                typeof(Span<int>),
+                typeof(ReadOnlySpan<int>),
+                typeof(List<object>), 
+                typeof(NestedGeneric<>), 
+                typeof(NestedGeneric<List<string>>),
+                typeof(Generators.InterfaceProxyGenerator<>), 
+                typeof(System.ComponentModel.Component), // van esemenye
+                typeof(HasInternal),
+                typeof(MyDelegate),
+                typeof(Action),
+                typeof(MyClassNoCtor)
+            )
+        ] Type type) 
         {
             Assembly[] refs = type
                 .Assembly
@@ -117,15 +127,9 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(t1.Name, t2.Name);
                 Assert.AreEqual(t1.QualifiedName, t2.QualifiedName);
                 Assert.AreEqual(t1.AssemblyQualifiedName, t2.AssemblyQualifiedName);
-                Assert.AreEqual(t1.IsNested, t2.IsNested);
+                Assert.AreEqual(t1.Flags, t2.Flags);
                 Assert.AreEqual(t1.AccessModifiers, t2.AccessModifiers);
-                Assert.AreEqual(t1.IsClass, t2.IsClass);
-                Assert.AreEqual(t1.IsAbstract, t2.IsAbstract);
-                Assert.AreEqual(t1.IsFinal, t2.IsFinal);
-                Assert.AreEqual(t1.IsInterface, t2.IsInterface);
                 Assert.AreEqual(t1.RefType, t2.RefType);
-                Assert.AreEqual(t1.IsGenericParameter, t2.IsGenericParameter);
-                Assert.AreEqual(t1.IsVoid, t2.IsVoid);
 
                 if (!FProcessedTypes.TryAdd(t1.Name, null) || t1.DeclaringAssembly.Name.Contains("CodeAnalysis"))
                     return;
@@ -136,10 +140,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 AssertEqualsT(t1.BaseType, t2.BaseType);
                 AssertEqualsN(t1.ContainingMember, t2.ContainingMember);
                 AssertSequenceEqualsT(t1.Interfaces.OrderBy(i => i.Name).ToArray(), t2.Interfaces.OrderBy(i => i.Name).ToArray());
-                AssertSequenceEqualsM(OrderCtors(t1).ToArray(), OrderCtors(t2).ToArray());
-                AssertSequenceEqualsM(OrderMethods(t1).ToArray(), OrderMethods(t2).ToArray());
-                AssertSequenceEqualsPr(OrderProperties(t1).ToArray(), OrderProperties(t2).ToArray());
-                AssertSequenceEqualsE(t1.Events.OrderBy(e => e.Name).ToArray(), t2.Events.OrderBy(e => e.Name).ToArray());
+                AssertSequenceEqualsM(t1.Constructors, t2.Constructors);
+                AssertSequenceEqualsM(t1.Methods, t2.Methods);
+                AssertSequenceEqualsPr(t1.Properties, t2.Properties);
+                AssertSequenceEqualsE(t1.Events, t2.Events);
 
                 IGenericTypeInfo
                     gt1 = t1 as IGenericTypeInfo,
@@ -149,29 +153,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 if (gt1 != null)
                 {
                     Assert.AreEqual(gt1.IsGenericDefinition, gt2.IsGenericDefinition);
-                    Assert.AreEqual(gt1.IsGenericParameter, gt2.IsGenericParameter);
+                    Assert.AreEqual(gt1.Flags.HasFlag(TypeInfoFlags.IsGenericParameter), gt2.Flags.HasFlag(TypeInfoFlags.IsGenericParameter));
 
                     AssertSequenceEqualsT(gt1.GenericArguments, gt2.GenericArguments);
                 }
-
-                IEnumerable<IMethodInfo> OrderCtors(ITypeInfo t) => t
-                    .Constructors
-                    .OrderBy(m => m.AccessModifiers)
-                    .ThenBy(m => string.Join(string.Empty, m.Parameters.Select(p => p.Type.Name)));
-
-                IEnumerable<IMethodInfo> OrderMethods(ITypeInfo t) => t
-                    .Methods
-                    .OrderBy(m => m.Name)
-                    .ThenBy(m => m.AccessModifiers)
-                    .ThenBy(m => m.IsStatic)     
-                    .ThenBy(m => (m as IGenericMethodInfo)?.GenericArguments.Count ?? 0)
-                    .ThenBy(m => string.Join("_", m.Parameters.Select(p => $"{p.Type.Name}_{p.Type.RefType}")))
-                    .ThenBy(m => m.ReturnValue.Type.Name);
-
-                IEnumerable<IPropertyInfo> OrderProperties(ITypeInfo t) => t
-                    .Properties
-                    .OrderBy(p => p.Name)
-                    .ThenBy(p => p.DeclaringType.Name);
             }
 
             void AssertEqualsA(IAssemblyInfo a1, IAssemblyInfo a2) 
@@ -230,6 +215,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(m1.IsSpecial, m2.IsSpecial);
                 Assert.AreEqual(m1.IsStatic, m2.IsStatic);
                 Assert.AreEqual(m1.IsAbstract, m2.IsAbstract);
+                Assert.AreEqual(m1.IsVirtual, m2.IsVirtual);
                 Assert.AreEqual(m1.AccessModifiers, m2.AccessModifiers);
 
                 AssertEqualsT(m1.DeclaringType, m2.DeclaringType);
@@ -243,7 +229,10 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
                 Assert.AreEqual(gm1 != null, gm2 != null);
                 if (gm1 != null)
+                {
                     AssertSequenceEqualsT(gm1.GenericArguments, gm2.GenericArguments);
+                    AssertSequenceEqualsG(gm1.GenericConstraints, gm2.GenericConstraints);
+                }
             }
 
             void AssertEqualsPr(IPropertyInfo p1, IPropertyInfo p2) 
@@ -257,6 +246,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(p1.Name, p2.Name);
                 Assert.AreEqual(p1.IsStatic, p2.IsStatic);
                 Assert.AreEqual(p1.IsAbstract, p2.IsAbstract);
+                Assert.AreEqual(p1.IsVirtual, p2.IsVirtual);
 
                 AssertEqualsT(p1.Type, p2.Type);
                 AssertEqualsT(p1.DeclaringType, p2.DeclaringType);
@@ -276,11 +266,22 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 Assert.AreEqual(e1.Name, e2.Name);
                 Assert.AreEqual(e1.IsStatic, e2.IsStatic);
                 Assert.AreEqual(e1.IsAbstract, e2.IsAbstract);
+                Assert.AreEqual(e1.IsVirtual, e2.IsVirtual);
 
                 AssertEqualsT(e1.Type, e2.Type);
                 AssertEqualsT(e1.DeclaringType, e2.DeclaringType);
                 AssertEqualsM(e1.AddMethod, e2.AddMethod);
                 AssertEqualsM(e1.RemoveMethod, e2.RemoveMethod);
+            }
+
+            void AssertEqualsG(IGenericConstraint c1, IGenericConstraint c2)
+            {
+                Assert.AreEqual(c1.Struct, c2.Struct);
+                Assert.AreEqual(c1.Reference, c2.Reference);
+                Assert.AreEqual(c1.DefaultConstructor, c2.DefaultConstructor);
+
+                AssertSequenceEqualsT(c1.ConstraintTypes, c2.ConstraintTypes);
+                AssertEqualsT(c1.Target, c2.Target);
             }
 
             void AssertSequenceEqualsT(IReadOnlyList<ITypeInfo> l1, IReadOnlyList<ITypeInfo> l2) 
@@ -330,6 +331,16 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 for (int i = 0; i < l1.Count; i++)
                 {
                     AssertEqualsE(l1[i], l2[i]);
+                }
+            }
+
+            void AssertSequenceEqualsG(IReadOnlyList<IGenericConstraint> l1, IReadOnlyList<IGenericConstraint> l2)
+            {
+                Assert.AreEqual(l1.Count, l2.Count);
+
+                for (int i = 0; i < l1.Count; i++)
+                {
+                    AssertEqualsG(l1[i], l2[i]);
                 }
             }
         }

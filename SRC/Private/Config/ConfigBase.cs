@@ -5,54 +5,48 @@
 ********************************************************************************/
 using System;
 using System.IO;
-using System.Threading;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class ConfigBase<TDescendant> where TDescendant : ConfigBase<TDescendant>, new()
+    /// <summary>
+    /// Represents the common configuration.
+    /// </summary>
+    internal abstract class ConfigBase: ILogConfiguration
     {
-        //
-        // It seems not documented if SourceGenerators can run parallel or not, so lets assume
-        // they can -> ThreadLocal
-        //
+        /// <summary>
+        /// When implemented, reads the value associated with the given <paramref name="name"/> from the underlying config source.
+        /// </summary>
+        protected abstract string? ReadValue(string name);
 
-        private static readonly ThreadLocal<TDescendant> FInstance = new
-        (
-            static () => 
-            {
-                TDescendant instance = new();
-                instance.InitWithDefaults();
-                return instance;
-            },
-            trackAllValues: false
-        );
+        /// <summary>
+        /// When implemented returns the containing directory of executable that references the ProxyGen assembly.
+        /// </summary>
+        protected abstract string BasePath { get; }
 
-        protected static string? GetPath(IConfigReader configReader, string name)
+        /// <inheritdoc/>
+        public string? LogDirectory => GetPath(nameof(LogDirectory));
+
+        /// <inheritdoc/>
+        public LogLevel LogLevel => Enum.TryParse(ReadValue(nameof(LogLevel)), out LogLevel logLevel)
+            ? logLevel
+            : LogLevel.Info;
+
+        /// <summary>
+        /// Gets the path associated with the given name.
+        /// </summary>
+        protected string? GetPath(string name)
         {
-            string? result = configReader.ReadValue(name);
+            string? result = ReadValue(name);
 
             if (result is not null)
             {
                 result = Environment.ExpandEnvironmentVariables(result);
 
                 if (!Path.IsPathRooted(result))
-                    result = Path.Combine(configReader.BasePath, result);
+                    result = Path.Combine(BasePath, result);
             }
 
             return result;
         }
-
-        protected abstract void Init(IConfigReader configReader);
-
-        protected abstract void InitWithDefaults();
-
-        public static void Setup(IConfigReader configReader) 
-        {
-            TDescendant instance = new();
-            instance.Init(configReader);
-            FInstance.Value = instance;
-        }
-
-        public static TDescendant Instance => FInstance.Value;
     }
 }

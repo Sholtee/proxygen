@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -22,66 +21,36 @@ namespace Solti.Utils.Proxy.Internals
 
     internal static class Compile
     {
-        internal static IEnumerable<MetadataReference> GetPlatformAssemblies(string? platformAsmsDir, IEnumerable<string> platformAsms)
-        {
-            if (Directory.Exists(platformAsmsDir))  // Directory.Exists() returns False on NULL 
-                return GetFilteredPlatformAssemblies
-                (
-                    EnumerateDlls(platformAsmsDir!)
-                );
-
-            if (AppContext.GetData("TRUSTED_PLATFORM_ASSEMBLIES") is string tpa)
-                return GetFilteredPlatformAssemblies
-                (
-                    tpa.Split(Path.PathSeparator)
-                );
-
-            //
-            // .NET Framework 4.X support
-            //
-
-            return GetFilteredPlatformAssemblies 
-            (
-                EnumerateDlls
-                (
-                    Path.GetDirectoryName(typeof(object).Assembly.Location)
-                )
-            );
-
-            static IEnumerable<string> EnumerateDlls(string path) => Directory.EnumerateFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
-
-            IEnumerable<MetadataReference> GetFilteredPlatformAssemblies(IEnumerable<string> allAssemblies)
-            {
-                foreach (string asm in allAssemblies)
-                {
-                    foreach (string platformAsm in platformAsms)
-                    {
-                        if (Path.GetFileName(asm).Equals(platformAsm, StringComparison.OrdinalIgnoreCase))
-                            yield return MetadataReference.CreateFromFile(asm);
-                    }
-                }
-            }
-        }
-
-        public static Stream ToAssembly(
-            IReadOnlyCollection<CompilationUnitSyntax> units,
+        public static Stream ToAssembly
+        (
+            IEnumerable<CompilationUnitSyntax> units,
             string asmName,
             string? outputFile,
-            IReadOnlyCollection<MetadataReference> references,
+            IEnumerable<MetadataReference> references,
+            LanguageVersion languageVersion,
+            ILogger logger,
             Func<Compilation, Compilation>? customConfig = default,
-            in CancellationToken cancellation = default) 
+            in CancellationToken cancellation = default
+        ) 
         {
+            logger.Log(LogLevel.Info, "COMP-200", "Starting compilation", new Dictionary<string, object?>
+            {
+                ["References"] = references.Select(static @ref => @ref.Display).ToList(),
+                ["LanguageVersion"] = languageVersion.ToString(),
+                ["AssemblyName"] = asmName,
+                ["OutputFile"] = outputFile
+            });
+
             Compilation compilation = CSharpCompilation.Create
             (
                 assemblyName: asmName,
-                syntaxTrees: units.Select(static unit => CSharpSyntaxTree.Create(unit)),
+                syntaxTrees: units.Select
+                (
+                    unit => CSharpSyntaxTree.Create(unit, new CSharpParseOptions(languageVersion))
+                ),
                 references: references.Union
                 (              
-                    GetPlatformAssemblies
-                    (
-                        TargetFramework.Instance.PlatformAssembliesDir,
-                        TargetFramework.Instance.PlatformAssemblies
-                    ),
+                    PlatformAssemblies.References,
                     MetadataReferenceComparer.Instance
                 ),
                 options: new CSharpCompilationOptions
@@ -100,42 +69,41 @@ namespace Solti.Utils.Proxy.Internals
             {
                 EmitResult result = compilation.Emit(stm, cancellationToken: cancellation);
 
-                Debug.WriteLine(string.Join($",{Environment.NewLine}", result.Diagnostics));
+                logger.Log(LogLevel.Info, "COMP-201", "Compilation finished", new Dictionary<string, object?>
+                {
+                    ["Diagnostics"] = result.Diagnostics.Select(static d => d.ToString()).ToList(),
+                    ["Success"] = result.Success
+                });
 
                 if (!result.Success)
                 {
-                    string src = string.Join
+                    InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
+
+                    IDictionary extra = ex.Data;
+                    extra.Add
                     (
-                        Environment.NewLine,
-                        compilation
-                            .SyntaxTrees
-                            .Select
+                        "failures",
+                        result
+                            .Diagnostics
+                            .Where(static d => d.Severity is DiagnosticSeverity.Error)
+                            .Select(static d => d.ToString())
+                            .ToList()
+                    );
+                    extra.Add
+                    (
+                        "src",
+                        string.Join
+                        (
+                            Environment.NewLine,
+                            compilation.SyntaxTrees.Select
                             (
                                 static unit => unit
                                     .GetCompilationUnitRoot()
                                     .NormalizeWhitespace(eol: Environment.NewLine)
                                     .ToFullString()
                             )
+                        )
                     );
-
-                    string[]
-                        failures = result
-                            .Diagnostics
-                            .Where(static d => d.Severity is DiagnosticSeverity.Error)
-                            .Select(static d => d.ToString())
-                            .ToArray(),
-                        refs = compilation
-                            .References
-                            .Select(static r => r.Display!)
-                            .ToArray();
-
-                    InvalidOperationException ex = new(Resources.COMPILATION_FAILED);
-
-                    IDictionary extra = ex.Data;
-
-                    extra.Add(nameof(failures), failures);
-                    extra.Add(nameof(src), src);
-                    extra.Add(nameof(references), refs);
 
                     throw ex;
                 }

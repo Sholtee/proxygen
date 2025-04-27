@@ -1,0 +1,93 @@
+abstract Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetConcreteGenerator() -> TUntypedGenerator!
+Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute
+Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute.EmbedGeneratedTypeAttribute(System.Type! generator) -> void
+Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute.Generator.get -> System.Type!
+Solti.Utils.Proxy.ExtendedMemberInfo
+Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo! method) -> void
+Solti.Utils.Proxy.ExtendedMemberInfo.Member.get -> System.Reflection.MemberInfo!
+Solti.Utils.Proxy.ExtendedMemberInfo.Method.get -> System.Reflection.MethodInfo!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, System.Runtime.CompilerServices.ITuple! ctorParamz) -> object!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, System.Runtime.CompilerServices.ITuple! ctorParamz, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class.get -> System.Type!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.ClassProxyGenerator(System.Type! class) -> void
+Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>
+Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ClassProxyGenerator() -> void
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, System.Delegate? delegate) -> object!
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, System.Delegate? delegate, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateProxyGenerator(System.Type! delegateType) -> void
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType.get -> System.Type!
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>
+Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.DelegateProxyGenerator() -> void
+Solti.Utils.Proxy.Generators.DuckGenerator
+Solti.Utils.Proxy.Generators.DuckGenerator.Activate(object! target) -> object!
+Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync(object! target, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator(System.Type! iface, System.Type! target) -> void
+Solti.Utils.Proxy.Generators.DuckGenerator.Interface.get -> System.Type!
+Solti.Utils.Proxy.Generators.DuckGenerator.Target.get -> System.Type!
+Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>
+Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.DuckGenerator() -> void
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, object? target = null) -> object!
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, object? target = null, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface.get -> System.Type!
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.InterfaceProxyGenerator(System.Type! interface) -> void
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>
+Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.InterfaceProxyGenerator() -> void
+Solti.Utils.Proxy.IInterceptor
+Solti.Utils.Proxy.IInterceptor.Invoke(Solti.Utils.Proxy.IInvocationContext! context) -> object?
+Solti.Utils.Proxy.IInvocationContext
+Solti.Utils.Proxy.IInvocationContext.Args.get -> object?[]!
+Solti.Utils.Proxy.IInvocationContext.Dispatch() -> object?
+Solti.Utils.Proxy.IInvocationContext.GenericArguments.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+Solti.Utils.Proxy.IInvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.IInvocationContext.Proxy.get -> object!
+Solti.Utils.Proxy.Internals.CurrentMember
+Solti.Utils.Proxy.Internals.Generator
+Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Runtime.CompilerServices.ITuple? tuple, System.Threading.CancellationToken cancellation) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Internals.Generator.Generator(object! id) -> void
+Solti.Utils.Proxy.Internals.Generator.GetGeneratedType() -> System.Type!
+Solti.Utils.Proxy.Internals.Generator.GetGeneratedTypeAsync(System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Type!>!
+Solti.Utils.Proxy.Internals.Generator.Id.get -> object!
+Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>
+Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Generator() -> void
+Solti.Utils.Proxy.Internals.IDelegateWrapper
+Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped.get -> System.Delegate!
+Solti.Utils.Proxy.Internals.IInterceptorAccess
+Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor.get -> Solti.Utils.Proxy.IInterceptor!
+Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor.set -> void
+Solti.Utils.Proxy.Internals.InvocationContext
+Solti.Utils.Proxy.Internals.InvocationContext.Args.get -> object?[]!
+Solti.Utils.Proxy.Internals.InvocationContext.Dispatch.get -> System.Func<object?[]!, object?>!
+Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments.get -> System.Collections.Generic.IReadOnlyList<System.Type!>!
+Solti.Utils.Proxy.Internals.InvocationContext.InvocationContext(object! proxy, Solti.Utils.Proxy.ExtendedMemberInfo! targetMember, System.Func<object?[]!, object?>! dispatch, object?[]! args, System.Collections.Generic.IReadOnlyList<System.Type!>! genericArguments) -> void
+Solti.Utils.Proxy.Internals.InvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
+Solti.Utils.Proxy.Internals.InvocationContext.Proxy.get -> object!
+Solti.Utils.Proxy.Internals.ITargetAccess
+Solti.Utils.Proxy.Internals.ITargetAccess.Target.get -> object?
+Solti.Utils.Proxy.Internals.ITargetAccess.Target.set -> void
+Solti.Utils.Proxy.Internals.LoadedTypes
+Solti.Utils.Proxy.Internals.TypeContext
+Solti.Utils.Proxy.Internals.TypeContext.Activator.get -> System.Func<object?, object!>!
+Solti.Utils.Proxy.Internals.TypeContext.Activator.init -> void
+Solti.Utils.Proxy.Internals.TypeContext.Type.get -> System.Type!
+Solti.Utils.Proxy.Internals.TypeContext.Type.init -> void
+Solti.Utils.Proxy.Internals.TypeContext.TypeContext(System.Type! Type, System.Func<object?, object!>! Activator) -> void
+Solti.Utils.Proxy.Internals.TypeEmitter
+Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter() -> void
+static Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, System.Runtime.CompilerServices.ITuple! ctorParamz) -> TClass!
+static Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, System.Runtime.CompilerServices.ITuple! ctorParamz, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TClass!>!
+static Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, TDelegate? delegate) -> TDelegate!
+static Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, TDelegate? delegate, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TDelegate!>!
+static Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.Activate(TTarget target) -> TInterface!
+static Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.ActivateAsync(TTarget target, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
+static Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, TInterface? target = null) -> TInterface!
+static Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, TInterface? target = null, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<TInterface!>!
+static Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
+static Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref Solti.Utils.Proxy.ExtendedMemberInfo! memberInfo) -> bool
+static Solti.Utils.Proxy.Internals.Generator.GenerateId(string! prefix, params System.Collections.Generic.IEnumerable<System.Type!>! types) -> string!
+static Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedType() -> System.Type!
+static Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<System.Type!>!
+static Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Instance.get -> TUntypedGenerator!
+static Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type! type, System.Func<object?, object!>! activator) -> void

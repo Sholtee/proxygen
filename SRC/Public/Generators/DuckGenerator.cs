@@ -4,6 +4,8 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Solti.Utils.Proxy.Generators
 {
@@ -12,39 +14,41 @@ namespace Solti.Utils.Proxy.Generators
     /// <summary>
     /// Type generator for creating a proxy that wraps the <see cref="Target"/> to implement the <see cref="Interface"/>.
     /// </summary>
-    public sealed class DuckGenerator: Generator
+    public sealed class DuckGenerator(Type iface, Type target) : Generator(id: GenerateId(nameof(DuckGenerator), iface, target))
     {
         /// <summary>
         /// The target implementing all the <see cref="Interface"/> members.
         /// </summary>
-        public Type Target { get; }
+        public Type Target { get; } = target ?? throw new ArgumentNullException(nameof(target));
 
         /// <summary>
         /// The interface for which the proxy will be created.
         /// </summary>
-        public Type Interface { get; }
+        public Type Interface { get; } = iface ?? throw new ArgumentNullException(nameof(iface));
 
         /// <summary>
-        /// Creates a new <see cref="DuckGenerator"/> instance.
+        /// Activates the underlying duck type.
         /// </summary>
-        public DuckGenerator(Type iface, Type target): base(id: new { iface, target })
+        #if NETSTANDARD2_0
+        new
+        #endif
+        public async Task<object> ActivateAsync(object target, CancellationToken cancellation = default)
         {
-            //
-            // The rest of validation is done in the compile phase.
-            //
-
-            Target = target ?? throw new ArgumentNullException(nameof(target));
-            Interface = iface ?? throw new ArgumentNullException(nameof(iface));
+            ITargetAccess targetAccess = (ITargetAccess) await base.ActivateAsync(null, cancellation);
+            targetAccess.Target = target ?? throw new ArgumentNullException(nameof(target));
+            return targetAccess;
         }
 
-        private protected override ProxyUnitSyntaxFactory CreateMainUnit(string? asmName, ReferenceCollector referenceCollector) => new DuckSyntaxFactory
+        /// <summary>
+        /// Activates the underlying duck type.
+        /// </summary>
+        public object Activate(object target) => ActivateAsync(target, CancellationToken.None).GetAwaiter().GetResult();
+
+        private protected override ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context) => new DuckSyntaxFactory
         (
             MetadataTypeInfo.CreateFrom(Interface),
             MetadataTypeInfo.CreateFrom(Target),
-            asmName,
-            OutputType.Module,
-            MetadataAssemblyInfo.CreateFrom(GetType().Assembly),
-            referenceCollector
+            context
         );
     }
 }

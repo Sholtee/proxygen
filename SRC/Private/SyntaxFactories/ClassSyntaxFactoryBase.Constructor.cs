@@ -3,7 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -23,46 +23,39 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
-        {
-            IReadOnlyList<IParameterInfo> paramz = ctor.Parameters;
-
-            return ConstructorDeclaration
-            (
-                name
-            )
+        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => ConstructorDeclaration(name)
             .WithModifiers
             (
                 modifiers: TokenList
                 (
-                    Token(SyntaxKind.PublicKeyword)
+                    //
+                    // Constructor argument may use nested protected/internal types
+                    //
+
+                    Token
+                    (
+                        ctor.Parameters.SelectMany(static param => param.Type.AccessModifiers.SetFlags()).DefaultIfEmpty().Min() switch
+                        {
+                            AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
+                            AccessModifiers.Internal => SyntaxKind.InternalKeyword,
+                            _ => SyntaxKind.PublicKeyword
+                        }
+                    )
                 )
             )
             .WithParameterList
             (
-                parameterList: ParameterList
-                (
-                    paramz.ToSyntaxList
-                    (
-                        param => Parameter
-                        (
-                            identifier: Identifier(param.Name)
-                        )
-                        .WithType
-                        (
-                            type: ResolveType(param.Type)
-                        )
-                    )
-                )
+                parameterList: ResolveParameterList(ctor)
             )
             .WithInitializer
             (
                 initializer: ConstructorInitializer
                 (
                     SyntaxKind.BaseConstructorInitializer,
-                    ArgumentList
+                    ResolveArgumentList
                     (
-                        paramz.ToSyntaxList
+                        ctor,
+                        ctor.Parameters.Select
                         (
                             static param => Argument
                             (
@@ -73,7 +66,6 @@ namespace Solti.Utils.Proxy.Internals
                 )
             )
             .WithBody(Block());
-        }
 
         #if DEBUG
         internal

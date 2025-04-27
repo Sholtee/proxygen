@@ -3,8 +3,8 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis.CSharp;
@@ -20,50 +20,78 @@ namespace Solti.Utils.Proxy.Internals
         /// <code>
         /// event TDelegate IInterface.EventName
         /// {                                    
-        ///   add{...}                           
-        ///   remove{...}                       
+        ///   add {...}                           
+        ///   remove {...}                       
+        /// }                                    
+        /// </code>
+        /// or
+        /// <code>
+        /// public override event TDelegate EventName
+        /// {                                    
+        ///   add {...}                           
+        ///   remove {...}                       
         /// }                                    
         /// </code>
         /// </summary>
         #if DEBUG
         internal
         #endif
-        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode? addBody, CSharpSyntaxNode? removeBody, bool forceInlining = false)
+        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode addBody, CSharpSyntaxNode removeBody)
         {
-            Debug.Assert(@event.DeclaringType.IsInterface);
-
             EventDeclarationSyntax result = EventDeclaration
             (
                 type: ResolveType(@event.Type),
                 identifier: Identifier(@event.Name)
-            )
-            .WithExplicitInterfaceSpecifier
-            (
-                explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
-                (
-                    (NameSyntax) ResolveType(@event.DeclaringType)
-                )
             );
 
-            List<AccessorDeclarationSyntax> accessors = new(2);
+            if (@event.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+            {
+                CheckNotStaticAbstract(@event);
 
-            if (@event.AddMethod is not null && addBody is not null)
-                accessors.Add
+                result = result.WithExplicitInterfaceSpecifier
                 (
-                    ResolveAccessor(SyntaxKind.AddAccessorDeclaration, addBody, forceInlining)
+                    explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
+                    (
+                        (NameSyntax) ResolveType(@event.DeclaringType)
+                    )
                 );
+            }
+            else
+            {
+                //
+                // Events must have add and remove accessors defined
+                //
 
-            if (@event.RemoveMethod is not null && removeBody is not null)
-                accessors.Add
+                IMethodInfo backingMethod = @event.AddMethod!;
+
+                List<SyntaxKind> tokens = [.. ResolveAccessModifiers(backingMethod)];
+
+                tokens.Add(backingMethod.IsVirtual || backingMethod.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
+
+                result = result.WithModifiers
                 (
-                    ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody, forceInlining)
+                    modifiers: TokenList
+                    (
+                        tokens.Select(Token)
+                    )
                 );
+            }
 
-            return !accessors.Any() ? result : result.WithAccessorList
+            return result.WithAccessorList
             (
                 accessorList: AccessorList
                 (
-                    accessors: List(accessors)
+                    accessors: List
+                    (
+                        [
+                            //
+                            // Modifiers cannot be placed on event declarations
+                            //
+
+                            ResolveAccessor(SyntaxKind.AddAccessorDeclaration, addBody),
+                            ResolveAccessor(SyntaxKind.RemoveAccessorDeclaration, removeBody)
+                        ]
+                    )
                 )
             );
         }
@@ -96,6 +124,6 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt) => cls;
+        protected virtual ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo evt) => throw new NotImplementedException();
     }
 }

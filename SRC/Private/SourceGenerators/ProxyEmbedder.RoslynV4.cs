@@ -13,6 +13,8 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Attributes;
+
     #pragma warning disable CS3016 // Arrays as attribute arguments is not CLS-compliant
     [Generator(LanguageNames.CSharp)]
     #pragma warning restore CS3016
@@ -27,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
                 _ => false,
             };
 
-            static bool IsEmbedGeneratedTypeAttribute(SyntaxToken token) => token.Text is "EmbedGeneratedTypeAttribute" or "EmbedGeneratedType";
+            static bool IsEmbedGeneratedTypeAttribute(SyntaxToken token) => token.Text is nameof(EmbedGeneratedTypeAttribute) or "EmbedGeneratedType";
         }
 
         private static INamedTypeSymbol? ExtractGenerator(GeneratorSyntaxContext context, CancellationToken cancellationToken)

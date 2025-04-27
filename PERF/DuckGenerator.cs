@@ -7,16 +7,20 @@ using System;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Moq;
 
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
+    using Internals;
 
     [MemoryDiagnoser]
     [SimpleJob(RunStrategy.Throughput, invocationCount: 30000)]
     public class DuckGenerator
     {
         private const int OPERATIONS_PER_INVOKE = 100;
+
+        private static readonly IAssemblyCachingConfiguration FCachingConfiguration = new Mock<IAssemblyCachingConfiguration>().Object;
 
         public class Implementation
         {
@@ -26,7 +30,9 @@ namespace Solti.Utils.Proxy.Perf
         [Benchmark]
         public void AssemblingProxyType() => DuckGenerator<IInterface, Implementation>
             .Instance
-            .Emit(Guid.NewGuid().ToString(), default, default);
+            .EmitAsync(FCachingConfiguration, SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
+            .GetAwaiter()
+            .GetResult();
 
         [Benchmark(OperationsPerInvoke = OPERATIONS_PER_INVOKE)]
         public void GetGeneratedType()
@@ -44,7 +50,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                DuckGenerator<IInterface, Implementation>.Activate(Tuple.Create(FImplementation));
+                DuckGenerator<IInterface, Implementation>.Activate(FImplementation);
             }
         }
     }

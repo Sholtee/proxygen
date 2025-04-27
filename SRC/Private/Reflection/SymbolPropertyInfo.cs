@@ -5,7 +5,9 @@
 ********************************************************************************/
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
+
 using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
@@ -16,24 +18,29 @@ namespace Solti.Utils.Proxy.Internals
 
         private Compilation Compilation { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FGetMethod;
-        public IMethodInfo? GetMethod => FGetMethod ??= UnderlyingSymbol.GetMethod is not null
-            ? SymbolMethodInfo.CreateFrom(UnderlyingSymbol.GetMethod, Compilation) 
+        public IMethodInfo? GetMethod => UnderlyingSymbol.GetMethod is not null
+            ? FGetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.GetMethod, Compilation) 
             : null;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IMethodInfo? FSetMethod;
-        public IMethodInfo? SetMethod => FSetMethod ??= UnderlyingSymbol.SetMethod is not null
-            ? SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
+        public IMethodInfo? SetMethod => UnderlyingSymbol.SetMethod is not null
+            ? FSetMethod ??= SymbolMethodInfo.CreateFrom(UnderlyingSymbol.SetMethod, Compilation) 
             : null;
 
         public string Name => UnderlyingSymbol.StrippedName();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FType;
         public ITypeInfo Type => FType ??= SymbolTypeInfo.CreateFrom(UnderlyingSymbol.Type, Compilation);
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private ITypeInfo? FDeclaringType;
         public ITypeInfo DeclaringType => FDeclaringType ??= (GetMethod ?? SetMethod!).DeclaringType;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private IReadOnlyList<IParameterInfo>? FIndices;
         public IReadOnlyList<IParameterInfo> Indices => FIndices ??= UnderlyingSymbol
             .Parameters
@@ -43,6 +50,8 @@ namespace Solti.Utils.Proxy.Internals
         public bool IsStatic => (GetMethod ?? SetMethod!).IsStatic;
 
         public bool IsAbstract => (GetMethod ?? SetMethod!).IsAbstract;
+
+        public bool IsVirtual => (GetMethod ?? SetMethod!).IsVirtual;
 
         private SymbolPropertyInfo(IPropertySymbol prop, Compilation compilation)
         {

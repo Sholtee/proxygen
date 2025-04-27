@@ -5,73 +5,45 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
-    internal partial class DuckSyntaxFactory : ProxyUnitSyntaxFactory
+    internal sealed partial class DuckSyntaxFactory : ProxyUnitSyntaxFactoryBase
     {
-        public ITypeInfo InterfaceType { get; }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly ITypeInfo FInterfaceType;
 
-        public ITypeInfo TargetType { get; }
+        public override string ExposedClass => $"Duck_{new ITypeInfo[] { FInterfaceType, TargetType! }.GetMD5HashCode()}";
 
-        public ITypeInfo BaseType { get; }
-
-        public IPropertyInfo Target { get; }
-
-        public DuckSyntaxFactory
-        (
-            ITypeInfo interfaceType,
-            ITypeInfo targetType, 
-            string? containingAssembly,
-            OutputType outputType,
-            IAssemblyInfo proxyGenAsm,
-            ReferenceCollector? referenceCollector = null,
-            LanguageVersion languageVersion = LanguageVersion.Latest   
-        )
-        : base
-        (
-            outputType,
-            containingAssembly ?? $"Duck_{ITypeInfoExtensions.GetMD5HashCode(interfaceType, targetType)}",
-            referenceCollector,
-            languageVersion
-        ) 
+        public DuckSyntaxFactory(ITypeInfo interfaceType, ITypeInfo targetType, SyntaxFactoryContext context) : base(targetType, context) 
         {
-            if (!interfaceType.IsInterface)
+            if (!interfaceType.Flags.HasFlag(TypeInfoFlags.IsInterface))
                 throw new ArgumentException(Resources.NOT_AN_INTERFACE, nameof(interfaceType));
 
-            InterfaceType = interfaceType;
-            TargetType = targetType;
-
-            //
-            // We don't know if BaseType should be backed by Symbol or Metadata, so grab it from proxyGenAsm.
-            //
-
-            BaseType = ((IGenericTypeInfo) proxyGenAsm.GetType(typeof(DuckBase<>).FullName)!).Close(targetType);
-            Target = BaseType
-                .Properties
-                .Single(static prop => prop.Name == nameof(DuckBase<object>.Target));
-        }
-
-        public override CompilationUnitSyntax ResolveUnit(object context, CancellationToken cancellation)
-        {
-            Visibility.Check(InterfaceType, ContainingAssembly);
-            Visibility.Check(TargetType, ContainingAssembly);
-
-            return base.ResolveUnit(context, cancellation);
+            FInterfaceType = interfaceType;
         }
 
         #if DEBUG
         internal
         #endif
-        protected override IEnumerable<ITypeInfo> ResolveBases(object context) => new[] { BaseType, InterfaceType };
+        protected override CompilationUnitSyntax ResolveUnitCore(object context, CancellationToken cancellation)
+        {
+            Visibility.Check(FInterfaceType, ContainingAssembly);
+            return base.ResolveUnitCore(context, cancellation);
+        }
+
+        #if DEBUG
+        internal
+        #endif
+        protected override IReadOnlyList<ITypeInfo> Bases => [FInterfaceType, .. base.Bases];
 
         #if DEBUG
         internal
@@ -80,12 +52,6 @@ namespace Solti.Utils.Proxy.Internals
         {
             yield return ResolveClass(context, cancellation);
         }
-
-        #if DEBUG
-        internal
-        #endif
-        protected override string ResolveClassName(object context) =>
-            $"Duck_{ITypeInfoExtensions.GetMD5HashCode(InterfaceType, TargetType)}";
 
         private static TMember GetTargetMember<TMember>(TMember ifaceMember, IEnumerable<TMember> targetMembers, Func<TMember, TMember, bool> signatureEquals) where TMember : IMemberInfo
         {
@@ -96,9 +62,7 @@ namespace Solti.Utils.Proxy.Internals
             if (ifaceMember.IsAbstract && ifaceMember.IsStatic)
                 throw new NotSupportedException(Resources.ABSTRACT_STATIC_NOT_SUPPORTED);
 
-            IReadOnlyList<TMember> possibleTargets = targetMembers
-              .Where(targetMember => signatureEquals(targetMember, ifaceMember))
-              .ToList();
+            IReadOnlyList<TMember> possibleTargets = [..targetMembers.Where(targetMember => signatureEquals(targetMember, ifaceMember))];
 
             return possibleTargets.Count switch
             {

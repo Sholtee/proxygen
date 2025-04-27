@@ -3,6 +3,7 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -14,39 +15,77 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    using Properties;
+
     internal partial class ClassSyntaxFactoryBase
     {
         // https://github.com/dotnet/roslyn/issues/4861
-        protected const string Value = "value";
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        protected static readonly IdentifierNameSyntax FValue = IdentifierName("value");
 
-        private AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode body, bool forceInlining)
+        private static T Fail<T>(string message)
+        {
+            Debug.Fail(message);
+            return default!;
+        }
+
+        private static AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode? body, params IEnumerable<SyntaxKind> modifiers)
         {
             AccessorDeclarationSyntax declaration = AccessorDeclaration(kind);
 
-            switch (body)
+            declaration = body switch
             {
-                case BlockSyntax block:
-                    declaration = declaration.WithBody(block);
-                    break;
-                case ArrowExpressionClauseSyntax arrow:
-                    declaration = declaration
-                        .WithExpressionBody(arrow)
-                        .WithSemicolonToken
-                        (
-                            Token(SyntaxKind.SemicolonToken)
-                        );
-                    break;
-                default:
-                    Debug.Fail("Unknown node type");
-                    return null!;
-            }
+                BlockSyntax block => declaration.WithBody(block),
+                ArrowExpressionClauseSyntax arrow => declaration.WithExpressionBody(arrow).WithSemicolonToken
+                (
+                    Token(SyntaxKind.SemicolonToken)
+                ),
+                null => declaration.WithSemicolonToken
+                (
+                    Token(SyntaxKind.SemicolonToken)
+                ),
+                _ => Fail<AccessorDeclarationSyntax>("Unknown node type")
+            };
 
-            if (forceInlining) declaration = declaration.WithAttributeLists
+            if (modifiers.Any()) declaration = declaration.WithModifiers
             (
-                attributeLists: ResolveMethodImplAttributeToForceInlining()
+                modifiers: TokenList
+                (
+                    modifiers.Select(Token)
+                )
             );
 
             return declaration;
+        }
+
+        private IEnumerable<SyntaxKind> ResolveAccessModifiers(IMethodInfo method)
+        {
+            bool internalAllowed = method.DeclaringType.DeclaringAssembly?.IsFriend(ContainingAssembly) is true;
+
+            IEnumerable<SyntaxKind> ams = method
+                .AccessModifiers
+                .SetFlags()
+
+                //
+                // When overriding an "internal protected" member we cannot reuse the "internal" keyword
+                // if the base is declared in a different assembly
+                //
+
+                .Where(am => am >= AccessModifiers.Protected && (am is not AccessModifiers.Internal || internalAllowed))
+                .Select
+                (
+                    static am => am switch
+                    {
+                        AccessModifiers.Public => SyntaxKind.PublicKeyword,
+                        AccessModifiers.Protected => SyntaxKind.ProtectedKeyword,
+                        AccessModifiers.Internal => SyntaxKind.InternalKeyword,
+                        _ => Fail<SyntaxKind>("Member not visible")
+                    }
+                );
+            if (!ams.Any())
+                throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER);
+
+            return ams;
         }
 
         /// <summary>
@@ -100,7 +139,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ObjectCreationExpressionSyntax ResolveObject<T>(params ArgumentSyntax[] arguments) => ObjectCreationExpression(type: ResolveType<T>()).WithArgumentList
+        protected ObjectCreationExpressionSyntax ResolveObject<T>(params IEnumerable<ArgumentSyntax> arguments) => ObjectCreationExpression(type: ResolveType<T>()).WithArgumentList
         (
             ArgumentList
             (
@@ -111,7 +150,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static IdentifierNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
+        protected static SimpleNameSyntax ResolveIdentifierName(LocalDeclarationStatementSyntax variable) => IdentifierName(variable.Declaration.Variables.Single().Identifier);
 
         #if DEBUG
         internal
@@ -124,27 +163,22 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected static IdentifierNameSyntax ResolveIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
+        protected static SimpleNameSyntax ResolveIdentifierName(FieldDeclarationSyntax field) => IdentifierName(field.Declaration.Variables.Single()!.Identifier);
 
         #if DEBUG
         internal
         #endif
-        protected static ArgumentSyntax ResolveArgument(FieldDeclarationSyntax field) => Argument
-        (
-            ResolveIdentifierName(field)
-        );
-
-        #if DEBUG
-        internal
-        #endif
-        protected static NameSyntax ResolveIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null
+        protected static SimpleNameSyntax ResolveIdentifierName(ClassDeclarationSyntax cls) => cls.TypeParameterList is null
             ? IdentifierName(cls.Identifier)
             : GenericName
             (
                 cls.Identifier,
                 TypeArgumentList
                 (
-                    cls.TypeParameterList.Parameters.ToSyntaxList(ga => (TypeSyntax) IdentifierName(ga.Identifier))
+                    cls.TypeParameterList.Parameters.ToSyntaxList<TypeParameterSyntax, TypeSyntax>
+                    (
+                        static ga => IdentifierName(ga.Identifier)
+                    )
                 )
             );
     }

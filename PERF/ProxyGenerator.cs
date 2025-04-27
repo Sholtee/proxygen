@@ -7,10 +7,12 @@ using System;
 
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Engines;
+using Moq;
 
 namespace Solti.Utils.Proxy.Perf
 {
     using Generators;
+    using Internals;
 
     [MemoryDiagnoser]
     [SimpleJob(RunStrategy.Throughput, invocationCount: 30000)]
@@ -18,24 +20,28 @@ namespace Solti.Utils.Proxy.Perf
     {
         private const int OPERATIONS_PER_INVOKE = 100;
 
-        public class InterfaceProxy: InterfaceInterceptor<IInterface>
+        private static readonly IAssemblyCachingConfiguration FCachingConfiguration = new Mock<IAssemblyCachingConfiguration>().Object;
+
+        private sealed class Interceptor : IInterceptor
         {
-            public InterfaceProxy(IInterface target) : base(target)
-            {
-            }
+            public object Invoke(IInvocationContext context) => context.Dispatch();
         }
 
+        private static readonly Interceptor FInterceptor = new();
+
         [Benchmark]
-        public void AssemblingProxyType() => ProxyGenerator<IInterface, InterfaceProxy>
+        public void AssemblingProxyType() => InterfaceProxyGenerator<IInterface>
             .Instance
-            .Emit(Guid.NewGuid().ToString(), default, default);
+            .EmitAsync(FCachingConfiguration, SyntaxFactoryContext.Default with { AssemblyNameOverride = Guid.NewGuid().ToString() }, default)
+            .GetAwaiter()
+            .GetResult();
 
         [Benchmark(OperationsPerInvoke = OPERATIONS_PER_INVOKE)]
         public void GetGeneratedType()
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                ProxyGenerator<IInterface, InterfaceProxy>.GetGeneratedType();
+                _ = InterfaceProxyGenerator<IInterface>.GetGeneratedType();
             }
         }
 
@@ -44,7 +50,7 @@ namespace Solti.Utils.Proxy.Perf
         {
             for (int i = 0; i < OPERATIONS_PER_INVOKE; i++)
             {
-                ProxyGenerator<IInterface, InterfaceProxy>.Activate(Tuple.Create((IInterface) null));
+                _ = InterfaceProxyGenerator<IInterface>.Activate(FInterceptor);
             }
         }
     }

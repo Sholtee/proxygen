@@ -11,6 +11,18 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class ParameterInfoExtensions
     {
+        /// <summary>
+        /// Determines if the parameter possesses the given attribute. The attribute is identified by its fully qualified name since not all attribute types are available in NETSTANDARD. 
+        /// </summary>
+        public static bool HasAttribute(this ParameterInfo src, string fullName) => src
+            .GetCustomAttributes()
+            .Select(static attr => attr.GetType().FullName)
+            .Contains(fullName, StringComparer.OrdinalIgnoreCase);
+
+        /// <summary>
+        /// Associates <see cref="ParameterKind"/> to the given <see cref="ParameterInfo"/>.
+        /// </summary>
+        /// <remarks>This method examines attributes as well so the caller better cache the return value.</remarks>
         public static ParameterKind GetParameterKind(this ParameterInfo src)
         {
             //
@@ -20,8 +32,7 @@ namespace Solti.Utils.Proxy.Internals
 
             if (src.Position is -1) return src switch
             {
-                _ when src.ParameterType.IsByRef && IsReadOnly() => ParameterKind.RefReadonly,
-                _ when src.ParameterType.IsByRef => ParameterKind.Ref,
+                { ParameterType.IsByRef: true } => IsReadOnly() ? ParameterKind.RefReadonly : ParameterKind.Ref,
                 _ => ParameterKind.Out
             };
 
@@ -29,43 +40,27 @@ namespace Solti.Utils.Proxy.Internals
             // We have a "regular" parameter
             //
 
-            if (src.ParameterType.IsByRef)
+            if (src.ParameterType.IsByRef) return src switch
             {
                 //
                 // "native by ref" (e.g. IntPtr) is out of play from here.
                 //
 
-                if (src.IsIn && IsReadOnly()) // src.IsIn is not enough
-                    return ParameterKind.In;
-
-                if (!src.IsIn && src.IsOut)
-                    return ParameterKind.Out;
-
-                return ParameterKind.Ref;
-            }
+                { IsIn: true } when IsReadOnly() => ParameterKind.In, // src.IsIn is not enough
+                { IsIn: false, IsOut: true } => ParameterKind.Out,
+                _ => ParameterKind.Ref
+            };
 
             //
             // "params" and by ref parameters are mutually exclusives.
             //
 
-            if (src.GetCustomAttribute<ParamArrayAttribute>() != null) 
+            if (src.HasAttribute(typeof(ParamArrayAttribute).FullName) || src.HasAttribute("System.Runtime.CompilerServices.ParamCollectionAttribute")) 
                 return ParameterKind.Params;
 
             return ParameterKind.None;
 
-            bool IsReadOnly() => src
-                .GetCustomAttributes()
-                .Any
-                (
-                    //
-                    // "IsReadOnlyAttribute" is public since netstandard2.1.
-                    //
-
-                    static attr => attr
-                        .GetType()
-                        .FullName
-                        .Equals("System.Runtime.CompilerServices.IsReadOnlyAttribute", StringComparison.OrdinalIgnoreCase)
-                );
+            bool IsReadOnly() => src.HasAttribute("System.Runtime.CompilerServices.IsReadOnlyAttribute");
         }
     }
 }

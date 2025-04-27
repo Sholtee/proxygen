@@ -88,11 +88,11 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &quot;reference return value&quot;s and &quot;ref struct&quot;s are not supported..
+        ///   Looks up a localized string similar to By ref constructor parameters are not supported..
         /// </summary>
-        internal static string BYREF_NOT_SUPPORTED {
+        internal static string BYREF_CTOR_PARAMETER {
             get {
-                return ResourceManager.GetString("BYREF_NOT_SUPPORTED", resourceCulture);
+                return ResourceManager.GetString("BYREF_CTOR_PARAMETER", resourceCulture);
             }
         }
         
@@ -124,7 +124,7 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Target interface can not be generic.
+        ///   Looks up a localized string similar to Target interface can not be open generic.
         /// </summary>
         internal static string GENERIC_IFACE {
             get {
@@ -133,11 +133,29 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The interceptor can not be generic..
+        ///   Looks up a localized string similar to The interceptor can not be open generic..
         /// </summary>
         internal static string GENERIC_INTERCEPTOR {
             get {
                 return ResourceManager.GetString("GENERIC_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target class cannot be open generic..
+        /// </summary>
+        internal static string GENERIC_TARGET {
+            get {
+                return ResourceManager.GetString("GENERIC_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid dispatch function..
+        /// </summary>
+        internal static string INVALID_DISPATCH_FN {
+            get {
+                return ResourceManager.GetString("INVALID_DISPATCH_FN", resourceCulture);
             }
         }
         
@@ -169,11 +187,29 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to At least one public constructor should be declared on {0}..
+        ///   Looks up a localized string similar to At least one accessible constructor should be declared on {0}..
         /// </summary>
-        internal static string NO_PUBLIC_CTOR {
+        internal static string NO_ACCESSIBLE_CTOR {
             get {
-                return ResourceManager.GetString("NO_PUBLIC_CTOR", resourceCulture);
+                return ResourceManager.GetString("NO_ACCESSIBLE_CTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The parameter must be a class..
+        /// </summary>
+        internal static string NOT_A_CLASS {
+            get {
+                return ResourceManager.GetString("NOT_A_CLASS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The given type is not a concrete delegate..
+        /// </summary>
+        internal static string NOT_A_DELEGATE {
+            get {
+                return ResourceManager.GetString("NOT_A_DELEGATE", resourceCulture);
             }
         }
         
@@ -205,6 +241,15 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The given member is not virtual..
+        /// </summary>
+        internal static string NOT_VIRTUAL {
+            get {
+                return ResourceManager.GetString("NOT_VIRTUAL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The target is NULL..
         /// </summary>
         internal static string NULL_TARGET {
@@ -214,11 +259,47 @@ namespace Solti.Utils.Proxy.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The interceptor can not be sealed..
+        ///   Looks up a localized string similar to &quot;reference return value&quot;s and &quot;ref struct&quot;s are not supported..
+        /// </summary>
+        internal static string REF_VALUE {
+            get {
+                return ResourceManager.GetString("REF_VALUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot derive from reserved type..
+        /// </summary>
+        internal static string RESERVED_TYPE {
+            get {
+                return ResourceManager.GetString("RESERVED_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The interceptor cannot be sealed..
         /// </summary>
         internal static string SEALED_INTERCEPTOR {
             get {
                 return ResourceManager.GetString("SEALED_INTERCEPTOR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target class cannot be sealed..
+        /// </summary>
+        internal static string SEALED_TARGET {
+            get {
+                return ResourceManager.GetString("SEALED_TARGET", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Too many constructor parameters.
+        /// </summary>
+        internal static string TOO_MANY_CTOR_PARAMS {
+            get {
+                return ResourceManager.GetString("TOO_MANY_CTOR_PARAMS", resourceCulture);
             }
         }
         
@@ -246,6 +327,15 @@ namespace Solti.Utils.Proxy.Properties {
         internal static string UNDETERMINED_ACCESS_MODIFIER {
             get {
                 return ResourceManager.GetString("UNDETERMINED_ACCESS_MODIFIER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsafe context not supported..
+        /// </summary>
+        internal static string UNSAFE_CONTEXT {
+            get {
+                return ResourceManager.GetString("UNSAFE_CONTEXT", resourceCulture);
             }
         }
     }
