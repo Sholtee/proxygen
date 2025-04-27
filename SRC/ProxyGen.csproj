@@ -90,7 +90,7 @@
     <Description>.NET proxy generator powered by Roslyn</Description>
     <PackageId>ProxyGen.NET</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Proxy;Interface-Proxy;Duck-Typing;Interface-Interceptor;Interceptor</PackageTags>
+    <PackageTags>Proxy;Interface-Proxy;Delegate-Proxy;VirtualMethod-Proxy;Duck-Typing;Interceptor</PackageTags>
     <PackageReleaseNotes>See https://github.com/Sholtee/proxygen/blob/master/history.md </PackageReleaseNotes>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.MD</PackageReadmeFile>
