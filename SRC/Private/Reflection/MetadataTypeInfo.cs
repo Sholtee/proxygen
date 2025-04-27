@@ -232,9 +232,7 @@ namespace Solti.Utils.Proxy.Internals
                 Type[] gas = new Type[genericArgs.Length];
 
                 for (int i = 0; i < genericArgs.Length; i++)
-                {
                     gas[i] = genericArgs[i].ToMetadata();
-                }
 
                 return (IGenericTypeInfo) CreateFrom(UnderlyingType.MakeGenericType(gas));
             }
