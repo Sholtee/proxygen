@@ -340,6 +340,10 @@ namespace Solti.Utils.Proxy.Internals
             } 
         }
 
+        /// <summary>
+        /// Associates <see cref="AccessModifiers"/> to the given <see cref="Type"/>.
+        /// </summary>
+        /// <remarks>Since this method may use reflection to determine the result, callers better cache the returned data</remarks>
         public static AccessModifiers GetAccessModifiers(this Type src)
         {
             src = src.GetInnermostElementType() ?? src;
@@ -380,13 +384,21 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>
+        /// Associates <see cref="RefType"/> to the given <see cref="Type"/>.
+        /// </summary>
+        /// <remarks>Since this method may inspect attributes to determine the result, callers better cache the returned data.</remarks>
         public static RefType GetRefType(this Type src) => src switch
         {
             _ when
             #if NETSTANDARD2_1_OR_GREATER
                 src.IsByRefLike ||
             #endif
-                src.GetCustomAttributes().Any(static ca => ca.GetType().FullName?.Equals("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparison.OrdinalIgnoreCase) is true) => RefType.Ref, // ref struct
+                src
+                    .GetCustomAttributes()
+                    .Select(static ca => ca.GetType().FullName)
+                    .Contains("System.Runtime.CompilerServices.IsByRefLikeAttribute", StringComparer.OrdinalIgnoreCase)
+                => RefType.Ref, // ref struct
             _ when src.IsPointer => RefType.Pointer,
             _ when src.IsArray => RefType.Array,
             _ => RefType.None

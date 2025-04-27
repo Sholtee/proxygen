@@ -101,7 +101,9 @@ namespace Solti.Utils.Proxy.Internals
         });
         public TypeInfoFlags Flags => FFlags.Value;
 
-        public RefType RefType => UnderlyingType.GetRefType();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private RefType? FRefType;
+        public RefType RefType => FRefType ??= UnderlyingType.GetRefType();
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<ITypeInfo?> FElementType = new(() =>
@@ -188,11 +190,15 @@ namespace Solti.Utils.Proxy.Internals
         });
         public IHasName? ContainingMember => FContainingMember.Value;
 
-        public AccessModifiers AccessModifiers => UnderlyingType.GetAccessModifiers();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private AccessModifiers? FAccessModifiers;
+        public AccessModifiers AccessModifiers => FAccessModifiers ??= UnderlyingType.GetAccessModifiers();
 
         private sealed class MetadataGenericTypeInfo(Type underlyingType) : MetadataTypeInfo(underlyingType), IGenericTypeInfo
         {
-            public bool IsGenericDefinition => UnderlyingType
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            private bool? FIsGenericDefinition;
+            public bool IsGenericDefinition => FIsGenericDefinition ??= UnderlyingType
                 .GetGenericArguments()
                 .Any(static ga => ga.IsGenericParameter);
 
@@ -207,7 +213,9 @@ namespace Solti.Utils.Proxy.Internals
                 ? base.Name
                 : GenericDefinition.Name;
 
-            public IGenericTypeInfo GenericDefinition => new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
+            [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+            private IGenericTypeInfo? FGenericDefinition;
+            public IGenericTypeInfo GenericDefinition => FGenericDefinition ??= new MetadataGenericTypeInfo(UnderlyingType.GetGenericTypeDefinition());
 
             public IReadOnlyList<IGenericConstraint> GenericConstraints =>
                 //
