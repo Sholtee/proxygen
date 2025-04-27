@@ -50,8 +50,10 @@
     <div class="level0"><span class="xref">System.Object</span></div>
     <div class="level1"><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a></div>
     <div class="level2"><span class="xref">Generator</span></div>
+      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.ClassProxyGenerator.html">ClassProxyGenerator</a></div>
+      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html">DelegateProxyGenerator</a></div>
       <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.DuckGenerator.html">DuckGenerator</a></div>
-      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.ProxyGenerator.html">ProxyGenerator</a></div>
+      <div class="level3"><a class="xref" href="Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html">InterfaceProxyGenerator</a></div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.Internals.html">Solti.Utils.Proxy.Internals</a></h6>
   <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
@@ -63,7 +65,7 @@
   </h3>
   <a id="Solti_Utils_Proxy_Internals_Generator__ctor_" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_Generator__ctor_System_Object_" data-uid="Solti.Utils.Proxy.Internals.Generator.#ctor(System.Object)">Generator(Object)</h4>
-  <div class="markdown level1 summary"><p>Creates a new <a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a> instance.</p>
+  <div class="markdown level1 summary"><p>Base of untyped generators.</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -115,49 +117,6 @@
   </table>
   <h3 id="methods">Methods
   </h3>
-  <a id="Solti_Utils_Proxy_Internals_Generator_Activate_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate*"></a>
-  <h4 id="Solti_Utils_Proxy_Internals_Generator_Activate_System_Runtime_CompilerServices_ITuple_" data-uid="Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)">Activate(ITuple)</h4>
-  <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
-</div>
-  <div class="markdown level1 conceptual"></div>
-  <h5 class="decalaration">Declaration</h5>
-  <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public object Activate(ITuple tuple)</code></pre>
-  </div>
-  <h5 class="parameters">Parameters</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Name</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Runtime.CompilerServices.ITuple</span></td>
-        <td><span class="parametername">tuple</span></td>
-        <td><p>A <span class="xref">System.Tuple</span> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
-  <h5 class="returns">Returns</h5>
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><span class="xref">System.Object</span></td>
-        <td><p>The just activated instance.</p>
-</td>
-      </tr>
-    </tbody>
-  </table>
   <a id="Solti_Utils_Proxy_Internals_Generator_ActivateAsync_" data-uid="Solti.Utils.Proxy.Internals.Generator.ActivateAsync*"></a>
   <h4 id="Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_" data-uid="Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)">ActivateAsync(ITuple, CancellationToken)</h4>
   <div class="markdown level1 summary"><p>Creates an instance of the generated type.</p>
@@ -165,7 +124,7 @@
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">public Task&lt;object&gt; ActivateAsync(ITuple tuple, CancellationToken cancellation = null)</code></pre>
+    <pre><code class="lang-csharp hljs">protected Task&lt;object&gt; ActivateAsync(ITuple tuple, CancellationToken cancellation)</code></pre>
   </div>
   <h5 class="parameters">Parameters</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -180,7 +139,7 @@
       <tr>
         <td><span class="xref">System.Runtime.CompilerServices.ITuple</span></td>
         <td><span class="parametername">tuple</span></td>
-        <td><p>A <span class="xref">System.Tuple</span> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
+        <td><p>A <span class="xref">System.Runtime.CompilerServices.ITuple</span> containing the constructor parameters or null if you want to invoke the parameterless constructor.</p>
 </td>
       </tr>
       <tr>
@@ -204,6 +163,52 @@
         <td><span class="xref">System.Threading.Tasks.Task</span>&lt;<span class="xref">System.Object</span>&gt;</td>
         <td><p>The just activated instance.</p>
 </td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_Internals_Generator_GenerateId_" data-uid="Solti.Utils.Proxy.Internals.Generator.GenerateId*"></a>
+  <h4 id="Solti_Utils_Proxy_Internals_Generator_GenerateId_System_String_System_Collections_Generic_IEnumerable_System_Type__" data-uid="Solti.Utils.Proxy.Internals.Generator.GenerateId(System.String,System.Collections.Generic.IEnumerable{System.Type})">GenerateId(String, IEnumerable&lt;Type&gt;)</h4>
+  <div class="markdown level1 summary"><p>Creates unique generator ids. </p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected static string GenerateId(string prefix, IEnumerable&lt;Type&gt; types)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">prefix</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IEnumerable</span>&lt;<span class="xref">System.Type</span>&gt;</td>
+        <td><span class="parametername">types</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

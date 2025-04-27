@@ -1,0 +1,213 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Interface IInvocationContext
+   | ProxyGen </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Interface IInvocationContext
+   | ProxyGen ">
+    <meta name="generator" content="docfx 2.59.3.0">
+    
+    <link rel="shortcut icon" href="icon.png">
+    <link rel="stylesheet" href="styles/docfx.vendor.css">
+    <link rel="stylesheet" href="styles/docfx.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <meta property="docfx:navrel" content="toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        <div class="article row grid">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="Solti.Utils.Proxy.IInvocationContext">
+  
+  
+  <h1 id="Solti_Utils_Proxy_IInvocationContext" data-uid="Solti.Utils.Proxy.IInvocationContext" class="text-break">Interface IInvocationContext
+  </h1>
+  <div class="markdown level0 summary"><p>Abstract invocation context</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Solti.Utils.Proxy.html">Solti.Utils.Proxy</a></h6>
+  <h6><strong>Assembly</strong>: Solti.Utils.Proxy.dll</h6>
+  <h5 id="Solti_Utils_Proxy_IInvocationContext_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public interface IInvocationContext</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="Solti_Utils_Proxy_IInvocationContext_Args_" data-uid="Solti.Utils.Proxy.IInvocationContext.Args*"></a>
+  <h4 id="Solti_Utils_Proxy_IInvocationContext_Args" data-uid="Solti.Utils.Proxy.IInvocationContext.Args">Args</h4>
+  <div class="markdown level1 summary"><p>The arguments passed by the caller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">object[] Args { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span>[]</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="Solti_Utils_Proxy_IInvocationContext_Args_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>Before the target gets called you may use this property to inspect or modify parameters passed by the caller. After it you can read or amend the &quot;by ref&quot; parameters set by the target method.</p>
+</div>
+  <a id="Solti_Utils_Proxy_IInvocationContext_GenericArguments_" data-uid="Solti.Utils.Proxy.IInvocationContext.GenericArguments*"></a>
+  <h4 id="Solti_Utils_Proxy_IInvocationContext_GenericArguments" data-uid="Solti.Utils.Proxy.IInvocationContext.GenericArguments">GenericArguments</h4>
+  <div class="markdown level1 summary"><p>Generic arguments supplied by the caller.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">IReadOnlyList&lt;Type&gt; GenericArguments { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<span class="xref">System.Type</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_IInvocationContext_Member_" data-uid="Solti.Utils.Proxy.IInvocationContext.Member*"></a>
+  <h4 id="Solti_Utils_Proxy_IInvocationContext_Member" data-uid="Solti.Utils.Proxy.IInvocationContext.Member">Member</h4>
+  <div class="markdown level1 summary"><p>The member (property, event or method) that is being proxied.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">ExtendedMemberInfo Member { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Solti.Utils.Proxy.ExtendedMemberInfo.html">ExtendedMemberInfo</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="Solti_Utils_Proxy_IInvocationContext_Proxy_" data-uid="Solti.Utils.Proxy.IInvocationContext.Proxy*"></a>
+  <h4 id="Solti_Utils_Proxy_IInvocationContext_Proxy" data-uid="Solti.Utils.Proxy.IInvocationContext.Proxy">Proxy</h4>
+  <div class="markdown level1 summary"><p>The proxy object on which the call was made.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">object Proxy { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="Solti_Utils_Proxy_IInvocationContext_Dispatch_" data-uid="Solti.Utils.Proxy.IInvocationContext.Dispatch*"></a>
+  <h4 id="Solti_Utils_Proxy_IInvocationContext_Dispatch" data-uid="Solti.Utils.Proxy.IInvocationContext.Dispatch">Dispatch()</h4>
+  <div class="markdown level1 summary"><p>Dispatches the current call to the target.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">object Dispatch()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Object</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="styles/docfx.js"></script>
+    <script type="text/javascript" src="styles/main.js"></script>
+  </body>
+</html>

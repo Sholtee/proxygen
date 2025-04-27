@@ -46,26 +46,37 @@
   <div class="markdown level0 remarks"></div>
     <h3 id="classes">Classes
   </h3>
-      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.DuckBase-1.html">DuckBase&lt;T&gt;</a></h4>
-      <section><p>Defines the base class for ducks.</p>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.CurrentMember.html">CurrentMember</a></h4>
+      <section><p>Contains helpers related to the currently executing member (method, property or event accessor). Intended for private use only.</p>
 </section>
       <h4><a class="xref" href="Solti.Utils.Proxy.Internals.Generator.html">Generator</a></h4>
       <section><p>Base of untyped generators.</p>
 </section>
-      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html">Generator&lt;TInterface, TDescendant&gt;</a></h4>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.Generator-2.html">Generator&lt;TUntypedGenerator, TDescendant&gt;</a></h4>
       <section><p>Base of typed generators.</p>
 </section>
-      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html">InterfaceInterceptorBase&lt;TInterface&gt;</a></h4>
-      <section><p>Represents the base class of interface interceptors.</p>
-</section>
-      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.InterfaceMap-2.html">InterfaceMap&lt;TInterface, TImplementation&gt;</a></h4>
-      <section><p>Cached interface mappings. Intended for private use only.</p>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.InvocationContext.html">InvocationContext</a></h4>
+      <section><p>The default implementation of the <a class="xref" href="Solti.Utils.Proxy.IInvocationContext.html">IInvocationContext</a> interface.</p>
 </section>
       <h4><a class="xref" href="Solti.Utils.Proxy.Internals.LoadedTypes.html">LoadedTypes</a></h4>
       <section><p>Contains the loaded proxy <span class="xref">System.Type</span>s</p>
 </section>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.TypeContext.html">TypeContext</a></h4>
+      <section><p>Describes a loaded generated <a class="xref" href="Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Type">Type</a>.</p>
+</section>
       <h4><a class="xref" href="Solti.Utils.Proxy.Internals.TypeEmitter.html">TypeEmitter</a></h4>
       <section><p>Compiles SyntaxFactory outputs to materialized <span class="xref">System.Type</span>s.</p>
+</section>
+    <h3 id="interfaces">Interfaces
+  </h3>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.IDelegateWrapper.html">IDelegateWrapper</a></h4>
+      <section><p>Contract that specifies how to get the wrapped delegate</p>
+</section>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.IInterceptorAccess.html">IInterceptorAccess</a></h4>
+      <section><p>Type independent way to access the underlying interceptor.</p>
+</section>
+      <h4><a class="xref" href="Solti.Utils.Proxy.Internals.ITargetAccess.html">ITargetAccess</a></h4>
+      <section><p>Type independent way to access the underlying target.</p>
 </section>
 </article>
           </div>

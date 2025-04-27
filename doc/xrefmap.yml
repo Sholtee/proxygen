@@ -43,12 +43,308 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute.Generator
   fullName: Solti.Utils.Proxy.Attributes.EmbedGeneratedTypeAttribute.Generator
   nameWithType: EmbedGeneratedTypeAttribute.Generator
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo
+  name: ExtendedMemberInfo
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html
+  commentId: T:Solti.Utils.Proxy.ExtendedMemberInfo
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo
+  nameWithType: ExtendedMemberInfo
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.#ctor(System.Reflection.MethodInfo)
+  name: ExtendedMemberInfo(MethodInfo)
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo__ctor_System_Reflection_MethodInfo_
+  commentId: M:Solti.Utils.Proxy.ExtendedMemberInfo.#ctor(System.Reflection.MethodInfo)
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.MethodInfo)
+  nameWithType: ExtendedMemberInfo.ExtendedMemberInfo(MethodInfo)
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.#ctor*
+  name: ExtendedMemberInfo
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo__ctor_
+  commentId: Overload:Solti.Utils.Proxy.ExtendedMemberInfo.#ctor
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo
+  nameWithType: ExtendedMemberInfo.ExtendedMemberInfo
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.Member
+  name: Member
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo_Member
+  commentId: P:Solti.Utils.Proxy.ExtendedMemberInfo.Member
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.Member
+  nameWithType: ExtendedMemberInfo.Member
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.Member*
+  name: Member
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo_Member_
+  commentId: Overload:Solti.Utils.Proxy.ExtendedMemberInfo.Member
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.Member
+  nameWithType: ExtendedMemberInfo.Member
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.Method
+  name: Method
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo_Method
+  commentId: P:Solti.Utils.Proxy.ExtendedMemberInfo.Method
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.Method
+  nameWithType: ExtendedMemberInfo.Method
+- uid: Solti.Utils.Proxy.ExtendedMemberInfo.Method*
+  name: Method
+  href: Solti.Utils.Proxy.ExtendedMemberInfo.html#Solti_Utils_Proxy_ExtendedMemberInfo_Method_
+  commentId: Overload:Solti.Utils.Proxy.ExtendedMemberInfo.Method
+  fullName: Solti.Utils.Proxy.ExtendedMemberInfo.Method
+  nameWithType: ExtendedMemberInfo.Method
 - uid: Solti.Utils.Proxy.Generators
   name: Solti.Utils.Proxy.Generators
   href: Solti.Utils.Proxy.Generators.html
   commentId: N:Solti.Utils.Proxy.Generators
   fullName: Solti.Utils.Proxy.Generators
   nameWithType: Solti.Utils.Proxy.Generators
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator
+  name: ClassProxyGenerator
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html
+  commentId: T:Solti.Utils.Proxy.Generators.ClassProxyGenerator
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator
+  nameWithType: ClassProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.#ctor(System.Type)
+  name: ClassProxyGenerator(Type)
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator__ctor_System_Type_
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator.#ctor(System.Type)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ClassProxyGenerator(System.Type)
+  nameWithType: ClassProxyGenerator.ClassProxyGenerator(Type)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.#ctor*
+  name: ClassProxyGenerator
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator.#ctor
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ClassProxyGenerator
+  nameWithType: ClassProxyGenerator.ClassProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple)
+  name: Activate(IInterceptor, ITuple)
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_Activate_Solti_Utils_Proxy_IInterceptor_System_Runtime_CompilerServices_ITuple_
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple)
+  nameWithType: ClassProxyGenerator.Activate(IInterceptor, ITuple)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate
+  nameWithType: ClassProxyGenerator.Activate
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, ITuple, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_ActivateAsync_Solti_Utils_Proxy_IInterceptor_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple, System.Threading.CancellationToken)
+  nameWithType: ClassProxyGenerator.ActivateAsync(IInterceptor, ITuple, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync
+  nameWithType: ClassProxyGenerator.ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class
+  name: Class
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_Class
+  commentId: P:Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class
+  nameWithType: ClassProxyGenerator.Class
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class*
+  name: Class
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_Class_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class
+  nameWithType: ClassProxyGenerator.Class
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1
+  name: ClassProxyGenerator<TClass>
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html
+  commentId: T:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1
+  name.vb: ClassProxyGenerator(Of TClass)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass)
+  nameWithType: ClassProxyGenerator<TClass>
+  nameWithType.vb: ClassProxyGenerator(Of TClass)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.#ctor
+  name: ClassProxyGenerator()
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1__ctor
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ClassProxyGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).ClassProxyGenerator()
+  nameWithType: ClassProxyGenerator<TClass>.ClassProxyGenerator()
+  nameWithType.vb: ClassProxyGenerator(Of TClass).ClassProxyGenerator()
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.#ctor*
+  name: ClassProxyGenerator
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ClassProxyGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).ClassProxyGenerator
+  nameWithType: ClassProxyGenerator<TClass>.ClassProxyGenerator
+  nameWithType.vb: ClassProxyGenerator(Of TClass).ClassProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple)
+  name: Activate(IInterceptor, ITuple)
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_Activate_Solti_Utils_Proxy_IInterceptor_System_Runtime_CompilerServices_ITuple_
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.Activate(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple)
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).Activate(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple)
+  nameWithType: ClassProxyGenerator<TClass>.Activate(IInterceptor, ITuple)
+  nameWithType.vb: ClassProxyGenerator(Of TClass).Activate(IInterceptor, ITuple)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.Activate
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.Activate
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).Activate
+  nameWithType: ClassProxyGenerator<TClass>.Activate
+  nameWithType.vb: ClassProxyGenerator(Of TClass).Activate
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, ITuple, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_ActivateAsync_Solti_Utils_Proxy_IInterceptor_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ActivateAsync(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple, System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).ActivateAsync(Solti.Utils.Proxy.IInterceptor, System.Runtime.CompilerServices.ITuple, System.Threading.CancellationToken)
+  nameWithType: ClassProxyGenerator<TClass>.ActivateAsync(IInterceptor, ITuple, CancellationToken)
+  nameWithType.vb: ClassProxyGenerator(Of TClass).ActivateAsync(IInterceptor, ITuple, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.ActivateAsync
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).ActivateAsync
+  nameWithType: ClassProxyGenerator<TClass>.ActivateAsync
+  nameWithType.vb: ClassProxyGenerator(Of TClass).ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.GetConcreteGenerator
+  name: GetConcreteGenerator()
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_GetConcreteGenerator
+  commentId: M:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.GetConcreteGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).GetConcreteGenerator()
+  nameWithType: ClassProxyGenerator<TClass>.GetConcreteGenerator()
+  nameWithType.vb: ClassProxyGenerator(Of TClass).GetConcreteGenerator()
+- uid: Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.GetConcreteGenerator*
+  name: GetConcreteGenerator
+  href: Solti.Utils.Proxy.Generators.ClassProxyGenerator-1.html#Solti_Utils_Proxy_Generators_ClassProxyGenerator_1_GetConcreteGenerator_
+  commentId: Overload:Solti.Utils.Proxy.Generators.ClassProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>.GetConcreteGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.ClassProxyGenerator(Of TClass).GetConcreteGenerator
+  nameWithType: ClassProxyGenerator<TClass>.GetConcreteGenerator
+  nameWithType.vb: ClassProxyGenerator(Of TClass).GetConcreteGenerator
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator
+  name: DelegateProxyGenerator
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html
+  commentId: T:Solti.Utils.Proxy.Generators.DelegateProxyGenerator
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator
+  nameWithType: DelegateProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.#ctor(System.Type)
+  name: DelegateProxyGenerator(Type)
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator__ctor_System_Type_
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.#ctor(System.Type)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateProxyGenerator(System.Type)
+  nameWithType: DelegateProxyGenerator.DelegateProxyGenerator(Type)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.#ctor*
+  name: DelegateProxyGenerator
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.#ctor
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateProxyGenerator
+  nameWithType: DelegateProxyGenerator.DelegateProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Delegate)
+  name: Activate(IInterceptor, Delegate)
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_Activate_Solti_Utils_Proxy_IInterceptor_System_Delegate_
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Delegate)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor, System.Delegate)
+  nameWithType: DelegateProxyGenerator.Activate(IInterceptor, Delegate)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.Activate
+  nameWithType: DelegateProxyGenerator.Activate
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Delegate,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, Delegate, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_ActivateAsync_Solti_Utils_Proxy_IInterceptor_System_Delegate_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Delegate,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor, System.Delegate, System.Threading.CancellationToken)
+  nameWithType: DelegateProxyGenerator.ActivateAsync(IInterceptor, Delegate, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.ActivateAsync
+  nameWithType: DelegateProxyGenerator.ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType
+  name: DelegateType
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_DelegateType
+  commentId: P:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType
+  nameWithType: DelegateProxyGenerator.DelegateType
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType*
+  name: DelegateType
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_DelegateType_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator.DelegateType
+  nameWithType: DelegateProxyGenerator.DelegateType
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1
+  name: DelegateProxyGenerator<TDelegate>
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html
+  commentId: T:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1
+  name.vb: DelegateProxyGenerator(Of TDelegate)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate)
+  nameWithType: DelegateProxyGenerator<TDelegate>
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.#ctor
+  name: DelegateProxyGenerator()
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1__ctor
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.DelegateProxyGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).DelegateProxyGenerator()
+  nameWithType: DelegateProxyGenerator<TDelegate>.DelegateProxyGenerator()
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).DelegateProxyGenerator()
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.#ctor*
+  name: DelegateProxyGenerator
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.DelegateProxyGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).DelegateProxyGenerator
+  nameWithType: DelegateProxyGenerator<TDelegate>.DelegateProxyGenerator
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).DelegateProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,`0)
+  name: Activate(IInterceptor, TDelegate)
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_Activate_Solti_Utils_Proxy_IInterceptor__0_
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,`0)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.Activate(Solti.Utils.Proxy.IInterceptor, TDelegate)
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).Activate(Solti.Utils.Proxy.IInterceptor, TDelegate)
+  nameWithType: DelegateProxyGenerator<TDelegate>.Activate(IInterceptor, TDelegate)
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).Activate(IInterceptor, TDelegate)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.Activate
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.Activate
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).Activate
+  nameWithType: DelegateProxyGenerator<TDelegate>.Activate
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).Activate
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,`0,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, TDelegate, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_ActivateAsync_Solti_Utils_Proxy_IInterceptor__0_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,`0,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.ActivateAsync(Solti.Utils.Proxy.IInterceptor, TDelegate, System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).ActivateAsync(Solti.Utils.Proxy.IInterceptor, TDelegate, System.Threading.CancellationToken)
+  nameWithType: DelegateProxyGenerator<TDelegate>.ActivateAsync(IInterceptor, TDelegate, CancellationToken)
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).ActivateAsync(IInterceptor, TDelegate, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.ActivateAsync
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).ActivateAsync
+  nameWithType: DelegateProxyGenerator<TDelegate>.ActivateAsync
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.GetConcreteGenerator
+  name: GetConcreteGenerator()
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_GetConcreteGenerator
+  commentId: M:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.GetConcreteGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).GetConcreteGenerator()
+  nameWithType: DelegateProxyGenerator<TDelegate>.GetConcreteGenerator()
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).GetConcreteGenerator()
+- uid: Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.GetConcreteGenerator*
+  name: GetConcreteGenerator
+  href: Solti.Utils.Proxy.Generators.DelegateProxyGenerator-1.html#Solti_Utils_Proxy_Generators_DelegateProxyGenerator_1_GetConcreteGenerator_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DelegateProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.DelegateProxyGenerator<TDelegate>.GetConcreteGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.DelegateProxyGenerator(Of TDelegate).GetConcreteGenerator
+  nameWithType: DelegateProxyGenerator<TDelegate>.GetConcreteGenerator
+  nameWithType.vb: DelegateProxyGenerator(Of TDelegate).GetConcreteGenerator
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator
   name: DuckGenerator
   href: Solti.Utils.Proxy.Generators.DuckGenerator.html
@@ -67,6 +363,30 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.#ctor
   fullName: Solti.Utils.Proxy.Generators.DuckGenerator.DuckGenerator
   nameWithType: DuckGenerator.DuckGenerator
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Activate(System.Object)
+  name: Activate(Object)
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Activate_System_Object_
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.Activate(System.Object)
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Activate(System.Object)
+  nameWithType: DuckGenerator.Activate(Object)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.Activate
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.Activate
+  nameWithType: DuckGenerator.Activate
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  name: ActivateAsync(Object, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_ActivateAsync_System_Object_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync(System.Object,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync(System.Object, System.Threading.CancellationToken)
+  nameWithType: DuckGenerator.ActivateAsync(Object, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator.ActivateAsync
+  nameWithType: DuckGenerator.ActivateAsync
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator.Interface
   name: Interface
   href: Solti.Utils.Proxy.Generators.DuckGenerator.html#Solti_Utils_Proxy_Generators_DuckGenerator_Interface
@@ -116,6 +436,38 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).DuckGenerator
   nameWithType: DuckGenerator<TInterface, TTarget>.DuckGenerator
   nameWithType.vb: DuckGenerator(Of TInterface, TTarget).DuckGenerator
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.Activate(`1)
+  name: Activate(TTarget)
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_Activate__1_
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator`2.Activate(`1)
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.Activate(TTarget)
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).Activate(TTarget)
+  nameWithType: DuckGenerator<TInterface, TTarget>.Activate(TTarget)
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).Activate(TTarget)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator`2.Activate
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.Activate
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).Activate
+  nameWithType: DuckGenerator<TInterface, TTarget>.Activate
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).Activate
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.ActivateAsync(`1,System.Threading.CancellationToken)
+  name: ActivateAsync(TTarget, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_ActivateAsync__1_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.DuckGenerator`2.ActivateAsync(`1,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.ActivateAsync(TTarget, System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).ActivateAsync(TTarget, System.Threading.CancellationToken)
+  nameWithType: DuckGenerator<TInterface, TTarget>.ActivateAsync(TTarget, CancellationToken)
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).ActivateAsync(TTarget, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.DuckGenerator`2.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.DuckGenerator<TInterface, TTarget>.ActivateAsync
+  fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).ActivateAsync
+  nameWithType: DuckGenerator<TInterface, TTarget>.ActivateAsync
+  nameWithType.vb: DuckGenerator(Of TInterface, TTarget).ActivateAsync
 - uid: Solti.Utils.Proxy.Generators.DuckGenerator`2.GetConcreteGenerator
   name: GetConcreteGenerator()
   href: Solti.Utils.Proxy.Generators.DuckGenerator-2.html#Solti_Utils_Proxy_Generators_DuckGenerator_2_GetConcreteGenerator
@@ -132,234 +484,259 @@ references:
   fullName.vb: Solti.Utils.Proxy.Generators.DuckGenerator(Of TInterface, TTarget).GetConcreteGenerator
   nameWithType: DuckGenerator<TInterface, TTarget>.GetConcreteGenerator
   nameWithType.vb: DuckGenerator(Of TInterface, TTarget).GetConcreteGenerator
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator
-  name: ProxyGenerator
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html
-  commentId: T:Solti.Utils.Proxy.Generators.ProxyGenerator
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator
-  nameWithType: ProxyGenerator
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor(System.Type,System.Type)
-  name: ProxyGenerator(Type, Type)
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__ctor_System_Type_System_Type_
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor(System.Type,System.Type)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator(System.Type, System.Type)
-  nameWithType: ProxyGenerator.ProxyGenerator(Type, Type)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor*
-  name: ProxyGenerator
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.#ctor
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.ProxyGenerator
-  nameWithType: ProxyGenerator.ProxyGenerator
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
-  name: Interceptor
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor
-  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
-  nameWithType: ProxyGenerator.Interceptor
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor*
-  name: Interceptor
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interceptor_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interceptor
-  nameWithType: ProxyGenerator.Interceptor
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator
+  name: InterfaceProxyGenerator
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html
+  commentId: T:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator
+  nameWithType: InterfaceProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.#ctor(System.Type)
+  name: InterfaceProxyGenerator(Type)
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator__ctor_System_Type_
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.#ctor(System.Type)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.InterfaceProxyGenerator(System.Type)
+  nameWithType: InterfaceProxyGenerator.InterfaceProxyGenerator(Type)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.#ctor*
+  name: InterfaceProxyGenerator
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.#ctor
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.InterfaceProxyGenerator
+  nameWithType: InterfaceProxyGenerator.InterfaceProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Object)
+  name: Activate(IInterceptor, Object)
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_Activate_Solti_Utils_Proxy_IInterceptor_System_Object_
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor,System.Object)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor, System.Object)
+  nameWithType: InterfaceProxyGenerator.Activate(IInterceptor, Object)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Activate
+  nameWithType: InterfaceProxyGenerator.Activate
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Object,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, Object, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_ActivateAsync_Solti_Utils_Proxy_IInterceptor_System_Object_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor,System.Object,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor, System.Object, System.Threading.CancellationToken)
+  nameWithType: InterfaceProxyGenerator.ActivateAsync(IInterceptor, Object, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.ActivateAsync
+  nameWithType: InterfaceProxyGenerator.ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface
   name: Interface
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interface
-  commentId: P:Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
-  nameWithType: ProxyGenerator.Interface
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface*
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_Interface
+  commentId: P:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface
+  nameWithType: InterfaceProxyGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface*
   name: Interface
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator.html#Solti_Utils_Proxy_Generators_ProxyGenerator_Interface_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator.Interface
-  nameWithType: ProxyGenerator.Interface
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2
-  name: ProxyGenerator<TInterface, TInterceptor>
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html
-  commentId: T:Solti.Utils.Proxy.Generators.ProxyGenerator`2
-  name.vb: ProxyGenerator(Of TInterface, TInterceptor)
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor)
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor)
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.#ctor
-  name: ProxyGenerator()
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2__ctor
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator`2.#ctor
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator()
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).ProxyGenerator()
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator()
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).ProxyGenerator()
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.#ctor*
-  name: ProxyGenerator
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator`2.#ctor
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).ProxyGenerator
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.ProxyGenerator
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).ProxyGenerator
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_Interface_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator.Interface
+  nameWithType: InterfaceProxyGenerator.Interface
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1
+  name: InterfaceProxyGenerator<TInterface>
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html
+  commentId: T:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1
+  name.vb: InterfaceProxyGenerator(Of TInterface)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface)
+  nameWithType: InterfaceProxyGenerator<TInterface>
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.#ctor
+  name: InterfaceProxyGenerator()
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1__ctor
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.InterfaceProxyGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).InterfaceProxyGenerator()
+  nameWithType: InterfaceProxyGenerator<TInterface>.InterfaceProxyGenerator()
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).InterfaceProxyGenerator()
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.#ctor*
+  name: InterfaceProxyGenerator
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.#ctor
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.InterfaceProxyGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).InterfaceProxyGenerator
+  nameWithType: InterfaceProxyGenerator<TInterface>.InterfaceProxyGenerator
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).InterfaceProxyGenerator
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,`0)
+  name: Activate(IInterceptor, TInterface)
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_Activate_Solti_Utils_Proxy_IInterceptor__0_
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.Activate(Solti.Utils.Proxy.IInterceptor,`0)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.Activate(Solti.Utils.Proxy.IInterceptor, TInterface)
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).Activate(Solti.Utils.Proxy.IInterceptor, TInterface)
+  nameWithType: InterfaceProxyGenerator<TInterface>.Activate(IInterceptor, TInterface)
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).Activate(IInterceptor, TInterface)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.Activate*
+  name: Activate
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_Activate_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.Activate
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.Activate
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).Activate
+  nameWithType: InterfaceProxyGenerator<TInterface>.Activate
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).Activate
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,`0,System.Threading.CancellationToken)
+  name: ActivateAsync(IInterceptor, TInterface, CancellationToken)
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_ActivateAsync_Solti_Utils_Proxy_IInterceptor__0_System_Threading_CancellationToken_
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.ActivateAsync(Solti.Utils.Proxy.IInterceptor,`0,System.Threading.CancellationToken)
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.ActivateAsync(Solti.Utils.Proxy.IInterceptor, TInterface, System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).ActivateAsync(Solti.Utils.Proxy.IInterceptor, TInterface, System.Threading.CancellationToken)
+  nameWithType: InterfaceProxyGenerator<TInterface>.ActivateAsync(IInterceptor, TInterface, CancellationToken)
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).ActivateAsync(IInterceptor, TInterface, CancellationToken)
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.ActivateAsync*
+  name: ActivateAsync
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_ActivateAsync_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.ActivateAsync
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.ActivateAsync
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).ActivateAsync
+  nameWithType: InterfaceProxyGenerator<TInterface>.ActivateAsync
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).ActivateAsync
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.GetConcreteGenerator
   name: GetConcreteGenerator()
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetConcreteGenerator
-  commentId: M:Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.GetConcreteGenerator()
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).GetConcreteGenerator()
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.GetConcreteGenerator()
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).GetConcreteGenerator()
-- uid: Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator*
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_GetConcreteGenerator
+  commentId: M:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.GetConcreteGenerator()
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).GetConcreteGenerator()
+  nameWithType: InterfaceProxyGenerator<TInterface>.GetConcreteGenerator()
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).GetConcreteGenerator()
+- uid: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.GetConcreteGenerator*
   name: GetConcreteGenerator
-  href: Solti.Utils.Proxy.Generators.ProxyGenerator-2.html#Solti_Utils_Proxy_Generators_ProxyGenerator_2_GetConcreteGenerator_
-  commentId: Overload:Solti.Utils.Proxy.Generators.ProxyGenerator`2.GetConcreteGenerator
-  fullName: Solti.Utils.Proxy.Generators.ProxyGenerator<TInterface, TInterceptor>.GetConcreteGenerator
-  fullName.vb: Solti.Utils.Proxy.Generators.ProxyGenerator(Of TInterface, TInterceptor).GetConcreteGenerator
-  nameWithType: ProxyGenerator<TInterface, TInterceptor>.GetConcreteGenerator
-  nameWithType.vb: ProxyGenerator(Of TInterface, TInterceptor).GetConcreteGenerator
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`1
-  name: InterfaceInterceptor<TInterface>
-  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html
-  commentId: T:Solti.Utils.Proxy.InterfaceInterceptor`1
-  name.vb: InterfaceInterceptor(Of TInterface)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface)
-  nameWithType: InterfaceInterceptor<TInterface>
-  nameWithType.vb: InterfaceInterceptor(Of TInterface)
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.#ctor(`0)
-  name: InterfaceInterceptor(TInterface)
-  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1__ctor__0_
-  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`1.#ctor(`0)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.InterfaceInterceptor(TInterface)
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).InterfaceInterceptor(TInterface)
-  nameWithType: InterfaceInterceptor<TInterface>.InterfaceInterceptor(TInterface)
-  nameWithType.vb: InterfaceInterceptor(Of TInterface).InterfaceInterceptor(TInterface)
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`1.#ctor*
-  name: InterfaceInterceptor
-  href: Solti.Utils.Proxy.InterfaceInterceptor-1.html#Solti_Utils_Proxy_InterfaceInterceptor_1__ctor_
-  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`1.#ctor
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface>.InterfaceInterceptor
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface).InterfaceInterceptor
-  nameWithType: InterfaceInterceptor<TInterface>.InterfaceInterceptor
-  nameWithType.vb: InterfaceInterceptor(Of TInterface).InterfaceInterceptor
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2
-  name: InterfaceInterceptor<TInterface, TTarget>
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html
-  commentId: T:Solti.Utils.Proxy.InterfaceInterceptor`2
-  name.vb: InterfaceInterceptor(Of TInterface, TTarget)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget)
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget)
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.#ctor(`1)
-  name: InterfaceInterceptor(TTarget)
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2__ctor__1_
-  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`2.#ctor(`1)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.InterfaceInterceptor(TTarget)
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).InterfaceInterceptor(TTarget)
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.InterfaceInterceptor(TTarget)
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).InterfaceInterceptor(TTarget)
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.#ctor*
-  name: InterfaceInterceptor
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2__ctor_
-  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`2.#ctor
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.InterfaceInterceptor
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).InterfaceInterceptor
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.InterfaceInterceptor
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).InterfaceInterceptor
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Invoke(Solti.Utils.Proxy.InvocationContext)
-  name: Invoke(InvocationContext)
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Invoke_Solti_Utils_Proxy_InvocationContext_
-  commentId: M:Solti.Utils.Proxy.InterfaceInterceptor`2.Invoke(Solti.Utils.Proxy.InvocationContext)
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke(Solti.Utils.Proxy.InvocationContext)
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Invoke(Solti.Utils.Proxy.InvocationContext)
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Invoke(InvocationContext)
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Invoke(InvocationContext)
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Invoke*
+  href: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator-1.html#Solti_Utils_Proxy_Generators_InterfaceProxyGenerator_1_GetConcreteGenerator_
+  commentId: Overload:Solti.Utils.Proxy.Generators.InterfaceProxyGenerator`1.GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator<TInterface>.GetConcreteGenerator
+  fullName.vb: Solti.Utils.Proxy.Generators.InterfaceProxyGenerator(Of TInterface).GetConcreteGenerator
+  nameWithType: InterfaceProxyGenerator<TInterface>.GetConcreteGenerator
+  nameWithType.vb: InterfaceProxyGenerator(Of TInterface).GetConcreteGenerator
+- uid: Solti.Utils.Proxy.IInterceptor
+  name: IInterceptor
+  href: Solti.Utils.Proxy.IInterceptor.html
+  commentId: T:Solti.Utils.Proxy.IInterceptor
+  fullName: Solti.Utils.Proxy.IInterceptor
+  nameWithType: IInterceptor
+- uid: Solti.Utils.Proxy.IInterceptor.Invoke(Solti.Utils.Proxy.IInvocationContext)
+  name: Invoke(IInvocationContext)
+  href: Solti.Utils.Proxy.IInterceptor.html#Solti_Utils_Proxy_IInterceptor_Invoke_Solti_Utils_Proxy_IInvocationContext_
+  commentId: M:Solti.Utils.Proxy.IInterceptor.Invoke(Solti.Utils.Proxy.IInvocationContext)
+  fullName: Solti.Utils.Proxy.IInterceptor.Invoke(Solti.Utils.Proxy.IInvocationContext)
+  nameWithType: IInterceptor.Invoke(IInvocationContext)
+- uid: Solti.Utils.Proxy.IInterceptor.Invoke*
   name: Invoke
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Invoke_
-  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`2.Invoke
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Invoke
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Invoke
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Invoke
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Invoke
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Proxy
+  href: Solti.Utils.Proxy.IInterceptor.html#Solti_Utils_Proxy_IInterceptor_Invoke_
+  commentId: Overload:Solti.Utils.Proxy.IInterceptor.Invoke
+  fullName: Solti.Utils.Proxy.IInterceptor.Invoke
+  nameWithType: IInterceptor.Invoke
+- uid: Solti.Utils.Proxy.IInvocationContext
+  name: IInvocationContext
+  href: Solti.Utils.Proxy.IInvocationContext.html
+  commentId: T:Solti.Utils.Proxy.IInvocationContext
+  fullName: Solti.Utils.Proxy.IInvocationContext
+  nameWithType: IInvocationContext
+- uid: Solti.Utils.Proxy.IInvocationContext.Args
+  name: Args
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Args
+  commentId: P:Solti.Utils.Proxy.IInvocationContext.Args
+  fullName: Solti.Utils.Proxy.IInvocationContext.Args
+  nameWithType: IInvocationContext.Args
+- uid: Solti.Utils.Proxy.IInvocationContext.Args*
+  name: Args
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Args_
+  commentId: Overload:Solti.Utils.Proxy.IInvocationContext.Args
+  fullName: Solti.Utils.Proxy.IInvocationContext.Args
+  nameWithType: IInvocationContext.Args
+- uid: Solti.Utils.Proxy.IInvocationContext.Dispatch
+  name: Dispatch()
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Dispatch
+  commentId: M:Solti.Utils.Proxy.IInvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.IInvocationContext.Dispatch()
+  nameWithType: IInvocationContext.Dispatch()
+- uid: Solti.Utils.Proxy.IInvocationContext.Dispatch*
+  name: Dispatch
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Dispatch_
+  commentId: Overload:Solti.Utils.Proxy.IInvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.IInvocationContext.Dispatch
+  nameWithType: IInvocationContext.Dispatch
+- uid: Solti.Utils.Proxy.IInvocationContext.GenericArguments
+  name: GenericArguments
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_GenericArguments
+  commentId: P:Solti.Utils.Proxy.IInvocationContext.GenericArguments
+  fullName: Solti.Utils.Proxy.IInvocationContext.GenericArguments
+  nameWithType: IInvocationContext.GenericArguments
+- uid: Solti.Utils.Proxy.IInvocationContext.GenericArguments*
+  name: GenericArguments
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_GenericArguments_
+  commentId: Overload:Solti.Utils.Proxy.IInvocationContext.GenericArguments
+  fullName: Solti.Utils.Proxy.IInvocationContext.GenericArguments
+  nameWithType: IInvocationContext.GenericArguments
+- uid: Solti.Utils.Proxy.IInvocationContext.Member
+  name: Member
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Member
+  commentId: P:Solti.Utils.Proxy.IInvocationContext.Member
+  fullName: Solti.Utils.Proxy.IInvocationContext.Member
+  nameWithType: IInvocationContext.Member
+- uid: Solti.Utils.Proxy.IInvocationContext.Member*
+  name: Member
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Member_
+  commentId: Overload:Solti.Utils.Proxy.IInvocationContext.Member
+  fullName: Solti.Utils.Proxy.IInvocationContext.Member
+  nameWithType: IInvocationContext.Member
+- uid: Solti.Utils.Proxy.IInvocationContext.Proxy
   name: Proxy
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Proxy
-  commentId: P:Solti.Utils.Proxy.InterfaceInterceptor`2.Proxy
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Proxy
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Proxy
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Proxy
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Proxy
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Proxy*
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Proxy
+  commentId: P:Solti.Utils.Proxy.IInvocationContext.Proxy
+  fullName: Solti.Utils.Proxy.IInvocationContext.Proxy
+  nameWithType: IInvocationContext.Proxy
+- uid: Solti.Utils.Proxy.IInvocationContext.Proxy*
   name: Proxy
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Proxy_
-  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`2.Proxy
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Proxy
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Proxy
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Proxy
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Proxy
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Target
-  name: Target
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Target
-  commentId: P:Solti.Utils.Proxy.InterfaceInterceptor`2.Target
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Target
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Target
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Target
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Target
-- uid: Solti.Utils.Proxy.InterfaceInterceptor`2.Target*
-  name: Target
-  href: Solti.Utils.Proxy.InterfaceInterceptor-2.html#Solti_Utils_Proxy_InterfaceInterceptor_2_Target_
-  commentId: Overload:Solti.Utils.Proxy.InterfaceInterceptor`2.Target
-  fullName: Solti.Utils.Proxy.InterfaceInterceptor<TInterface, TTarget>.Target
-  fullName.vb: Solti.Utils.Proxy.InterfaceInterceptor(Of TInterface, TTarget).Target
-  nameWithType: InterfaceInterceptor<TInterface, TTarget>.Target
-  nameWithType.vb: InterfaceInterceptor(Of TInterface, TTarget).Target
+  href: Solti.Utils.Proxy.IInvocationContext.html#Solti_Utils_Proxy_IInvocationContext_Proxy_
+  commentId: Overload:Solti.Utils.Proxy.IInvocationContext.Proxy
+  fullName: Solti.Utils.Proxy.IInvocationContext.Proxy
+  nameWithType: IInvocationContext.Proxy
 - uid: Solti.Utils.Proxy.Internals
   name: Solti.Utils.Proxy.Internals
   href: Solti.Utils.Proxy.Internals.html
   commentId: N:Solti.Utils.Proxy.Internals
   fullName: Solti.Utils.Proxy.Internals
   nameWithType: Solti.Utils.Proxy.Internals
-- uid: Solti.Utils.Proxy.Internals.DuckBase`1
-  name: DuckBase<T>
-  href: Solti.Utils.Proxy.Internals.DuckBase-1.html
-  commentId: T:Solti.Utils.Proxy.Internals.DuckBase`1
-  name.vb: DuckBase(Of T)
-  fullName: Solti.Utils.Proxy.Internals.DuckBase<T>
-  fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T)
-  nameWithType: DuckBase<T>
-  nameWithType.vb: DuckBase(Of T)
-- uid: Solti.Utils.Proxy.Internals.DuckBase`1.#ctor(`0)
-  name: DuckBase(T)
-  href: Solti.Utils.Proxy.Internals.DuckBase-1.html#Solti_Utils_Proxy_Internals_DuckBase_1__ctor__0_
-  commentId: M:Solti.Utils.Proxy.Internals.DuckBase`1.#ctor(`0)
-  fullName: Solti.Utils.Proxy.Internals.DuckBase<T>.DuckBase(T)
-  fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).DuckBase(T)
-  nameWithType: DuckBase<T>.DuckBase(T)
-  nameWithType.vb: DuckBase(Of T).DuckBase(T)
-- uid: Solti.Utils.Proxy.Internals.DuckBase`1.#ctor*
-  name: DuckBase
-  href: Solti.Utils.Proxy.Internals.DuckBase-1.html#Solti_Utils_Proxy_Internals_DuckBase_1__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Internals.DuckBase`1.#ctor
-  fullName: Solti.Utils.Proxy.Internals.DuckBase<T>.DuckBase
-  fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).DuckBase
-  nameWithType: DuckBase<T>.DuckBase
-  nameWithType.vb: DuckBase(Of T).DuckBase
-- uid: Solti.Utils.Proxy.Internals.DuckBase`1.Target
-  name: Target
-  href: Solti.Utils.Proxy.Internals.DuckBase-1.html#Solti_Utils_Proxy_Internals_DuckBase_1_Target
-  commentId: P:Solti.Utils.Proxy.Internals.DuckBase`1.Target
-  fullName: Solti.Utils.Proxy.Internals.DuckBase<T>.Target
-  fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
-  nameWithType: DuckBase<T>.Target
-  nameWithType.vb: DuckBase(Of T).Target
-- uid: Solti.Utils.Proxy.Internals.DuckBase`1.Target*
-  name: Target
-  href: Solti.Utils.Proxy.Internals.DuckBase-1.html#Solti_Utils_Proxy_Internals_DuckBase_1_Target_
-  commentId: Overload:Solti.Utils.Proxy.Internals.DuckBase`1.Target
-  fullName: Solti.Utils.Proxy.Internals.DuckBase<T>.Target
-  fullName.vb: Solti.Utils.Proxy.Internals.DuckBase(Of T).Target
-  nameWithType: DuckBase<T>.Target
-  nameWithType.vb: DuckBase(Of T).Target
+- uid: Solti.Utils.Proxy.Internals.CurrentMember
+  name: CurrentMember
+  href: Solti.Utils.Proxy.Internals.CurrentMember.html
+  commentId: T:Solti.Utils.Proxy.Internals.CurrentMember
+  fullName: Solti.Utils.Proxy.Internals.CurrentMember
+  nameWithType: CurrentMember
+- uid: Solti.Utils.Proxy.Internals.CurrentMember.GetBase(Solti.Utils.Proxy.ExtendedMemberInfo@)
+  name: GetBase(ref ExtendedMemberInfo)
+  href: Solti.Utils.Proxy.Internals.CurrentMember.html#Solti_Utils_Proxy_Internals_CurrentMember_GetBase_Solti_Utils_Proxy_ExtendedMemberInfo__
+  commentId: M:Solti.Utils.Proxy.Internals.CurrentMember.GetBase(Solti.Utils.Proxy.ExtendedMemberInfo@)
+  name.vb: GetBase(ByRef ExtendedMemberInfo)
+  fullName: Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ref Solti.Utils.Proxy.ExtendedMemberInfo)
+  fullName.vb: Solti.Utils.Proxy.Internals.CurrentMember.GetBase(ByRef Solti.Utils.Proxy.ExtendedMemberInfo)
+  nameWithType: CurrentMember.GetBase(ref ExtendedMemberInfo)
+  nameWithType.vb: CurrentMember.GetBase(ByRef ExtendedMemberInfo)
+- uid: Solti.Utils.Proxy.Internals.CurrentMember.GetBase*
+  name: GetBase
+  href: Solti.Utils.Proxy.Internals.CurrentMember.html#Solti_Utils_Proxy_Internals_CurrentMember_GetBase_
+  commentId: Overload:Solti.Utils.Proxy.Internals.CurrentMember.GetBase
+  fullName: Solti.Utils.Proxy.Internals.CurrentMember.GetBase
+  nameWithType: CurrentMember.GetBase
+- uid: Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(Solti.Utils.Proxy.ExtendedMemberInfo@)
+  name: GetImplementedInterfaceMethod(ref ExtendedMemberInfo)
+  href: Solti.Utils.Proxy.Internals.CurrentMember.html#Solti_Utils_Proxy_Internals_CurrentMember_GetImplementedInterfaceMethod_Solti_Utils_Proxy_ExtendedMemberInfo__
+  commentId: M:Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(Solti.Utils.Proxy.ExtendedMemberInfo@)
+  name.vb: GetImplementedInterfaceMethod(ByRef ExtendedMemberInfo)
+  fullName: Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ref Solti.Utils.Proxy.ExtendedMemberInfo)
+  fullName.vb: Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod(ByRef Solti.Utils.Proxy.ExtendedMemberInfo)
+  nameWithType: CurrentMember.GetImplementedInterfaceMethod(ref ExtendedMemberInfo)
+  nameWithType.vb: CurrentMember.GetImplementedInterfaceMethod(ByRef ExtendedMemberInfo)
+- uid: Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod*
+  name: GetImplementedInterfaceMethod
+  href: Solti.Utils.Proxy.Internals.CurrentMember.html#Solti_Utils_Proxy_Internals_CurrentMember_GetImplementedInterfaceMethod_
+  commentId: Overload:Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod
+  fullName: Solti.Utils.Proxy.Internals.CurrentMember.GetImplementedInterfaceMethod
+  nameWithType: CurrentMember.GetImplementedInterfaceMethod
 - uid: Solti.Utils.Proxy.Internals.Generator
   name: Generator
   href: Solti.Utils.Proxy.Internals.Generator.html
@@ -378,18 +755,6 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.#ctor
   fullName: Solti.Utils.Proxy.Internals.Generator.Generator
   nameWithType: Generator.Generator
-- uid: Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)
-  name: Activate(ITuple)
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_System_Runtime_CompilerServices_ITuple_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)
-  fullName: Solti.Utils.Proxy.Internals.Generator.Activate(System.Runtime.CompilerServices.ITuple)
-  nameWithType: Generator.Activate(ITuple)
-- uid: Solti.Utils.Proxy.Internals.Generator.Activate*
-  name: Activate
-  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_Activate_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.Activate
-  fullName: Solti.Utils.Proxy.Internals.Generator.Activate
-  nameWithType: Generator.Activate
 - uid: Solti.Utils.Proxy.Internals.Generator.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
   name: ActivateAsync(ITuple, CancellationToken)
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_ActivateAsync_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_
@@ -402,6 +767,21 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator.ActivateAsync
   fullName: Solti.Utils.Proxy.Internals.Generator.ActivateAsync
   nameWithType: Generator.ActivateAsync
+- uid: Solti.Utils.Proxy.Internals.Generator.GenerateId(System.String,System.Collections.Generic.IEnumerable{System.Type})
+  name: GenerateId(String, IEnumerable<Type>)
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GenerateId_System_String_System_Collections_Generic_IEnumerable_System_Type__
+  commentId: M:Solti.Utils.Proxy.Internals.Generator.GenerateId(System.String,System.Collections.Generic.IEnumerable{System.Type})
+  name.vb: GenerateId(String, IEnumerable(Of Type))
+  fullName: Solti.Utils.Proxy.Internals.Generator.GenerateId(System.String, System.Collections.Generic.IEnumerable<System.Type>)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator.GenerateId(System.String, System.Collections.Generic.IEnumerable(Of System.Type))
+  nameWithType: Generator.GenerateId(String, IEnumerable<Type>)
+  nameWithType.vb: Generator.GenerateId(String, IEnumerable(Of Type))
+- uid: Solti.Utils.Proxy.Internals.Generator.GenerateId*
+  name: GenerateId
+  href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GenerateId_
+  commentId: Overload:Solti.Utils.Proxy.Internals.Generator.GenerateId
+  fullName: Solti.Utils.Proxy.Internals.Generator.GenerateId
+  nameWithType: Generator.GenerateId
 - uid: Solti.Utils.Proxy.Internals.Generator.GetGeneratedType
   name: GetGeneratedType()
   href: Solti.Utils.Proxy.Internals.Generator.html#Solti_Utils_Proxy_Internals_Generator_GetGeneratedType
@@ -439,209 +819,434 @@ references:
   fullName: Solti.Utils.Proxy.Internals.Generator.Id
   nameWithType: Generator.Id
 - uid: Solti.Utils.Proxy.Internals.Generator`2
-  name: Generator<TInterface, TDescendant>
+  name: Generator<TUntypedGenerator, TDescendant>
   href: Solti.Utils.Proxy.Internals.Generator-2.html
   commentId: T:Solti.Utils.Proxy.Internals.Generator`2
-  name.vb: Generator(Of TInterface, TDescendant)
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant)
-  nameWithType: Generator<TInterface, TDescendant>
-  nameWithType.vb: Generator(Of TInterface, TDescendant)
+  name.vb: Generator(Of TUntypedGenerator, TDescendant)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant)
+  nameWithType: Generator<TUntypedGenerator, TDescendant>
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant)
 - uid: Solti.Utils.Proxy.Internals.Generator`2.#ctor
   name: Generator()
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2__ctor
   commentId: M:Solti.Utils.Proxy.Internals.Generator`2.#ctor
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Generator()
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Generator()
-  nameWithType: Generator<TInterface, TDescendant>.Generator()
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Generator()
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Generator()
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).Generator()
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.Generator()
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).Generator()
 - uid: Solti.Utils.Proxy.Internals.Generator`2.#ctor*
   name: Generator
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2__ctor_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.#ctor
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Generator
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Generator
-  nameWithType: Generator<TInterface, TDescendant>.Generator
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Generator
-- uid: Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Runtime.CompilerServices.ITuple)
-  name: Activate(ITuple)
-  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_System_Runtime_CompilerServices_ITuple_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.Activate(System.Runtime.CompilerServices.ITuple)
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate(System.Runtime.CompilerServices.ITuple)
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Activate(System.Runtime.CompilerServices.ITuple)
-  nameWithType: Generator<TInterface, TDescendant>.Activate(ITuple)
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Activate(ITuple)
-- uid: Solti.Utils.Proxy.Internals.Generator`2.Activate*
-  name: Activate
-  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Activate_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.Activate
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Activate
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Activate
-  nameWithType: Generator<TInterface, TDescendant>.Activate
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Activate
-- uid: Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
-  name: ActivateAsync(ITuple, CancellationToken)
-  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_System_Runtime_CompilerServices_ITuple_System_Threading_CancellationToken_
-  commentId: M:Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync(System.Runtime.CompilerServices.ITuple,System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAsync(System.Runtime.CompilerServices.ITuple, System.Threading.CancellationToken)
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).ActivateAsync(System.Runtime.CompilerServices.ITuple, System.Threading.CancellationToken)
-  nameWithType: Generator<TInterface, TDescendant>.ActivateAsync(ITuple, CancellationToken)
-  nameWithType.vb: Generator(Of TInterface, TDescendant).ActivateAsync(ITuple, CancellationToken)
-- uid: Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync*
-  name: ActivateAsync
-  href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_ActivateAsync_
-  commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.ActivateAsync
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.ActivateAsync
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).ActivateAsync
-  nameWithType: Generator<TInterface, TDescendant>.ActivateAsync
-  nameWithType.vb: Generator(Of TInterface, TDescendant).ActivateAsync
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Generator
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).Generator
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.Generator
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).Generator
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator
   name: GetConcreteGenerator()
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetConcreteGenerator
   commentId: M:Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetConcreteGenerator()
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetConcreteGenerator()
-  nameWithType: Generator<TInterface, TDescendant>.GetConcreteGenerator()
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetConcreteGenerator()
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetConcreteGenerator()
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetConcreteGenerator()
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetConcreteGenerator()
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetConcreteGenerator()
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator*
   name: GetConcreteGenerator
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetConcreteGenerator_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.GetConcreteGenerator
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetConcreteGenerator
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetConcreteGenerator
-  nameWithType: Generator<TInterface, TDescendant>.GetConcreteGenerator
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetConcreteGenerator
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetConcreteGenerator
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetConcreteGenerator
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetConcreteGenerator
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetConcreteGenerator
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
   name: GetGeneratedType()
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType
   commentId: M:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType()
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedType()
-  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedType()
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedType()
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedType()
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetGeneratedType()
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetGeneratedType()
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetGeneratedType()
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType*
   name: GetGeneratedType
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedType_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedType
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedType
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedType
-  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedType
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedType
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedType
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetGeneratedType
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetGeneratedType
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetGeneratedType
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync(System.Threading.CancellationToken)
   name: GetGeneratedTypeAsync(CancellationToken)
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_System_Threading_CancellationToken_
   commentId: M:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync(System.Threading.CancellationToken)
-  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedTypeAsync(CancellationToken)
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync(CancellationToken)
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetGeneratedTypeAsync(System.Threading.CancellationToken)
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetGeneratedTypeAsync(CancellationToken)
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetGeneratedTypeAsync(CancellationToken)
 - uid: Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync*
   name: GetGeneratedTypeAsync
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_GetGeneratedTypeAsync_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.GetGeneratedTypeAsync
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.GetGeneratedTypeAsync
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
-  nameWithType: Generator<TInterface, TDescendant>.GetGeneratedTypeAsync
-  nameWithType.vb: Generator(Of TInterface, TDescendant).GetGeneratedTypeAsync
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.GetGeneratedTypeAsync
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).GetGeneratedTypeAsync
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.GetGeneratedTypeAsync
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).GetGeneratedTypeAsync
 - uid: Solti.Utils.Proxy.Internals.Generator`2.Instance
   name: Instance
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Instance
   commentId: P:Solti.Utils.Proxy.Internals.Generator`2.Instance
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Instance
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Instance
-  nameWithType: Generator<TInterface, TDescendant>.Instance
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Instance
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Instance
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).Instance
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.Instance
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).Instance
 - uid: Solti.Utils.Proxy.Internals.Generator`2.Instance*
   name: Instance
   href: Solti.Utils.Proxy.Internals.Generator-2.html#Solti_Utils_Proxy_Internals_Generator_2_Instance_
   commentId: Overload:Solti.Utils.Proxy.Internals.Generator`2.Instance
-  fullName: Solti.Utils.Proxy.Internals.Generator<TInterface, TDescendant>.Instance
-  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TInterface, TDescendant).Instance
-  nameWithType: Generator<TInterface, TDescendant>.Instance
-  nameWithType.vb: Generator(Of TInterface, TDescendant).Instance
-- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1
-  name: InterfaceInterceptorBase<TInterface>
-  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html
-  commentId: T:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1
-  name.vb: InterfaceInterceptorBase(Of TInterface)
-  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface)
-  nameWithType: InterfaceInterceptorBase<TInterface>
-  nameWithType.vb: InterfaceInterceptorBase(Of TInterface)
-- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
-  name: InterfaceInterceptorBase()
-  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html#Solti_Utils_Proxy_Internals_InterfaceInterceptorBase_1__ctor
-  commentId: M:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
-  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase()
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase()
-  nameWithType: InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase()
-  nameWithType.vb: InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase()
-- uid: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor*
-  name: InterfaceInterceptorBase
-  href: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase-1.html#Solti_Utils_Proxy_Internals_InterfaceInterceptorBase_1__ctor_
-  commentId: Overload:Solti.Utils.Proxy.Internals.InterfaceInterceptorBase`1.#ctor
-  fullName: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase
-  nameWithType: InterfaceInterceptorBase<TInterface>.InterfaceInterceptorBase
-  nameWithType.vb: InterfaceInterceptorBase(Of TInterface).InterfaceInterceptorBase
-- uid: Solti.Utils.Proxy.Internals.InterfaceMap`2
-  name: InterfaceMap<TInterface, TImplementation>
-  href: Solti.Utils.Proxy.Internals.InterfaceMap-2.html
-  commentId: T:Solti.Utils.Proxy.Internals.InterfaceMap`2
-  name.vb: InterfaceMap(Of TInterface, TImplementation)
-  fullName: Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceMap(Of TInterface, TImplementation)
-  nameWithType: InterfaceMap<TInterface, TImplementation>
-  nameWithType.vb: InterfaceMap(Of TInterface, TImplementation)
-- uid: Solti.Utils.Proxy.Internals.InterfaceMap`2.Value
-  name: Value
-  href: Solti.Utils.Proxy.Internals.InterfaceMap-2.html#Solti_Utils_Proxy_Internals_InterfaceMap_2_Value
-  commentId: P:Solti.Utils.Proxy.Internals.InterfaceMap`2.Value
-  fullName: Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Value
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceMap(Of TInterface, TImplementation).Value
-  nameWithType: InterfaceMap<TInterface, TImplementation>.Value
-  nameWithType.vb: InterfaceMap(Of TInterface, TImplementation).Value
-- uid: Solti.Utils.Proxy.Internals.InterfaceMap`2.Value*
-  name: Value
-  href: Solti.Utils.Proxy.Internals.InterfaceMap-2.html#Solti_Utils_Proxy_Internals_InterfaceMap_2_Value_
-  commentId: Overload:Solti.Utils.Proxy.Internals.InterfaceMap`2.Value
-  fullName: Solti.Utils.Proxy.Internals.InterfaceMap<TInterface, TImplementation>.Value
-  fullName.vb: Solti.Utils.Proxy.Internals.InterfaceMap(Of TInterface, TImplementation).Value
-  nameWithType: InterfaceMap<TInterface, TImplementation>.Value
-  nameWithType.vb: InterfaceMap(Of TInterface, TImplementation).Value
+  fullName: Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Instance
+  fullName.vb: Solti.Utils.Proxy.Internals.Generator(Of TUntypedGenerator, TDescendant).Instance
+  nameWithType: Generator<TUntypedGenerator, TDescendant>.Instance
+  nameWithType.vb: Generator(Of TUntypedGenerator, TDescendant).Instance
+- uid: Solti.Utils.Proxy.Internals.IDelegateWrapper
+  name: IDelegateWrapper
+  href: Solti.Utils.Proxy.Internals.IDelegateWrapper.html
+  commentId: T:Solti.Utils.Proxy.Internals.IDelegateWrapper
+  fullName: Solti.Utils.Proxy.Internals.IDelegateWrapper
+  nameWithType: IDelegateWrapper
+- uid: Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped
+  name: Wrapped
+  href: Solti.Utils.Proxy.Internals.IDelegateWrapper.html#Solti_Utils_Proxy_Internals_IDelegateWrapper_Wrapped
+  commentId: P:Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped
+  fullName: Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped
+  nameWithType: IDelegateWrapper.Wrapped
+- uid: Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped*
+  name: Wrapped
+  href: Solti.Utils.Proxy.Internals.IDelegateWrapper.html#Solti_Utils_Proxy_Internals_IDelegateWrapper_Wrapped_
+  commentId: Overload:Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped
+  fullName: Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped
+  nameWithType: IDelegateWrapper.Wrapped
+- uid: Solti.Utils.Proxy.Internals.IInterceptorAccess
+  name: IInterceptorAccess
+  href: Solti.Utils.Proxy.Internals.IInterceptorAccess.html
+  commentId: T:Solti.Utils.Proxy.Internals.IInterceptorAccess
+  fullName: Solti.Utils.Proxy.Internals.IInterceptorAccess
+  nameWithType: IInterceptorAccess
+- uid: Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor
+  name: Interceptor
+  href: Solti.Utils.Proxy.Internals.IInterceptorAccess.html#Solti_Utils_Proxy_Internals_IInterceptorAccess_Interceptor
+  commentId: P:Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor
+  fullName: Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor
+  nameWithType: IInterceptorAccess.Interceptor
+- uid: Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor*
+  name: Interceptor
+  href: Solti.Utils.Proxy.Internals.IInterceptorAccess.html#Solti_Utils_Proxy_Internals_IInterceptorAccess_Interceptor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor
+  fullName: Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor
+  nameWithType: IInterceptorAccess.Interceptor
+- uid: Solti.Utils.Proxy.Internals.InvocationContext
+  name: InvocationContext
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html
+  commentId: T:Solti.Utils.Proxy.Internals.InvocationContext
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext
+  nameWithType: InvocationContext
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.#ctor(System.Object,Solti.Utils.Proxy.ExtendedMemberInfo,System.Func{System.Object[],System.Object},System.Object[],System.Collections.Generic.IReadOnlyList{System.Type})
+  name: InvocationContext(Object, ExtendedMemberInfo, Func<Object[], Object>, Object[], IReadOnlyList<Type>)
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext__ctor_System_Object_Solti_Utils_Proxy_ExtendedMemberInfo_System_Func_System_Object___System_Object__System_Object___System_Collections_Generic_IReadOnlyList_System_Type__
+  commentId: M:Solti.Utils.Proxy.Internals.InvocationContext.#ctor(System.Object,Solti.Utils.Proxy.ExtendedMemberInfo,System.Func{System.Object[],System.Object},System.Object[],System.Collections.Generic.IReadOnlyList{System.Type})
+  name.vb: InvocationContext(Object, ExtendedMemberInfo, Func(Of Object(), Object), Object(), IReadOnlyList(Of Type))
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.InvocationContext(System.Object, Solti.Utils.Proxy.ExtendedMemberInfo, System.Func<System.Object[], System.Object>, System.Object[], System.Collections.Generic.IReadOnlyList<System.Type>)
+  fullName.vb: Solti.Utils.Proxy.Internals.InvocationContext.InvocationContext(System.Object, Solti.Utils.Proxy.ExtendedMemberInfo, System.Func(Of System.Object(), System.Object), System.Object(), System.Collections.Generic.IReadOnlyList(Of System.Type))
+  nameWithType: InvocationContext.InvocationContext(Object, ExtendedMemberInfo, Func<Object[], Object>, Object[], IReadOnlyList<Type>)
+  nameWithType.vb: InvocationContext.InvocationContext(Object, ExtendedMemberInfo, Func(Of Object(), Object), Object(), IReadOnlyList(Of Type))
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.#ctor*
+  name: InvocationContext
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.#ctor
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.InvocationContext
+  nameWithType: InvocationContext.InvocationContext
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Args
+  name: Args
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Args
+  commentId: P:Solti.Utils.Proxy.Internals.InvocationContext.Args
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Args
+  nameWithType: InvocationContext.Args
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Args*
+  name: Args
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Args_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.Args
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Args
+  nameWithType: InvocationContext.Args
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Dispatch
+  name: Dispatch
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Dispatch
+  commentId: P:Solti.Utils.Proxy.Internals.InvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Dispatch
+  nameWithType: InvocationContext.Dispatch
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Dispatch*
+  name: Dispatch
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Dispatch_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Dispatch
+  nameWithType: InvocationContext.Dispatch
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments
+  name: GenericArguments
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_GenericArguments
+  commentId: P:Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments
+  nameWithType: InvocationContext.GenericArguments
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments*
+  name: GenericArguments
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_GenericArguments_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments
+  nameWithType: InvocationContext.GenericArguments
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Member
+  name: Member
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Member
+  commentId: P:Solti.Utils.Proxy.Internals.InvocationContext.Member
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Member
+  nameWithType: InvocationContext.Member
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Member*
+  name: Member
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Member_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.Member
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Member
+  nameWithType: InvocationContext.Member
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Proxy
+  name: Proxy
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Proxy
+  commentId: P:Solti.Utils.Proxy.Internals.InvocationContext.Proxy
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Proxy
+  nameWithType: InvocationContext.Proxy
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Proxy*
+  name: Proxy
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Proxy_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.Proxy
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Proxy
+  nameWithType: InvocationContext.Proxy
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Solti#Utils#Proxy#IInvocationContext#Dispatch
+  name: IInvocationContext.Dispatch()
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Solti_Utils_Proxy_IInvocationContext_Dispatch
+  commentId: M:Solti.Utils.Proxy.Internals.InvocationContext.Solti#Utils#Proxy#IInvocationContext#Dispatch
+  name.vb: Solti.Utils.Proxy.IInvocationContext.Dispatch()
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Solti.Utils.Proxy.IInvocationContext.Dispatch()
+  nameWithType: InvocationContext.IInvocationContext.Dispatch()
+  nameWithType.vb: InvocationContext.Solti.Utils.Proxy.IInvocationContext.Dispatch()
+- uid: Solti.Utils.Proxy.Internals.InvocationContext.Solti#Utils#Proxy#IInvocationContext#Dispatch*
+  name: IInvocationContext.Dispatch
+  href: Solti.Utils.Proxy.Internals.InvocationContext.html#Solti_Utils_Proxy_Internals_InvocationContext_Solti_Utils_Proxy_IInvocationContext_Dispatch_
+  commentId: Overload:Solti.Utils.Proxy.Internals.InvocationContext.Solti#Utils#Proxy#IInvocationContext#Dispatch
+  name.vb: Solti.Utils.Proxy.IInvocationContext.Dispatch
+  fullName: Solti.Utils.Proxy.Internals.InvocationContext.Solti.Utils.Proxy.IInvocationContext.Dispatch
+  nameWithType: InvocationContext.IInvocationContext.Dispatch
+  nameWithType.vb: InvocationContext.Solti.Utils.Proxy.IInvocationContext.Dispatch
+- uid: Solti.Utils.Proxy.Internals.ITargetAccess
+  name: ITargetAccess
+  href: Solti.Utils.Proxy.Internals.ITargetAccess.html
+  commentId: T:Solti.Utils.Proxy.Internals.ITargetAccess
+  fullName: Solti.Utils.Proxy.Internals.ITargetAccess
+  nameWithType: ITargetAccess
+- uid: Solti.Utils.Proxy.Internals.ITargetAccess.Target
+  name: Target
+  href: Solti.Utils.Proxy.Internals.ITargetAccess.html#Solti_Utils_Proxy_Internals_ITargetAccess_Target
+  commentId: P:Solti.Utils.Proxy.Internals.ITargetAccess.Target
+  fullName: Solti.Utils.Proxy.Internals.ITargetAccess.Target
+  nameWithType: ITargetAccess.Target
+- uid: Solti.Utils.Proxy.Internals.ITargetAccess.Target*
+  name: Target
+  href: Solti.Utils.Proxy.Internals.ITargetAccess.html#Solti_Utils_Proxy_Internals_ITargetAccess_Target_
+  commentId: Overload:Solti.Utils.Proxy.Internals.ITargetAccess.Target
+  fullName: Solti.Utils.Proxy.Internals.ITargetAccess.Target
+  nameWithType: ITargetAccess.Target
 - uid: Solti.Utils.Proxy.Internals.LoadedTypes
   name: LoadedTypes
   href: Solti.Utils.Proxy.Internals.LoadedTypes.html
   commentId: T:Solti.Utils.Proxy.Internals.LoadedTypes
   fullName: Solti.Utils.Proxy.Internals.LoadedTypes
   nameWithType: LoadedTypes
-- uid: Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type)
-  name: Register(Type)
-  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_Register_System_Type_
-  commentId: M:Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type)
-  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type)
-  nameWithType: LoadedTypes.Register(Type)
+- uid: Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type,System.Func{System.Object,System.Object})
+  name: Register(Type, Func<Object, Object>)
+  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_Register_System_Type_System_Func_System_Object_System_Object__
+  commentId: M:Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type,System.Func{System.Object,System.Object})
+  name.vb: Register(Type, Func(Of Object, Object))
+  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type, System.Func<System.Object, System.Object>)
+  fullName.vb: Solti.Utils.Proxy.Internals.LoadedTypes.Register(System.Type, System.Func(Of System.Object, System.Object))
+  nameWithType: LoadedTypes.Register(Type, Func<Object, Object>)
+  nameWithType.vb: LoadedTypes.Register(Type, Func(Of Object, Object))
 - uid: Solti.Utils.Proxy.Internals.LoadedTypes.Register*
   name: Register
   href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_Register_
   commentId: Overload:Solti.Utils.Proxy.Internals.LoadedTypes.Register
   fullName: Solti.Utils.Proxy.Internals.LoadedTypes.Register
   nameWithType: LoadedTypes.Register
-- uid: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String,System.Type@)
-  name: TryGet(String, out Type)
-  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_TryGet_System_String_System_Type__
-  commentId: M:Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String,System.Type@)
-  name.vb: TryGet(String, ByRef Type)
-  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String, out System.Type)
-  fullName.vb: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet(System.String, ByRef System.Type)
-  nameWithType: LoadedTypes.TryGet(String, out Type)
-  nameWithType.vb: LoadedTypes.TryGet(String, ByRef Type)
-- uid: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet*
-  name: TryGet
-  href: Solti.Utils.Proxy.Internals.LoadedTypes.html#Solti_Utils_Proxy_Internals_LoadedTypes_TryGet_
-  commentId: Overload:Solti.Utils.Proxy.Internals.LoadedTypes.TryGet
-  fullName: Solti.Utils.Proxy.Internals.LoadedTypes.TryGet
-  nameWithType: LoadedTypes.TryGet
+- uid: Solti.Utils.Proxy.Internals.TypeContext
+  name: TypeContext
+  href: Solti.Utils.Proxy.Internals.TypeContext.html
+  commentId: T:Solti.Utils.Proxy.Internals.TypeContext
+  fullName: Solti.Utils.Proxy.Internals.TypeContext
+  nameWithType: TypeContext
+- uid: Solti.Utils.Proxy.Internals.TypeContext.#ctor(Solti.Utils.Proxy.Internals.TypeContext)
+  name: TypeContext(TypeContext)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext__ctor_Solti_Utils_Proxy_Internals_TypeContext_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.#ctor(Solti.Utils.Proxy.Internals.TypeContext)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.TypeContext(Solti.Utils.Proxy.Internals.TypeContext)
+  nameWithType: TypeContext.TypeContext(TypeContext)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.#ctor(System.Type,System.Func{System.Object,System.Object})
+  name: TypeContext(Type, Func<Object, Object>)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext__ctor_System_Type_System_Func_System_Object_System_Object__
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.#ctor(System.Type,System.Func{System.Object,System.Object})
+  name.vb: TypeContext(Type, Func(Of Object, Object))
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.TypeContext(System.Type, System.Func<System.Object, System.Object>)
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeContext.TypeContext(System.Type, System.Func(Of System.Object, System.Object))
+  nameWithType: TypeContext.TypeContext(Type, Func<Object, Object>)
+  nameWithType.vb: TypeContext.TypeContext(Type, Func(Of Object, Object))
+- uid: Solti.Utils.Proxy.Internals.TypeContext.#ctor*
+  name: TypeContext
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext__ctor_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.#ctor
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.TypeContext
+  nameWithType: TypeContext.TypeContext
+- uid: Solti.Utils.Proxy.Internals.TypeContext.{Clone}$
+  name: <Clone>$()
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext__Clone__
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.{Clone}$
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.<Clone>$()
+  nameWithType: TypeContext.<Clone>$()
+- uid: Solti.Utils.Proxy.Internals.TypeContext.{Clone}$*
+  name: <Clone>$
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext__Clone___
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.{Clone}$
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.<Clone>$
+  nameWithType: TypeContext.<Clone>$
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Activator
+  name: Activator
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Activator
+  commentId: P:Solti.Utils.Proxy.Internals.TypeContext.Activator
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Activator
+  nameWithType: TypeContext.Activator
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Activator*
+  name: Activator
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Activator_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.Activator
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Activator
+  nameWithType: TypeContext.Activator
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Deconstruct(System.Type@,System.Func{System.Object,System.Object}@)
+  name: Deconstruct(out Type, out Func<Object, Object>)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Deconstruct_System_Type__System_Func_System_Object_System_Object___
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.Deconstruct(System.Type@,System.Func{System.Object,System.Object}@)
+  name.vb: Deconstruct(ByRef Type, ByRef Func(Of Object, Object))
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Deconstruct(out System.Type, out System.Func<System.Object, System.Object>)
+  fullName.vb: Solti.Utils.Proxy.Internals.TypeContext.Deconstruct(ByRef System.Type, ByRef System.Func(Of System.Object, System.Object))
+  nameWithType: TypeContext.Deconstruct(out Type, out Func<Object, Object>)
+  nameWithType.vb: TypeContext.Deconstruct(ByRef Type, ByRef Func(Of Object, Object))
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Deconstruct*
+  name: Deconstruct
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Deconstruct_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.Deconstruct
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Deconstruct
+  nameWithType: TypeContext.Deconstruct
+- uid: Solti.Utils.Proxy.Internals.TypeContext.EqualityContract
+  name: EqualityContract
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_EqualityContract
+  commentId: P:Solti.Utils.Proxy.Internals.TypeContext.EqualityContract
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.EqualityContract
+  nameWithType: TypeContext.EqualityContract
+- uid: Solti.Utils.Proxy.Internals.TypeContext.EqualityContract*
+  name: EqualityContract
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_EqualityContract_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.EqualityContract
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.EqualityContract
+  nameWithType: TypeContext.EqualityContract
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Equals(Solti.Utils.Proxy.Internals.TypeContext)
+  name: Equals(TypeContext)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Equals_Solti_Utils_Proxy_Internals_TypeContext_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.Equals(Solti.Utils.Proxy.Internals.TypeContext)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Equals(Solti.Utils.Proxy.Internals.TypeContext)
+  nameWithType: TypeContext.Equals(TypeContext)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Equals(System.Object)
+  name: Equals(Object)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Equals_System_Object_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.Equals(System.Object)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Equals(System.Object)
+  nameWithType: TypeContext.Equals(Object)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Equals*
+  name: Equals
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Equals_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.Equals
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Equals
+  nameWithType: TypeContext.Equals
+- uid: Solti.Utils.Proxy.Internals.TypeContext.GetHashCode
+  name: GetHashCode()
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_GetHashCode
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.GetHashCode
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.GetHashCode()
+  nameWithType: TypeContext.GetHashCode()
+- uid: Solti.Utils.Proxy.Internals.TypeContext.GetHashCode*
+  name: GetHashCode
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_GetHashCode_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.GetHashCode
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.GetHashCode
+  nameWithType: TypeContext.GetHashCode
+- uid: Solti.Utils.Proxy.Internals.TypeContext.op_Equality(Solti.Utils.Proxy.Internals.TypeContext,Solti.Utils.Proxy.Internals.TypeContext)
+  name: Equality(TypeContext, TypeContext)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_op_Equality_Solti_Utils_Proxy_Internals_TypeContext_Solti_Utils_Proxy_Internals_TypeContext_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.op_Equality(Solti.Utils.Proxy.Internals.TypeContext,Solti.Utils.Proxy.Internals.TypeContext)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Equality(Solti.Utils.Proxy.Internals.TypeContext, Solti.Utils.Proxy.Internals.TypeContext)
+  nameWithType: TypeContext.Equality(TypeContext, TypeContext)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.op_Equality*
+  name: Equality
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_op_Equality_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.op_Equality
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Equality
+  nameWithType: TypeContext.Equality
+- uid: Solti.Utils.Proxy.Internals.TypeContext.op_Inequality(Solti.Utils.Proxy.Internals.TypeContext,Solti.Utils.Proxy.Internals.TypeContext)
+  name: Inequality(TypeContext, TypeContext)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_op_Inequality_Solti_Utils_Proxy_Internals_TypeContext_Solti_Utils_Proxy_Internals_TypeContext_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.op_Inequality(Solti.Utils.Proxy.Internals.TypeContext,Solti.Utils.Proxy.Internals.TypeContext)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Inequality(Solti.Utils.Proxy.Internals.TypeContext, Solti.Utils.Proxy.Internals.TypeContext)
+  nameWithType: TypeContext.Inequality(TypeContext, TypeContext)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.op_Inequality*
+  name: Inequality
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_op_Inequality_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.op_Inequality
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Inequality
+  nameWithType: TypeContext.Inequality
+- uid: Solti.Utils.Proxy.Internals.TypeContext.PrintMembers(System.Text.StringBuilder)
+  name: PrintMembers(StringBuilder)
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_PrintMembers_System_Text_StringBuilder_
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.PrintMembers(System.Text.StringBuilder)
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.PrintMembers(System.Text.StringBuilder)
+  nameWithType: TypeContext.PrintMembers(StringBuilder)
+- uid: Solti.Utils.Proxy.Internals.TypeContext.PrintMembers*
+  name: PrintMembers
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_PrintMembers_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.PrintMembers
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.PrintMembers
+  nameWithType: TypeContext.PrintMembers
+- uid: Solti.Utils.Proxy.Internals.TypeContext.ToString
+  name: ToString()
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_ToString
+  commentId: M:Solti.Utils.Proxy.Internals.TypeContext.ToString
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.ToString()
+  nameWithType: TypeContext.ToString()
+- uid: Solti.Utils.Proxy.Internals.TypeContext.ToString*
+  name: ToString
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_ToString_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.ToString
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.ToString
+  nameWithType: TypeContext.ToString
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Type
+  name: Type
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Type
+  commentId: P:Solti.Utils.Proxy.Internals.TypeContext.Type
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Type
+  nameWithType: TypeContext.Type
+- uid: Solti.Utils.Proxy.Internals.TypeContext.Type*
+  name: Type
+  href: Solti.Utils.Proxy.Internals.TypeContext.html#Solti_Utils_Proxy_Internals_TypeContext_Type_
+  commentId: Overload:Solti.Utils.Proxy.Internals.TypeContext.Type
+  fullName: Solti.Utils.Proxy.Internals.TypeContext.Type
+  nameWithType: TypeContext.Type
 - uid: Solti.Utils.Proxy.Internals.TypeEmitter
   name: TypeEmitter
   href: Solti.Utils.Proxy.Internals.TypeEmitter.html
@@ -660,148 +1265,3 @@ references:
   commentId: Overload:Solti.Utils.Proxy.Internals.TypeEmitter.#ctor
   fullName: Solti.Utils.Proxy.Internals.TypeEmitter.TypeEmitter
   nameWithType: TypeEmitter.TypeEmitter
-- uid: Solti.Utils.Proxy.InvocationContext
-  name: InvocationContext
-  href: Solti.Utils.Proxy.InvocationContext.html
-  commentId: T:Solti.Utils.Proxy.InvocationContext
-  fullName: Solti.Utils.Proxy.InvocationContext
-  nameWithType: InvocationContext
-- uid: Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],Solti.Utils.Proxy.MethodContext)
-  name: InvocationContext(Object[], MethodContext)
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_System_Object___Solti_Utils_Proxy_MethodContext_
-  commentId: M:Solti.Utils.Proxy.InvocationContext.#ctor(System.Object[],Solti.Utils.Proxy.MethodContext)
-  name.vb: InvocationContext(Object(), MethodContext)
-  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object[], Solti.Utils.Proxy.MethodContext)
-  fullName.vb: Solti.Utils.Proxy.InvocationContext.InvocationContext(System.Object(), Solti.Utils.Proxy.MethodContext)
-  nameWithType: InvocationContext.InvocationContext(Object[], MethodContext)
-  nameWithType.vb: InvocationContext.InvocationContext(Object(), MethodContext)
-- uid: Solti.Utils.Proxy.InvocationContext.#ctor*
-  name: InvocationContext
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext__ctor_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.#ctor
-  fullName: Solti.Utils.Proxy.InvocationContext.InvocationContext
-  nameWithType: InvocationContext.InvocationContext
-- uid: Solti.Utils.Proxy.InvocationContext.Args
-  name: Args
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Args
-  commentId: P:Solti.Utils.Proxy.InvocationContext.Args
-  fullName: Solti.Utils.Proxy.InvocationContext.Args
-  nameWithType: InvocationContext.Args
-- uid: Solti.Utils.Proxy.InvocationContext.Args*
-  name: Args
-  href: Solti.Utils.Proxy.InvocationContext.html#Solti_Utils_Proxy_InvocationContext_Args_
-  commentId: Overload:Solti.Utils.Proxy.InvocationContext.Args
-  fullName: Solti.Utils.Proxy.InvocationContext.Args
-  nameWithType: InvocationContext.Args
-- uid: Solti.Utils.Proxy.IProxyAccess`1
-  name: IProxyAccess<TInterface>
-  href: Solti.Utils.Proxy.IProxyAccess-1.html
-  commentId: T:Solti.Utils.Proxy.IProxyAccess`1
-  name.vb: IProxyAccess(Of TInterface)
-  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>
-  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface)
-  nameWithType: IProxyAccess<TInterface>
-  nameWithType.vb: IProxyAccess(Of TInterface)
-- uid: Solti.Utils.Proxy.IProxyAccess`1.Proxy
-  name: Proxy
-  href: Solti.Utils.Proxy.IProxyAccess-1.html#Solti_Utils_Proxy_IProxyAccess_1_Proxy
-  commentId: P:Solti.Utils.Proxy.IProxyAccess`1.Proxy
-  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy
-  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface).Proxy
-  nameWithType: IProxyAccess<TInterface>.Proxy
-  nameWithType.vb: IProxyAccess(Of TInterface).Proxy
-- uid: Solti.Utils.Proxy.IProxyAccess`1.Proxy*
-  name: Proxy
-  href: Solti.Utils.Proxy.IProxyAccess-1.html#Solti_Utils_Proxy_IProxyAccess_1_Proxy_
-  commentId: Overload:Solti.Utils.Proxy.IProxyAccess`1.Proxy
-  fullName: Solti.Utils.Proxy.IProxyAccess<TInterface>.Proxy
-  fullName.vb: Solti.Utils.Proxy.IProxyAccess(Of TInterface).Proxy
-  nameWithType: IProxyAccess<TInterface>.Proxy
-  nameWithType.vb: IProxyAccess(Of TInterface).Proxy
-- uid: Solti.Utils.Proxy.MethodContext
-  name: MethodContext
-  href: Solti.Utils.Proxy.MethodContext.html
-  commentId: T:Solti.Utils.Proxy.MethodContext
-  fullName: Solti.Utils.Proxy.MethodContext
-  nameWithType: MethodContext
-- uid: Solti.Utils.Proxy.MethodContext.#ctor(Solti.Utils.Proxy.MethodContext)
-  name: MethodContext(MethodContext)
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_Solti_Utils_Proxy_MethodContext_
-  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(Solti.Utils.Proxy.MethodContext)
-  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(Solti.Utils.Proxy.MethodContext)
-  nameWithType: MethodContext.MethodContext(MethodContext)
-- uid: Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
-  name: MethodContext(Func<Object, Object[], Object>, Int32, IReadOnlyDictionary<MethodInfo, MethodInfo>)
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_System_Func_System_Object_System_Object___System_Object__System_Int32_System_Collections_Generic_IReadOnlyDictionary_System_Reflection_MethodInfo_System_Reflection_MethodInfo__
-  commentId: M:Solti.Utils.Proxy.MethodContext.#ctor(System.Func{System.Object,System.Object[],System.Object},System.Int32,System.Collections.Generic.IReadOnlyDictionary{System.Reflection.MethodInfo,System.Reflection.MethodInfo})
-  name.vb: MethodContext(Func(Of Object, Object(), Object), Int32, IReadOnlyDictionary(Of MethodInfo, MethodInfo))
-  fullName: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func<System.Object, System.Object[], System.Object>, System.Int32, System.Collections.Generic.IReadOnlyDictionary<System.Reflection.MethodInfo, System.Reflection.MethodInfo>)
-  fullName.vb: Solti.Utils.Proxy.MethodContext.MethodContext(System.Func(Of System.Object, System.Object(), System.Object), System.Int32, System.Collections.Generic.IReadOnlyDictionary(Of System.Reflection.MethodInfo, System.Reflection.MethodInfo))
-  nameWithType: MethodContext.MethodContext(Func<Object, Object[], Object>, Int32, IReadOnlyDictionary<MethodInfo, MethodInfo>)
-  nameWithType.vb: MethodContext.MethodContext(Func(Of Object, Object(), Object), Int32, IReadOnlyDictionary(Of MethodInfo, MethodInfo))
-- uid: Solti.Utils.Proxy.MethodContext.#ctor*
-  name: MethodContext
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext__ctor_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.#ctor
-  fullName: Solti.Utils.Proxy.MethodContext.MethodContext
-  nameWithType: MethodContext.MethodContext
-- uid: Solti.Utils.Proxy.MethodContext.Dispatch
-  name: Dispatch
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Dispatch
-  commentId: P:Solti.Utils.Proxy.MethodContext.Dispatch
-  fullName: Solti.Utils.Proxy.MethodContext.Dispatch
-  nameWithType: MethodContext.Dispatch
-- uid: Solti.Utils.Proxy.MethodContext.Dispatch*
-  name: Dispatch
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_Dispatch_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.Dispatch
-  fullName: Solti.Utils.Proxy.MethodContext.Dispatch
-  nameWithType: MethodContext.Dispatch
-- uid: Solti.Utils.Proxy.MethodContext.InterfaceMember
-  name: InterfaceMember
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_InterfaceMember
-  commentId: P:Solti.Utils.Proxy.MethodContext.InterfaceMember
-  fullName: Solti.Utils.Proxy.MethodContext.InterfaceMember
-  nameWithType: MethodContext.InterfaceMember
-- uid: Solti.Utils.Proxy.MethodContext.InterfaceMember*
-  name: InterfaceMember
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_InterfaceMember_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.InterfaceMember
-  fullName: Solti.Utils.Proxy.MethodContext.InterfaceMember
-  nameWithType: MethodContext.InterfaceMember
-- uid: Solti.Utils.Proxy.MethodContext.InterfaceMethod
-  name: InterfaceMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_InterfaceMethod
-  commentId: P:Solti.Utils.Proxy.MethodContext.InterfaceMethod
-  fullName: Solti.Utils.Proxy.MethodContext.InterfaceMethod
-  nameWithType: MethodContext.InterfaceMethod
-- uid: Solti.Utils.Proxy.MethodContext.InterfaceMethod*
-  name: InterfaceMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_InterfaceMethod_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.InterfaceMethod
-  fullName: Solti.Utils.Proxy.MethodContext.InterfaceMethod
-  nameWithType: MethodContext.InterfaceMethod
-- uid: Solti.Utils.Proxy.MethodContext.TargetMember
-  name: TargetMember
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMember
-  commentId: P:Solti.Utils.Proxy.MethodContext.TargetMember
-  fullName: Solti.Utils.Proxy.MethodContext.TargetMember
-  nameWithType: MethodContext.TargetMember
-- uid: Solti.Utils.Proxy.MethodContext.TargetMember*
-  name: TargetMember
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMember_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.TargetMember
-  fullName: Solti.Utils.Proxy.MethodContext.TargetMember
-  nameWithType: MethodContext.TargetMember
-- uid: Solti.Utils.Proxy.MethodContext.TargetMethod
-  name: TargetMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMethod
-  commentId: P:Solti.Utils.Proxy.MethodContext.TargetMethod
-  fullName: Solti.Utils.Proxy.MethodContext.TargetMethod
-  nameWithType: MethodContext.TargetMethod
-- uid: Solti.Utils.Proxy.MethodContext.TargetMethod*
-  name: TargetMethod
-  href: Solti.Utils.Proxy.MethodContext.html#Solti_Utils_Proxy_MethodContext_TargetMethod_
-  commentId: Overload:Solti.Utils.Proxy.MethodContext.TargetMethod
-  fullName: Solti.Utils.Proxy.MethodContext.TargetMethod
-  nameWithType: MethodContext.TargetMethod
