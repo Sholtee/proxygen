@@ -26,7 +26,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return underlyingType switch
             {
-                _ when underlyingType.IsArray => new MetadataArrayTypeInfo(underlyingType),
+                { IsArray: true } => new MetadataArrayTypeInfo(underlyingType),
                 _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
                 _ => new MetadataTypeInfo(underlyingType)
             };
@@ -183,7 +183,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return concreteType switch
             {
-                _ when concreteType.IsGenericParameter && concreteType.DeclaringMethod is not null => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
+                { IsGenericParameter: true, DeclaringMethod: not null } => MetadataMethodInfo.CreateFrom(concreteType.DeclaringMethod),
                 _ when concreteType.GetEnclosingType() is not null => MetadataTypeInfo.CreateFrom(concreteType.GetEnclosingType()!),
                 _ => null
             };

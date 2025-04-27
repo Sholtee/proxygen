@@ -31,7 +31,7 @@ namespace Solti.Utils.Proxy.Internals
 
             return method switch
             {
-                _ when method.TypeArguments.Length > 0 => new SymbolGenericMethodInfo(method, compilation),
+                { TypeArguments.Length: > 0 } => new SymbolGenericMethodInfo(method, compilation),
                 _ => new SymbolMethodInfo(method, compilation)
             };
         }

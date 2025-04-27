@@ -17,7 +17,7 @@ namespace Solti.Utils.Proxy.Internals
         public static IMethodInfo CreateFrom(MethodBase methodBase) => methodBase switch
         {
             ConstructorInfo constructor => new MetadataConstructorInfo(constructor),
-            MethodInfo method when method.IsGenericMethod => new MetadataGenericMethodInfo(method), 
+            MethodInfo { IsGenericMethod: true } method => new MetadataGenericMethodInfo(method), 
             MethodInfo method => new MetadataMethodInfoImpl(method),
             _ => throw new NotSupportedException()
         };

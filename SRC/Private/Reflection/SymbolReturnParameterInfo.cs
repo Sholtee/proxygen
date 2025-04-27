@@ -13,8 +13,8 @@ namespace Solti.Utils.Proxy.Internals
     {
         public ParameterKind Kind => method switch
         {
-            _ when method.ReturnsByRefReadonly => ParameterKind.RefReadonly,
-            _ when method.ReturnsByRef => ParameterKind.Ref,
+            { ReturnsByRefReadonly: true } => ParameterKind.RefReadonly,
+            { ReturnsByRef: true } => ParameterKind.Ref,
             _ => ParameterKind.Out
         };
 

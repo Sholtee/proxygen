@@ -26,13 +26,13 @@ namespace Solti.Utils.Proxy.Internals
             return typeSymbol switch
             {
                 IArrayTypeSymbol array => new SymbolArrayTypeInfo(array, compilation),
-                INamedTypeSymbol named when named.TypeArguments.Any() => new SymbolGenericTypeInfo(named, compilation),
+                INamedTypeSymbol { TypeArguments.Length: > 0 } named => new SymbolGenericTypeInfo(named, compilation),
 
                 //
                 // NET6_0 workaround
                 //
 
-                _ when typeSymbol.Kind is SymbolKind.FunctionPointerType => CreateFrom
+                { Kind: SymbolKind.FunctionPointerType } => CreateFrom
                 (
                     compilation.GetTypeByMetadataName(typeof(IntPtr).FullName)!,
                     compilation
@@ -98,7 +98,7 @@ namespace Solti.Utils.Proxy.Internals
         {
             IPointerTypeSymbol => RefType.Pointer,
             IArrayTypeSymbol => RefType.Array,
-            _ when UnderlyingSymbol.IsRefLikeType => RefType.Ref,
+            { IsRefLikeType: true } => RefType.Ref,
             _ => RefType.None
         };
 
