@@ -29,6 +29,7 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(asm => Path.Combine(baseDir, $"{asm.Name}.dll"))
                 .Where(File.Exists)
                 .Concat([netstandard.Location])
+                .OrderBy(Path.GetFileName)
                 .Select(static loc => MetadataReference.CreateFromFile(loc));
         }
 
