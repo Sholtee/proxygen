@@ -163,7 +163,7 @@ Note that:
   </PropertyGroup>
   ```
 
-The output should look like [this](https://github.com/Sholtee/proxygen/blob/3740e6d608d30aec0f5a88aabfc89f8897cbd211/TEST/ProxyGen.Tests/IfaceProxySrcModule.txt ).
+The output should look like [this](https://github.com/Sholtee/proxygen/blob/bc4169b9d5c1727a4d612ef65183ccfae84979f8/TEST/ProxyGen.Tests/IfaceProxySrcModule.txt ).
 ## Migrating from version 
 - 2.X
   - Delete all the cached assemblies (if the `[Proxy|Duck]Generator.CacheDirectory` is set somewhere)
