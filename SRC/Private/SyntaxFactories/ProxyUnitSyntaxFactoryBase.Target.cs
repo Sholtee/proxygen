@@ -3,7 +3,6 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -18,21 +17,10 @@ namespace Solti.Utils.Proxy.Internals
     {
         private const string TARGET_FIELD = "FTarget";
 
-        protected ExpressionSyntax GetTarget() => ParenthesizedExpression
+        protected ExpressionSyntax GetTarget() => SimpleMemberAccess
         (
-            BinaryExpression
-            (
-                SyntaxKind.CoalesceExpression,
-                SimpleMemberAccess
-                (
-                    ThisExpression(),
-                    TARGET_FIELD
-                ),
-                ThrowExpression
-                (
-                    ResolveObject<InvalidOperationException>()
-                )
-            )
+            ThisExpression(),
+            TARGET_FIELD
         );
 
         #if DEBUG
