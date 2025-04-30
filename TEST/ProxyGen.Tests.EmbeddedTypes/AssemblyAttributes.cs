@@ -24,4 +24,3 @@ using Solti.Utils.Proxy.Tests.EmbeddedTypes;
     EmbedGeneratedType(typeof(DelegateProxyGenerator<Action<object>>)),
     EmbedGeneratedType(typeof(DelegateProxyGenerator<InternalDelegate<object>>))
 ]
-

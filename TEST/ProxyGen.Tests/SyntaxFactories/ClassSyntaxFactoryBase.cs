@@ -116,7 +116,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveProperty_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
         {
             (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveProperty(Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveProperty(Property, Block(), Block(), allowProtected: true).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
         }
 
         public static IEnumerable<object> ResolveIndexer_ShouldDeclareANewProperty_Params
@@ -132,7 +132,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveIndexer_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
         {
             (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveIndexer(Property, Block(), Block()).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveIndexer(Property, Block(), Block(), allowProtected: true).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
         }
 
         public static IEnumerable<object> ResolveEvent_ShouldDeclareANewEvent_Params
@@ -228,7 +228,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(ClassMethodsToResolve))]
         public void ResolveMethod_ShouldSupportClassMethods((MethodInfo Method, string Expected) param) =>
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default with { AssemblyNameOverride = typeof(ClassSyntaxFactoryBaseTests).Assembly.GetName().Name }).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method)).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default with { AssemblyNameOverride = typeof(ClassSyntaxFactoryBaseTests).Assembly.GetName().Name }).ResolveMethod(MetadataMethodInfo.CreateFrom(param.Method), allowProtected: true).NormalizeWhitespace().ToString(), Is.EqualTo(param.Expected));
 
         private interface INullable 
         {

@@ -60,52 +60,34 @@ namespace Solti.Utils.Proxy.Internals
         {
             List<MemberDeclarationSyntax> members = [];
 
-            BlockSyntax?
-                get = null,
-                set = null;
-
-            if (prop.GetMethod is not null)
-            {
-                //
-                // Starting from .NET 5.0 interface members may have visibility.
-                //
-
-                Visibility.Check(prop.GetMethod, ContainingAssembly);
-
-                get = BuildBody
+            BlockSyntax? get = prop.GetMethod is null ? null : BuildBody
+            (
+                prop.GetMethod,
+                (_, locals) => PropertyAccess
                 (
-                    prop.GetMethod,
-                    (_, locals) => PropertyAccess
+                    prop,
+                    GetTarget(),
+                    indices: locals.Select(ResolveArgument)
+                )
+            );
+
+            BlockSyntax? set = prop.SetMethod is null ? null : BuildBody
+            (
+                prop.SetMethod,
+                (_, locals) => AssignmentExpression // FTarget.Prop = _value
+                (
+                    kind: SyntaxKind.SimpleAssignmentExpression,
+                    left: PropertyAccess
                     (
                         prop,
                         GetTarget(),
-                        indices: locals.Select(ResolveArgument)
-                    )
-                );
-            }
-
-            if (prop.SetMethod is not null)
-            {
-                Visibility.Check(prop.SetMethod, ContainingAssembly);
-
-                set = BuildBody
-                (
-                    prop.SetMethod,
-                    (_, locals) => AssignmentExpression // FTarget.Prop = _value
-                    (
-                        kind: SyntaxKind.SimpleAssignmentExpression,
-                        left: PropertyAccess
-                        (
-                            prop,
-                            GetTarget(),
-                            indices: locals
-                                .Take(locals.Count - 1)
-                                .Select(ResolveArgument)
-                        ),
-                        right: ResolveIdentifierName(locals.Last())  // "value" always the last parameter
-                    )
-                );
-            }
+                        indices: locals
+                            .Take(locals.Count - 1)
+                            .Select(ResolveArgument)
+                    ),
+                    right: ResolveIdentifierName(locals.Last())  // "value" always the last parameter
+                )
+            );
 
             members.Add
             (

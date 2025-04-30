@@ -51,15 +51,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo targetMethod)
         {
-            IMethodInfo ifaceMethod = (IMethodInfo) context;
-
             Visibility.Check(targetMethod, ContainingAssembly);
-
-            //
-            // Starting from .NET 5.0 interface members may have visibility.
-            //
-
-            Visibility.Check(ifaceMethod, ContainingAssembly);
 
             //
             // Explicit members cannot be accessed directly
@@ -68,6 +60,8 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo? castTargetTo = targetMethod.AccessModifiers is AccessModifiers.Explicit
                 ? targetMethod.DeclaringInterfaces.Single()
                 : null;
+
+            IMethodInfo ifaceMethod = (IMethodInfo) context;
 
             ExpressionSyntax invocation = InvokeMethod
             (

@@ -61,23 +61,41 @@ namespace Solti.Utils.Proxy.Internals
                 )
             );
 
-        private TDeclaration ResolveProperty<TDeclaration>(IPropertyInfo property, Func<IPropertyInfo, TDeclaration> fact, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) where TDeclaration : BasePropertyDeclarationSyntax
+        private TDeclaration ResolveProperty<TDeclaration>(IPropertyInfo property, Func<IPropertyInfo, TDeclaration> fact, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool allowProtected) where TDeclaration : BasePropertyDeclarationSyntax
         {
+            //
+            // Starting from .NET 5.0 interface members may have visibility.
+            //
+
+            Visibility.Check(property, ContainingAssembly, allowProtected);
+
             TDeclaration result = fact(property);
 
             IMethodInfo backingMethodHavingHigherVisibility = (property.GetMethod?.AccessModifiers ?? AccessModifiers.Unknown) > (property.SetMethod?.AccessModifiers ?? AccessModifiers.Unknown)
                 ? property.GetMethod!
                 : property.SetMethod!;
 
+            List<AccessorDeclarationSyntax> accessors = new(2);
+
             if (property.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
             {
                 CheckNotStaticAbstract(property);
+
+                if (property.GetMethod is not null) accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody)
+                );
+
+                if (property.SetMethod is not null) accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody)
+                );
 
                 result = (TDeclaration) result.WithExplicitInterfaceSpecifier
                 (
                     explicitInterfaceSpecifier: ExplicitInterfaceSpecifier
                     (
-                        (NameSyntax) ResolveType(property.DeclaringType)
+                        (NameSyntax)ResolveType(property.DeclaringType)
                     )
                 );
             }
@@ -89,6 +107,16 @@ namespace Solti.Utils.Proxy.Internals
 
                 tokens.Add(underlyingMethod.IsVirtual || underlyingMethod.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
 
+                if (property.GetMethod is not null) accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.GetAccessorDeclaration, getBody, property.GetMethod)
+                );
+
+                if (property.SetMethod is not null) accessors.Add
+                (
+                    ResolveAccessor(SyntaxKind.SetAccessorDeclaration, setBody, property.SetMethod)
+                );
+
                 result = (TDeclaration) result.WithModifiers
                 (
                     TokenList
@@ -96,20 +124,22 @@ namespace Solti.Utils.Proxy.Internals
                         tokens.Select(Token)
                     )
                 );
+
+                AccessorDeclarationSyntax ResolveAccessor(SyntaxKind kind, CSharpSyntaxNode? body, IMethodInfo backingMethod) => ClassSyntaxFactoryBase.ResolveAccessor
+                (
+                    kind,
+                    body,
+
+                    //
+                    // Accessor cannot have higher visibility than the property's
+                    //
+
+                    backingMethod!.AccessModifiers < backingMethodHavingHigherVisibility.AccessModifiers
+                        ? ResolveAccessModifiers(backingMethod)
+                        : []
+                );
             }
-
-            List<AccessorDeclarationSyntax> accessors = new(2);
-
-            if (property.GetMethod is not null) accessors.Add
-            (
-                ResolveAccessor(property.GetMethod, getBody, SyntaxKind.GetAccessorDeclaration)
-            );
-
-            if (property.SetMethod is not null) accessors.Add
-            (
-                ResolveAccessor(property.SetMethod, setBody, SyntaxKind.SetAccessorDeclaration)
-            );
-
+  
             return (TDeclaration) result.WithAccessorList
             (
                 accessorList: AccessorList
@@ -117,21 +147,6 @@ namespace Solti.Utils.Proxy.Internals
                     accessors: List(accessors)
                 )
             );
-
-            AccessorDeclarationSyntax ResolveAccessor(IMethodInfo backingMethod, CSharpSyntaxNode? body, SyntaxKind kind)
-            {
-                Debug.Assert(backingMethod is not null, "Backing method cannot be null");
-
-                //
-                // Accessor cannot have higher visibility than the property's
-                //
-
-                IEnumerable<SyntaxKind> modifiers = backingMethod!.AccessModifiers < backingMethodHavingHigherVisibility.AccessModifiers
-                    ? ResolveAccessModifiers(backingMethod)
-                    : [];
-
-                return ClassSyntaxFactoryBase.ResolveAccessor(kind, body, modifiers);
-            }
         }
 
         /// <summary>
@@ -154,7 +169,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
+        protected PropertyDeclarationSyntax ResolveProperty(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool allowProtected = false) => ResolveProperty
         (
             property,
             property => PropertyDeclaration
@@ -163,7 +178,8 @@ namespace Solti.Utils.Proxy.Internals
                 identifier: Identifier(property.Name)
             ),
             getBody,
-            setBody
+            setBody,
+            allowProtected
         );
 
         /// <summary>
@@ -186,7 +202,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody) => ResolveProperty
+        protected IndexerDeclarationSyntax ResolveIndexer(IPropertyInfo property, CSharpSyntaxNode? getBody, CSharpSyntaxNode? setBody, bool allowProtected = false) => ResolveProperty
         (
             property,
             property => 
@@ -212,7 +228,8 @@ namespace Solti.Utils.Proxy.Internals
                     )
                 ),
             getBody,
-            setBody
+            setBody,
+            allowProtected
         );
 
         #if DEBUG

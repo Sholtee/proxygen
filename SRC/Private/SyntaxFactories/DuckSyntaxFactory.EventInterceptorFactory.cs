@@ -49,15 +49,7 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveEvent(ClassDeclarationSyntax cls, object context, IEventInfo targetEvt)
         {
-            IEventInfo ifaceEvt = (IEventInfo) context;
-
             Visibility.Check(targetEvt, ContainingAssembly);
-
-            //
-            // Starting from .NET 5.0 interface members may have visibility.
-            //
-
-            Visibility.Check(ifaceEvt, ContainingAssembly);
 
             IMethodInfo accessor = targetEvt.AddMethod ?? targetEvt.RemoveMethod!;
 
@@ -68,6 +60,8 @@ namespace Solti.Utils.Proxy.Internals
             ITypeInfo? castTargetTo = accessor.AccessModifiers is AccessModifiers.Explicit
                 ? accessor.DeclaringInterfaces.Single() // Explicit event can have exactly one declaring interface
                 : null;
+
+            IEventInfo ifaceEvt = (IEventInfo) context;
 
             return cls.AddMembers
             (

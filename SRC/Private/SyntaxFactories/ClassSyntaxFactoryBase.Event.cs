@@ -36,8 +36,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode addBody, CSharpSyntaxNode removeBody)
+        protected EventDeclarationSyntax ResolveEvent(IEventInfo @event, CSharpSyntaxNode addBody, CSharpSyntaxNode removeBody, bool allowProtected = false)
         {
+            //
+            // Starting from .NET 5.0 interface members may have visibility.
+            //
+
+            Visibility.Check(@event, ContainingAssembly, allowProtected);
+
             EventDeclarationSyntax result = EventDeclaration
             (
                 type: ResolveType(@event.Type),
