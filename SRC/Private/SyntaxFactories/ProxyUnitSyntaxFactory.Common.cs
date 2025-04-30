@@ -21,16 +21,6 @@ namespace Solti.Utils.Proxy.Internals
     {
         protected static readonly IReadOnlyCollection<ParameterKind> ByRefs = [ParameterKind.Ref, ParameterKind.Out];
 
-        protected static string EnsureUnused(IEnumerable<IParameterInfo> parameters, string variable)
-        {
-            while (parameters.Any(param => param.Name == variable))
-                variable = $"_{variable}";
-
-            return variable;
-        }
-
-        protected static string EnsureUnused(IMethodInfo method, string variable) => EnsureUnused(method.Parameters, variable);
-
         /// <summary>
         /// <code>
         /// return;

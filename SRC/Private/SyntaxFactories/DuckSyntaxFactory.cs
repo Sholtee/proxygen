@@ -43,7 +43,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases => [FInterfaceType, .. base.Bases];
+        protected override IReadOnlyList<ITypeInfo> Bases => [FInterfaceType];
 
         #if DEBUG
         internal

@@ -4,10 +4,9 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,13 +16,7 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyUnitSyntaxFactoryBase
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly IPropertyInfo FTarget = MetadataPropertyInfo.CreateFrom
-        (
-            PropertyInfoExtensions.ExtractFrom(static (ITargetAccess ta) => ta.Target!)
-        );
-
-        private const string TARGET_FIELD = nameof(FTarget);
+        private const string TARGET_FIELD = "FTarget";
 
         protected ExpressionSyntax GetTarget() => ParenthesizedExpression
         (
@@ -45,27 +38,11 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases
-        {
-            get
-            {
-                List<ITypeInfo> result = [];
-                if (TargetType is not null) result.Add
-                (
-                    MetadataTypeInfo.CreateFrom(typeof(ITargetAccess))
-                );
-                return result;
-            }
-        }
-
-        #if DEBUG
-        internal
-        #endif
         protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => base.ResolveMembers
         (
             TargetType is null ? cls : cls.AddMembers
             (
-                ResolveField(TargetType, TARGET_FIELD, @static: false, @readonly: false)
+                ResolveField(TargetType, TARGET_FIELD, @static: false)
             ),
             context,
             cancellation
@@ -74,25 +51,24 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => TargetType is null ? cls : cls.AddMembers
-        (
-            ResolveProperty
+        protected override ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
+        {
+            ConstructorDeclarationSyntax resolved = base.ResolveConstructor(ctor, name);
+
+            return TargetType is null ? resolved : AugmentConstructor<object>
             (
-                FTarget,
-                getBody: ArrowExpressionClause
-                (
-                    SimpleMemberAccess(ThisExpression(), TARGET_FIELD)
-                ),
-                setBody: ArrowExpressionClause
+                resolved,
+                "target",
+                target => ExpressionStatement
                 (
                     AssignmentExpression
                     (
                         SyntaxKind.SimpleAssignmentExpression,
                         left: SimpleMemberAccess(ThisExpression(), TARGET_FIELD),
-                        right: CastExpression(ResolveType(TargetType), FValue)
+                        right: CastExpression(ResolveType(TargetType), IdentifierName(target.Identifier))
                     )
                 )
-            )
-        );
+            );
+        }
     }
 }

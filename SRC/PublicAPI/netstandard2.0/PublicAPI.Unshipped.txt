@@ -64,9 +64,6 @@ Solti.Utils.Proxy.Internals.InvocationContext.GenericArguments.get -> System.Col
 Solti.Utils.Proxy.Internals.InvocationContext.InvocationContext(object! proxy, Solti.Utils.Proxy.ExtendedMemberInfo! targetMember, System.Func<object?[]!, object?>! dispatch, object?[]! args, System.Collections.Generic.IReadOnlyList<System.Type!>! genericArguments) -> void
 Solti.Utils.Proxy.Internals.InvocationContext.Member.get -> Solti.Utils.Proxy.ExtendedMemberInfo!
 Solti.Utils.Proxy.Internals.InvocationContext.Proxy.get -> object!
-Solti.Utils.Proxy.Internals.ITargetAccess
-Solti.Utils.Proxy.Internals.ITargetAccess.Target.get -> object?
-Solti.Utils.Proxy.Internals.ITargetAccess.Target.set -> void
 Solti.Utils.Proxy.Internals.LoadedTypes
 Solti.Utils.Proxy.Internals.TypeContext
 Solti.Utils.Proxy.Internals.TypeContext.Activator.get -> System.Func<object?, object!>!

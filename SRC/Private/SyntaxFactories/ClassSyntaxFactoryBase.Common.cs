@@ -88,6 +88,14 @@ namespace Solti.Utils.Proxy.Internals
             return ams;
         }
 
+        private static string EnsureUnused(IEnumerable<string> values, string val)
+        {
+            while (values.Any(actual => actual == val))
+                val = $"_{val}";
+
+            return val;
+        }
+
         /// <summary>
         /// <code>
         /// new System.Object[] {..., ..., ...}

@@ -27,8 +27,7 @@ namespace Solti.Utils.Proxy.Generators
         /// </summary>
         public async Task<object> ActivateAsync(IInterceptor interceptor, object? target = null, CancellationToken cancellation = default)
         {
-            object result = await base.ActivateAsync(null, cancellation);
-            ((ITargetAccess) result).Target = target;
+            object result = await ActivateAsync(Tuple.Create(target), cancellation);
             ((IInterceptorAccess) result).Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
             return result;
         }

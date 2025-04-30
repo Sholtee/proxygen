@@ -33,7 +33,6 @@ namespace Solti.Utils.Proxy.Internals
         protected override IReadOnlyList<ITypeInfo> Bases =>
         [
             MetadataTypeInfo.CreateFrom(typeof(IInterceptorAccess)),
-            ..base.Bases
         ];
 
         #if DEBUG

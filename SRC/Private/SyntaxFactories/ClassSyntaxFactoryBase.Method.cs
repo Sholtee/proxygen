@@ -73,6 +73,14 @@ namespace Solti.Utils.Proxy.Internals
             })
         );
 
+        protected static string EnsureUnused(IEnumerable<IParameterInfo> parameters, string variable) => EnsureUnused
+        (
+            parameters.Select(static param => param.Name),
+            variable
+        );
+
+        protected static string EnsureUnused(IMethodInfo method, string variable) => EnsureUnused(method.Parameters, variable);
+
         /// <summary>
         /// <code>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method&lt;...&gt;(...)
