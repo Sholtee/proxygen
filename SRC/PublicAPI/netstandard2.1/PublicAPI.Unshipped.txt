@@ -54,9 +54,6 @@ Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>
 Solti.Utils.Proxy.Internals.Generator<TUntypedGenerator, TDescendant>.Generator() -> void
 Solti.Utils.Proxy.Internals.IDelegateWrapper
 Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped.get -> System.Delegate!
-Solti.Utils.Proxy.Internals.IInterceptorAccess
-Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor.get -> Solti.Utils.Proxy.IInterceptor!
-Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor.set -> void
 Solti.Utils.Proxy.Internals.InvocationContext
 Solti.Utils.Proxy.Internals.InvocationContext.Args.get -> object?[]!
 Solti.Utils.Proxy.Internals.InvocationContext.Dispatch.get -> System.Func<object?[]!, object?>!

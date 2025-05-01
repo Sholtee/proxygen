@@ -24,14 +24,8 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the proxy type.
         /// </summary>
-        public async Task<object> ActivateAsync(IInterceptor interceptor, Delegate? @delegate, CancellationToken cancellation = default)
-        {
-            object result = await ActivateAsync(Tuple.Create((object?) @delegate), cancellation);
-
-            ((IInterceptorAccess) result).Interceptor = interceptor;
-
-            return ((IDelegateWrapper) result).Wrapped;
-        }
+        public async Task<object> ActivateAsync(IInterceptor interceptor, Delegate? @delegate, CancellationToken cancellation = default) =>
+            ((IDelegateWrapper) await ActivateAsync(Tuple.Create(interceptor, (object?) @delegate), cancellation)).Wrapped;
 
         /// <summary>
         /// Activates the underlying proxy type.
