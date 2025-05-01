@@ -51,7 +51,7 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ParameterList
                     (
-                        [param, .. ctor.ParameterList.Parameters]
+                        [param, ..ctor.ParameterList.Parameters]
                     )
                 )
                 .WithBody
