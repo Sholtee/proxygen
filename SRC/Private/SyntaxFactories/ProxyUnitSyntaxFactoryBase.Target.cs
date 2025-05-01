@@ -43,6 +43,10 @@ namespace Solti.Utils.Proxy.Internals
         {
             ConstructorDeclarationSyntax resolved = base.ResolveConstructor(ctor, name);
 
+            //
+            // Using typed "target" in the constructor would make the activator invocation much more difficult.
+            //
+
             return TargetType is null ? resolved : AugmentConstructor<object>
             (
                 resolved,
@@ -52,8 +56,16 @@ namespace Solti.Utils.Proxy.Internals
                     AssignmentExpression
                     (
                         SyntaxKind.SimpleAssignmentExpression,
-                        left: SimpleMemberAccess(ThisExpression(), TARGET_FIELD),
-                        right: CastExpression(ResolveType(TargetType), IdentifierName(target.Identifier))
+                        left: SimpleMemberAccess
+                        (
+                            ThisExpression(),
+                            TARGET_FIELD
+                        ),
+                        right: CastExpression
+                        (
+                            ResolveType(TargetType),
+                            IdentifierName(target.Identifier)
+                        )
                     )
                 )
             );
