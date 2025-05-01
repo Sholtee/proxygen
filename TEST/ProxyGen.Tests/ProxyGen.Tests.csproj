@@ -16,6 +16,7 @@
     <OutputType>Library</OutputType>
     <Configurations>Debug</Configurations>
     <DefineConstants Condition="'$(Variant)' == 'ROSLYN_LEGACY'">LEGACY_COMPILER</DefineConstants>
+    <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
   </PropertyGroup>
 
   <ItemGroup>
