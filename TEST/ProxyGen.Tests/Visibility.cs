@@ -23,39 +23,46 @@ namespace Solti.Utils.Proxy.Internals.Tests
             NonAnnotatedAssembly = nameof(NonAnnotatedAssembly),
             AnnotatedAssembly = nameof(AnnotatedAssembly);
 
-        public static IEnumerable<(TestDelegate, string)> NotVisibleTypes
+        public static IEnumerable<object[]> NotVisibleTypes
         {
             get
             {
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<IInternalInterface>)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), NonAnnotatedAssembly), Resources.IVT_REQUIRED);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PrivateClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<PrivateClass>)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(ProtectedClass)), AnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
-                yield return (static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(ProtectedClass)), NonAnnotatedAssembly), Resources.TYPE_NOT_VISIBLE);
+                yield return [typeof(IInternalInterface), NonAnnotatedAssembly, string.Format(Resources.IVT_REQUIRED, typeof(IInternalInterface), NonAnnotatedAssembly)];
+                yield return [typeof(IList<IInternalInterface>), NonAnnotatedAssembly, string.Format(Resources.IVT_REQUIRED, typeof(IInternalInterface), NonAnnotatedAssembly)];
+                yield return [typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass), NonAnnotatedAssembly, string.Format(Resources.IVT_REQUIRED, typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass), NonAnnotatedAssembly)];
+                yield return [typeof(PrivateClass), NonAnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateClass))];
+                yield return [typeof(PrivateClass), AnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateClass))];
+                yield return [typeof(IList<PrivateClass>), NonAnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateClass))];
+                yield return [typeof(IList<PrivateClass>), AnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateClass))];
+                yield return [typeof(ProtectedClass), AnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(ProtectedClass))];
+                yield return [typeof(ProtectedClass), NonAnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(ProtectedClass))];
+                yield return [typeof(InternalProtectedClass), NonAnnotatedAssembly, string.Format(Resources.IVT_REQUIRED, typeof(InternalProtectedClass), NonAnnotatedAssembly)];
+                yield return [typeof(PrivateProtectedClass), NonAnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateProtectedClass))];
+                yield return [typeof(PrivateProtectedClass), AnnotatedAssembly, string.Format(Resources.TYPE_NOT_VISIBLE, typeof(PrivateProtectedClass))];
             }
         }
 
-        [Test]
-        public void Check_ShouldThrowOnInvisibleTypes([ValueSource(nameof(NotVisibleTypes))] (TestDelegate, string) check) =>
-            Assert.Throws<MemberAccessException>(check.Item1, check.Item2);
+        [TestCaseSource(nameof(NotVisibleTypes))]
+        public void Check_ShouldThrowOnInvisibleTypes(Type t, string asm, string msg)
+        {
+            MemberAccessException ex = Assert.Throws<MemberAccessException>(() => Visibility.Check(MetadataTypeInfo.CreateFrom(t), asm));
+            Assert.That(ex.Message, Is.EqualTo(msg));
+        }
 
-        public static IEnumerable<TestDelegate> VisibleTypes
+        public static IEnumerable<object[]> VisibleTypes
         {
             get
             {
-                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IInternalInterface)), AnnotatedAssembly);
-                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<IInternalInterface>)), AnnotatedAssembly);
-                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass)), AnnotatedAssembly);
-                yield return static () => Visibility.Check(MetadataTypeInfo.CreateFrom(typeof(IList<object>)), NonAnnotatedAssembly);
+                yield return [typeof(IInternalInterface), AnnotatedAssembly];
+                yield return [typeof(IList<IInternalInterface>), AnnotatedAssembly];
+                yield return [typeof(PublicClassWithInternalMethodAndNestedType.InternalNestedClass), AnnotatedAssembly];
+                yield return [typeof(IList<object>), NonAnnotatedAssembly];
             }
         }
 
-        [Test]
-        public void Check_ShouldNotThrowOnVisibleTypes([ValueSource(nameof(VisibleTypes))] TestDelegate check) => Assert.DoesNotThrow(check);
+        [TestCaseSource(nameof(VisibleTypes))]
+        public void Check_ShouldNotThrowOnVisibleTypes(Type t, string asm) =>
+            Assert.DoesNotThrow(() => Visibility.Check(MetadataTypeInfo.CreateFrom(t), asm));
 
         internal interface IInternalInterface { }
 
@@ -71,6 +78,14 @@ namespace Solti.Utils.Proxy.Internals.Tests
         }
 
         protected class ProtectedClass
+        {
+        }
+
+        internal protected class InternalProtectedClass
+        {
+        }
+
+        private protected class PrivateProtectedClass
         {
         }
 
