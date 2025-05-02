@@ -106,10 +106,13 @@ namespace Solti.Utils.Proxy.Internals
 
             switch (type.AccessModifiers) 
             {
-                case AccessModifiers.Private: case AccessModifiers.Protected when type.Flags.HasFlag(TypeInfoFlags.IsNested):
+                case AccessModifiers am when am.HasFlag(AccessModifiers.Internal):
+                    if (!type.DeclaringAssembly.IsFriend(assemblyName))
+                        throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
+                    break;
+                case AccessModifiers am when am.HasFlag(AccessModifiers.Private) || am.HasFlag(AccessModifiers.Protected):
+                    Assert(type.Flags.HasFlag(TypeInfoFlags.IsNested), "Only nested types can be declared 'private' or 'protected'");
                     throw new MemberAccessException(string.Format(Resources.Culture, Resources.TYPE_NOT_VISIBLE, type));
-                case AccessModifiers.Internal when !type.DeclaringAssembly.IsFriend(assemblyName):
-                    throw new MemberAccessException(string.Format(Resources.Culture, Resources.IVT_REQUIRED, type, assemblyName));
                 default:
                     Assert(type.AccessModifiers is not AccessModifiers.Unknown, "Unknown access modifier");
                     break;
