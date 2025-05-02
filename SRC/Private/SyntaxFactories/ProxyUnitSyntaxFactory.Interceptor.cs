@@ -42,7 +42,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => AugmentConstructor<object>
+        protected override ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => AugmentConstructor<IInterceptor>
         (
             base.ResolveConstructor(ctor, name),
             "interceptor",

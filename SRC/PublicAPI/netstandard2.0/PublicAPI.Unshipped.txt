@@ -7,8 +7,8 @@ Solti.Utils.Proxy.ExtendedMemberInfo.ExtendedMemberInfo(System.Reflection.Method
 Solti.Utils.Proxy.ExtendedMemberInfo.Member.get -> System.Reflection.MemberInfo!
 Solti.Utils.Proxy.ExtendedMemberInfo.Method.get -> System.Reflection.MethodInfo!
 Solti.Utils.Proxy.Generators.ClassProxyGenerator
-Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, object! ctorParamz) -> object!
-Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, object! ctorParamz, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.Activate(Solti.Utils.Proxy.IInterceptor! interceptor, object? ctorParamz) -> object!
+Solti.Utils.Proxy.Generators.ClassProxyGenerator.ActivateAsync(Solti.Utils.Proxy.IInterceptor! interceptor, object? ctorParamz, System.Threading.CancellationToken cancellation = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<object!>!
 Solti.Utils.Proxy.Generators.ClassProxyGenerator.Class.get -> System.Type!
 Solti.Utils.Proxy.Generators.ClassProxyGenerator.ClassProxyGenerator(System.Type! class) -> void
 Solti.Utils.Proxy.Generators.ClassProxyGenerator<TClass>

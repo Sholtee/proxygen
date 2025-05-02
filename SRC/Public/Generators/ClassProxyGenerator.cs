@@ -31,17 +31,13 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the proxy type.
         /// </summary>
-        public async Task<object> ActivateAsync(IInterceptor interceptor, Tuple ctorParamz, CancellationToken cancellation = default)
-        {
-            IInterceptorAccess interceptorAccess = (IInterceptorAccess) await ActivateAsync(ctorParamz, cancellation);
-            interceptorAccess.Interceptor = interceptor;
-            return interceptorAccess;
-        }
+        public Task<object> ActivateAsync(IInterceptor interceptor, Tuple? ctorParamz, CancellationToken cancellation = default) =>
+            ActivateAsync(System.Tuple.Create(interceptor, (object?) ctorParamz), cancellation);
 
         /// <summary>
         /// Activates the underlying proxy type.
         /// </summary>
-        public object Activate(IInterceptor interceptor, Tuple ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None)
+        public object Activate(IInterceptor interceptor, Tuple? ctorParamz) => ActivateAsync(interceptor, ctorParamz, CancellationToken.None)
             .GetAwaiter()
             .GetResult();
 
