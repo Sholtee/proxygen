@@ -114,25 +114,9 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
-        /// <summary>
-        /// <code>
-        /// t1.Item1, t1.Item2
-        /// </code>
-        /// </summary>
-        protected virtual IEnumerable<ExpressionSyntax> ResolveProxyObjectParameters(ConstructorDeclarationSyntax ctor, string tupleId, object context) => ctor.ParameterList.Parameters.Select
-        (
-            (parameter, i) =>
-            {
-                if (parameter.Modifiers.Any(static token => token.IsKind(SyntaxKind.OutKeyword) || token.IsKind(SyntaxKind.RefKeyword)))
-                    throw new InvalidOperationException(Resources.BYREF_CTOR_PARAMETER);
-
-                return SimpleMemberAccess
-                (
-                    IdentifierName(tupleId),
-                    IdentifierName($"Item{i + 1}")
-                );
-            }
-        );
+        protected virtual IEnumerable<ParameterSyntax> FilterProxyObjectCtorParameters(ConstructorDeclarationSyntax ctor) => ctor
+            .ParameterList
+            .Parameters;
 
         /// <summary>
         /// <code>
@@ -159,8 +143,7 @@ namespace Solti.Utils.Proxy.Internals
                 int i = 0;
                 foreach (ConstructorDeclarationSyntax ctor in cls.Members.OfType<ConstructorDeclarationSyntax>())
                 {
-                    string tupleId = $"t{i}";
-                    IReadOnlyList<ExpressionSyntax> parameters = [.. ResolveProxyObjectParameters(ctor, tupleId, context)];
+                    IReadOnlyList<ParameterSyntax> parameters = [..FilterProxyObjectCtorParameters(ctor)];
 
                     switch (parameters.Count)
                     {
@@ -191,7 +174,7 @@ namespace Solti.Utils.Proxy.Internals
                                 );
                             break;
                         default:
-                            i++;
+                            string tupleId = $"t{i++}";
 
                             yield return SwitchSection()
                                 .WithLabels
@@ -202,7 +185,7 @@ namespace Solti.Utils.Proxy.Internals
                                         (
                                             DeclarationPattern
                                             (
-                                                GetTupleForCtor(ctor),
+                                                GetTupleForCtor(parameters),
                                                 SingleVariableDesignation
                                                 (
                                                     Identifier(tupleId)
@@ -216,7 +199,25 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     List
                                     (
-                                        ResolveProxyObject(cls, context, parameters)
+                                        ResolveProxyObject
+                                        (
+                                            cls,
+                                            context,
+                                            parameters.Select
+                                            (
+                                                (parameter, i) =>
+                                                {
+                                                    if (parameter.Modifiers.Any(static token => token.IsKind(SyntaxKind.OutKeyword) || token.IsKind(SyntaxKind.RefKeyword)))
+                                                        throw new InvalidOperationException(Resources.BYREF_CTOR_PARAMETER);
+
+                                                    return SimpleMemberAccess
+                                                    (
+                                                        IdentifierName(tupleId),
+                                                        IdentifierName($"Item{i + 1}")
+                                                    );
+                                                }
+                                            )
+                                        )
                                     )
                                 );
                             break;
@@ -259,7 +260,7 @@ namespace Solti.Utils.Proxy.Internals
                     );
             }
 
-            TypeSyntax GetTupleForCtor(ConstructorDeclarationSyntax ctor)
+            TypeSyntax GetTupleForCtor(IReadOnlyList<ParameterSyntax> parameters)
             {
                 TypeSyntax generic = ResolveType
                 (
@@ -267,7 +268,7 @@ namespace Solti.Utils.Proxy.Internals
                     (
                         typeof(Tuple).Assembly.GetType
                         (
-                            $"System.Tuple`{ctor.ParameterList.Parameters.Count}",
+                            $"System.Tuple`{parameters.Count}",
                             throwOnError: true
                         )
                     )
@@ -286,7 +287,7 @@ namespace Solti.Utils.Proxy.Internals
                 return generic.ReplaceNodes
                 (
                     gn.DescendantNodes().OfType<TypeSyntax>(),
-                    (_, _) => ctor.ParameterList.Parameters[arity++].Type!
+                    (_, _) => parameters[arity++].Type!
                 );
             }
         }

@@ -30,13 +30,12 @@ namespace Solti.Utils.Proxy.Internals
         );
 
         /// <inheritdoc/>
-        protected override IEnumerable<ExpressionSyntax> ResolveProxyObjectParameters(ConstructorDeclarationSyntax ctor, string tupleId, object context) =>
+        protected override IEnumerable<ParameterSyntax> FilterProxyObjectCtorParameters(ConstructorDeclarationSyntax ctor) =>
             //
             // Skip the first argument as it will be taken from the "wrapper"
             //
 
-            base.ResolveProxyObjectParameters(ctor, tupleId, context).Skip(1);
-
+            base.FilterProxyObjectCtorParameters(ctor).Skip(1);
 
         /// <summary>
         /// <code>

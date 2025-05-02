@@ -1,10 +1,13 @@
 #pragma warning disable
 [global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::Solti.Utils.Proxy.Internals.IDelegateWrapper, global::Solti.Utils.Proxy.Internals.IInterceptorAccess, global::Solti.Utils.Proxy.Internals.ITargetAccess
+internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::Solti.Utils.Proxy.Internals.IDelegateWrapper
 {
-    private global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>> FTarget;
-    public DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A() : base()
+    private readonly global::Solti.Utils.Proxy.IInterceptor FInterceptor;
+    private readonly global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>> FTarget;
+    public DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A(global::Solti.Utils.Proxy.IInterceptor interceptor, global::System.Object target) : base()
     {
+        this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)target;
+        this.FInterceptor = interceptor;
     }
 
     private global::System.Int32 Invoke(global::System.String a, ref global::System.Collections.Generic.IList<global::System.Int64>[] b, out global::System.Object c)
@@ -15,12 +18,12 @@ internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::S
             b,
             default(global::System.Object)
         };
-        global::System.Object result = ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, new global::Solti.Utils.Proxy.ExtendedMemberInfo((this.FTarget ?? throw new global::System.InvalidOperationException()).Method), (global::System.Object[] args) =>
+        global::System.Object result = this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, new global::Solti.Utils.Proxy.ExtendedMemberInfo(this.FTarget.Method), (global::System.Object[] args) =>
         {
             global::System.String _a = (global::System.String)args[0];
             global::System.Collections.Generic.IList<global::System.Int64>[] _b = (global::System.Collections.Generic.IList<global::System.Int64>[])args[1];
             global::System.Object _c;
-            global::System.Object result = (this.FTarget ?? throw new global::System.InvalidOperationException()).Invoke(_a, ref _b, out _c);
+            global::System.Object result = this.FTarget.Invoke(_a, ref _b, out _c);
             args[1] = (global::System.Object)_b;
             args[2] = (global::System.Object)_c;
             return result;
@@ -32,16 +35,12 @@ internal sealed class DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A : global::S
 
     global::System.Delegate global::Solti.Utils.Proxy.Internals.IDelegateWrapper.Wrapped { get => (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)this.Invoke; }
 
-    global::Solti.Utils.Proxy.IInterceptor global::Solti.Utils.Proxy.Internals.IInterceptorAccess.Interceptor { get; set; }
-
-    global::System.Object global::Solti.Utils.Proxy.Internals.ITargetAccess.Target { get => this.FTarget; set => this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DelegateProxySyntaxFactoryTests.MyDelegate<global::System.Collections.Generic.IList<global::System.Int64>>)value; }
-
     public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
         switch (tuple)
         {
-            case null:
-                return new global::DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A();
+            case global::System.Tuple<global::Solti.Utils.Proxy.IInterceptor, global::System.Object> t0:
+                return new global::DelegateProxy_CD02DE1819A83EB41FEAD0580D8C5B1A(t0.Item1, t0.Item2);
             default:
                 throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }
