@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.Internals
                     ParameterList
                     (
 #if LEGACY_COMPILER
-                        ((ParameterSyntax[]) [param, ..ctor.ParameterList.Parameters]).ToSyntaxList()
+                        CodeAnalysisExtensions.ToSyntaxList([param, ..ctor.ParameterList.Parameters])
 #else
                         [param, ..ctor.ParameterList.Parameters]
 #endif
