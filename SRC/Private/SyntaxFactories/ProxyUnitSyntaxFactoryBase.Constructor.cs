@@ -51,7 +51,11 @@ namespace Solti.Utils.Proxy.Internals
                 (
                     ParameterList
                     (
+#if LEGACY_COMPILER
+                        ((ParameterSyntax[]) [param, ..ctor.ParameterList.Parameters]).ToSyntaxList()
+#else
                         [param, ..ctor.ParameterList.Parameters]
+#endif
                     )
                 )
                 .WithBody
