@@ -95,7 +95,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases => [FBaseType, ..base.Bases];
+        protected override IReadOnlyList<ITypeInfo> Bases => [FBaseType];
 
         public override string ExposedClass => $"ClsProxy_{FBaseType.GetMD5HashCode()}";
 

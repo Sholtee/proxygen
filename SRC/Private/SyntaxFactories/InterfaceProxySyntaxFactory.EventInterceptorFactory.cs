@@ -98,12 +98,6 @@ namespace Solti.Utils.Proxy.Internals
 
                 IMethodInfo backingMethod = add ? evt.AddMethod : evt.RemoveMethod;
 
-                //
-                // Starting from .NET 5.0 interface members may have visibility.
-                //
-
-                Visibility.Check(backingMethod, ContainingAssembly);
-
                 yield return ExpressionStatement
                 (
                     InvokeMethod

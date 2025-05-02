@@ -1,27 +1,26 @@
 ﻿[global::System.CodeDom.Compiler.GeneratedCodeAttribute("ProxyGen.NET", "{version}"), global::System.Diagnostics.DebuggerNonUserCodeAttribute, global::System.Runtime.CompilerServices.CompilerGeneratedAttribute]
-internal sealed class Duck_BBDAC00766728D37DE5666C5248517A4 : global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>, global::Solti.Utils.Proxy.Internals.ITargetAccess
+internal sealed class Duck_BBDAC00766728D37DE5666C5248517A4 : global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>
 {
-    private global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> FTarget;
-    public Duck_BBDAC00766728D37DE5666C5248517A4() : base()
+    private readonly global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32> FTarget;
+    public Duck_BBDAC00766728D37DE5666C5248517A4(global::System.Object target) : base()
     {
+        this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)target;
     }
 
-    void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar() => (this.FTarget ?? throw new global::System.InvalidOperationException()).Bar();
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => (this.FTarget ?? throw new global::System.InvalidOperationException()).Foo<TT>(a, out b, ref c);
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.this[global::System.Int32 i] { get => (this.FTarget ?? throw new global::System.InvalidOperationException())[i]; set => (this.FTarget ?? throw new global::System.InvalidOperationException())[i] = value; }
+    void global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Bar() => this.FTarget.Bar();
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Foo<TT>(global::System.Int32 a, out global::System.String b, ref TT c) => this.FTarget.Foo<TT>(a, out b, ref c);
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.this[global::System.Int32 i] { get => this.FTarget[i]; set => this.FTarget[i] = value; }
 
-    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop; set => (this.FTarget ?? throw new global::System.InvalidOperationException()).Prop = value; }
+    global::System.Int32 global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Prop { get => this.FTarget.Prop; set => this.FTarget.Prop = value; }
 
-    global::System.Object global::Solti.Utils.Proxy.Internals.ITargetAccess.Target { get => this.FTarget; set => this.FTarget = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.DuckSyntaxFactoryTests.GoodFoo<global::System.Int32>)value; }
-
-    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += value; remove => (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= value; }
+    event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.IFoo<global::System.Int32>.Event { add => this.FTarget.Event += value; remove => this.FTarget.Event -= value; }
 
     public static readonly global::System.Func<global::System.Object, global::System.Object> __Activator = static tuple =>
     {
         switch (tuple)
         {
-            case null:
-                return new global::Duck_BBDAC00766728D37DE5666C5248517A4();
+            case global::System.Tuple<global::System.Object> t0:
+                return new global::Duck_BBDAC00766728D37DE5666C5248517A4(t0.Item1);
             default:
                 throw new global::System.MissingMethodException("Constructor with the given layout cannot be found.");
         }

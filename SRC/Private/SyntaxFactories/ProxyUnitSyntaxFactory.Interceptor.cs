@@ -6,7 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -15,37 +18,43 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyUnitSyntaxFactory
     {
+        private const string INTERCEPTOR_FIELD = "FInterceptor";
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly IMethodInfo FInvokeInterceptor = MetadataMethodInfo.CreateFrom
         (
             MethodInfoExtensions.ExtractFrom(static (IInterceptor i) => i.Invoke(null!))
         );
 
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly IPropertyInfo FInterceptor = MetadataPropertyInfo.CreateFrom
+        #if DEBUG
+        internal
+        #endif
+        protected override ClassDeclarationSyntax ResolveMembers(ClassDeclarationSyntax cls, object context, CancellationToken cancellation) => base.ResolveMembers
         (
-            PropertyInfoExtensions.ExtractFrom(static (IInterceptorAccess ia) => ia.Interceptor)
+            cls.AddMembers
+            (
+                ResolveField(MetadataTypeInfo.CreateFrom(typeof(IInterceptor)), INTERCEPTOR_FIELD, @static: false)
+            ),
+            context,
+            cancellation
         );
 
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases =>
-        [
-            MetadataTypeInfo.CreateFrom(typeof(IInterceptorAccess)),
-            ..base.Bases
-        ];
-
-        #if DEBUG
-        internal
-        #endif
-        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => base.ResolveProperties
+        protected override ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => AugmentConstructor<IInterceptor>
         (
-            cls.AddMembers
+            base.ResolveConstructor(ctor, name),
+            "interceptor",
+            interceptor => ExpressionStatement
             (
-                ResolveProperty(FInterceptor, null, null)
-            ),
-            context
+                AssignmentExpression
+                (
+                    SyntaxKind.SimpleAssignmentExpression,
+                    left: SimpleMemberAccess(ThisExpression(), INTERCEPTOR_FIELD),
+                    right: IdentifierName(interceptor.Identifier)
+                )
+            )
         );
 
         #if DEBUG
@@ -59,11 +68,10 @@ namespace Solti.Utils.Proxy.Internals
             InvocationExpressionSyntax invokeInterceptor = InvokeMethod
             (
                 method: FInvokeInterceptor,
-                target: MemberAccess
+                target: SimpleMemberAccess
                 (
                     ThisExpression(),
-                    FInterceptor,
-                    castTargetTo: FInterceptor.DeclaringType
+                    INTERCEPTOR_FIELD
                 ),
                 castTargetTo: null,
                 arguments: Argument

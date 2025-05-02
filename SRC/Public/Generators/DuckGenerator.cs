@@ -32,12 +32,11 @@ namespace Solti.Utils.Proxy.Generators
         #if NETSTANDARD2_0
         new
         #endif
-        public async Task<object> ActivateAsync(object target, CancellationToken cancellation = default)
-        {
-            ITargetAccess targetAccess = (ITargetAccess) await base.ActivateAsync(null, cancellation);
-            targetAccess.Target = target ?? throw new ArgumentNullException(nameof(target));
-            return targetAccess;
-        }
+        public Task<object> ActivateAsync(object target, CancellationToken cancellation = default) => base.ActivateAsync
+        (
+            Tuple.Create(target ?? throw new ArgumentNullException(nameof(target))),
+            cancellation
+        );
 
         /// <summary>
         /// Activates the underlying duck type.

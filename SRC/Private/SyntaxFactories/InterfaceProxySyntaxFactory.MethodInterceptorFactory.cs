@@ -71,12 +71,6 @@ namespace Solti.Utils.Proxy.Internals
         #endif
         protected override ClassDeclarationSyntax ResolveMethod(ClassDeclarationSyntax cls, object context, IMethodInfo method)
         {
-            //
-            // Starting from .NET 5.0 interface members may have visibility.
-            //
-
-            Visibility.Check(method, ContainingAssembly);
-
             FieldDeclarationSyntax memberInfo = ResolveField<ExtendedMemberInfo>
             (
                 $"F{method.GetMD5HashCode()}",

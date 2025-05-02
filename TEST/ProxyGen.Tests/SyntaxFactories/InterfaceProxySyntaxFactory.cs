@@ -172,6 +172,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             IEnumerable<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members.Where(m => m is EventDeclarationSyntax);
 
+            var s = evts.First().NormalizeWhitespace(eol: "\n").ToFullString();
+
             Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
         }
 

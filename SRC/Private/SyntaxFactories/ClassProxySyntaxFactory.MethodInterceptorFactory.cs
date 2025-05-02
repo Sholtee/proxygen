@@ -91,7 +91,7 @@ namespace Solti.Utils.Proxy.Internals
             return cls.AddMembers
             (
                 memberInfo,
-                ResolveMethod(targetMethod).WithBody
+                ResolveMethod(targetMethod, allowProtected: true).WithBody
                 (
                     Block
                     (

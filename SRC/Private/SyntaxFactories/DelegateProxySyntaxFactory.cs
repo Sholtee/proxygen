@@ -38,7 +38,6 @@ namespace Solti.Utils.Proxy.Internals
         protected override IReadOnlyList<ITypeInfo> Bases =>
         [
             MetadataTypeInfo.CreateFrom(typeof(IDelegateWrapper)),
-            ..base.Bases
         ];
 
         public DelegateProxySyntaxFactory(ITypeInfo targetType, SyntaxFactoryContext context) : base(targetType, context)

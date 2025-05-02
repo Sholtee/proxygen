@@ -19,7 +19,7 @@ namespace Solti.Utils.Proxy.Internals
 
     internal abstract partial class ProxyUnitSyntaxFactoryBase
     {
-        public const string ACTIVATOR_NAME = "__Activator";
+        protected const string ACTIVATOR_NAME = "__Activator";
 
         /// <summary>
         /// <code>
@@ -28,7 +28,7 @@ namespace Solti.Utils.Proxy.Internals
         ///    switch (tuple)
         ///    {
         ///        case null: return new Class();
-        ///        case Tuple&lt;int, string&gt; t1: return new Class(t1.Item1, t1.Item2);  // C# 7.0 compatible
+        ///        case Tuple&lt;int, string&gt; t1: return new Class(t1.Item1, t1.Item2);
         ///        default: throw new MissingMethodException("...");
         ///    }
         /// }
@@ -37,7 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected virtual ClassDeclarationSyntax ResolveActivator(ClassDeclarationSyntax cls, object context)
+        protected ClassDeclarationSyntax ResolveActivator(ClassDeclarationSyntax cls, object context)
         {
             const string tuple = nameof(tuple);
 
@@ -46,8 +46,8 @@ namespace Solti.Utils.Proxy.Internals
                 ResolveField
                 (
                     MetadataTypeInfo.CreateFrom(typeof(Func<object, object>)),
-                    EnsureUnused(cls, ACTIVATOR_NAME),
-                    initializer: 
+                    ACTIVATOR_NAME,
+                    initializer:
                         SimpleLambdaExpression
                         (
                             Parameter
@@ -66,23 +66,75 @@ namespace Solti.Utils.Proxy.Internals
                         (
                             Block
                             (
-                                SingletonList<StatementSyntax>
+                                List
                                 (
-                                    SwitchStatement
+                                    ResolveActivatorBody
                                     (
-                                        IdentifierName(tuple)
-                                    )
-                                    .WithSections
-                                    (
-                                        List
-                                        (
-                                            GetCases()
-                                        )
+                                        cls,
+                                        IdentifierName(tuple),
+                                        context
                                     )
                                 )
                             )
                         ),
                     @private: false
+                )
+            );
+        }
+
+        /// <summary>
+        /// <code>
+        /// new Proxy(...);
+        /// </code>
+        /// </summary>
+        protected virtual IEnumerable<StatementSyntax> ResolveProxyObject(ClassDeclarationSyntax cls, object context, params IEnumerable<ExpressionSyntax> arguments)
+        {
+            yield return ReturnStatement
+            (
+                ObjectCreationExpression
+                (
+                    AliasQualifiedName
+                    (
+                        IdentifierName
+                        (
+                            Token(SyntaxKind.GlobalKeyword)
+                        ),
+                        IdentifierName(cls.Identifier)
+                    )
+                )
+                .WithArgumentList
+                (
+                    ArgumentList
+                    (
+                        arguments
+                            .Select(Argument)
+                            .ToSyntaxList()
+                    )
+                )
+            );
+        }
+
+        protected virtual IEnumerable<ParameterSyntax> FilterProxyObjectCtorParameters(ConstructorDeclarationSyntax ctor) => ctor
+            .ParameterList
+            .Parameters;
+
+        /// <summary>
+        /// <code>
+        /// switch (tuple)
+        /// {
+        ///     case null: return new Class();
+        ///     case Tuple&lt;int, string&gt; t1: return new Class(t1.Item1, t1.Item2);
+        ///     default: throw new MissingMethodException("...");
+        /// }
+        /// </code>
+        /// </summary>
+        protected virtual IEnumerable<StatementSyntax> ResolveActivatorBody(ClassDeclarationSyntax cls, ExpressionSyntax tuple, object context)
+        {
+            yield return SwitchStatement(tuple).WithSections
+            (
+                List
+                (
+                    GetCases()
                 )
             );
 
@@ -91,14 +143,85 @@ namespace Solti.Utils.Proxy.Internals
                 int i = 0;
                 foreach (ConstructorDeclarationSyntax ctor in cls.Members.OfType<ConstructorDeclarationSyntax>())
                 {
-                    //
-                    // Tuple may hold at most 7 items
-                    //
+                    IReadOnlyList<ParameterSyntax> parameters = [..FilterProxyObjectCtorParameters(ctor)];
 
-                    if (ctor.ParameterList.Parameters.Count > 7)
-                        throw new InvalidOperationException(Resources.TOO_MANY_CTOR_PARAMS);
+                    switch (parameters.Count)
+                    {
+                        case > 7:
+                            //
+                            // Tuple may hold at most 7 items
+                            //
 
-                    yield return GetCase(ctor, ref i);
+                            throw new InvalidOperationException(Resources.TOO_MANY_CTOR_PARAMS);
+                        case 0:
+                            yield return SwitchSection()
+                                .WithLabels
+                                (
+                                    SingletonList<SwitchLabelSyntax>
+                                    (
+                                        CaseSwitchLabel
+                                        (
+                                            LiteralExpression(SyntaxKind.NullLiteralExpression)
+                                        )
+                                    )
+                                )
+                                .WithStatements
+                                (
+                                    List
+                                    (
+                                        ResolveProxyObject(cls, context)
+                                    )
+                                );
+                            break;
+                        default:
+                            string tupleId = $"t{i++}";
+
+                            yield return SwitchSection()
+                                .WithLabels
+                                (
+                                    SingletonList<SwitchLabelSyntax>
+                                    (
+                                        CasePatternSwitchLabel
+                                        (
+                                            DeclarationPattern
+                                            (
+                                                GetTupleForCtor(parameters),
+                                                SingleVariableDesignation
+                                                (
+                                                    Identifier(tupleId)
+                                                )
+                                            ),
+                                            Token(SyntaxKind.ColonToken)
+                                        )
+                                    )
+                                )
+                                .WithStatements
+                                (
+                                    List
+                                    (
+                                        ResolveProxyObject
+                                        (
+                                            cls,
+                                            context,
+                                            parameters.Select
+                                            (
+                                                (parameter, i) =>
+                                                {
+                                                    if (parameter.Modifiers.Any(static token => token.IsKind(SyntaxKind.OutKeyword) || token.IsKind(SyntaxKind.RefKeyword)))
+                                                        throw new InvalidOperationException(Resources.BYREF_CTOR_PARAMETER);
+
+                                                    return SimpleMemberAccess
+                                                    (
+                                                        IdentifierName(tupleId),
+                                                        IdentifierName($"Item{i + 1}")
+                                                    );
+                                                }
+                                            )
+                                        )
+                                    )
+                                );
+                            break;
+                    }
                 }
 
                 yield return SwitchSection()
@@ -137,105 +260,17 @@ namespace Solti.Utils.Proxy.Internals
                     );
             }
 
-            SwitchSectionSyntax GetCase(ConstructorDeclarationSyntax ctor, ref int i)
-            {
-                if (ctor.ParameterList.Parameters.Count is 0)
-                {
-                    return SwitchSection()
-                        .WithLabels
-                        (
-                            SingletonList<SwitchLabelSyntax>
-                            (
-                                CaseSwitchLabel
-                                (
-                                    LiteralExpression(SyntaxKind.NullLiteralExpression)
-                                )
-                            )
-                        )
-                        .WithStatements
-                        (
-                            InvokeCtor()
-                        );
-                }
-
-                string tupleId = $"t{i++}";
-
-                return SwitchSection()
-                    .WithLabels
-                    (
-                        SingletonList<SwitchLabelSyntax>
-                        (
-                            CasePatternSwitchLabel
-                            (
-                                DeclarationPattern
-                                (
-                                    GetTupleForCtor(ctor),
-                                    SingleVariableDesignation
-                                    (
-                                        Identifier(tupleId)
-                                    )
-                                ),
-                                Token(SyntaxKind.ColonToken)
-                            )
-                        )
-                    )
-                    .WithStatements
-                    (
-                        InvokeCtor
-                        (
-                            ctor.ParameterList.Parameters.Select
-                            (
-                                (parameter, i) =>
-                                {
-                                    if (parameter.Modifiers.Any(static token => token.IsKind(SyntaxKind.OutKeyword) || token.IsKind(SyntaxKind.RefKeyword)))
-                                        throw new InvalidOperationException(Resources.BYREF_CTOR_PARAMETER);
-
-                                    return Argument
-                                    (
-                                        SimpleMemberAccess
-                                        (
-                                            IdentifierName(tupleId),
-                                            IdentifierName($"Item{i + 1}")
-                                        )
-                                    );
-                                }
-                            )
-                        )
-                    );
-            }
-
-            
-            SyntaxList<StatementSyntax> InvokeCtor(params IEnumerable<ArgumentSyntax> arguments) => SingletonList<StatementSyntax>
-            (
-                ReturnStatement
-                (
-                    ObjectCreationExpression
-                    (
-                        AliasQualifiedName
-                        (
-                            IdentifierName
-                            (
-                                Token(SyntaxKind.GlobalKeyword)
-                            ),
-                            IdentifierName(cls.Identifier)
-                        )
-                    )
-                    .WithArgumentList
-                    (
-                        ArgumentList(arguments.ToSyntaxList())
-                    )
-                )
-            );
-
-            TypeSyntax GetTupleForCtor(ConstructorDeclarationSyntax ctor)
+            TypeSyntax GetTupleForCtor(IReadOnlyList<ParameterSyntax> parameters)
             {
                 TypeSyntax generic = ResolveType
                 (
                     MetadataTypeInfo.CreateFrom
                     (
-                        typeof(Tuple)
-                            .Assembly
-                            .GetType($"System.Tuple`{ctor.ParameterList.Parameters.Count}", throwOnError: true)
+                        typeof(Tuple).Assembly.GetType
+                        (
+                            $"System.Tuple`{parameters.Count}",
+                            throwOnError: true
+                        )
                     )
                 );
 
@@ -252,7 +287,7 @@ namespace Solti.Utils.Proxy.Internals
                 return generic.ReplaceNodes
                 (
                     gn.DescendantNodes().OfType<TypeSyntax>(),
-                    (_, _) => ctor.ParameterList.Parameters[arity++].Type!
+                    (_, _) => parameters[arity++].Type!
                 );
             }
         }

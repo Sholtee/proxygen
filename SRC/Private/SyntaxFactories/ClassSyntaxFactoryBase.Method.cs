@@ -73,6 +73,14 @@ namespace Solti.Utils.Proxy.Internals
             })
         );
 
+        protected static string EnsureUnused(IEnumerable<IParameterInfo> parameters, string variable) => EnsureUnused
+        (
+            parameters.Select(static param => param.Name),
+            variable
+        );
+
+        protected static string EnsureUnused(IMethodInfo method, string variable) => EnsureUnused(method.Parameters, variable);
+
         /// <summary>
         /// <code>
         /// [[(Type)] target | [(Type)] this | Namespace.Type].Method&lt;...&gt;(...)
@@ -109,8 +117,14 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax ResolveMethodCore(IMethodInfo method)
+        protected MethodDeclarationSyntax ResolveMethodCore(IMethodInfo method, bool allowProtected = false)
         {
+            //
+            // Starting from .NET 5.0 interface members may have visibility.
+            //
+
+            Visibility.Check(method, ContainingAssembly, allowProtected);
+
             TypeSyntax returnTypeSyntax = ResolveType(method.ReturnValue.Type);
 
             if (method.ReturnValue.Kind >= ParameterKind.Ref)
@@ -149,9 +163,9 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method)
+        protected MethodDeclarationSyntax ResolveMethod(IMethodInfo method, bool allowProtected = false)
         {
-            MethodDeclarationSyntax result = ResolveMethodCore(method);
+            MethodDeclarationSyntax result = ResolveMethodCore(method, allowProtected);
 
             if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
             {

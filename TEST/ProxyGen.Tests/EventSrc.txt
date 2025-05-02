@@ -7,10 +7,10 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
         {
             value
         };
-        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F8AFB6CA98CF89121422C106996C9C75B, (global::System.Object[] args) =>
+        this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F8AFB6CA98CF89121422C106996C9C75B, (global::System.Object[] args) =>
         {
             global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
-            (this.FTarget ?? throw new global::System.InvalidOperationException()).Event += _value;
+            this.FTarget.Event += _value;
             return null;
         }, args, new global::System.Type[0]));
     }
@@ -22,10 +22,10 @@ event global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.Tes
         {
             value
         };
-        ((global::Solti.Utils.Proxy.Internals.IInterceptorAccess)this).Interceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F75E8723887FE87A170AE953C4D35B5B4, (global::System.Object[] args) =>
+        this.FInterceptor.Invoke(new global::Solti.Utils.Proxy.Internals.InvocationContext(this, global::Dummy.F75E8723887FE87A170AE953C4D35B5B4, (global::System.Object[] args) =>
         {
             global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32> _value = (global::Solti.Utils.Proxy.SyntaxFactories.Tests.SyntaxFactoryTestsBase.TestDelegate<global::System.Int32>)args[0];
-            (this.FTarget ?? throw new global::System.InvalidOperationException()).Event -= _value;
+            this.FTarget.Event -= _value;
             return null;
         }, args, new global::System.Type[0]));
     }

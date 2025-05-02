@@ -23,7 +23,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => ConstructorDeclaration(name)
+        protected virtual ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name) => ConstructorDeclaration(name)
             .WithModifiers
             (
                 modifiers: TokenList
@@ -76,5 +76,11 @@ namespace Solti.Utils.Proxy.Internals
         internal
         #endif
         protected virtual ClassDeclarationSyntax ResolveConstructor(ClassDeclarationSyntax cls, object context, IConstructorInfo ctor) => cls;
+
+        protected static string EnsureUnused(ConstructorDeclarationSyntax ctor, string param) => EnsureUnused
+        (
+            ctor.ParameterList.Parameters.Select(static p => p.Identifier.Text),
+            param
+        );
     }
 }

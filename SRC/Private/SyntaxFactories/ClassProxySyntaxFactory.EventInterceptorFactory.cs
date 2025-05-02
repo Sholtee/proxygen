@@ -95,7 +95,8 @@ namespace Solti.Utils.Proxy.Internals
                     Block
                     (
                         BuildBody(false)
-                    )
+                    ),
+                    allowProtected: true
                 )
             );
 

@@ -3,11 +3,9 @@
 *                                                                               *
 * Author: Denes Solti                                                           *
 ********************************************************************************/
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading;
 
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -17,46 +15,13 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal abstract partial class ProxyUnitSyntaxFactoryBase
     {
-        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static readonly IPropertyInfo FTarget = MetadataPropertyInfo.CreateFrom
+        private const string TARGET_FIELD = "FTarget";
+
+        protected static ExpressionSyntax GetTarget() => SimpleMemberAccess
         (
-            PropertyInfoExtensions.ExtractFrom(static (ITargetAccess ta) => ta.Target!)
+            ThisExpression(),
+            TARGET_FIELD
         );
-
-        private const string TARGET_FIELD = nameof(FTarget);
-
-        protected ExpressionSyntax GetTarget() => ParenthesizedExpression
-        (
-            BinaryExpression
-            (
-                SyntaxKind.CoalesceExpression,
-                SimpleMemberAccess
-                (
-                    ThisExpression(),
-                    TARGET_FIELD
-                ),
-                ThrowExpression
-                (
-                    ResolveObject<InvalidOperationException>()
-                )
-            )
-        );
-
-        #if DEBUG
-        internal
-        #endif
-        protected override IReadOnlyList<ITypeInfo> Bases
-        {
-            get
-            {
-                List<ITypeInfo> result = [];
-                if (TargetType is not null) result.Add
-                (
-                    MetadataTypeInfo.CreateFrom(typeof(ITargetAccess))
-                );
-                return result;
-            }
-        }
 
         #if DEBUG
         internal
@@ -65,7 +30,7 @@ namespace Solti.Utils.Proxy.Internals
         (
             TargetType is null ? cls : cls.AddMembers
             (
-                ResolveField(TargetType, TARGET_FIELD, @static: false, @readonly: false)
+                ResolveField(TargetType, TARGET_FIELD, @static: false)
             ),
             context,
             cancellation
@@ -74,25 +39,36 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override ClassDeclarationSyntax ResolveProperties(ClassDeclarationSyntax cls, object context) => TargetType is null ? cls : cls.AddMembers
-        (
-            ResolveProperty
+        protected override ConstructorDeclarationSyntax ResolveConstructor(IConstructorInfo ctor, SyntaxToken name)
+        {
+            ConstructorDeclarationSyntax resolved = base.ResolveConstructor(ctor, name);
+
+            //
+            // Using typed "target" in the constructor would make the activator invocation much more difficult.
+            //
+
+            return TargetType is null ? resolved : AugmentConstructor<object>
             (
-                FTarget,
-                getBody: ArrowExpressionClause
-                (
-                    SimpleMemberAccess(ThisExpression(), TARGET_FIELD)
-                ),
-                setBody: ArrowExpressionClause
+                resolved,
+                "target",
+                target => ExpressionStatement
                 (
                     AssignmentExpression
                     (
                         SyntaxKind.SimpleAssignmentExpression,
-                        left: SimpleMemberAccess(ThisExpression(), TARGET_FIELD),
-                        right: CastExpression(ResolveType(TargetType), FValue)
+                        left: SimpleMemberAccess
+                        (
+                            ThisExpression(),
+                            TARGET_FIELD
+                        ),
+                        right: CastExpression
+                        (
+                            ResolveType(TargetType),
+                            IdentifierName(target.Identifier)
+                        )
                     )
                 )
-            )
-        );
+            );
+        }
     }
 }

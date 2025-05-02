@@ -27,7 +27,7 @@ namespace Solti.Utils.Proxy.Internals
         #if DEBUG
         internal
         #endif
-        protected override IReadOnlyList<ITypeInfo> Bases => [TargetType!, ..base.Bases];
+        protected override IReadOnlyList<ITypeInfo> Bases => [TargetType!];
 
         #if DEBUG
         internal

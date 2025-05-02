@@ -25,13 +25,8 @@ namespace Solti.Utils.Proxy.Generators
         /// <summary>
         /// Activates the proxy type.
         /// </summary>
-        public async Task<object> ActivateAsync(IInterceptor interceptor, object? target = null, CancellationToken cancellation = default)
-        {
-            object result = await base.ActivateAsync(null, cancellation);
-            ((ITargetAccess) result).Target = target;
-            ((IInterceptorAccess) result).Interceptor = interceptor ?? throw new ArgumentNullException(nameof(interceptor));
-            return result;
-        }
+        public Task<object> ActivateAsync(IInterceptor interceptor, object? target = null, CancellationToken cancellation = default) =>
+            ActivateAsync(Tuple.Create(interceptor, target), cancellation);
 
         /// <summary>
         /// Activates the underlying duck type.
