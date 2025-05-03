@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Internals
 
             Logger.Log(LogLevel.Info, "REUN-201", $"Unit resolved");
 
-            Logger.WriteSource(result);
+            Logger.WriteSource(result.Stringify());
             return result;
         }
     }

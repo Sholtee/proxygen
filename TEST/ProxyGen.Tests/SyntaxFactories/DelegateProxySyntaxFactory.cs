@@ -44,8 +44,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 gen
                     .ResolveUnit(null, default)
-                    .NormalizeWhitespace(eol: "\n")
-                    .ToFullString(),
+                    .Stringify("\n"),
                 Is.EqualTo
                 (
                     File

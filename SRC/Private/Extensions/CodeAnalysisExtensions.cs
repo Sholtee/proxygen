@@ -17,6 +17,10 @@ namespace Solti.Utils.Proxy.Internals
 {
     internal static class CodeAnalysisExtensions
     {
+        public static string Stringify(this SyntaxNode src, string? lineEnding = null) => src
+            .NormalizeWhitespace(eol: lineEnding ?? Environment.NewLine)
+            .ToFullString();
+
         /// <summary>
         /// SyntaxNode1, SyntaxNode2, ....
         /// </summary>

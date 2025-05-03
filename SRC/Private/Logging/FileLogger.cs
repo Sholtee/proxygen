@@ -19,13 +19,6 @@ namespace Solti.Utils.Proxy.Internals
         protected override void LogCore(string message) =>
             FLogWriter.WriteLine(message);
 
-        protected override void WriteSourceCore(string src) =>
-            //
-            // Overwrite the target file for every invocation
-            //
-
-            File.WriteAllText(Path.Combine(FLogDirectory, $"{Scope}.cs"), src);
-
         public FileLogger(string scope, ILogConfiguration config): base($"{scope} - {Environment.CurrentManagedThreadId}", config.LogLevel)
         {
             FLogDirectory = config.LogDirectory!;
@@ -35,6 +28,13 @@ namespace Solti.Utils.Proxy.Internals
             FLogWriter = File.CreateText(Path.Combine(FLogDirectory, $"{Scope}.log"));
             FLogWriter.AutoFlush = true;
         }
+
+        public override void WriteSource(string src) =>
+            //
+            // Overwrite the target file for every invocation
+            //
+
+            File.WriteAllText(Path.Combine(FLogDirectory, $"{Scope}.cs"), src);
 
         /// <summary>
         /// Disposes this instance. Since this is an internal class we won't implement the disposable pattern.

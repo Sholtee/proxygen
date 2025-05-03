@@ -5,8 +5,6 @@
 ********************************************************************************/
 using System.Collections.Generic;
 
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
@@ -15,9 +13,9 @@ namespace Solti.Utils.Proxy.Internals
     internal interface ILogger
     {
         /// <summary>
-        /// Creates/overwrites the source log.
+        /// Creates/overwrites a separate log for the generated source code.
         /// </summary>
-        void WriteSource(CompilationUnitSyntax src);
+        void WriteSource(string src);
 
         /// <summary>
         /// Appends the system log

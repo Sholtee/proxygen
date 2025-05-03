@@ -99,8 +99,7 @@ namespace Solti.Utils.Proxy.Internals
                             (
                                 static unit => unit
                                     .GetCompilationUnitRoot()
-                                    .NormalizeWhitespace(eol: Environment.NewLine)
-                                    .ToFullString()
+                                    .Stringify()
                             )
                         )
                     );

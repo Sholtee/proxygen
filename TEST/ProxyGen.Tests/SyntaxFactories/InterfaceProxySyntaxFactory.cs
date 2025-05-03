@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +11,6 @@ using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using NUnit.Framework;
@@ -52,7 +50,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(MethodsToWhichTheArrayIsCreated))]
         public void CreateArgumentsArray_ShouldCreateAnObjectArrayFromTheArguments((object Method, string Expected) para) =>
-            Assert.That(CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveArgumentsArray((IMethodInfo) para.Method).Stringify(), Is.EqualTo(para.Expected));
 
         [Test]
         public void AssignByRefParameters_ShouldAssignByRefParameters()
@@ -65,8 +63,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             ).ToArray();
 
             Assert.That(assignments.Count, Is.EqualTo(2));
-            Assert.That(assignments[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("b = (global::System.String)args[1];"));
-            Assert.That(assignments[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("c = (TT)args[2];"));
+            Assert.That(assignments[0].Stringify(), Is.EqualTo("b = (global::System.String)args[1];"));
+            Assert.That(assignments[1].Stringify(), Is.EqualTo("c = (TT)args[2];"));
         }
 
         [Test]
@@ -88,9 +86,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             ).ToArray();
 
             Assert.That(locals.Count, Is.EqualTo(3));
-            Assert.That(locals[0].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.Int32 _a = (global::System.Int32)args[0];"));
-            Assert.That(locals[1].NormalizeWhitespace().ToFullString(), Is.EqualTo("global::System.String _b;"));
-            Assert.That(locals[2].NormalizeWhitespace().ToFullString(), Is.EqualTo("TT _c = (TT)args[2];"));
+            Assert.That(locals[0].Stringify(), Is.EqualTo("global::System.Int32 _a = (global::System.Int32)args[0];"));
+            Assert.That(locals[1].Stringify(), Is.EqualTo("global::System.String _b;"));
+            Assert.That(locals[2].Stringify(), Is.EqualTo("TT _c = (TT)args[2];"));
         }
 
         [Test]
@@ -115,8 +113,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             );
 
             Assert.That(assigns.Count, Is.EqualTo(2));
-            Assert.That(assigns.First().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[1] = (global::System.Object)_b;"));
-            Assert.That(assigns.Last().NormalizeWhitespace().ToFullString(), Is.EqualTo("args[2] = (global::System.Object)_c;"));
+            Assert.That(assigns.First().Stringify(), Is.EqualTo("args[1] = (global::System.Object)_b;"));
+            Assert.That(assigns.Last().Stringify(), Is.EqualTo("args[2] = (global::System.Object)_c;"));
         }
 
         public static (Type Type, string Local, string Expected)[] ReturnTypes = new[]
@@ -130,7 +128,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             InterfaceProxySyntaxFactory gen = CreateSyntaxFactory<IFoo<int>>(OutputType.Module);
 
-            Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).NormalizeWhitespace().ToFullString(), Is.EqualTo(para.Expected));
+            Assert.That(gen.ReturnResult(MetadataTypeInfo.CreateFrom(para.Type), gen.ResolveLocal<object>(para.Local)).Stringify(), Is.EqualTo(para.Expected));
         }
 
         public static (object Method, string File)[] Methods = new[]
@@ -144,7 +142,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             IEnumerable<MemberDeclarationSyntax> methods = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveMethods(GetDummyClass(), null).Members.Where(m => m is MethodDeclarationSyntax);
 
-            Assert.That(methods.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, para.File)))));
+            Assert.That(methods.Any(member => member.Stringify("\n").Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, para.File)))));
         }
 
         [Test]
@@ -152,7 +150,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             IEnumerable<MemberDeclarationSyntax> props = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveProperties(GetDummyClass(), null).Members.Where(m => m is PropertyDeclarationSyntax);
 
-            Assert.That(props.Any(prop => prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
+            Assert.That(props.Any(prop => prop.Stringify("\n").Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "PropSrc.txt")))));
         }
 
         [Test]
@@ -164,7 +162,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 SyntaxFactoryContext.Default
             ).ResolveProperties(GetDummyClass(), null).Members.Single(m => m is IndexerDeclarationSyntax);
 
-            Assert.That(prop.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt"))));
+            Assert.That(prop.Stringify("\n").Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IndexerSrc.txt"))));
         }
 
         [Test]
@@ -172,9 +170,9 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         {
             IEnumerable<MemberDeclarationSyntax> evts = CreateSyntaxFactory<IFoo<int>>(OutputType.Module).ResolveEvents(GetDummyClass(), null).Members.Where(m => m is EventDeclarationSyntax);
 
-            var s = evts.First().NormalizeWhitespace(eol: "\n").ToFullString();
+            var s = evts.First().Stringify("\n");
 
-            Assert.That(evts.Any(member => member.NormalizeWhitespace(eol: "\n").ToFullString().Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
+            Assert.That(evts.Any(member => member.Stringify("\n").Equals(File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EventSrc.txt")))));
         }
 
         [TestCase(typeof(IFoo<int>), OutputType.Module, "IfaceProxySrcModule.txt")]
@@ -187,8 +185,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
             (
                 gen
                     .ResolveUnit(null, default)
-                    .NormalizeWhitespace(eol: "\n")
-                    .ToFullString(),
+                    .Stringify("\n"),
                 Is.EqualTo
                 (
                     File
@@ -245,8 +242,8 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 );
 
             string
-                src1 = fact1.ResolveUnit(null, default).NormalizeWhitespace().ToFullString(),
-                src2 = fact2.ResolveUnit(null, default).NormalizeWhitespace().ToFullString();
+                src1 = fact1.ResolveUnit(null, default).Stringify(),
+                src2 = fact2.ResolveUnit(null, default).Stringify();
 
             Assert.That(src1.SequenceEqual(src2));
         }

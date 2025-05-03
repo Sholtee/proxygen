@@ -52,7 +52,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(string[]), "global::System.String[] param;")]
         [TestCase(typeof(object), "global::System.Object param;")]
         public void ResolveLocal_ShouldDeclareTheDesiredLocalVariable(Type paramType, string expected) =>
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveLocal(MetadataTypeInfo.CreateFrom(paramType), "param").NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveLocal(MetadataTypeInfo.CreateFrom(paramType), "param").Stringify(), Is.EqualTo(expected));
 
         [TestCase(typeof(object), "global::System.Object")]
         [TestCase(typeof(int[]), "global::System.Int32[]")]
@@ -70,7 +70,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
                 AllowPointers = true
             };
 
-            Assert.That(fact.ResolveType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+            Assert.That(fact.ResolveType(MetadataTypeInfo.CreateFrom(type)).Stringify(), Is.EqualTo(expected));
         }
 
         private class CicaNested<T>
@@ -101,7 +101,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         [TestCase(typeof(CicaNested<int>.Mica.Hajj<string, object>), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.CicaNested<global::System.Int32>.Mica.Hajj<global::System.String, global::System.Object>")]
         [TestCase(typeof(CicaNestedDescendant.Mica), "global::Solti.Utils.Proxy.SyntaxFactories.Tests.ClassSyntaxFactoryBaseTests.CicaNested<global::Microsoft.CodeAnalysis.IAliasSymbol>.Mica")]
         public void ResolveType_ShouldHandleNestedTypes(Type type, string expected) =>
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveType(MetadataTypeInfo.CreateFrom(type)).NormalizeWhitespace().ToFullString(), Is.EqualTo(expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveType(MetadataTypeInfo.CreateFrom(type)).Stringify(), Is.EqualTo(expected));
 
         public static IEnumerable<object> ResolveProperty_ShouldDeclareANewProperty_Params
         {
@@ -116,7 +116,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveProperty_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
         {
             (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveProperty(Property, Block(), Block(), allowProtected: true).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveProperty(Property, Block(), Block(), allowProtected: true).Stringify("\n"), Is.EqualTo(Expected));
         }
 
         public static IEnumerable<object> ResolveIndexer_ShouldDeclareANewProperty_Params
@@ -132,7 +132,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveIndexer_ShouldDeclareANewProperty(object p /*object to work accessibility issue around*/)
         {
             (IPropertyInfo Property, string Expected) = ((IPropertyInfo Property, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveIndexer(Property, Block(), Block(), allowProtected: true).NormalizeWhitespace(eol: "\n").ToFullString(), Is.EqualTo(Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveIndexer(Property, Block(), Block(), allowProtected: true).Stringify("\n"), Is.EqualTo(Expected));
         }
 
         public static IEnumerable<object> ResolveEvent_ShouldDeclareANewEvent_Params
@@ -148,7 +148,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
         public void ResolveEvent_ShouldDeclareANewEvent(object p /*object to work accessibility issue around*/)
         {
             (IEventInfo Event, string Expected) = ((IEventInfo Event, string Expected)) p;
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveEvent(Event, Block(), Block()).NormalizeWhitespace(eol: "\n").ToString(), Is.EqualTo(Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).ResolveEvent(Event, Block(), Block()).Stringify("\n"), Is.EqualTo(Expected));
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
         [TestCaseSource(nameof(GenericMethods))]
         public void InvokeMethod_ShouldSupportGenerics((MethodInfo Method, string Expected) param) =>
-            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).InvokeMethod(MetadataMethodInfo.CreateFrom(param.Method), null, null, "a").NormalizeWhitespace().ToFullString(), Is.EqualTo(param.Expected));
+            Assert.That(new ClassSyntaxFactory(SyntaxFactoryContext.Default).InvokeMethod(MetadataMethodInfo.CreateFrom(param.Method), null, null, "a").Stringify(), Is.EqualTo(param.Expected));
 
         protected interface IRefInterface
         {

@@ -9,9 +9,6 @@ using System.IO;
 using System.Runtime.Serialization.Json;
 using System.Text;
 
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-
 namespace Solti.Utils.Proxy.Internals
 {
     internal abstract class LoggerBase(string scope, LogLevel? level) : ILogger
@@ -37,8 +34,6 @@ namespace Solti.Utils.Proxy.Internals
 
         protected abstract void LogCore(string message);
 
-        protected abstract void WriteSourceCore(string src);
-
         public LogLevel? Level { get; } = level;
 
         public string Scope { get; } = scope;
@@ -55,11 +50,6 @@ namespace Solti.Utils.Proxy.Internals
             LogCore(msg);
         }
 
-        public void WriteSource(CompilationUnitSyntax src) => WriteSourceCore
-        (
-            src
-                .NormalizeWhitespace(eol: Environment.NewLine)
-                .ToFullString()
-        );
+        public abstract void WriteSource(string src);
     }
 }

@@ -6,7 +6,6 @@
 using System;
 using System.IO;
 
-using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
 namespace Solti.Utils.Proxy.SyntaxFactories.Tests
@@ -23,7 +22,7 @@ namespace Solti.Utils.Proxy.SyntaxFactories.Tests
 
             Assert.That
             (
-                factory.ResolveUnit(null, default).NormalizeWhitespace(eol: "\n").ToFullString(),
+                factory.ResolveUnit(null, default).Stringify("\n"),
                 Is.EqualTo
                 (
                     File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ModuleInitializerAttribute.txt")).Replace("{version}", typeof(ModuleInitializerSyntaxFactory).Assembly.GetName().Version.ToString())          
