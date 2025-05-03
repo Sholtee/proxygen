@@ -178,9 +178,11 @@ namespace Solti.Utils.Proxy.Internals
             }
             else
             {
-                List<SyntaxKind> tokens = [.. ResolveAccessModifiers(method)];
-
-                tokens.Add(method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword);
+                IReadOnlyList<SyntaxKind> tokens = 
+                [
+                    ..ResolveAccessModifiers(method),
+                    method.IsVirtual || method.IsAbstract ? SyntaxKind.OverrideKeyword : SyntaxKind.NewKeyword
+                ];
 
                 result = result.WithModifiers
                 (
@@ -193,25 +195,18 @@ namespace Solti.Utils.Proxy.Internals
 
             if (method is IGenericMethodInfo genericMethod)
             {
-                result = result.WithTypeParameterList
-                (
-                    typeParameterList: TypeParameterList
+                result = result
+                    .WithTypeParameterList
                     (
-                        parameters: genericMethod
-                            .GenericArguments
-                            .ToSyntaxList
+                        typeParameterList: TypeParameterList
+                        (
+                            parameters: genericMethod.GenericArguments.ToSyntaxList
                             (
-                                type => TypeParameter
-                                (
-                                    ResolveType(type).ToFullString()
-                                )
+                                static type => TypeParameter(type.Name)
                             )
+                        )
                     )
-                );
-
-                if (genericMethod.IsGenericDefinition)
-                {
-                    result = result.WithConstraintClauses
+                    .WithConstraintClauses
                     (
                         List
                         (
@@ -222,10 +217,7 @@ namespace Solti.Utils.Proxy.Internals
                                 (
                                     constraint => TypeParameterConstraintClause
                                     (
-                                        IdentifierName
-                                        (
-                                            constraint.Target.Name  // T, T, etc
-                                        )
+                                        IdentifierName(constraint.Target.Name)  // T, TT, etc
                                     )
                                     .WithConstraints
                                     (
@@ -235,31 +227,28 @@ namespace Solti.Utils.Proxy.Internals
                         )
                     );
 
-                    IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
-                    {
-                        if (constraint.Struct)
-                            yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
-                        if (constraint.Reference)
-                            yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
+                IEnumerable<TypeParameterConstraintSyntax> GetConstraints(IGenericConstraint constraint)
+                {
+                    if (constraint.Struct)
+                        yield return ClassOrStructConstraint(SyntaxKind.StructConstraint);
+                    if (constraint.Reference)
+                        yield return ClassOrStructConstraint(SyntaxKind.ClassConstraint);
 
-                        //
-                        // Explicit interface implementations must not specify type constraints
-                        //
+                    //
+                    // Explicit interface implementations must not specify type constraints
+                    //
 
-                        if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
-                            yield break;
+                    if (method.DeclaringType.Flags.HasFlag(TypeInfoFlags.IsInterface))
+                        yield break;
 
-                        if (constraint.DefaultConstructor)
-                            yield return ConstructorConstraint();
+                    if (constraint.DefaultConstructor)
+                        yield return ConstructorConstraint();
 
-                        foreach (ITypeInfo typeConstraint in constraint.ConstraintTypes)
-                        {
-                            yield return TypeConstraint
-                            (
-                                ResolveType(typeConstraint)
-                            );
-                        }
-                    }
+                    foreach (ITypeInfo typeConstraint in constraint.ConstraintTypes)
+                        yield return TypeConstraint
+                        (
+                            ResolveType(typeConstraint)
+                        );
                 }
             }
 
@@ -310,16 +299,13 @@ namespace Solti.Utils.Proxy.Internals
                 method,
                 target,
                 castTargetTo,
-                arguments: method
-                    .Parameters
-                    .Select
+                arguments: method.Parameters.Select
+                (
+                    (param, i) => Argument
                     (
-                        (param, i) => Argument
-                        (
-                            expression: IdentifierName(arguments[i])
-                        )
+                        expression: IdentifierName(arguments[i])
                     )
-                    .ToArray()
+                )
             );
         }
     
