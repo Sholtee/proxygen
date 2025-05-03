@@ -1,0 +1,25 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Perf" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Project Path="PERF/ProxyGen.Perf.csproj">
+    <BuildType Solution="Perf|*" Project="Release" />
+    <BuildType Solution="Release|*" Project="Debug" />
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+  <Project Path="SRC/ProxyGen.csproj">
+    <BuildType Solution="Perf|*" Project="Release" />
+  </Project>
+  <Project Path="TEST/ProxyGen.Tests.EmbeddedTypes/ProxyGen.Tests.EmbeddedTypes.csproj">
+    <BuildType Project="Debug" />
+    <Build Solution="Perf|*" Project="false" />
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+  <Project Path="TEST/ProxyGen.Tests/ProxyGen.Tests.csproj">
+    <BuildType Project="Debug" />
+    <Build Solution="Perf|*" Project="false" />
+    <Build Solution="Release|*" Project="false" />
+  </Project>
+</Solution>
