@@ -8,8 +8,14 @@ using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Helper methods for the <see cref="IPropertyInfo"/> interface.
+    /// </summary>
     internal static class IPropertyInfoExtensions
     {
+        /// <summary>
+        /// Sorts the given property list by name and signature.
+        /// </summary>
         public static IEnumerable<IPropertyInfo> Sort(this IEnumerable<IPropertyInfo> self) => self.OrderBy(static p =>
         {
             List<IMethodInfo> accessors = [];

@@ -7,8 +7,14 @@ using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Helper methods for the <see cref="IGenericConstraint"/> interface.
+    /// </summary>
     internal static class IGenericConstraintExtensions
     {
+        /// <summary>
+        /// Determines the equality of the given two constraints.
+        /// </summary>
         public static bool EqualsTo(this IGenericConstraint @this, IGenericConstraint that)
         {
             if (@this.ConstraintTypes.Count != that.ConstraintTypes.Count)
