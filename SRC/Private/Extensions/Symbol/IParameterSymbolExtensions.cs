@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Helper methods for the <see cref="IParameterInfo"/> interface.
+    /// </summary>
     internal static class IParameterSymbolExtensions
     {
         /// <summary>

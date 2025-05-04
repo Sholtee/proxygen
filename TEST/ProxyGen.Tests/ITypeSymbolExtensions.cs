@@ -238,7 +238,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
 
             ITypeSymbol ga = visitor.AllTypeSymbols.Single(t => t.Name == "MyList").BaseType.TypeArguments.Single();
 
-            Assert.That(ga.GetElementType(recurse: true)?.GetFriendlyName(), Is.EqualTo(element));
+            Assert.That(ga.GetInnerMostElementType()?.GetFriendlyName(), Is.EqualTo(element));
         }
 
         [Test]

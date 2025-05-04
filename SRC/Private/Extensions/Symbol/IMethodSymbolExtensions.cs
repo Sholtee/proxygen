@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 using Microsoft.CodeAnalysis;
@@ -13,8 +14,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
+    /// <summary>
+    /// Helpers methods for the <see cref="IMethodSymbol"/> interface.
+    /// </summary>
     internal static class IMethodSymbolExtensions
     {
+        /// <summary>
+        /// Calculates the <see cref="AccessModifiers"/> value for the given method.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">When the access modifier can not be determined</exception>
         public static AccessModifiers GetAccessModifiers(this IMethodSymbol src) => src.DeclaredAccessibility switch
         {
             Accessibility.Protected => AccessModifiers.Protected,
@@ -38,13 +46,19 @@ namespace Solti.Utils.Proxy.Internals
             _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 
+        /// <summary>
+        /// Returns the interfaces that declare the given method. Similar to the <see cref="MethodInfoExtensions.GetDeclaringInterfaces(System.Reflection.MethodBase)"/> method.
+        /// </summary>
         public static IEnumerable<INamedTypeSymbol> GetDeclaringInterfaces(this IMethodSymbol src) => src.ContainingType.IsInterface()
-            ? Array.Empty<INamedTypeSymbol>()
+            ? []
             : src
                 .GetImplementedInterfaceMethods()
                 .Select(static m => m.ContainingType);
 
-        public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src, bool inspectOverrides = true)
+        /// <summary>
+        /// Returns the interface methods that are implemented by the given implementation. <paramref name="src"/> should belong to a class method.
+        /// </summary>
+        public static IEnumerable<IMethodSymbol> GetImplementedInterfaceMethods(this IMethodSymbol src)
         {
             //
             // As of C# 11 interfaces may have static abstract methods... We don't deal with
@@ -59,25 +73,15 @@ namespace Solti.Utils.Proxy.Internals
                 yield break;
 
             foreach (ITypeSymbol iface in containingType.GetAllInterfaces())
-            {
                 foreach (ISymbol member in iface.GetMembers())
-                {
-                    if (member is not IMethodSymbol ifaceMethod)
-                        continue;
-
-                    for (IMethodSymbol? met = src; met is not null; met = met.OverriddenMethod)
-                    {
-                        if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(ifaceMethod), met))
-                            yield return ifaceMethod;
-
-                        if (!inspectOverrides)
-                            break;
-                    }
-                }
-            }
+                    if (member is IMethodSymbol ifaceMethod)
+                        for (IMethodSymbol? met = src; met is not null; met = met.OverriddenMethod)
+                            if (SymbolEqualityComparer.Default.Equals(containingType.FindImplementationForInterfaceMember(ifaceMethod), met))
+                                yield return ifaceMethod;
         }
 
-        private static readonly IReadOnlyList<MethodKind> SpecialMethods =
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly IReadOnlyList<MethodKind> FSpecialMethods =
         [
             MethodKind.Constructor, MethodKind.StaticConstructor,
             MethodKind.PropertyGet, MethodKind.PropertySet,
@@ -86,15 +90,19 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.Conversion // explicit, implicit
         ];
 
+        /// <summary>
+        /// Returns true if the given method is special.
+        /// </summary>
         public static bool IsSpecial(this IMethodSymbol src)
         {
             if (src.MethodKind is MethodKind.ExplicitInterfaceImplementation && !src.ContainingType.IsInterface())
                 src = src.GetImplementedInterfaceMethods().Single();
 
-            return SpecialMethods.Contains(src.MethodKind);
+            return FSpecialMethods.Contains(src.MethodKind);
         }
 
-        private static readonly IReadOnlyList<MethodKind> ClassMethods =
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly IReadOnlyList<MethodKind> FClassMethods =
         [
             MethodKind.Ordinary,
             MethodKind.ExplicitInterfaceImplementation,
@@ -105,12 +113,18 @@ namespace Solti.Utils.Proxy.Internals
             MethodKind.DelegateInvoke
         ];
 
-        public static bool IsClassMethod(this IMethodSymbol src) => ClassMethods.Contains(src.MethodKind);
+        /// <summary>
+        /// Returns true if the given method is class method.
+        /// </summary>
+        public static bool IsClassMethod(this IMethodSymbol src) => FClassMethods.Contains(src.MethodKind);
 
         //
         // OverriddenMethod won't work in case of "new" override.
         //
 
+        /// <summary>
+        /// Gets the immediate method that has been overridden by the given method (using "new" or "override" keyword). Returns null if the base method could not be determined.
+        /// </summary>
         public static IMethodSymbol? GetOverriddenMethod(this IMethodSymbol src)
         {
             IMethodSymbol? overriddenMethod = src.OverriddenMethod;
@@ -119,14 +133,14 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach(INamedTypeSymbol baseType in src.ContainingType.GetBaseTypes())
             {
-                IMethodSymbol? baseMethod = GetBaseMethods(baseType).SingleOrDefault();
+                IMethodSymbol? baseMethod = GetBaseMethods(src, baseType).SingleOrDefault();
                 if (baseMethod is not null)
                     return baseMethod;
             }
 
             return null;
 
-            IEnumerable<IMethodSymbol> GetBaseMethods(INamedTypeSymbol baseType)
+            static IEnumerable<IMethodSymbol> GetBaseMethods(IMethodSymbol src, INamedTypeSymbol baseType)
             {
                 foreach (ISymbol member in baseType.GetMembers(src.Name))
                 {
@@ -156,6 +170,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>
+        /// Returns true if the given method can be overridden (not sealed virtual)
+        /// </summary>
         public static bool IsVirtual(this IMethodSymbol src) =>
             (src.IsVirtual || src.IsAbstract || (src.OverriddenMethod is not null && !src.IsSealed)) && !src.ContainingType.IsInterface();
     }

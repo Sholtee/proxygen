@@ -242,7 +242,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 foreach (TMember member in GetMembers())
                 {
-                    MethodInfo  underlyingMethod = getUnderlyingMethod(member);
+                    MethodInfo underlyingMethod = getUnderlyingMethod(member);
 
                     //
                     // When we encounter a virtual method, return only the last override

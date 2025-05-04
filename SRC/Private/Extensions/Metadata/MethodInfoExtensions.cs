@@ -22,7 +22,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Calculates the <see cref="AccessModifiers"/> value for the given method.
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException">When the access modifier can not be determined</exception>
         public static AccessModifiers GetAccessModifiers(this MethodBase src) => src switch
         {
             { IsFamily: true } => AccessModifiers.Protected,
@@ -51,8 +51,6 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Returns the interface methods that are implemented by the given implementation. <paramref name="src"/> should belong to a class method.
         /// </summary>
-        /// <param name="src"></param>
-        /// <returns></returns>
         public static IEnumerable<MethodInfo> GetImplementedInterfaceMethods(this MethodBase src)
         {
             //
@@ -88,7 +86,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// Gets the immediate method (in contrast of <see cref="MethodInfo.GetBaseDefinition"/>) that has been overridden by the given method. Returns null if the base method could not be determined.
+        /// Gets the immediate method (in contrast of <see cref="MethodInfo.GetBaseDefinition"/>) that has been overridden by the given method (using "new" or "override" keyword). Returns null if the base method could not be determined.
         /// </summary>
         public static MethodInfo? GetOverriddenMethod(this MethodInfo method)
         {
