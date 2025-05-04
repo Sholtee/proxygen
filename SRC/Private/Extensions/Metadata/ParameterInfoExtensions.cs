@@ -9,6 +9,9 @@ using System.Reflection;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Defines helpers methods for the <see cref="ParameterInfo"/> class.
+    /// </summary>
     internal static class ParameterInfoExtensions
     {
         /// <summary>

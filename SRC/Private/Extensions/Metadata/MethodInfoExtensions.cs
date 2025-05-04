@@ -14,8 +14,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
+    /// <summary>
+    /// Defines helper methods for the <see cref="MethodBase"/> and <see cref="MethodInfo"/> classes.
+    /// </summary>
     internal static class MethodInfoExtensions
     {
+        /// <summary>
+        /// Calculates the <see cref="AccessModifiers"/> value for the given method.
+        /// </summary>
+        /// <exception cref="InvalidOperationException"></exception>
         public static AccessModifiers GetAccessModifiers(this MethodBase src) => src switch
         {
             { IsFamily: true } => AccessModifiers.Protected,
@@ -28,12 +35,24 @@ namespace Solti.Utils.Proxy.Internals
             _ => throw new InvalidOperationException(Resources.UNDETERMINED_ACCESS_MODIFIER)
         };
 
+        /// <summary>
+        /// Returns the interfaces that declare the given method:
+        /// <code>
+        /// typeof(List&lt;int&gt;).GetProperty("Count").GetGetMethod().GetDeclaringInterfaces();  // [typeof(ICollection), typeof(IReadOnyCollection&lt;int&gt;)] 
+        /// </code>
+        /// <paramref name="src"/> should belong to a class method.
+        /// </summary>
         public static IEnumerable<Type> GetDeclaringInterfaces(this MethodBase src) => src.ReflectedType.IsInterface
-            ? Array.Empty<Type>()
+            ? []
             : src
                 .GetImplementedInterfaceMethods()
                 .Select(static m => m.ReflectedType);
 
+        /// <summary>
+        /// Returns the interface methods that are implemented by the given implementation. <paramref name="src"/> should belong to a class method.
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
         public static IEnumerable<MethodInfo> GetImplementedInterfaceMethods(this MethodBase src)
         {
             //
@@ -68,6 +87,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>
+        /// Gets the immediate method (in contrast of <see cref="MethodInfo.GetBaseDefinition"/>) that has been overridden by the given method. Returns null if the base method could not be determined.
+        /// </summary>
         public static MethodInfo? GetOverriddenMethod(this MethodInfo method)
         {
             /*
@@ -125,8 +147,14 @@ namespace Solti.Utils.Proxy.Internals
         // that library with our source generator, so reimplement it.
         //
 
+        /// <summary>
+        /// Extracts the method info referenced by the given expression.
+        /// </summary>
         public static MethodInfo ExtractFrom<T>(Expression<Action<T>> expression) => ((MethodCallExpression) expression.Body).Method;
 
+        /// <summary>
+        /// Returns true if the given method can be overridden (not sealed virtual)
+        /// </summary>
         public static bool IsVirtual(this MethodBase method) =>
             method.IsVirtual && !method.IsFinal && !method.ReflectedType.IsInterface;
     }

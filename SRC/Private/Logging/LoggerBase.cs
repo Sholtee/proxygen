@@ -11,7 +11,7 @@ using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
-    internal abstract class LoggerBase(string scope, LogLevel? level) : ILogger
+    internal abstract class LoggerBase(string scope, LogLevel? minLevel) : ILogger
     {
         private readonly DataContractJsonSerializer FSerializer = new
         (
@@ -34,20 +34,20 @@ namespace Solti.Utils.Proxy.Internals
 
         protected abstract void LogCore(string message);
 
-        public LogLevel? Level { get; } = level;
+        public LogLevel? MinLevel { get; } = minLevel;
 
         public string Scope { get; } = scope;
 
         public void Log(LogLevel level, object id, string message, IDictionary<string, object?>? additionalData)
         {
-            if (level < Level)
-                return;
+            if (level >= MinLevel)
+            {
+                string msg = $"{DateTime.UtcNow:o} [{level}] {id} - {message}";
+                if (additionalData is not null)
+                    msg += $"{Environment.NewLine}    {Stringify(additionalData)}";
 
-            string msg = $"{DateTime.UtcNow:o} [{level}] {id} - {message}";
-            if (additionalData is not null)
-                msg += $"{Environment.NewLine}    {Stringify(additionalData)}";
-
-            LogCore(msg);
+                LogCore(msg);
+            }
         }
 
         public abstract void WriteSource(string src);

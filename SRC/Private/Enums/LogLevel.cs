@@ -18,7 +18,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// Represents a warning, the system can still operate without issue.
         /// </summary>
-        /// <remarks>Errors caused by invalid user inputs should alse generate warnings</remarks>
+        /// <remarks>Errors caused by invalid user inputs should else generate warnings</remarks>
         Warn,
 
         /// <summary>
