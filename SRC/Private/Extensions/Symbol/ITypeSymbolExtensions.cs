@@ -46,7 +46,7 @@ namespace Solti.Utils.Proxy.Internals
         ];
 
         /// <summary>
-        /// Returns true if the given <see cref="ITypeSymbol"/> is sealed.
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies a sealed type.
         /// </summary>
         public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || FSealedTypes.Contains(src.TypeKind);
 
@@ -147,7 +147,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// Enumerates the methods defined on the given type
+        /// Enumerates the methods defined on the type identified by the given <see cref="ITypeSymbol"/>.
         /// </summary>
         public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src
             .ListMembersInternal<IMethodSymbol>
@@ -158,7 +158,7 @@ namespace Solti.Utils.Proxy.Internals
             .Where(static m => !m.IsSpecial());
 
         /// <summary>
-        /// Enumerates the properties defined on the given type
+        /// Enumerates the properties defined on the type identified by the given <see cref="ITypeSymbol"/>.
         /// </summary>
         public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false)
         {
@@ -185,7 +185,7 @@ namespace Solti.Utils.Proxy.Internals
         }
 
         /// <summary>
-        /// Enumerates the events defined on the given type
+        /// Enumerates the events defined on the type identified by the given <see cref="ITypeSymbol"/>.
         /// </summary>
         public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IEventSymbol>
         (

@@ -29,7 +29,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IMethodInfo method in methods)
                 method.Hash(md5);
 
-            return md5.ToString("X2");
+            return md5.Stringify("X2");
         }
 
         /// <summary>

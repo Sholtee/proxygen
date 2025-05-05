@@ -38,7 +38,7 @@ namespace Solti.Utils.Proxy.Internals
             foreach (ITypeInfo type in types)
                 type.Hash(md5);
 
-            return md5.ToString("X2");         
+            return md5.Stringify("X2");         
         }
 
         /// <summary>
