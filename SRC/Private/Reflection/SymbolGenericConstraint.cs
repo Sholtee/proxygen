@@ -15,9 +15,9 @@ namespace Solti.Utils.Proxy.Internals
     internal sealed class SymbolGenericConstraint(ITypeParameterSymbol genericArgument, Compilation compilation) : IGenericConstraint
     {
         public static IGenericConstraint? CreateFrom(ITypeParameterSymbol genericArgument, Compilation compilation) =>
-            !genericArgument.HasConstructorConstraint && !genericArgument.HasReferenceTypeConstraint && !genericArgument.HasValueTypeConstraint && !genericArgument.ConstraintTypes.Any()
-                ? null
-                : new SymbolGenericConstraint(genericArgument, compilation);
+            genericArgument is { HasConstructorConstraint: true } or { HasReferenceTypeConstraint: true } or { HasValueTypeConstraint: true } or { ConstraintTypes.Length: > 0 }
+                ? new SymbolGenericConstraint(genericArgument, compilation)
+                : null;
 
         public bool DefaultConstructor => genericArgument.HasConstructorConstraint;
 
