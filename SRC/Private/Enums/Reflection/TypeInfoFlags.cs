@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace Solti.Utils.Proxy.Internals
 {
     /// <summary>
-    /// Represents the additional read-only boolean properties if a particular type.
+    /// Represents the additional read-only boolean properties of a particular type.
     /// </summary>
     [Flags]
     internal enum TypeInfoFlags

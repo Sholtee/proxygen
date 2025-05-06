@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 
 using Microsoft.CodeAnalysis;
@@ -19,8 +20,15 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
+    /// <summary>
+    /// Wrapper around the <see cref="CSharpCompilation"/> class. 
+    /// </summary>
     internal static class Compile
     {
+        /// <summary>
+        /// Compiles the given <paramref name="units"/> to an assembly and yields the IL code as a <see cref="Stream"/>. If <paramref name="outputFile"/> is specified the assembly will be persisted on the disk.
+        /// </summary>
+        /// <remarks>The caller is responsible for loading the returned assembly by calling the <see cref="Assembly.Load(byte[])"/> method.</remarks>
         public static Stream ToAssembly
         (
             IEnumerable<CompilationUnitSyntax> units,
