@@ -4,6 +4,7 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -61,6 +62,25 @@ namespace Solti.Utils.Proxy.Internals
                 },
                 cancellation
             );
+        }
+
+        #if DEBUG
+        internal
+        #else
+        private 
+        #endif
+        static Assembly LoadAssembly(Stream stm)
+        {
+            byte[] buffer = ArrayPool<byte>.Shared.Rent((int) stm.Length);
+            try
+            {
+                stm.Read(buffer, 0, (int) stm.Length);
+                return Assembly.Load(buffer);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(buffer);
+            }
         }
 
         #if DEBUG
@@ -160,7 +180,7 @@ namespace Solti.Utils.Proxy.Internals
 
                 RunInitializers
                 (
-                    Assembly.Load(asm.ToArray())
+                    LoadAssembly(asm)
                 );
 
                 logger.Log(LogLevel.Info, "EMIT-204", $"Built type is ready");

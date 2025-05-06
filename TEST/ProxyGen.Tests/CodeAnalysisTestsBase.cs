@@ -4,7 +4,6 @@
 * Author: Denes Solti                                                           *
 ********************************************************************************/
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +11,6 @@ using System.Reflection;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Moq;
 
 namespace Solti.Utils.Proxy.Internals.Tests
@@ -72,7 +70,7 @@ namespace Solti.Utils.Proxy.Internals.Tests
                 customConfig
             );
 
-            return Assembly.Load(asm.ToArray());
+            return TypeEmitter.LoadAssembly(asm);
         }
 
         public static CSharpCompilation CreateCompilation(string src, params Assembly[] additionalReferences) => CreateCompilation
