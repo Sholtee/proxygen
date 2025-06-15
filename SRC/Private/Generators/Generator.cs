@@ -37,6 +37,7 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private static readonly ConcurrentDictionary<object, ContextWrapper> FContextCache = new();
 
+        /// <inheritdoc/>
         private protected override IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context)
         {
             //
@@ -48,6 +49,9 @@ namespace Solti.Utils.Proxy.Internals
                 yield return new ModuleInitializerSyntaxFactory(context);
         }
 
+        /// <summary>
+        /// Wraps the <see cref="TypeEmitter.EmitAsync(CancellationToken)"/> function to make it thread safe. Also implements singleton pattern using the <see cref="Id"/> property.
+        /// </summary>
         private async Task<TypeContext> GetContextAsync(CancellationToken cancellation)
         {
             cancellation.ThrowIfCancellationRequested();

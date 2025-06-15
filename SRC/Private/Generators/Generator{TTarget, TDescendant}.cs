@@ -13,7 +13,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Base of typed generators.
     /// </summary>
-    /// <remarks>Generators should not be instantiated. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
+    /// <remarks>Generators should not be instantiated directly. To access the created <see cref="Type"/> use the <see cref="GetGeneratedType()"/> or <see cref="GetGeneratedTypeAsync(CancellationToken)"/> method.</remarks>
     [SuppressMessage("Design", "CA1000:Do not declare static members on generic types")]
     public abstract class Generator<TUntypedGenerator, TDescendant> where TDescendant: Generator<TUntypedGenerator, TDescendant>, new() where TUntypedGenerator: Generator
     {

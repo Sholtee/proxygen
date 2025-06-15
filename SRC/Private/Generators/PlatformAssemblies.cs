@@ -13,6 +13,9 @@ using Microsoft.CodeAnalysis;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Returns the assembly references to <see href="https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-1">netstandard</see> version supported be the actual runtime.
+    /// </summary>
     internal static class PlatformAssemblies
     {
         private static IEnumerable<MetadataReference> Read()
@@ -33,6 +36,9 @@ namespace Solti.Utils.Proxy.Internals
                 .Select(static loc => MetadataReference.CreateFromFile(loc));
         }
 
+        /// <summary>
+        /// The assembly references wrapped to Roslyn's <see cref="MetadataReference"/>. 
+        /// </summary>
         public static IReadOnlyCollection<MetadataReference> References { get; } = [..Read()];
     }
 }
