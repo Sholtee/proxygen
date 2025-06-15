@@ -7,6 +7,9 @@ using System.Collections.Generic;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Extensions for the <see cref="IEnumerable{T}"/> interface.
+    /// </summary>
     internal static class IEnumerableExtensions
     {
         /// <summary>

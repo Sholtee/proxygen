@@ -9,10 +9,19 @@ using System.Security.Cryptography;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Helper methods for the <see cref="IMethodInfo"/> interface.
+    /// </summary>
     internal static class IMethodInfoExtensions
     {
+        /// <summary>
+        /// Gets the MD5 hash code of the given method.
+        /// </summary>
         public static string GetMD5HashCode(this IMethodInfo src) => new IMethodInfo[] { src }.GetMD5HashCode();
 
+        /// <summary>
+        /// Gets the combined MD5 hash code of the given methods.
+        /// </summary>
         public static string GetMD5HashCode(this IEnumerable<IMethodInfo> methods)
         {
             using MD5 md5 = MD5.Create();
@@ -20,9 +29,12 @@ namespace Solti.Utils.Proxy.Internals
             foreach (IMethodInfo method in methods)
                 method.Hash(md5);
 
-            return md5.ToString("X2");
+            return md5.Stringify("X2");
         }
 
+        /// <summary>
+        /// Calculates the hash code of the given method using custom transformation.
+        /// </summary>
         public static void Hash(this IMethodInfo src, ICryptoTransform transform)
         {
             transform.Update(src.Name);
@@ -44,6 +56,9 @@ namespace Solti.Utils.Proxy.Internals
                     ga.Hash(transform);
         }
 
+        /// <summary>
+        /// Returns true if the given methods have the same signature.
+        /// </summary>
         public static bool SignatureEquals(this IMethodInfo src, IMethodInfo that, bool ignoreVisibility = false)
         {
             if (!GetMethodBasicAttributes(src, ignoreVisibility).Equals(GetMethodBasicAttributes(that, ignoreVisibility)))
@@ -72,6 +87,10 @@ namespace Solti.Utils.Proxy.Internals
 
             return true;
 
+            //
+            // Anon objects behave like record types (they can be compared for value equality)
+            //
+
             static object GetMethodBasicAttributes(IMethodInfo m, bool ignoreVisibility) => new
             {
                 //
@@ -94,6 +113,9 @@ namespace Solti.Utils.Proxy.Internals
             };
         }
 
+        /// <summary>
+        /// Sorts the given methods by name and signature.
+        /// </summary>
         public static IEnumerable<TMethodInfo> Sort<TMethodInfo>(this IEnumerable<TMethodInfo> self) where TMethodInfo: IMethodInfo => self
             .OrderBy(static m => $"{m.Name}_{m.GetMD5HashCode()}");
     }

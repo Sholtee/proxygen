@@ -9,9 +9,15 @@ using System.Text;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Hashing helpers.
+    /// </summary>
     internal static class HashExtensions
     {
-        public static string ToString(this HashAlgorithm self, string format)
+        /// <summary>
+        /// Stringifies the given hash using the specified format string.
+        /// </summary>
+        public static string Stringify(this HashAlgorithm self, string format)
         {
             self.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
@@ -23,6 +29,9 @@ namespace Solti.Utils.Proxy.Internals
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Updates the given transformation with provided string value.
+        /// </summary>
         public static void Update(this ICryptoTransform transform, string value)
         {
             byte[] bytes = Encoding.UTF8.GetBytes(value);

@@ -5,6 +5,7 @@
 ********************************************************************************/
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -14,11 +15,18 @@ namespace Solti.Utils.Proxy.Internals
 {
     using Properties;
 
+    /// <summary>
+    /// Defines helper methods for the <see cref="ITypeSymbol"/> interface.
+    /// </summary>
     internal static class ITypeSymbolExtensions
     {
+        /// <summary>
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies an interface.
+        /// </summary>
         public static bool IsInterface(this ITypeSymbol src) => src.TypeKind is TypeKind.Interface;
 
-        private static readonly IReadOnlyList<TypeKind> ClassTypes =
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly IReadOnlyList<TypeKind> FClassTypes =
         [
             TypeKind.Class,
             TypeKind.Array,
@@ -26,17 +34,30 @@ namespace Solti.Utils.Proxy.Internals
             TypeKind.Pointer
         ];
 
-        public static bool IsClass(this ITypeSymbol src) => ClassTypes.Contains(src.TypeKind);
+        /// <summary>
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies a class.
+        /// </summary>
+        public static bool IsClass(this ITypeSymbol src) => FClassTypes.Contains(src.TypeKind);
 
-        private static readonly IReadOnlyList<TypeKind> SealedTypes =
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static readonly IReadOnlyList<TypeKind> FSealedTypes =
         [
             TypeKind.Array
         ];
 
-        public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || SealedTypes.Contains(src.TypeKind);
+        /// <summary>
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies a sealed type.
+        /// </summary>
+        public static bool IsFinal(this ITypeSymbol src) => src.IsSealed || src.IsStatic || FSealedTypes.Contains(src.TypeKind);
 
-        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => (src.GetElementType(recurse: true) ?? src).ContainingType;
+        /// <summary>
+        /// Gets the enclosing type if the given <see cref="ITypeSymbol"/> identifies a nested type.
+        /// </summary>
+        public static ITypeSymbol? GetEnclosingType(this ITypeSymbol src) => (src.GetInnerMostElementType() ?? src).ContainingType;
 
+        /// <summary>
+        /// Gets the friendly name of the type identified by the given <see cref="ITypeSymbol"/>. Friendly name doesn't contain references for generic arguments, pointer features or the enclosing type.
+        /// </summary>
         public static string GetFriendlyName(this ITypeSymbol src) => src switch
         {
             //
@@ -75,121 +96,114 @@ namespace Solti.Utils.Proxy.Internals
             )
         };
 
+        /// <summary>
+        /// Returns true if the given type is a specialized nullable:
+        /// <code>
+        /// Nullable&lt;int&gt;
+        /// </code>
+        /// </summary>
         public static bool IsBoundNullable(this INamedTypeSymbol src) =>
             src.ConstructedFrom?.SpecialType is SpecialType.System_Nullable_T &&
             !SymbolEqualityComparer.Default.Equals(src.ConstructedFrom, src);
 
+        /// <summary>
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies a generic type.
+        /// </summary>
         public static bool IsGenericType(this ITypeSymbol src) => src is INamedTypeSymbol named && named.TypeArguments.Any();
 
+        /// <summary>
+        /// Returns the enclosing types.
+        /// </summary>
         public static IEnumerable<ITypeSymbol> GetParents(this ITypeSymbol src) 
         {
-            src = src.GetElementType(recurse: true) ?? src; // Array has no containing type but array item does
+            src = src.GetInnerMostElementType() ?? src; // Array has no containing type but array item does
 
             for (ITypeSymbol parent = src; (parent = parent!.ContainingType) is not null;)
-            {
                 yield return parent;
-            }
         }
 
+        /// <summary>
+        /// Returns the base types.
+        /// </summary>
         public static IEnumerable<ITypeSymbol> GetBaseTypes(this ITypeSymbol src)
         {
-            return src.IsInterface()
-                ? src.GetAllInterfaces()
-                : GetBaseTypes();
-
-            IEnumerable<ITypeSymbol> GetBaseTypes()
-            {
+            if (src.IsInterface())
+                foreach (ITypeSymbol iface in src.GetAllInterfaces())
+                    yield return iface;
+            else
                 for (ITypeSymbol? baseType = src.BaseType; baseType is not null; baseType = baseType.BaseType)
-                {
                     yield return baseType;
-                }
-            }
         }
 
+        /// <summary>
+        /// Returns the class or interface hierarchy starting from the current type.
+        /// </summary>
         public static IEnumerable<ITypeSymbol> GetHierarchy(this ITypeSymbol src)
         {
             yield return src;
 
             foreach (ITypeSymbol baseType in src.GetBaseTypes())
-            {
                 yield return baseType;
-            }
         }
 
-        public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false, bool skipSpecial = true)
-        {
-            IEnumerable<IMethodSymbol> methods = src.ListMembersInternal<IMethodSymbol>
+        /// <summary>
+        /// Enumerates the methods defined on the type identified by the given <see cref="ITypeSymbol"/>.
+        /// </summary>
+        public static IEnumerable<IMethodSymbol> ListMethods(this ITypeSymbol src, bool includeStatic = false) => src
+            .ListMembersInternal<IMethodSymbol>
             (
                 static m => m,
-                static m => m.GetOverriddenMethod(),
                 includeStatic
-            );
+            )
+            .Where(static m => !m.IsSpecial());
 
-            if (skipSpecial)
-                methods = methods.Where(static m => !m.IsSpecial());
-
-            return methods;
-        }
-
+        /// <summary>
+        /// Enumerates the properties defined on the type identified by the given <see cref="ITypeSymbol"/>.
+        /// </summary>
         public static IEnumerable<IPropertySymbol> ListProperties(this ITypeSymbol src, bool includeStatic = false)
         {
             return src.ListMembersInternal<IPropertySymbol>
             (
-                GetUnderlyingMethod,
-                static p => GetUnderlyingMethod(p).GetOverriddenMethod(),
+                static prop =>
+                {
+                    if (prop.GetMethod is null)
+                        return prop.SetMethod!;
+
+                    if (prop.SetMethod is null)
+                        return prop.GetMethod;
+
+                    //
+                    // Higher visibility has the precedence
+                    //
+
+                    return prop.GetMethod.GetAccessModifiers() > prop.SetMethod.GetAccessModifiers()
+                        ? prop.GetMethod
+                        : prop.SetMethod;
+                },
                 includeStatic
             );
-
-            //
-            // Higher visibility has the precedence
-            //
-
-            static IMethodSymbol GetUnderlyingMethod(IPropertySymbol prop)
-            {
-                if (prop.GetMethod is null)
-                    return prop.SetMethod!;
-
-                if (prop.SetMethod is null)
-                    return prop.GetMethod;
-
-                return prop.GetMethod.GetAccessModifiers() > prop.SetMethod.GetAccessModifiers()
-                    ? prop.GetMethod
-                    : prop.SetMethod;
-            }
         }
 
-        public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false)
-        {
-            return src.ListMembersInternal<IEventSymbol>
-            (
-                GetUnderlyingMethod,
-                static e => GetUnderlyingMethod(e).GetOverriddenMethod(),
-                includeStatic
-            );
-
+        /// <summary>
+        /// Enumerates the events defined on the type identified by the given <see cref="ITypeSymbol"/>.
+        /// </summary>
+        public static IEnumerable<IEventSymbol> ListEvents(this ITypeSymbol src, bool includeStatic = false) => src.ListMembersInternal<IEventSymbol>
+        (
             //
-            // Higher visibility has the precedence
+            // Events always have Add & Remove method declared
             //
 
-            static IMethodSymbol GetUnderlyingMethod(IEventSymbol evt)
-            {
-                if (evt.AddMethod is null)
-                    return evt.RemoveMethod!;
+            static e => e.AddMethod!,
+            includeStatic
+        );
 
-                if (evt.RemoveMethod is null)
-                    return evt.AddMethod;
-
-                return evt.AddMethod.GetAccessModifiers() > evt.RemoveMethod.GetAccessModifiers()
-                    ? evt.AddMethod
-                    : evt.RemoveMethod;
-            }
-        }
-
+        /// <summary>
+        /// The core member enumerator. It searches the whole hierarchy.
+        /// </summary>
         private static IEnumerable<TMember> ListMembersInternal<TMember>
         (
             this ITypeSymbol src, 
             Func<TMember, IMethodSymbol> getUnderlyingMethod,
-            Func<TMember, IMethodSymbol?> getOverriddenMethod,
             bool includeStatic
         ) where TMember : ISymbol
         {
@@ -211,18 +225,20 @@ namespace Solti.Utils.Proxy.Internals
                     if (member.IsStatic && !includeStatic)
                         continue;
 
-                    IMethodSymbol?
-                        overriddenMethod = getOverriddenMethod(member),
-                        underlyingMethod = getUnderlyingMethod(member);
+                    IMethodSymbol underlyingMethod = getUnderlyingMethod(member);
 
-                    if (overriddenMethod is not null)
-                        overriddenMethods.Add(overriddenMethod);
+                    //
+                    // When we encounter a virtual method, return only the last override
+                    //
+
+                    if (underlyingMethod.GetOverriddenMethod() is IMethodSymbol overriddenMethod && !overriddenMethods.Add(overriddenMethod))
+                        continue;
 
                     if (overriddenMethods.Contains(underlyingMethod))
                         continue;
 
                     //
-                    // If it was not yielded before (due to "new" or "override") and not private then we are fine.
+                    // We don't want to return private members
                     //
 
                     if (underlyingMethod.GetAccessModifiers() > AccessModifiers.Private)
@@ -236,6 +252,9 @@ namespace Solti.Utils.Proxy.Internals
                 .OfType<TMember>();
         }
 
+        /// <summary>
+        /// Returns the constructors declared by user code on the type identified by the given <see cref="ITypeSymbol"/>.
+        /// </summary>
         public static IEnumerable<IMethodSymbol> GetConstructors(this ITypeSymbol src)
         {
             //
@@ -251,49 +270,69 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
-        public static ITypeSymbol? GetElementType(this ITypeSymbol src, bool recurse = false)
+        /// <summary>
+        /// Resolves the given pointer type by returning the element type. For instance "int" in case of "int[]" 
+        /// </summary>
+        public static ITypeSymbol? GetElementType(this ITypeSymbol src) => src switch
+        {
+            IArrayTypeSymbol array => array.ElementType,
+            IPointerTypeSymbol pointer => pointer.PointedAtType,
+            _ => null
+        };
+
+        /// <summary>
+        /// Resolves the given pointer type by returning the inner most element type. For instance "int" in case of "int*[]" 
+        /// </summary>
+        public static ITypeSymbol? GetInnerMostElementType(this ITypeSymbol src)
         {
             ITypeSymbol? prev = null;
 
-            for (ITypeSymbol? current = src; (current = (current as IArrayTypeSymbol)?.ElementType ?? (current as IPointerTypeSymbol)?.PointedAtType) is not null;)
-            {
-                if (!recurse) return current;
+            for (ITypeSymbol? current = src; (current = current!.GetElementType()) is not null;)
                 prev = current;
-            }
 
             return prev;
         }
 
+        /// <summary>
+        /// Gets the assembly qualified name of the type identified by the given <see cref="ITypeSymbol"/>
+        /// </summary>
         public static string? GetAssemblyQualifiedName(this ITypeSymbol src)
         {
             //
             // Arrays and pointers have no containing assembly
             //
 
-            IAssemblySymbol? containingAsm = src.GetElementType(recurse: true)?.ContainingAssembly ?? src.ContainingAssembly;
+            IAssemblySymbol? containingAsm = src.GetInnerMostElementType()?.ContainingAssembly ?? src.ContainingAssembly;
             if (containingAsm is null)
                 return null;
 
             return $"{src.GetQualifiedMetadataName()}, {containingAsm.Identity}";
         }
 
+        /// <summary>
+        /// Returns true if the given <see cref="ITypeSymbol"/> identifies a delegate.
+        /// </summary>
         public static bool IsDelegate(this ITypeSymbol src) =>
-            (src.GetElementType(recurse: true) ?? src).TypeKind is TypeKind.Delegate;
+            (src.GetInnerMostElementType() ?? src).TypeKind is TypeKind.Delegate;
 
-        //
-        // Types (for instance arrays) derived from embedded types are no longer embedded. That's why this
-        // GetElementType() magic.
-        //
-
+        /// <summary>
+        /// Returns true if the type identified by the given <see cref="ITypeSymbol"/> is nested.
+        /// </summary>
         public static bool IsNested(this ITypeSymbol src) => 
-            (src.GetElementType(recurse: true)?.ContainingType ?? src.ContainingType) is not null && !src.IsGenericParameter();
+            (src.GetInnerMostElementType()?.ContainingType ?? src.ContainingType) is not null && !src.IsGenericParameter();
 
+        /// <summary>
+        /// Returns true if the type identified by the given <see cref="ITypeSymbol"/> is a generic parameter.
+        /// </summary>
         public static bool IsGenericParameter(this ITypeSymbol src) =>
-            (src.GetElementType(recurse: true) ?? src).TypeKind is TypeKind.TypeParameter;
+            (src.GetInnerMostElementType() ?? src).TypeKind is TypeKind.TypeParameter;
 
+        /// <summary>
+        /// Gets the qualified metadata name for the given type. For instance "Namespace.Type+NestedType"
+        /// </summary>
         public static string? GetQualifiedMetadataName(this ITypeSymbol src)
         {
-            ITypeSymbol? elementType = src.GetElementType(recurse: true);
+            ITypeSymbol? elementType = src.GetInnerMostElementType();
             if (elementType is IFunctionPointerTypeSymbol)
                 return null;
 
@@ -307,7 +346,7 @@ namespace Solti.Utils.Proxy.Internals
                 sb.Append(Type.Delimiter);
             }
 
-            foreach (ITypeSymbol parent in new Stack<ITypeSymbol>(src.GetParents()))
+            foreach (ITypeSymbol parent in src.GetParents().Reverse())
             {
                 sb.Append($"{GetName(parent)}+");
             }
@@ -328,6 +367,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>
+        /// Returns all the interfaces, that were implemented or inherited by the given type.
+        /// </summary>
         public static IEnumerable<ITypeSymbol> GetAllInterfaces(this ITypeSymbol src) 
         {
             //
@@ -343,13 +385,12 @@ namespace Solti.Utils.Proxy.Internals
 
             foreach (INamedTypeSymbol t in src.AllInterfaces)
             {
-                INamedTypeSymbol iface = t;
+                INamedTypeSymbol iface = t;  // we cannot assign to foreach variable
 
-                if (iface.IsGenericType())
-                {
-                    ITypeSymbol[] tas = iface
-                        .TypeArguments
-                        .Select
+                if (iface.IsGenericType()) iface = iface.OriginalDefinition.Construct
+                (
+                    [
+                        ..iface.TypeArguments.Select
                         (
                             static ta => !ta.IsValueType
                                 //
@@ -359,19 +400,20 @@ namespace Solti.Utils.Proxy.Internals
                                 ? ta.WithNullableAnnotation(NullableAnnotation.NotAnnotated)
                                 : ta
                         )
-                        .ToArray();
-
-                    iface = iface.OriginalDefinition.Construct(tas);
-                }
+                    ]
+                );
 
                 if (returnedSymbols.Add(iface))
                     yield return iface;
             }
         }
 
+        /// <summary>
+        /// Associates <see cref="AccessModifiers"/> to the type identified by the given <see cref="ITypeSymbol"/>.
+        /// </summary>
         public static AccessModifiers GetAccessModifiers(this ITypeSymbol src)
         {
-            src = src.GetElementType(recurse: true) ?? src;
+            src = src.GetInnerMostElementType() ?? src;
 
             AccessModifiers am = src.DeclaredAccessibility switch
             {
@@ -391,20 +433,13 @@ namespace Solti.Utils.Proxy.Internals
             switch (src)
             {
                 case INamedTypeSymbol namedType:
-                    foreach (ITypeSymbol ta in namedType.TypeArguments)
-                    {
-                        if (ta.IsGenericParameter())
-                            continue;
-
+                    foreach (ITypeSymbol ta in namedType.TypeArguments.Where(static ta => !ta.IsGenericParameter()))
                         UpdateAm(ref am, ta);
-                    }
                     break;
 
                 case IFunctionPointerTypeSymbol fn:
                     foreach (ITypeSymbol pt in fn.Signature.Parameters.Select(static p => p.Type))
-                    {
                         UpdateAm(ref am, pt);
-                    }
                     break;
             }
 

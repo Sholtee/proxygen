@@ -7,6 +7,9 @@ using System;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Describes the visibility of a particular member. Uses <see cref="FlagsAttribute"/> to handle composite visibilities (for instance "private protected" or "protected internal")
+    /// </summary>
     [Flags]
     internal enum AccessModifiers
     {

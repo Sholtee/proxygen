@@ -42,10 +42,19 @@ namespace Solti.Utils.Proxy.Internals
             return type;
         }
 
+        /// <summary>
+        /// When overridden, creates the factory that is responsible for crafting the main (exported) class.
+        /// </summary>
         private protected abstract ProxyUnitSyntaxFactoryBase CreateMainUnit(SyntaxFactoryContext context);
 
+        /// <summary>
+        /// When overridden, creates the factory that is responsible for crafting helper classes (such as <see cref="ModuleInitializerAttribute"/> on older frameworks)
+        /// </summary>
         private protected abstract IEnumerable<UnitSyntaxFactoryBase> CreateChunks(SyntaxFactoryContext context);
 
+        /// <summary>
+        /// Emits the actual <see cref="Type"/>. When possible this method tries to avoid initiating new compilations.
+        /// </summary>
         private protected async Task<TypeContext> EmitAsync(CancellationToken cancellation)
         {
             RuntimeConfig config = new();
@@ -64,6 +73,9 @@ namespace Solti.Utils.Proxy.Internals
             );
         }
 
+        /// <summary>
+        /// The core logic of <see cref="EmitAsync(CancellationToken)"/>.
+        /// </summary>
         #if DEBUG
         internal
         #else
@@ -189,6 +201,9 @@ namespace Solti.Utils.Proxy.Internals
             }, cancellation);
         }
 #if DEBUG
+        /// <summary>
+        /// Returns the name of the underlying <see cref="Assembly"/> that will be created during the emit process.
+        /// </summary>
         internal string GetDefaultAssemblyName() => CreateMainUnit(SyntaxFactoryContext.Default).ContainingAssembly;
 #endif
     }

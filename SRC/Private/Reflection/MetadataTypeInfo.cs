@@ -27,8 +27,9 @@ namespace Solti.Utils.Proxy.Internals
             return underlyingType switch
             {
                 { IsArray: true } => new MetadataArrayTypeInfo(underlyingType),
-                _ when underlyingType.GetOwnGenericArguments().Any() => new MetadataGenericTypeInfo(underlyingType),
-                _ => new MetadataTypeInfo(underlyingType)
+                _ => underlyingType.GetOwnGenericArguments().Any() 
+                    ? new MetadataGenericTypeInfo(underlyingType)
+                    : new MetadataTypeInfo(underlyingType)
             };
         }
 

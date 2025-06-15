@@ -5,6 +5,9 @@
 ********************************************************************************/
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Abstraction of named members (for instance parameter, property or method).
+    /// </summary>
     internal interface IHasName
     {
         /// <summary>

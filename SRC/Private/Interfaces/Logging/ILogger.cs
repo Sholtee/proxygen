@@ -25,7 +25,7 @@ namespace Solti.Utils.Proxy.Internals
         /// <summary>
         /// The minimum log level under which the logger should not dump information or null when logging is turned off.
         /// </summary>
-        LogLevel? Level { get; }
+        LogLevel? MinLevel { get; }
 
         /// <summary>
         /// The scope to be used. For instance when writing physical logs this id will be used in output file names: "{Scope}.log" and "{Scope}.cs"

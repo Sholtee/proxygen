@@ -11,7 +11,7 @@ namespace Solti.Utils.Proxy.Internals
     /// <summary>
     /// Configuration to be used when the library is loaded as a source generator.
     /// </summary>
-    internal sealed class AnalyzerConfig(AnalyzerConfigOptions configOptions) : ConfigBase, IGeneratorConfiguration
+    internal sealed class AnalyzerConfig(AnalyzerConfigOptions configOptions) : ConfigBase, ISourceGeneratorConfiguration
     {
         //
         // It seems due to the CompilerVisibleProperty (see ProxyGen.NET.targets) if the name of a particular build

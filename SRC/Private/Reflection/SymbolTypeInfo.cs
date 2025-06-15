@@ -44,7 +44,7 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IAssemblyInfo?> FDeclaringAssembly = new(() =>
         {
-            ITypeSymbol? elementType = underlyingSymbol.GetElementType(recurse: true);
+            ITypeSymbol? elementType = underlyingSymbol.GetInnerMostElementType();
 
             IAssemblySymbol? asm = elementType?.ContainingAssembly ?? underlyingSymbol.ContainingAssembly;
 
@@ -124,7 +124,6 @@ namespace Solti.Utils.Proxy.Internals
         private readonly Lazy<ITypeInfo?> FElementType = new(() =>
         {
             ITypeSymbol? realType = underlyingSymbol.GetElementType();
-
             return realType is not null
                 ? CreateFrom(realType, compilation)
                 : null;
@@ -188,7 +187,7 @@ namespace Solti.Utils.Proxy.Internals
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Lazy<IHasName?> FContainingMember = new(() =>
         {
-            ITypeSymbol concreteType = underlyingSymbol.GetElementType(recurse: true) ?? underlyingSymbol;
+            ITypeSymbol concreteType = underlyingSymbol.GetInnerMostElementType() ?? underlyingSymbol;
 
             return concreteType.ContainingSymbol switch
             {

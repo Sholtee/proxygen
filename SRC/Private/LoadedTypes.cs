@@ -15,7 +15,9 @@ namespace Solti.Utils.Proxy.Internals
     public record TypeContext(Type Type, Func<object?, object> Activator);
 
     /// <summary>
-    /// Contains the loaded proxy <see cref="Type"/>s
+    /// Contains the loaded proxy <see cref="Type"/>s. Every type (created by this library either run or compile time) contains a 
+    /// <see href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/proposals/csharp-9.0/module-initializers">module initializer</see>
+    /// that invokes the <see cref="Register(Type, Func{object?, object})"/> method to register the actual type and its activator.
     /// </summary>
     public static class LoadedTypes  // this class is referenced by the generated proxies so it must be public
     {

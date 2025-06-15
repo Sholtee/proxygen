@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace Solti.Utils.Proxy.Internals
 {
+    /// <summary>
+    /// Helper methods for the <see cref="Exception"/> class.
+    /// </summary>
     internal static class ExceptionExtensions
     {
         /// <summary>

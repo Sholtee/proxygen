@@ -22,8 +22,14 @@ namespace Solti.Utils.Proxy.Internals
         // Generic arguments have no impact on "GUID" property
         //
 
+        /// <summary>
+        /// Calculates the MD5 hash code of the given type.
+        /// </summary>
         public static string GetMD5HashCode(this ITypeInfo src) => new ITypeInfo[] { src }.GetMD5HashCode();
 
+        /// <summary>
+        /// Calculates the combined MD5 hash code of the given types.
+        /// </summary>
         [SuppressMessage("Security", "CA5351:Do Not Use Broken Cryptographic Algorithms")]
         public static string GetMD5HashCode(this IEnumerable<ITypeInfo> types)
         {
@@ -32,9 +38,12 @@ namespace Solti.Utils.Proxy.Internals
             foreach (ITypeInfo type in types)
                 type.Hash(md5);
 
-            return md5.ToString("X2");         
+            return md5.Stringify("X2");         
         }
 
+        /// <summary>
+        /// Calculates the hash code of the given type using custom transformation.
+        /// </summary>
         public static void Hash(this ITypeInfo src, ICryptoTransform transform)
         {
             if (src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
@@ -63,6 +72,9 @@ namespace Solti.Utils.Proxy.Internals
                 transform.Update(src.QualifiedName);
         }
 
+        /// <summary>
+        /// Determines the equality of the given two types.
+        /// </summary>
         public static bool EqualsTo(this ITypeInfo src, ITypeInfo that)
         {
             if (src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
@@ -99,6 +111,13 @@ namespace Solti.Utils.Proxy.Internals
             return true;
         }
 
+        /// <summary>
+        /// Returns the index of the given generic parameter similar to <see cref="TypeExtensions.GetGenericParameterIndex(Type)"/>:
+        /// <code>
+        /// class Foo&lt;T, TT&gt; {}
+        /// typeof(Foo&lt;T, TT&gt;).GetGenericArguments()[1].GetGenericParameterIndex() // == 1
+        /// </code>
+        /// </summary>
         public static int GetGenericParameterIndex(this ITypeInfo src) 
         {
             if (!src.Flags.HasFlag(TypeInfoFlags.IsGenericParameter))
@@ -122,6 +141,9 @@ namespace Solti.Utils.Proxy.Internals
             }
         }
 
+        /// <summary>
+        /// Gets the inner most element type in case of pointer types. For instance int*[] this method returns the <see cref="ITypeInfo"/> for the <see cref="int"/> type.
+        /// </summary>
         public static ITypeInfo? GetInnermostElementType(this ITypeInfo src)
         {
             ITypeInfo? prev = null;
@@ -132,6 +154,10 @@ namespace Solti.Utils.Proxy.Internals
             return prev;
         }
 
+        /// <summary>
+        /// Gets the constructors associated with the given type. Takes the implicit default constructor into account if necessary.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">In case there is no accessible constructor</exception>
         public static IEnumerable<IConstructorInfo> GetConstructors(this ITypeInfo src, AccessModifiers minAccessibility)
         {
             //
@@ -168,17 +194,32 @@ namespace Solti.Utils.Proxy.Internals
                 yield return type;
         }
 
+        /// <summary>
+        /// Gets the base types of the given type
+        /// </summary>
         public static IEnumerable<ITypeInfo> GetBaseTypes(this ITypeInfo src) => src.IterateOn(static x => x.BaseType);
 
+        /// <summary>
+        /// Gets the enclosing types of the given nested type.
+        /// </summary>
         public static IEnumerable<ITypeInfo> GetEnclosingTypes(this ITypeInfo src) => src.IterateOn(static x => x.EnclosingType);
 
+        /// <summary>
+        /// Returns the parent types if the given nested type. Similar to the <see cref="GetEnclosingTypes(ITypeInfo)"/> method but it returns the result in reverse order.
+        /// </summary>
         public static IEnumerable<ITypeInfo> GetParentTypes(this ITypeInfo src) => src.GetEnclosingTypes().Reverse();
 
+        /// <summary>
+        /// Returns true if <paramref name="src"/> is a descendant type of <paramref name="type"/> or <paramref name="type"/> is an interface and <paramref name="src"/> implements it.
+        /// </summary>
         public static bool IsAccessibleFrom(this ITypeInfo src, ITypeInfo type) =>
             type.EqualsTo(src) ||
             type.Interfaces.Any(iface => iface.EqualsTo(src)) ||
             type.GetBaseTypes().Any(baseType => baseType.EqualsTo(src));
 
+        /// <summary>
+        /// Converts the given <see cref="ITypeInfo"/> to Roslyn's <see cref="ITypeSymbol"/> interface.
+        /// </summary>
         public static ITypeSymbol ToSymbol(this ITypeInfo src, Compilation compilation)
         {
             INamedTypeSymbol? symbol;
@@ -238,6 +279,9 @@ namespace Solti.Utils.Proxy.Internals
             return symbol;
         }
 
+        /// <summary>
+        /// Converts the given <see cref="ITypeInfo"/> to <see cref="Type"/> instance.
+        /// </summary>
         public static Type ToMetadata(this ITypeInfo src)
         {
             //

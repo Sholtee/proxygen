@@ -1,0 +1,2 @@
+# Source Generators
+Contains the [source generator](https://learn.microsoft.com/en-us/dotnet/csharp/roslyn-sdk/#source-generators) implementation that augments user code with the [syntax factory](https://github.com/Sholtee/proxygen/tree/master/SRC/Private/SyntaxFactories) outputs.
